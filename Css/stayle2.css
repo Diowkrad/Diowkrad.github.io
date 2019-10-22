@@ -1,0 +1,395 @@
+/*Создатель Diowkrad*/
+/*Внимание стиль адаптивный и разбит на сектора для большей простоты использования !!!*/
+/*Фон сайта*/
+html{
+	cursor:url(Cursor1.cur),auto;
+}
+body{
+	background-image: url(body2.jpg);
+	background-position: center;
+	background-clip: content-box;
+	transition: all 0.3s;
+	cursor:url(Cursor9.cur),auto;
+}
+body:hover{
+	background-image: url(body1.jpg);
+}
+/*Главные оборачивующие блоки страници*/
+.headbox{
+	height: 100px;
+}
+.contentbox{
+	height: 565Px;
+}
+.footerbox{
+	height: 100Px;
+}
+/*hbox контейнеры блока headbox*/
+.hbox1{
+	display: flex;
+	height: 95px;
+	background: #309;
+	background-image: url(box1.png);
+	background-position: center;
+	background-clip: content-box;
+	background-size: cover;
+	border:3px groove #F70;
+	border-radius: 30px 30px 15px 15px;
+	transition: all 0.3s;
+	cursor:url(Cursor8.cur),auto;
+}
+.hbox1:hover{
+	background-image: url(box2.jpg);
+	border:3px groove #FFF;
+}
+/*Оборачивующие котейнер цнтральных блоков*/
+.sbox1{
+	display: flex;
+	margin-top:5px;
+	height: 560px;
+}
+/*hbox контейнеры блока contentbox*/
+.cbox1{
+	float: left;
+	width:15%;
+	background: #309;
+	border:3px groove #F70;
+	border-radius: 30px 30px 30px 30px;
+	background-image: url(cbox2.jpg);
+	background-position: center;
+	transition: all 0.3s;
+}
+.cbox1:hover{
+	border:3px groove #Fff;
+	background-image: url(cbox4.jpg);
+	cursor:url(Cursor7.cur),auto;
+}
+.cbox2{
+	display:block;
+	margin-left:5px;
+	float: left;
+	width:70%;
+	background: #309;
+	border:3px groove #F70;
+	border-radius: 30px 30px 30px 30px;
+	background-image: url(cbox3.jpg);
+	background-clip: content-box;
+	transition: all 0.3s;
+	cursor:url(Cursor12.cur),auto;
+	overflow: auto;
+	
+}
+.cbox2:hover{
+	background-image: url(cbox1.jpg);
+	border:3px groove #Fff;
+}
+.massage{
+	display:fixed;
+	margin: 10px;
+	max-width:900px;
+	min-height:166px;
+	background: #309;
+	border:3px groove #F70;
+	border-radius: 30px 30px 30px 30px;
+	background-image: url(body1.jpg);
+	background-position: center;
+	font-family: Comic Sans MS;
+	padding-left: 15px;
+	font-size: 1.2em;
+	color: #F70;
+	text-shadow: 1px 2px #750,
+				 2px 3px #530;
+	font-style:italic;
+	transition: all 0.3s;
+	overflow: hidden;
+	cursor:url(Cursor1.cur),auto;
+}
+.massage:hover{
+	color: #FE0;
+	text-shadow: 1px 2px #750,
+				 2px 3px #530;
+	border:3px double #Fff;
+	background-image: url(massage2.jpg);
+}
+.cbox3{
+	margin-left:5px;
+	float: left;
+	width:15%;
+	background: #309;
+	border:3px groove #F70;
+	border-radius: 30px 30px 30px 30px;
+	background-image: url(cbox2.jpg);
+	background-position: center;
+	transition: all 0.3s;
+	cursor:url(Cursor11.cur),auto;
+}
+.cbox3:hover{
+	border:3px groove #Fff;
+	background-image: url(cbox4.jpg);
+}
+/*hbox контейнеры блока footerbox*/
+.fbox1{
+	height: 95px;
+	background: #309;
+	background-image: url(box1.png);
+	background-position: center;
+	background-clip: content-box;
+	background-size: cover;
+	border:3px groove #F70;
+	border-radius: 15px 15px 30px 30px;
+	transition: all 0.3s;
+	cursor:url(Cursor8.cur),auto;
+}
+.fbox1:hover{
+	background-image: url(box2.jpg);
+	border:3px groove #FFF;
+}
+/*Ссылки*/
+.link{
+	text-align:center;
+	text-shadow:1px 2px #333;
+	font-family: "Trebuchet MS", sans-serif;
+	font-size: 18px;
+	text-decoration: none;
+	transition: all 0.2s;
+}
+.link:link{
+	color: #5F5;
+	cursor:url(Cursor5.cur),auto;
+	
+}
+.link:link:hover{
+	border-radius: 4px 16px 4px 16px;
+	background: rgba(150,150,0,0.4);
+	color: #CFC;
+}
+.link:visited{
+	color: #F95;
+	color: #5F5;
+}
+.link:visited:hover{
+	background: rgba(55,0,255,0.4);
+	color: #FFF;
+}
+.link:hover{
+	border-radius: 16px 16px 16px 16px;
+	padding-bottom: 2px;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 5px;
+	border-bottom: 6px double #F90;
+	border-left: 4px double #F90;
+	border-right: 4px double #F90;
+	border-top: 2px double #F90;
+}
+.link:active{
+	transition: all 0.1s;
+	cursor:url(Cursor6.cur),auto;
+}	
+.link:active:hover{
+	color: #000;
+	text-shadow: 1px 1px #000;
+	background: rgba(255,235,200,0.7);
+	border-radius: 16px 4px 16px 4px;
+	padding-bottom: 2px;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 5px;
+	border-bottom: 8px double #000;
+	border-left: 4px double #333;
+	border-right: 4px double #333;
+	border-top: 2px double #555;
+}
+/*Текс*/
+.namebox{
+	margin-left: 10%;
+	border: 3px double #F70;
+	border-radius: 90px 10px 90px 10px;
+	width: 80%;
+	text-align:center;
+	font-size:25px;
+	text-shadow:2px 3px #333;
+	font-family: "Trebuchet MS", sans-serif;
+	background-image: url(name2.jpg);
+	background-clip: content-box;
+	background-size: cover;
+	opacity: 0.85;
+	transition: all 0.3s;
+	cursor:url(Cursor10.cur),auto;
+}
+.namebox:hover{
+	border:3px double #Fff;
+	background-image: url(name1.png);
+}
+.logo{
+	color:#F90;
+	text-shadow:2px 3px #333;
+	transition: all 0.9s;
+	
+}
+.logo:hover{
+	color:#9F0;
+	transform:1s;
+}
+h1{
+	font-size: 1.8em;
+	margin-block-start: 0.0em;
+    margin-block-end: 0.0em;
+}
+.log{
+	text-align:center;
+	text-shadow: 3px 4px #000;
+	color: #F90;
+	width: 140px;
+	height: 68px;
+	font-size: 1.3em;
+	
+}
+/*Кнопки и окна ввода*/
+.login{
+	background: rgba(128,255,33,0.5);
+	border-radius: 8px;
+	border: 3px double #F90;
+	height: 24px;
+	width: 75px;
+	text-align: center;
+	transition: all 0.3s;
+	font-size:18px;
+	color: #FFF;
+	text-shadow:1px 2px #000;
+	cursor:url(Cursor3.cur),auto;
+	
+}
+.login:hover{
+	width: 100px;
+	border: 3px double #FFF;
+	background: rgba(200,200,16,1);
+	text-shadow:1px 2px #309;
+	color: #FEA;
+	border-radius: 24px;
+}
+.login:focus{
+	background: rgba(128,128,255,1);
+	text-shadow:1px 2px #000;
+	border-radius: 8px;
+	color: #355;
+	text-shadow:1px 2px #FFF;
+}
+.login:focus:hover{
+	background: rgba(8,36,80,1);
+	border-radius: 24px;
+	text-shadow:1px 2px #309;
+	color: #FFF;
+	text-shadow:1px 2px #222;
+}
+.passwd{
+	background: rgba(128,255,33,0.5);
+	border-radius: 8px;
+	border: 3px double #F90;
+	height: 24px;
+	width: 75px;
+	text-align: center;
+	transition: all 0.3s;
+	font-size:18px;
+	color: #FFF;
+	text-shadow:1px 2px #000;
+	cursor:url(Cursor3.cur),auto;
+}
+.passwd:hover{
+	width: 100px;
+	border: 3px double #FFF;
+	background: rgba(200,200,16,1);
+	text-shadow:1px 2px #309;
+	color: #FEA;
+	border-radius: 24px;
+}
+.passwd:focus{
+	background: rgba(128,128,255,1);
+	text-shadow:1px 2px #000;
+	border-radius: 8px;
+	color: #355;
+	text-shadow:1px 2px #FFF;
+}
+.passwd:focus:hover{
+	background: rgba(8,36,80,1);
+	border-radius: 24px;
+	text-shadow:1px 2px #309;
+	color: #FFF;
+	text-shadow:1px 2px #222;
+}
+/*Встроинный код*/
+.list5a {
+    padding:0;
+    list-style: none;
+}    
+.list5a li {
+	display:box;
+    position: relative;
+	margin:6px;
+    padding: 10px 1px;
+    background: linear-gradient(to left, #253455 0%, #315, #253455);
+    border: 2px double #40F;
+	border-radius: 8px;
+    color: #FFFFFF;
+	font-size: 18px;
+	text-shadow: 2px 3px #333;
+	font-family: "Trebuchet MS", sans-serif;
+    box-shadow: 0 5px 5px 0 rgba(0,0,0, .2);
+    margin-bottom: 10px;
+    text-align:center;
+    background-size: 100% 100%;
+    z-index: 1;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+    transition: all 0.3s;
+	cursor:url(Cursor2.cur),auto;
+}
+.list5a li:before {
+	border-radius: 8px;
+    content: "";
+    position:absolute;
+    width: 0;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    background: linear-gradient(to left, #FF7733 0%, #000, #FF7733);
+    opacity: 0;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+    z-index: -1;
+}
+.list5a li:hover:before {
+	border-radius: 16px;
+    width: 100%;
+    opacity: 1;
+}
+.list5a li:hover{
+	 background: linear-gradient(to left, #A79 0%, #FF0, #A79);
+	border-radius: 16px;
+	border: 2px double #000;
+}
+/*Скролбар*/
+.cbox2::-webkit-scrollbar { 
+	width: 25px; 
+} 
+.cbox2::-webkit-scrollbar-track { 
+  border-radius: 0px 25px 25px 0px;
+  transition: all 0.3s;
+} 
+.cbox2::-webkit-scrollbar-track:hover { 
+  background: #339;
+} 
+.cbox2::-webkit-scrollbar-thumb { 
+  background: #5F5; 
+  border-radius: 0px 25px 25px 0px; 
+  transition: all 0.7s;
+}
+.cbox2::-webkit-scrollbar-thumb:hover { 
+  background: #F90; 
+  
+}
