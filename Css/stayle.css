@@ -206,10 +206,10 @@ body:hover{
 }
 /*Текс*/
 .namebox{
-	margin-left: 20%;
+	margin-left: 10%;
 	border: 3px double #F70;
 	border-radius: 90px 10px 90px 10px;
-	width: 60%;
+	width: 80%;
 	text-align:center;
 	font-size:25px;
 	text-shadow:2px 3px #333;
@@ -236,7 +236,7 @@ body:hover{
 	transform:1s;
 }
 h1{
-	font-size: 3em;
+	font-size: 1.8em;
 	margin-block-start: 0.0em;
     margin-block-end: 0.0em;
 }
