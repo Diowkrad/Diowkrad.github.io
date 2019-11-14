@@ -99,6 +99,7 @@ body{
 		margin-right: 0.2%;
 		border-radius:12px;
 		font-size:24px;
+		overflow: hidden;
 		}
 		
 		.lpp{
@@ -142,4 +143,34 @@ body{
 	color:#F90
 }	
 	
+.bg{
+	border: 2px groove #F90;
+	margin: 12px;
+	padding:12px;
+	border-radius: 12px;
+	background-image: url(img/footer.jpg);
+}
+.fix{
+	display:flex;
+	height: 480px;
+	margin: 12px;
+	padding:12px;
+}
+.img{
+	float: left;
+	width:22%;
+	border-radius: 12px;
+	border: 2px groove #F90;
+	background-image: url(img/bg.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-clip: border-box;
+}
+.table{
+	width:78%;
+	font-family: gabriola;
+	text-align: center;
+	color: #F90;
+	font-size: 18px;
 }
