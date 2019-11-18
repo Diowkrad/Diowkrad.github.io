@@ -141,7 +141,7 @@ b:hover{
 
 .c_box{
 	width: 100%;
-	background-image: url(img/Body.jpg);
+	background-image: url(Body.jpg);
 	background-repeat:no-repeat;
 	background-size: 100% 100%;
 	background-position:fixed;
