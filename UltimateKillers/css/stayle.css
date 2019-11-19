@@ -115,6 +115,8 @@ b:hover{
 	border-radius:12px 6px 12px 6px;
 	background:#309;
 	
+	animation:  bar 1s linear 1s infinite  normal;
+	
 }
 .h_saytbar_menu_fix:hover{
 	border-radius:6px 12px 6px 12px;
@@ -130,6 +132,8 @@ b:hover{
 	border: 3px groove #FF0;
 	border-radius:12px 6px 12px 6px;
 	background:#252525;
+	
+	animation:  bar 1s linear 1s infinite  normal;
 	
 }
 .h_saytbar_menu_fix_g:hover{
@@ -159,8 +163,10 @@ b:hover{
 	padding:25px;
 	background:rgba(51, 0, 153,0.8);
 	border: 3px groove #F70;
-	border-radius:35px 6px 6px 35px;
+	border-radius:6px 6px 6px 6px;
 	overflow: auto;
+	
+	animation:  boxi 4s linear 1s infinite  normal;
 	
 }
 .inform{
@@ -172,9 +178,11 @@ b:hover{
 	border: 3px groove #F70;
 	font-family:corbel;
 	font-size:17px;
-	border-radius:6px 35px 35px 6px;
+	border-radius:6px 6px 6px 6px;
 	background:rgba(51, 0, 153,0.8);
 	overflow: auto;
+	
+	animation:  boxi 4s linear 1s infinite  normal;
 }
 .c_saytbar_menu_fix{
 	text-align:center;
@@ -197,19 +205,19 @@ b:hover{
 .c_saytbar_menu_name{
 	text-align:center;
 	border-radius:12px;
-	background:#309;
+	background:#500;
 	display:block;
 	font-family:Terminal;
 	font-size:20px;
 	border: 4px groove #F70;
 	font-weight:600;
 	overflow: hidden;
+	
+	animation:  names 8s linear 1s infinite  normal;
 }
 .c_saytbar_menu_name:hover{
 	border: 4px groove #FF0;
 	border-radius:32px 32px 32px 32px;
-	background:#669;
-	color:#FFF;
 }
 .f_box{
 	width: 100%;
@@ -354,3 +362,82 @@ b:hover{
 	
 	overflow: hidden;
 }
+
+@keyframes bar{
+	0%{
+		
+		border-radius:12px 6px 12px 6px;
+		
+	}
+	25%{
+		
+		border-radius:12px 12px 12px 12px;
+		
+	}
+	
+	50%{
+		
+		border-radius:6px 12px 6px 12px;
+		
+	}
+	75%{
+		
+		border-radius:12px 12px 12px 12px;
+		
+	}
+	100%{
+		
+		border-radius:12px 6px 12px 6px;
+		
+	}
+}
+
+
+@keyframes boxi{
+	
+	0%{
+		border-radius:0px 0px 0px 0px;
+	}
+	
+	25%{
+		border-radius:25px 50px 25px 50px;
+	}
+	
+	50%{
+		border-radius:50px 50px 50px 50px;
+	}
+	
+	75%{
+		border-radius:50px 25px 50px 25px;
+	}
+	100%{
+		border-radius:0px 0px 0px 0px;
+	}
+	
+}
+
+@keyframes names{
+	0%{background: #500 ;
+	}
+	10%{background: #530;
+	}
+	20%{background:#550;
+	}
+	30%{background: #350;
+	}
+	40%{background: #050;
+	}
+	50%{background: #030;
+	}
+	60%{background: #053;
+	}
+	70%{background: #005;
+	}
+	80%{background: #003;
+	}
+	90%{background: #303;
+	}
+	100%{background:#500;
+	}
+}
+	
