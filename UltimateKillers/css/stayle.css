@@ -149,6 +149,7 @@ b:hover{
 	background-repeat:no-repeat;
 	background-size: 100% 100%;
 	background-position:fixed;
+	
 }
 .c_box_content{
 	z-index: 2;
@@ -361,7 +362,62 @@ b:hover{
 	border-radius:12px;
 	
 	overflow: hidden;
+	
+	animation:  diobg 8s linear 1s infinite  normal;
 }
+
+
+.f_box_bar{
+	display:inline-block;
+	border-bottom: 4px solid #F40;
+	border-top: 1px solid #F40;
+	width: 50%;
+	height:46px;
+	background: #219;
+	margin-left: 3%;
+	border-radius:0px 0px 50px 50px;
+	border-left: 3px groove #F40;
+	border-right: 3px groove #F40;
+	font-family: Comic Sans MS;
+	font-size:12px;
+	text-align:center;
+	color:#F90;
+	text-shadow:1px 1px #940,
+				1px 2px #444,
+				2px 2px #441,
+				2px 3px #411,
+				3px 3px #111,
+				4px 3px #001,
+				4px 4px #100,
+				4px 5px #000;
+}
+
+.f_box_version{
+	position:absolute;
+	display:inline-block;
+	border-bottom: 4px solid #F40;
+	border-top: 1px solid #F40;
+	width: 14%;
+	height:46px;
+	background: #219;
+	margin-left:28%;
+	border-radius:0px 0px 50px 50px;
+	border-left: 3px groove #F40;
+	border-right: 3px groove #F40;
+	font-family: Comic Sans MS;
+	font-size:12px;
+	text-align:center;
+	color:#F90;
+	text-shadow:1px 1px #940,
+				1px 2px #444,
+				2px 2px #441,
+				2px 3px #411,
+				3px 3px #111,
+				4px 3px #001,
+				4px 4px #100,
+				4px 5px #000;
+}
+
 
 @keyframes bar{
 	0%{
@@ -396,22 +452,22 @@ b:hover{
 @keyframes boxi{
 	
 	0%{
-		border-radius:0px 0px 0px 0px;
+		border-radius:6px 12px 6px 12px;
 	}
 	
 	25%{
-		border-radius:25px 50px 25px 50px;
+		border-radius:12px 25px 12px 25px;
 	}
 	
 	50%{
-		border-radius:50px 50px 50px 50px;
+		border-radius:25px 50px 25px 50px;
 	}
 	
 	75%{
 		border-radius:50px 25px 50px 25px;
 	}
 	100%{
-		border-radius:0px 0px 0px 0px;
+		border-radius:6px 12px 6px 12px;
 	}
 	
 }
@@ -440,4 +496,30 @@ b:hover{
 	100%{background:#500;
 	}
 }
-	
+
+
+@keyframes diobg{
+	0%{
+		background:rgba(255,255,255,0.2);
+	}
+	20%{
+		background:rgba(180,180,180,0.3);
+	}
+	40%{
+		background:rgba(100,100,100,0.4);
+	}
+	50%{
+		background:rgba(55,55,55,0.5);
+	}
+	60%{
+		background:rgba(100,100,100,0.4);
+	}
+	80%{
+		background:rgba(180,180,180,0.3);
+	}
+	100%{
+		background:rgba(255,255,255,0.2);
+	}
+}
+
+
