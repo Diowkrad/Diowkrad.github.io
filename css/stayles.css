@@ -115,7 +115,7 @@ b:hover{
 	border-radius:12px 6px 12px 6px;
 	background:#309;
 	
-	animation:  bar 1s linear 1s infinite  normal;
+	animation: bar 1s linear 1s infinite  normal;
 	
 }
 .h_saytbar_menu_fix:hover{
@@ -133,11 +133,11 @@ b:hover{
 	border-radius:12px 6px 12px 6px;
 	background:#252525;
 	
-	animation:  bar 1s linear 1s infinite  normal;
+	animation: bar 1s linear 1s infinite  normal;
 	
 }
 .h_saytbar_menu_fix_g:hover{
-	border-radius:6px 12px 6px 12px;
+	
 	background:#5F5F5F;
 	border: 3px groove #0F0;
 	
@@ -429,34 +429,41 @@ b:hover{
 	overflow: hidden;
 }
 
-}
+
 
 @keyframes bar{
 	0%{
-		
 		border-radius:12px 6px 12px 6px;
-		
 	}
-	25%{
-		
-		border-radius:12px 12px 12px 12px;
-		
+	10%{
+		border-radius:6px 2px 6px 2px;
 	}
-	
-	50%{
-		
+	20%{
+		border-radius:2px 2px 2px 2px;
+	}
+	30%{
+		border-radius:2px 6px 2px 6px;
+	}
+	40%{
 		border-radius:6px 12px 6px 12px;
-		
 	}
-	75%{
-		
+	50%{
 		border-radius:12px 12px 12px 12px;
-		
+	}
+	60%{
+		border-radius:6px 12px 6px 12px;
+	}
+	70%{
+		border-radius:2px 6px 2px 6px;
+	}
+	80%{
+		border-radius:2px 2px 2px 2px;
+	}
+	90%{
+		border-radius:6px 2px 6px 2px;
 	}
 	100%{
-		
 		border-radius:12px 6px 12px 6px;
-		
 	}
 }
 
