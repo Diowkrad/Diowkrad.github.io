@@ -1,48 +1,121 @@
-b{
+span{
+	display: block; 
+}
+.content{
+	width:100%;
+	 display: grid; 
+		grid-template-rows:auto;
+		grid-template-columns:auto auto;
+}
+
+.sendbox{
+	position:center;
+	font-family:comic sans ms;
+	margin-left:6%;
+	text-align:center;
 	
 }
-.ItemName{
-	background:#73F;
-	color:#FF0;
-}
-.InvName{
-	background:#603;
-	color:#FFF;
-}
-.boxi{
-	background:#AAA;
+.Char{
+	padding-top:18px;
+	padding-left:24px;
+	padding-bottom:18px;
 	display:flex;
-	padding-left:4px;
-	text-align:center;
-	width:100%;
+	margin-bottom:2%;
+	background:#999;
 }
-.boxChar{
-	background:#BBB;
-}
-.boxNik{
-	font-family:comic sans ms;
-	background:#309;
-	color:#F90;
-	padding:7px;
-	border: 4px double #FFF;
-	display:block;
-}
-.boxLvL{
-	padding-top:4px;
-	background:#F90;
-	color:#309;
-	border-radius:10% 35%;
-}
-.boxInv{
+.nik{
+	min-width:25%;
 	padding:6px;
+	margin-top:4px;
+	margin-bottom:75%;
+	font-size:18px;
 }
-.boxGear{
-	border: 3px double #FFF;
-	background:#c7c;
+.name{
+	border-radius:50% 50% 0% 0%;
+	padding:3px;
+	background:#BFF;
+	border:3px double #036;
+	
 }
-.boxItem{
-	background:#37c;
+.LvL{
+	padding:3px;
+	background:#BF0;
+	border:3px double #036;
+	
 }
-.boxItemLvL{
-	background:#73F;
+.HM{
+	padding:3px;
+	background:#FFA;
+	border-radius:0% 0% 50% 50%;
+	border:3px double #036;
+}
+
+.Gear{
+	font-family:Arial;
+	font-size:16px;
+	background:#A81;
+	display:block;
+	padding:6px;
+	margin-top:4px;
+	border:5px double #FFF;
+	box-shadow:1px 1px #777,
+				2px 2px #999
+				,3px 3px #CCC;
+	font-size:14px;
+}
+
+.Gear2{
+	font-family:comic sans ms;
+	font-size:16px;
+	background:#93F;
+	display:block;
+	padding:6px;
+	margin-top:4px;
+	border:5px double #FFF;
+	
+	box-shadow:1px 1px #777,
+				2px 2px #999
+				,3px 3px #CCC;
+				font-size:10px;
+}
+.Gear3{
+	font-family:comic sans ms;
+	font-size:16px;
+	background:#A9F;
+	display:block;
+	padding:6px;
+	margin-top:4px;
+	border:5px double #FFF;
+	
+	box-shadow:1px 1px #777,
+				2px 2px #999
+				,3px 3px #CCC;
+				font-size:10px;
+}
+.ItemTeg{
+	padding:3px;
+	background:#BFF;
+	
+}
+
+.Itembox{
+	display:block;
+	padding:3px;
+	background:#BF0;
+	
+}
+
+.item{
+	padding:3px;
+	background:#FF0;
+	
+}
+.ItemLvL{
+	margin-top:4px;
+	padding:3px;
+	background:#FFA;
+	
+}
+.Inv{
+	display:Grid;
 }
