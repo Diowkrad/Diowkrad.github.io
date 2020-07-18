@@ -1,1 +1,48 @@
-
+b{
+	
+}
+.ItemName{
+	background:#73F;
+	color:#FF0;
+}
+.InvName{
+	background:#603;
+	color:#FFF;
+}
+.boxi{
+	background:#AAA;
+	display:flex;
+	padding-left:4px;
+	text-align:center;
+	width:100%;
+}
+.boxChar{
+	background:#BBB;
+}
+.boxNik{
+	font-family:comic sans ms;
+	background:#309;
+	color:#F90;
+	padding:7px;
+	border: 4px double #FFF;
+	display:block;
+}
+.boxLvL{
+	padding-top:4px;
+	background:#F90;
+	color:#309;
+	border-radius:10% 35%;
+}
+.boxInv{
+	padding:6px;
+}
+.boxGear{
+	border: 3px double #FFF;
+	background:#c7c;
+}
+.boxItem{
+	background:#37c;
+}
+.boxItemLvL{
+	background:#73F;
+}
