@@ -11,7 +11,7 @@ $(document).ready(function(){
 		
 		for(var i=0; i<data.length; i++){	
 			out +=`<Div class="Char">`;
-			out += `<Div class="nik"><Span class="name">${data[i]['gsx$nik']['$t']}</span><Div class="LvLbox"><Span class="LvL">Ур ${data[i]['gsx$ур']['$t']}</span><Span class="HM">+ ${data[i]['gsx$хм']['$t']}</span></span><Span class="SP">Спецелезация:  ${data[i]['gsx$спецелезация']['$t']}</span></Div><Span class="TEG"><BR>${data[i]['gsx$заметка']['$t']}</span></Div>`;
+			out += `<Div class="nik"><Span class="name">${data[i]['gsx$nik']['$t']}</span><Div class="LvLbox"><Span class="LvL">Ур ${data[i]['gsx$ур']['$t']}</span><Span class="HM">+ ${data[i]['gsx$хм']['$t']}</span></span><Span class="SP"><Div class="class">  ${data[i]['gsx$класс']['$t']}</Div>  Спецелезация:  ${data[i]['gsx$спецелезация']['$t']}</span></Div><Span class="TEG"><BR>${data[i]['gsx$заметка']['$t']}</span></Div>`;
 			out +=`<Div class="Inv">`;
 			out += `<Div class="Gear"><span class="ItemTeg">Кольцо:</Span><Div class="Itembox"><span class="Item">${data[i]['gsx$кольцо']['$t']}</span><Span class="ItemLvL">    Ур:    ${data[i]['gsx$уркольца']['$t']}</span></Div></Div>`;
 			out += `<Div class="Gear"><span class="ItemTeg">Серьга:</Span><Div class="Itembox"><span class="Item">${data[i]['gsx$серьга']['$t']}</span><Span class="ItemLvL">    Ур:    ${data[i]['gsx$урсерьги']['$t']}</span></Div></Div>`;

@@ -43,6 +43,15 @@ span{
 	border-radius:16Px;
 	font-family:Comic sans MS;
 }
+.class{
+	background:rgba(0,0,0,0.4);
+	border-radius:25Px;
+	padding:0px 6px;
+	color:#FFF;
+	margin-right:10px;
+
+}
+
 .TEG{
 	font-family:comic sans ms;
 	margin:0px 20px;
