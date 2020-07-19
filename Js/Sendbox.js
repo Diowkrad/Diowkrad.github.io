@@ -2,7 +2,7 @@ $(document).ready(function(){
 	$.getJSON("https://spreadsheets.google.com/feeds/list/1V1Lvg5AIKx9k0YmRhmTxYtv1Pn9dbTI--D8ejGKwPtk/od6/public/values?alt=json", 
 	function(data){ 
 		data = data['feed']['entry'];
-		console.log(data);
+		
 		showGoods(data);
 	});
 	
@@ -10,7 +10,7 @@ $(document).ready(function(){
 		var out ='';
 		
 		for(var i=0; i<data.length; i++){	
-			out +=`<Div class="Char">`;
+			out +=`<Div class="Char" id="${data[i]['title']['$t']}">`;
 			out += `<Div class="nik"><Span class="name">${data[i]['gsx$nik']['$t']}</span><Div class="LvLbox"><Span class="LvL">Ур ${data[i]['gsx$ур']['$t']}</span><Span class="HM">+ ${data[i]['gsx$хм']['$t']}</span></span><Span class="SP"><Div class="class">  ${data[i]['gsx$класс']['$t']}</Div><Div class="class">  Спецелезация:  ${data[i]['gsx$спецелезация']['$t']}</Div></span></Div><Span class="TEG"><BR>${data[i]['gsx$заметка']['$t']}</span></Div>`;
 			out +=`<Div class="Inv">`;
 			out += `<Div class="Gear"><span class="ItemTeg">Кольцо:</Span><Div class="Itembox"><span class="Item">${data[i]['gsx$кольцо']['$t']}</span><Span class="ItemLvL">    Ур:    ${data[i]['gsx$уркольца']['$t']}</span></Div></Div>`;
@@ -49,7 +49,11 @@ $(document).ready(function(){
 			out +=`</Div>`;
 			out +=`</Div>`;
 		}
+			
+		
 		$('.sendbox').html(out);
 		
 	}
 })
+
+	
