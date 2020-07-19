@@ -43,6 +43,19 @@ span{
 	border-radius:16Px;
 	font-family:Comic sans MS;
 }
+.TEG{
+	font-family:comic sans ms;
+	margin:0px 20px;
+	background:rgba(50,150,200,0.5);
+	display:flex;
+	font-size:16px;
+	padding:0px 12px;
+	color:#FFF;
+	text-align:center;
+	border-radius:16Px;
+	font-family:Comic sans MS;
+	text-shadow: 2px 4px 3px rgba(0,0,0,0.7);
+}
 .name{
 	margin:0% 0%;
 	padding:0px 16px;
@@ -68,7 +81,14 @@ span{
 	text-align:center;
 	text-shadow: 2px 4px 3px rgba(255,255,255,0.6),3px 5px 4px rgba(0,0,0,0.2);
 }
-
+.SP{
+	margin:0% 0%;
+	padding:0px 20px;
+	background:rgba(0,160,130,0.8);
+	border-radius:14Px;
+	text-align:center;
+	text-shadow: 2px 4px 3px rgba(255,255,255,0.4);
+}
 .Gear{
 	float:left;
 	padding:1%;
@@ -151,6 +171,16 @@ span{
 @media screen and (max-width: 767px) {
 	body{
 		background:#000;
+	}
+	.TEG{
+		font-size:12px;
+		padding:0px 0px;
+		display:block;
+		margin:0px 0px;
+		background:rgba(100,190,255,0.9);
+		box-shadow:1px 2px 1px rgba(0,0,0,0.4);
+		color:#000;
+		text-shadow: 2px 4px 3px rgba(255,255,255,0.5);
 	}
 	.Gear{
 	float:none;
