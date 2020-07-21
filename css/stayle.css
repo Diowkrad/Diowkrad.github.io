@@ -266,7 +266,7 @@ span{
 }
 /*--------------------*/
 /*Адаптация для блоков Сенд бокса*/
-@media screen and (max-width: 1035px) {
+@media screen and (max-width: 1023px) {
 	body{
 		
 		
@@ -287,6 +287,9 @@ span{
    }  
    .InvBox{
 	  
+   }
+   .TEG{
+	   height: 100%;
    }
    .Gear{
 	width: 50%;   
