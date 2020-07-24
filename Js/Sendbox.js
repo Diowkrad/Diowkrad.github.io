@@ -4,13 +4,14 @@ $(document).ready(function(){
 		data = data['feed']['entry'];
 		console.log(data);
 		showGoods(data);
+		showTab(data);
 	});
 	
 	function showGoods(data){
 		var out ='';
 		
 		for(var i=0; i<data.length; i++){	
-			out +=`<Div class="Send" id="${data[i]['title']['$t']}">`;
+			out +=`<Div class="Send" id="Send-${data[i]['title']['$t']}">`;
 			out +=`<Div class="Char" id="${data[i]['title']['$t']}">`;
 			out += `<Div class="display"><Div class="nik"><span class="name">${data[i]['gsx$nik']['$t']}</span></Div><Div class="Data"><Span class="LvL">Ур${data[i]['gsx$ур']['$t']}+${data[i]['gsx$хм']['$t']}</span><span class="class">${data[i]['gsx$класс']['$t']}</span><span class="SP">Спецелезация:  ${data[i]['gsx$спецелезация']['$t']}</span></Div><Div class="Comment"><span class="TEG">${data[i]['gsx$заметка']['$t']}</span></Div></Div>`;
 			out +=`</Div>`;
@@ -56,6 +57,18 @@ $(document).ready(function(){
 			
 		
 		$('.sendbox').html(out);
+		
+	}
+	function showTab(data){
+		var out ='';
+		
+		for(var x=0; x<data.length; x++){	
+			out +=` <a class="tab-label" href="#Send-${data[x]['title']['$t']}">${data[x]['gsx$nik']['$t']}</a>`;
+			
+		}
+			
+		
+		$('.sendtab').html(out);
 		
 	}
 })
