@@ -63,7 +63,7 @@ $(document).ready(function(){
 		var out ='';
 		
 		for(var x=0; x<data.length; x++){	
-			out +=` <a class="tab-label" href="#Send-${data[x]['title']['$t']}">${data[x]['gsx$nik']['$t']}</a>`;
+			out +=` <a class="tab-label" href="#Send-${data[x]['title']['$t']}"><Span class="tabname">${data[x]['gsx$nik']['$t']}</span><Span class="tabLvL">Ур${data[x]['gsx$ур']['$t']}+${data[x]['gsx$хм']['$t']}</span></a>`;
 			
 		}
 			

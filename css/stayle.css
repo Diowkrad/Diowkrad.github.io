@@ -95,6 +95,10 @@ span{
 	background-color: #039;
     color: #F90;
 }
+.tabLvL{
+	margin-left:66%;
+	font-size:12px
+}
 /*--------------------*/
 /*Блоки Сенд бокса*/
 .sendbox{
@@ -309,6 +313,9 @@ span:hover{
 		
 		
 	}
+	.tabLvL{
+	margin-left:70%;
+	}
 	.sendtab{
 		width: 40%;
 	}
@@ -367,6 +374,9 @@ span:hover{
 	body{
 		background:#000;
 	}
+	.tabLvL{
+	margin-left:86%;
+}
 	.sendtab{
 		width: 100%;
 	}
