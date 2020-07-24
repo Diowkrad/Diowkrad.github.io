@@ -5,6 +5,7 @@ $(document).ready(function(){
 		console.log(data);
 		showGoods(data);
 		showTab(data);
+		showMony(data);
 	});
 	
 	function showGoods(data){
@@ -47,9 +48,6 @@ $(document).ready(function(){
 			out +=`<Div class="InvBox3">`;
 			out += `<Div class="Gear3"><span class="ItemTeg">Професия 1:</Span><Div class="Itembox"><span class="Item">${data[i]['gsx$професия1']['$t']}</span><Span class="ItemLvL">    Ур:    ${data[i]['gsx$урпрофесии1']['$t']}</span></Div></Div>`;
 			out += `<Div class="Gear3"><span class="ItemTeg">Професия 2:</Span><Div class="Itembox"><span class="Item">${data[i]['gsx$професия2']['$t']}</span><Span class="ItemLvL">    Ур:    ${data[i]['gsx$урпрофесии2']['$t']}</span></Div></Div>`;
-			out += `<Div class="Gear3"><span class="ItemTeg">Золото:</Span><Div class="Itembox"><span class="Item">${data[i]['gsx$золото']['$t']}</span></Div></Div>`;
-			out += `<Div class="Gear3"><span class="ItemTeg">Серебро:</Span><Div class="Itembox"><span class="Item">${data[i]['gsx$серебро']['$t']}</Div></Div>`;
-			out += `<Div class="Gear3"><span class="ItemTeg">Медь:</Span><Div class="Itembox"><span class="Item">${data[i]['gsx$медь']['$t']}</span></Div></Div>`;
 			out +=`</Div>`;
 			out +=`</Div>`;
 			out +=`</Div>`;
@@ -69,6 +67,22 @@ $(document).ready(function(){
 			
 		
 		$('.sendtab').html(out);
+		
+	}
+	function showMony(data){
+		var out ='';
+		
+		var y=0; {
+			out +=`<Div class="Inform2" id="${data[y]['title']['$t']}">`;
+			out +=`<Div class="InvBox4">`;
+			out += `<Div class="Gear4"><span class="ItemTeg2">Золото:</Span><Div class="Itembox2"><span class="Item2">${data[y]['gsx$золото']['$t']}</span></Div></Div>`;
+			out += `<Div class="Gear4"><span class="ItemTeg2">Серебро:</Span><Div class="Itembox2"><span class="Item2">${data[y]['gsx$серебро']['$t']}</Div></Div>`;
+			out += `<Div class="Gear4"><span class="ItemTeg2">Медь:</Span><Div class="Itembox2"><span class="Item2">${data[y]['gsx$медь']['$t']}</span></Div></Div>`;
+			out +=`</Div>`;
+			out +=`</Div>`;
+		}
+			
+		$('.mony').html(out);
 		
 	}
 })
