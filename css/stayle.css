@@ -57,7 +57,7 @@ h1,h2,h3,h4,h5,h6{
 	}
 /*--------------------*/
 body{
-	background: Url(Body.jpg);
+	background: Url(img/Body.jpg);
 	background-repeat: no-repeat;
 	background-size: 100%;
 	background-attachment:fixed;
