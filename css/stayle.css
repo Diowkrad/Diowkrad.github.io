@@ -470,10 +470,13 @@ span:hover{
    padding:1% 1%;
    font-size:19px;
    }
+   .nik .textCentert{
+	font-weight:400;
+	}
 }
 
 
-@media screen and (max-width: 780px) {
+@media screen and (max-width: 767px) {
 	body{
 		background:#000;
 	}
@@ -564,6 +567,9 @@ span:hover{
    padding:0.5% 0.5%;
    font-size:16px;
    }
+   .nik .textCentert{
+	font-weight:600;
+	}
 }
 /*--------------------*/
 /*Табы Сенд бокса*/
