@@ -14,7 +14,7 @@ $(document).ready(function(){
 		for(var i=0; i<data.length; i++){	
 			out +=`<Div class="Send" id="Send-${data[i]['title']['$t']}">`;
 			out +=`<Div class="Char" id="${data[i]['title']['$t']}">`;
-			out += `<Div class="display"><Div class="nik"><span class="name">${data[i]['gsx$nik']['$t']}</span></Div><Div class="Data"><Span class="LvL">Ур${data[i]['gsx$ур']['$t']}+${data[i]['gsx$хм']['$t']}</span><span class="class">${data[i]['gsx$класс']['$t']}</span><span class="SP">Спецелезация:  ${data[i]['gsx$спецелезация']['$t']}</span></Div><Div class="Comment"><span class="TEG">${data[i]['gsx$заметка']['$t']}</span></Div></Div>`;
+			out += `<Div class="display"><Div class="nik"><span class="name"><B class="textCentert">${data[i]['gsx$nik']['$t']}</b></span></Div><Div class="Data"><Span class="LvL">Ур${data[i]['gsx$ур']['$t']}+${data[i]['gsx$хм']['$t']}</span><span class="class">${data[i]['gsx$класс']['$t']}</span><span class="SP">Спецелезация:  ${data[i]['gsx$спецелезация']['$t']}</span></Div><Div class="Comment"><span class="TEG"><B class="textCentert">${data[i]['gsx$заметка']['$t']}</b></span></Div></Div>`;
 			out +=`</Div>`;
 			out +=`<Div class="Inventory" id="${data[i]['title']['$t']}">`;
 			out +=`<Div class="InvBox">`;
