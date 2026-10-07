@@ -10,7 +10,7 @@
    ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS-ШАБЛОН ☩
    Селекторы отсортированы по группам, внутри группы — по алфавиту:
    1) ТЕГИ и служебные селекторы;  2) ID;  3) КЛАССЫ;  4) АНИМАЦИЯ.
-   JavaScript нет: разметка — заглушки эталона Build v1.0.18.
+   JavaScript нет: разметка — заглушки эталона Build v1.0.24.
    ============================================================ */
 
 /* ---------- 1. ТЕГИ И СЛУЖЕБНЫЕ СЕЛЕКТОРЫ ---------- */
@@ -98,10 +98,43 @@ select{
   font-size:0.8rem;
 }
 
-/* input[type=range] — ползунок громкости: циановый акцент, ширина 140px */
+/* input[type=range] — ползунки громкости и темпа: дорожка с золотой рамкой,
+   бегунок 460px оранжевый #f90 под цвет чип-панели (правка скролла громкости) */
 input[type=range]{
   accent-color:#3bc3d6;
   width:140px;
+}
+input[type=range]{
+    accent-color: #f90;
+    width: 460px;
+    -webkit-appearance: none;
+    background: #0a2a12;
+    border: 4px outset #950;
+    outline: none;
+    border-radius: 16px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+  margin-top:-5px;
+  box-shadow:0 0 4px rgba(249,153,0,.6);
+}
+input[type=range]::-moz-range-track{
+  height:6px;
+  background:#0a2a12;
+  border:1px solid var(--gold);
+  border-radius:3px;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
 }
 
 /* ---------- 2. ID ---------- */
@@ -171,7 +204,7 @@ border:2px solid #f90;
   padding:8px 12px;
   font-size:0.9rem;
   margin: 10px 5px 0px 5px;
-    height: 240px;
+    height: 320px;
     width: 240px;
   max-width:100%;
   overflow:auto;
@@ -332,7 +365,7 @@ border:1px solid #309;
 		<div class="panel_lcd">
 			<!-- LCD #1: состояние движка (в рабочей версии обновляется скриптом) -->
 			<div class="lcd" id="lcd">
-				☩ DIOWKRAD - ENGINE - 8BIT ☩ [Build v1.0.22]<hr>
+				☩ DIOWKRAD - ENGINE - 8BIT ☩ [Build v1.0.24]<hr>
 				MODE: [CHIP-TUNE] — Чип: [2A03]
 				Голос: [□ PULSE 50%] (квадрат -1 октава)
 				Подсказка: кнопки ТИП ВОЛНЫ — выбор чипового голоса.
@@ -372,6 +405,11 @@ border:1px solid #309;
 		  <div class="row">
 		  <span>Громкость:</span>
 		  <input type="range" id="vol" min="0" max="100" value="50">
+		</div>
+		  <div class="row">
+		  <span>ТЕМП:</span>
+		  <input type="range" id="bpm" min="40" max="300" value="120">
+		  <span id="bpmVal">120 BPM</span>
 		</div>
 		</div>
 		<!-- КОЛОНКА РЕЖИМОВ: заглушки кнопок и списков, обработчиков нет -->
@@ -418,10 +456,10 @@ border:1px solid #309;
 <div id="keys"></div>
 
 <!-- ПОДСКАЗКА РАСКЛАДКИ: полный текст управления движком -->
-<div class="row_b"><span>КЛАВИАТУРА ПК — 2 ряда: Z S X D C V G B H N J M , L . ; / ' — нижняя октава C4…F5 (/=E5) · Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ] — верхняя октава C5…F#6 (I=C6) · 1 ряд: A W S E D F T G Y H U J K O L P ; ' ] — хроматика C4…F#5 · стрелки ←/→ — смена октавы · Num7/Num8/Num9 — сустейн 1/8 · 1/4 · 1/2. Velocity мышью: чем ниже по клавише, тем громче. Сустейн: нота поёт после отпускания до границы доли, затем затухание; подсветка клавиши гаснет вместе со звуком.</span><p>Build v1.0.22</p></div>
+<div class="row_b"><span>КЛАВИАТУРА ПК — 2 ряда: Z S X D C V G B H N J M , L . ; / ' — нижняя октава C4…F5 (/=E5) · Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ] — верхняя октава C5…F#6 (I=C6) · 1 ряд: A W S E D F T G Y H U J K O L P ; ' ] — хроматика C4…F#5 · стрелки ←/→ — смена октавы · Num7/Num8/Num9 — сустейн 1/8 · 1/4 · 1/2. Velocity мышью: чем ниже по клавише, тем громче. Сустейн: нота поёт после отпускания до границы доли, затем затухание; подсветка клавиши гаснет вместе со звуком.</span><p>Build v1.0.24</p></div>
 
 <!-- ФУТЕР: класс Bottom_Buld, стилей нет — дизайн ваш -->
-<div class="Bottom_Buld">BUILD v1.0.22 «КРАСИВОЕ ОБНОВЛЕНИЕ»</div>
+<div class="Bottom_Buld">СБЕЖАВШАЯ НОТА С6 · Воскресший слэш: /=E5 · Двойник октавы: Q=C5 · Усыновление нот (замена владельца) · BUILD v1.0.24 «НОВАЯ МЕХАНИКА»</div>
 
 <script>
 "use strict";
@@ -998,6 +1036,18 @@ function susClearAll(){
   for(const [k,s] of susTimers){clearTimeout(s.relT);clearTimeout(s.hlT);hl(k,false);}
   susTimers.clear();
 }
+let bpm=120; /* ТЕМП: 40–300 BPM; целая нота = 4 доли = 240/BPM секунд */
+const killTimers=new Map(); /* key -> таймер потолка ноты */
+
+function ceilingKill(k){ /* потолок: нота звучит не дольше 1 целой — залипший MIDI не страшен */
+  killTimers.delete(k);
+  if(!activeChip.has(k)&&!activeSF2.has(k)) return;
+  susDecay(k); susCancel(k); hl(k,false);
+  log('Потолок ноты: нота '+k+' заглушена — прозвучала 1 целую ('+bpm+' BPM).');
+}
+function clearCeiling(k){ const t=killTimers.get(k); if(t){clearTimeout(t);killTimers.delete(k);} }
+function scheduleCeiling(k){ clearCeiling(k); killTimers.set(k,setTimeout(()=>ceilingKill(k),240000/bpm)); }
+
 function susSchedule(key){ /* нота живёт ПОСЛЕ отпускания до границы доли */
   const now=performance.now();
   const v=activeChip.get(key)||activeSF2.get(key);
@@ -1035,14 +1085,31 @@ function noteOn(k,v){
   state.mode==='sf2'?sfOn(k,v):chipOn(k,v);
   const nv=activeChip.get(k)||activeSF2.get(k);
   if(nv) nv.st=performance.now(); /* метка старта ноты — от неё отсчитывается доля */
+  scheduleCeiling(k); /* предохранитель: максимум 1 целая */
 }
 function noteOff(k){
+  clearCeiling(k);
   if(susMode){ susSchedule(k); return; }
   hardOff(k);
 }
 $('#susBtn8').addEventListener('click',()=>setSusMode(susMode==='1/8'?'':'1/8'));
 $('#susBtn4').addEventListener('click',()=>setSusMode(susMode==='1/4'?'':'1/4'));
 $('#susBtn2').addEventListener('click',()=>setSusMode(susMode==='1/2'?'':'1/2'));
+
+/* ТЕМП: ползунок 40–300 BPM; при смене предохранители живых голосов пересчитываются */
+$('#bpm').addEventListener('input',e=>{
+  bpm=Math.max(40,Math.min(300,Math.round(+e.target.value||120)));
+  const bv=$('#bpmVal'); if(bv) bv.textContent=bpm+' BPM';
+  const now=performance.now();
+  for(const [k,t] of killTimers){
+    clearTimeout(t);
+    const v=activeChip.get(k)||activeSF2.get(k);
+    if(!v){killTimers.delete(k);continue;}
+    const rem=Math.max(0,(v.st||now)+240000/bpm-now);
+    killTimers.set(k,setTimeout(()=>ceilingKill(k),rem));
+  }
+  log('ТЕМП: '+bpm+' BPM — целая нота '+(240/bpm).toFixed(2)+' с.');
+});
 
 /* ============ загрузка SF2 ============ */
 $('#sf2file').addEventListener('change',async e=>{
@@ -1247,6 +1314,7 @@ function updVoices(){
 }
 function panicAll(){
   sustainOn=false; sustained.clear(); susClearAll(); noteOwner.clear();
+  for(const t of killTimers.values()) clearTimeout(t); killTimers.clear();
   [...activeSF2.keys()].forEach(k=>sfOff(k));
   [...activeChip.keys()].forEach(k=>chipOff(k));
   updVoices();
@@ -1316,7 +1384,7 @@ $('#panicBtn').addEventListener('click',panicAll);
 
 /* ============ старт ============ */
 document.addEventListener('click',()=>ensureAudio(),{once:true});
-log('BUILD v1.0.22 «КРАСИВОЕ ОБНОВЛЕНИЕ»');
+log('BUILD v1.0.24 «НОВАЯ МЕХАНИКА»: ТЕМП 40–300 BPM на борту, потолок ноты — 1 целая (4 доли), залипший MIDI не страшен. Сбежавшая нота C6 (I=84) на месте, Воскресший слэш (/=E5) вернулся, Двойник октавы (Q=C5) под присмотром.');
 </script>
 </body>
 </html>
