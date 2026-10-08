@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SF2 ENGINE — CHIP-TUNE + SoundFont</title>
+<link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
+<style>
+/* ============================================================
+   ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS-ШАБЛОН ☩
+   Селекторы отсортированы по группам, внутри группы — по алфавиту:
+   1) ТЕГИ и служебные селекторы;  2) ID;  3) КЛАССЫ;  4) АНИМАЦИЯ.
+   Эталон Build v1.0.33 «ВЫСОКИЙ РОЛЛ»: две клавиатуры, полный ролл, высота режима 1 удвоена.
+   ============================================================ */
+
+/* ---------- 1. ТЕГИ И СЛУЖЕБНЫЕ СЕЛЕКТОРЫ ---------- */
+
+/* :root — палитра движка. Все цвета в переменных: фон страницы,
+   панели, золото кнопок, циан полей ввода, клавиши и акцент подсветки */
+:root{
+    --bg: #0f0f1b;
+    --panel: #1a1a2e;
+    --gold: #f7cc1d;
+    --cyan: #7dff8a;
+    --key-white: #fff;
+    --key-black: #16161d;
+    --accent: #4f8ee9;
+}
+/* ☩ ЧЕЛЛЕНДЖ-ЛОГ ☩ Баг (v1.0.26): -webkit-tap-highlight-color работает
+   только на сенсорных устройствах. Без адаптива селектор слеп на десктопе
+   и бесполезен. Обёрнут в @media (pointer: coarse) — живёт строго на таче. */
+@media (pointer: coarse) {
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+}
+/* * — глобальный сброс: блочная модель border-box и обнуление отступов */
+*{ box-sizing:border-box; margin:1px; padding:0; }
+
+/* ::-webkit-scrollbar — полоса прокрутки: ширина 12px */
+::-webkit-scrollbar{ width:12px; }
+
+/* ::-webkit-scrollbar-track — жёлоб прокрутки: тёмно-зелёный, рамка золота */
+::-webkit-scrollbar-track{
+  background:#140;
+  border:1px solid #950;
+  border-radius:1px;
+}
+
+/* ::-webkit-scrollbar-thumb — бегунок прокрутки: фиолетовый с золотой рамкой */
+::-webkit-scrollbar-thumb{
+  background-color:#207;
+  border-radius:4px;
+  border:3px solid #950;
+}
+
+/* body — страница: тёмный фон, светлый текст, моноширинный шрифт, отступы */
+body{
+  background:var(--bg);
+  color:#cfd2e8;
+  font-family:'Courier New', monospace;
+  padding:16px;
+}
+
+/* button — чип-кнопка: тёмная, золотой текст, рамка outset, тень 8-bit,
+   фиксированный размер 180x40 */
+button{
+  font-family:inherit;
+  background:#222;
+  color:var(--gold);
+  border:4px outset #950;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.85rem;
+  width:180px;
+  height:40px;
+}
+
+/* button.on — активная кнопка: золотая заливка, тёмный текст */
+button.on{ background:var(--gold); color:#111; }
+
+/* h1 — заголовок-вывеска: золото с тенью, рамка outset, панельный фон */
+h1{
+  color:var(--gold);
+  font-size:1.4rem;
+  letter-spacing:3px;
+  margin-bottom:12px;
+  text-shadow:2px 2px 0 #7a5c00;
+  border:4px outset #950;
+  background:#1a1a2e;
+  padding:6px;
+}
+
+/* input[type=file] и select — загрузчик банка и выпадающие списки:
+   тёмный фон, циановый текст, рамка outset */
+input[type=file],
+select{
+  font-family:inherit;
+  background:#111;
+  color:var(--cyan);
+  border:4px outset #950;
+  padding:4px;
+  max-width:340px;
+  font-size:0.8rem;
+}
+
+/* input[type=range] — ползунки громкости и темпа: дорожка с золотой рамкой,
+   бегунок 460px оранжевый #f90 под цвет чип-панели (правка скролла громкости) */
+input[type=range]{
+  accent-color:#3bc3d6;
+  width:140px;
+}
+input[type=range]{
+    accent-color: #f90;
+    width: 460px;
+    -webkit-appearance: none;
+    background: #0a2a12;
+    border: 4px outset #950;
+    outline: none;
+    border-radius: 16px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+  margin-top:-5px;
+  box-shadow:0 0 4px rgba(249,153,0,.6);
+}
+input[type=range]::-moz-range-track{
+  height:6px;
+  background:#0a2a12;
+  border:1px solid var(--gold);
+  border-radius:3px;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+}
+
+/* ---------- 2. ID ---------- */
+
+/* #keys — контейнер экранной клавиатуры: высота 180px, flex-ряд,
+   запрет выделения текста, рамка и тень. Клавиши в шаблоне — заглушка:
+   их рисует скрипт в рабочем движке */
+#keys{
+  position:relative;
+  height:180px;
+  width:100%;
+  user-select:none;
+  touch-action:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border:4px outset #950;
+  margin-bottom:10px;
+}
+
+/* #keys2 — контейнер второй клавиатуры: та же механика, размеры ведёт скрипт */
+#keys2{
+  position:relative;
+  height:80px;
+  width:100%;
+  user-select:none;
+  touch-action:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border:4px outset #950;
+  margin-bottom:10px;
+}
+
+/* #lcd — главный LCD-экран (состояние движка). Пустое правило:
+   зарезервировано под индивидуальные правки экрана */
+#lcd{
+}
+
+/* #log — строка нотного журнала. Пустое правило: зарезервировано под
+   индивидуальные правки журнала */
+#log{
+}
+
+/* ---------- 3. КЛАССЫ ---------- */
+
+/* .bk — чёрная клавиша: абсолют поверх белых, 60% высоты, верх ряда */
+.bk{
+  position:absolute;
+  top:0;
+  height:60%;
+  background:var(--key-black);
+  border:2px solid #000;
+  z-index:2;
+  cursor:pointer;
+  touch-action:none;
+  transition:0.2s;
+}
+.bk:hover{
+background:#333;
+border:2px solid #f90;
+}
+/* .bk.act — нажатая чёрная клавиша: заливка акцентом (поверх базового фона) */
+.bk.act{ background:var(--accent) !important; }
+
+/* .lbl — подпись ноты на клавише: внизу по центру, серая,
+   не перехватывает клики. (Два старых правила .lbl слиты в одно) */
+.lbl{
+  font-size:0.55rem;
+  position:absolute;
+  bottom:4px;
+  width:100%;
+  text-align:center;
+  color:#777;
+  pointer-events:none;
+}
+
+/* .lcd — LCD-экран: тёмно-зелёный фон, inset-рамка, зелёный текст,
+   фиксированные 300x450 с прокруткой */
+.lcd{
+  background:#0a2a12;
+  border:6px inset #1a1a2e;
+  color:#7dff8a;
+  padding:8px 12px;
+  font-size:0.9rem;
+  margin: 10px 5px 0px 5px;
+    height: 320px;
+    width: 240px;
+  max-width:100%;
+  overflow:auto;
+  line-height:150%;
+}
+
+/* .logotype — анимированная вывеска: перелив цвета по кейфрейму gradientMove */
+.logotype{
+  padding:5px 5px;
+  animation:gradientMove 30s ease infinite;
+}
+
+/* .panel — окно-панель (используется и для табов на сайте):
+   панельный фон, рамка outset, flex-обёртка */
+.panel{
+  background:#1a1a2e;
+  border:4px outset #950;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  flex-direction:row;
+  align-content:flex-start;
+  margin-bottom:12px;
+}
+
+/* .panel_buttons — правая колонка панели: ряды кнопок в столбик, без переноса */
+.panel_buttons{
+  display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+        margin: 10px 15px;
+    flex-direction: column;
+    width: 760px;
+}
+
+/* .panel_buttons_b — Больше неиспользуеться
+.panel_buttons_b{
+  display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-content: flex-start;*/
+}
+/* .panel_buttons_с — Понель скнопками под LCD */
+.panel_buttons_c{
+	display: inline-grid;
+    grid-auto-flow: row dense;
+    justify-items: start;
+    align-items: center;
+    justify-content: start;
+    align-content: start;
+}
+
+
+/* .panel_lcd — внутренний ряд панели: два LCD-экрана бок о бок */
+.panel_lcd{
+  display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    margin: 0px 10px;
+}
+
+/* .row — горизонтальный ряд: подпись-статус + кнопки, перенос разрешён */
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:8px;
+  align-content:flex-start;
+  justify-content:flex-start;
+}
+
+/* .row span — «кнопка-подпись» в LCD-стиле: зелёный экран, inset-рамка */
+.row span{
+    font-family: inherit;
+    background: #0a2a12;
+    color: #7dff8a;
+    border: 6px inset #1a1a2e;
+    padding: 6px 14px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+    font-size: 0.8rem;
+    width: 180px;
+    height: 40px;
+    text-align: center;
+}
+
+/* .row span.plain — тот же span без экрана и рамки: просто текст */
+.row span.plain{
+  background:none;
+  border:none;
+  box-shadow:none;
+  color:#cfd2e8;
+  padding:0;
+}
+
+/* .row_b — нижняя панель подсказки о раскладке: панельный фон, flex */
+.row_b{
+  background:#1a1a2e;
+  border:4px outset #950;
+  padding:8px;
+  display:flex;
+}
+
+/* .row_b span — текст подсказки: золотой моноширинный с разрядкой */
+.row_b span{
+  font-family:'Courier New', monospace;
+  color:#f7d51d;
+  font-size:0.75rem;
+  letter-spacing:1px;
+}
+
+/* .wk — белая клавиша: растёт на всю ширину ряда, светлая, тонкий бордер */
+.wk{
+  flex:1;
+  background:var(--key-white);
+  border:1px solid #555;
+  position:relative;
+  cursor:pointer;
+  touch-action:none;
+  transition: 0.2s;
+}
+.wk:hover{
+background:#CCC;
+border:1px solid #309;
+}
+/* .wk.act — нажатая белая клавиша: заливка акцентом */
+.wk.act{ background:var(--accent) !important; }
+
+/* .kbd-wrap — обёртка прокрутки клавиатуры: горизонтальный скролл,
+   нативная полоса скрыта — движение ведут фирменные ленты и колесо */
+.kbd-wrap{
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+}
+.kbd-wrap::-webkit-scrollbar{ display:none; }
+
+/* .kbd-strip — фирменная лента скролла: тёмная колея с золотой окантовкой,
+   бегунок как у скролла громкости. Слева у КЛАВИАТУРЫ I, справа-снизу у II */
+.kbd-strip{
+  height:18px;
+  margin-bottom:6px;
+  box-shadow:2px 2px 0 #000;
+  border:2px inset #950;
+  background:#14101e;
+  overflow:hidden;
+  cursor:pointer;
+  user-select:none;
+  touch-action:none;
+}
+.tape{ position:relative; width:100%; height:100%; }
+.tape-thumb{
+  position:absolute;
+  top:1px;
+  height:12px;
+  background:var(--accent);
+  border:2px solid #000;
+  cursor:grab;
+  touch-action:none;
+  transition:0.15s;
+}
+.tape-thumb:active{ cursor:grabbing; }
+
+/* body.kb-single — режим «1 КЛАВИАТУРА»: ленты и вторая роль скрыты,
+   клавиши автоподбором под панель, как в эталоне v1.0.25 */
+body.kb-single #strip2{ display:none !important; }
+body.kb-single #wrap2{ display:none !important; }
+
+/* ---------- 4. АНИМАЦИЯ ---------- */
+
+/* @keyframes gradientMove — кадры перебора цвета для .logotype: 30с цикл */
+@keyframes gradientMove{
+  10%{color:#FFA;}
+  20%{color:#F6F;}
+  30%{color:#AFF;}
+  40%{color:#AF9;}
+  50%{color:#AAF;}
+  60%{color:#fAF;}
+  70%{color:#96F;}
+  80%{color:#F93;}
+  90%{color:#FF9;}
+  100%{color:#666;}
+  /* Дополнение в стилях и структуре */
+ 
+
+</style>
+</head>
+<body>
+
+<!-- ЗАГОЛОВОК: вывеска движка (анимация цвета через .logotype) -->
+<h1 class="logotype"> ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ </h1>
+
+<!-- ГЛАВНАЯ ПАНЕЛЬ: слева два LCD, справа колонка рядов кнопок -->
+<div class="panel">
+	
+		<div class="panel_lcd">
+			<!-- LCD #1: состояние движка (в рабочей версии обновляется скриптом) -->
+			<div class="lcd" id="lcd">
+				☩ DIOWKRAD - ENGINE - 8BIT ☩ [Build v1.0.33] Интеграция для android.Залипание клавиш отключено .<hr>
+				MODE: [CHIP-TUNE] — Чип: [2A03]
+				Голос: [□ PULSE 50%] (квадрат -1 октава)
+				Подсказка: кнопки ТИП ВОЛНЫ — выбор чипового голоса.
+				SoundFont: загрузите банк .sf2 и нажмите SoundFont.
+			</div>
+			<!-- LCD #2: нотный журнал (в рабочей версии пишет скрипт) -->
+			<div class="lcd">
+      ☩ НОТНЫЙ - ЖУРНАЛ ☩<hr>
+      <p id="log">— журнал пуст —</p>
+    </div>
+		</div>
+		
+	<div class="panel_buttons_c">
+		<div class="row">
+		  <span>Midi-Keys:</span>
+		  <button id="midiBtn">Подключить MIDI</button>
+		  <select id="midiSel"><option value="all">Все устройства</option></select>
+		</div>
+		<div class="row">
+		  <span>ГОЛОС ЧИПА:</span><span>Голоса: <b id="voiceCnt">0</b></span>
+		  <select id="chipVoiceSel"><option>— заглушка —</option></select>
+		</div>
+		
+		
+		<div class="row">
+		  <span>ЗАГРУЗЧИК:</span>
+		  <input type="file" id="sf2file" accept=".sf2,.sf3">
+		</div>
+		<div class="row">
+		  <span>SF2 ШАБЛОН:</span>
+		  <select id="bankSel" disabled><option>— загрузите .sf2 —</option></select>
+
+		  <select id="presetSel" disabled><option>— загрузите .sf2 —</option></select>
+
+		  <select id="instSel" disabled><option value="-1">— авто —</option></select>
+		  </div>
+		  <div class="row">
+		  <span>Громкость:</span>
+		  <input type="range" id="vol" min="0" max="100" value="50">
+		</div>
+		  <div class="row">
+		  <span>ТЕМП:</span>
+		  <input type="range" id="bpm" min="40" max="300" value="120">
+		  <span id="bpmVal">120 BPM</span>
+		</div>
+		</div>
+		<!-- КОЛОНКА РЕЖИМОВ: заглушки кнопок и списков, обработчиков нет -->
+	<div class="panel_buttons" id="wavePanel">
+    <div class="row">
+		
+      <span>РЕЖИМ:</span>
+      <button id="btnChip" class="on">CHIP-TUNE</button>
+      <button id="btnSf2">SoundFont [.sf2]</button>
+	   <button id="panicBtn">REBOOT</button>
+    </div>
+    <div class="row">
+      <span>ТУШЕ:</span>
+      <button id="sensSoft">SOFT</button>
+      <button id="sensHard" class="on">HARD</button>
+      <button id="sensFixed">FIXED</button>
+    </div>
+    <div class="row">
+      <span>СУСТЕЙН:</span>
+      <button id="susBtn8">СУСТЕЙН 1/8</button>
+      <button id="susBtn4">СУСТЕЙН 1/4</button>
+      <button id="susBtn2">СУСТЕЙН 1/2</button>
+    </div>
+    <div class="row">
+      <span>ТУМБЛЕРЫ:</span>
+      <button id="kbToggle" class="on">КЛАВИАТУРА: ВКЛ</button>
+      <button id="lay2" class="on">2 РЯДА</button>
+      <button id="lay1">1 РЯД</button>
+    </div>
+	<div class="row">
+			<span>ТИП ВОЛНЫ:</span>
+			<button class="wbtn on" data-wave="pulse50">□ ПУЛЬС 50%</button>
+			<button class="wbtn" data-wave="pulse25">□ ПУЛЬС 25%</button>
+			<button class="wbtn" data-wave="pulse12">□ ПУЛЬС 12,5%</button>
+			<button class="wbtn" data-wave="saw">◺ ПИЛА</button>
+			<button class="wbtn" data-wave="tri">△ ТРЕУГ.</button>
+			<button class="wbtn" data-wave="sine">∿ СИНУС</button>
+			<button class="wbtn" data-wave="square">□ КВАДРАТ</button>
+			<button class="wbtn" data-wave="pulseR">ᵓ ПУЛЬС КРУГЛ.</button>
+			<button class="wbtn" data-wave="nwave">⟋⟋ N-ВОЛНА</button>
+			<button class="wbtn" data-wave="noiseL">ШУМ ДЛИН.</button>
+			<button class="wbtn" data-wave="noiseS">ШУМ КОРОТ.</button>
+		</div>
+	</div>
+  </div>
+</div>
+
+<!-- ЭКРАННАЯ КЛАВИАТУРА: в шаблоне пустая — клавиши .wk/.bk рисует скрипт -->
+<div class="row">
+				<span>КЛАВИАТУРЫ:</span>
+				<button id="kb2" class="on">2 КЛАВИАТУРЫ</button>
+				<button id="kb1">1 КЛАВИАТУРА</button>
+			</div>
+<div id="kbdHdr" class="row" style="color:#f7d51d; font-size:0.85rem; letter-spacing:1px;">КЛАВИАТУРА I — C1..C8 (мышь и ПК):</div>
+<div id="strip1" class="kbd-strip"><div class="tape"><div class="tape-thumb"></div></div></div>
+<div id="wrap1" class="kbd-wrap"><div id="keys"></div></div>
+<div id="wrap2" class="kbd-wrap"><div id="keys2"></div></div>
+<div id="strip2" class="kbd-strip"><div class="tape"><div class="tape-thumb"></div></div></div>
+
+<!-- ПОДСКАЗКА РАСКЛАДКИ: полный текст управления движком -->
+<div class="row_b"><span>КЛАВИАТУРА ПК — 2 ряда: Z S X D C V G B H N J M , L . ; / ' — нижняя октава C4…F5 (/=E5) · Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ] — верхняя октава C5…F#6 (I=C6) · 1 ряд: A W S E D F T G Y H U J K O L P ; ' ] — хроматика C4…F#5 · стрелки ←/→ — смена октавы · Num7/Num8/Num9 — сустейн 1/8 · 1/4 · 1/2. Velocity мышью: чем ниже по клавише, тем громче. Сустейн: нота поёт после отпускания до границы доли, затем затухание; подсветка клавиши гаснет вместе со звуком.</span><p>Build v1.0.33</p></div>
+
+<!-- ФУТЕР: класс Bottom_Buld, стилей нет — дизайн ваш -->
+<div class="Bottom_Buld">СБЕЖАВШАЯ НОТА С6 · Воскресший слэш: /=E5 · Двойник октавы: Q=C5 · Усыновление нот (замена владельца) · BUILD v1.0.33 «ВЫСОКИЙ РОЛЛ»</div>
+
+<!-- скрипт движка удалён — шаблон только для вёрстки и CSS -->
+
+</body>
+</html>
