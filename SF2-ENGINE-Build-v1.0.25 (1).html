@@ -10,7 +10,7 @@
    ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS-ШАБЛОН ☩
    Селекторы отсортированы по группам, внутри группы — по алфавиту:
    1) ТЕГИ и служебные селекторы;  2) ID;  3) КЛАССЫ;  4) АНИМАЦИЯ.
-   JavaScript нет: разметка — заглушки эталона Build v1.0.18.
+   Рабочий билд Build v1.0.25 «ТУШЕ»: SOFT/HARD/FIXED, интеграция для android.
    ============================================================ */
 
 /* ---------- 1. ТЕГИ И СЛУЖЕБНЫЕ СЕЛЕКТОРЫ ---------- */
@@ -26,7 +26,11 @@
     --key-black: #16161d;
     --accent: #4f8ee9;
 }
-
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+/* ТУШЕ/android: жест пальца не скроллит клавиши и не рвёт указатель — нота не залипает */
+.wk,.bk{ touch-action:none; -webkit-user-select:none; user-select:none; }
 /* * — глобальный сброс: блочная модель border-box и обнуление отступов */
 *{ box-sizing:border-box; margin:1px; padding:0; }
 
@@ -98,7 +102,12 @@ select{
   font-size:0.8rem;
 }
 
-/* input[type=range] — ползунок громкости: циановый акцент, ширина 460px */
+/* input[type=range] — ползунки громкости и темпа: дорожка с золотой рамкой,
+   бегунок 460px оранжевый #f90 под цвет чип-панели (правка скролла громкости) */
+input[type=range]{
+  accent-color:#3bc3d6;
+  width:140px;
+}
 input[type=range]{
     accent-color: #f90;
     width: 460px;
@@ -108,34 +117,28 @@ input[type=range]{
     outline: none;
     border-radius: 16px;
 }
-}
-
-/* #vol — фирменный ползунок громкости (v1.0.23): оранжевый бегунок 14px, золотая дорожка */
-#vol::-webkit-slider-runnable-track{
-  height:12px;
-  background:#0a2a12;
-  border:2px solid #950;
-  border-radius:8px;
-}
-#vol::-webkit-slider-thumb{
+input[type=range]::-webkit-slider-thumb{
   -webkit-appearance:none;
-  width:14px;height:14px;
-  margin-top:-3px;
+  width:14px;
+  height:14px;
   background:#f90;
-  border:2px solid #550;
-  border-radius:3px;
+  border:2px solid var(--panel);
+  border-radius:50%;
+  margin-top:-5px;
+  box-shadow:0 0 4px rgba(249,153,0,.6);
 }
-#vol::-moz-range-track{
-  height:12px;
+input[type=range]::-moz-range-track{
+  height:6px;
   background:#0a2a12;
-  border:2px solid #950;
-  border-radius:8px;
-}
-#vol::-moz-range-thumb{
-  width:14px;height:14px;
-  background:#f90;
-  border:2px solid #550;
+  border:1px solid var(--gold);
   border-radius:3px;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
 }
 
 /* ---------- 2. ID ---------- */
@@ -352,14 +355,6 @@ border:1px solid #309;
   100%{color:#666;}
   /* Дополнение в стилях и структуре */
  
- /* ---------- Интеграция для android. ---------- */
- 
- @media (max-width: 1020px) {
-	 /* ----- Отключает залипание клавишь при игре на сенсоре телефона и планшета. ----- */
-	* {
-  -webkit-tap-highlight-color: transparent;
-	}
-  }
 
 </style>
 </head>
@@ -374,8 +369,7 @@ border:1px solid #309;
 		<div class="panel_lcd">
 			<!-- LCD #1: состояние движка (в рабочей версии обновляется скриптом) -->
 			<div class="lcd" id="lcd">
-				☩ DIOWKRAD - ENGINE - 8BIT ☩ [Build v1.0.25]<hr>
-				Интеграция для android.Залипание клавиш отключено .<hr>
+				☩ DIOWKRAD - ENGINE - 8BIT ☩ [Build v1.0.25] Интеграция для android.Залипание клавиш отключено .<hr>
 				MODE: [CHIP-TUNE] — Чип: [2A03]
 				Голос: [□ PULSE 50%] (квадрат -1 октава)
 				Подсказка: кнопки ТИП ВОЛНЫ — выбор чипового голоса.
@@ -418,8 +412,8 @@ border:1px solid #309;
 		</div>
 		  <div class="row">
 		  <span>ТЕМП:</span>
-		  <input type="range" id="tempo" min="40" max="300" value="120">
-		  <span id="tempoVal">120 BPM</span>
+		  <input type="range" id="bpm" min="40" max="300" value="120">
+		  <span id="bpmVal">120 BPM</span>
 		</div>
 		</div>
 		<!-- КОЛОНКА РЕЖИМОВ: заглушки кнопок и списков, обработчиков нет -->
@@ -431,11 +425,11 @@ border:1px solid #309;
       <button id="btnSf2">SoundFont [.sf2]</button>
 	   <button id="panicBtn">REBOOT</button>
     </div>
-	 <div class="row">
+    <div class="row">
       <span>ТУШЕ:</span>
-      <button id="sensSoft" class="sensBtn">SOFT</button>
-      <button id="sensHard" class="sensBtn on">HARD</button>
-      <button id="sensFixed" class="sensBtn">FIXED</button>
+      <button id="sensSoft">SOFT</button>
+      <button id="sensHard" class="on">HARD</button>
+      <button id="sensFixed">FIXED</button>
     </div>
     <div class="row">
       <span>СУСТЕЙН:</span>
@@ -1019,18 +1013,6 @@ function sfOff(key){
 /* ============ сустейн 1/8 · 1/4 · 1/2 (доля + затухание) ============ */
 const SUSTAIN_MODES={'1/8':{gate:250,tail:900},'1/4':{gate:500,tail:700},'1/2':{gate:700,tail:500}};
 let susMode='';
-
-/* ============ v1.0.24: ТЕМП и потолок ноты — 1 целая (4 доли) ============ */
-let BPM=120;
-
-/* ============ v1.0.25: чувствительность (туше) SOFT/HARD/FIXED ============ */
-let sensMode='hard';
-const SENS_MODES={'soft':{lo:40,hi:65},'hard':{lo:1,hi:100},'fixed':{lo:80,hi:80}};
-function applySens(relY){
-  const m=SENS_MODES[sensMode];
-  const v=m.lo+(m.hi-m.lo)*relY;
-  return Math.round(Math.min(100,Math.max(1,v)));
-}
 const susTimers=new Map(); /* key -> {relT,hlT} */
 function susDecay(key){ /* начало затухания по границе доли */
   const md=SUSTAIN_MODES[susMode]||SUSTAIN_MODES['1/8'];
@@ -1064,32 +1046,18 @@ function susClearAll(){
   for(const [k,s] of susTimers){clearTimeout(s.relT);clearTimeout(s.hlT);hl(k,false);}
   susTimers.clear();
 }
+let bpm=120; /* ТЕМП: 40–300 BPM; целая нота = 4 доли = 240/BPM секунд */
+const killTimers=new Map(); /* key -> таймер потолка ноты */
 
-/* ===== v1.0.24: потолок ноты — 1 целая (4 доли) =====
-   Каждый голос при старте получает предохранитель. По границе целой ноты
-   (240/BPM секунд) голос форсированно затухает тем же graceful-путём,
-   что и обычное отпускание — без щелчка. Лечит: залипший MIDI noteoff,
-   потерянные остановки в фоновой вкладке, JS-щелчки. */
-const capTimers=new Map(); /* key -> timerId */
-function capArm(k){
-  capCancel(k);
-  const t=setTimeout(()=>capFire(k),240000/BPM);
-  capTimers.set(k,t);
+function ceilingKill(k){ /* потолок: нота звучит не дольше 1 целой — залипший MIDI не страшен */
+  killTimers.delete(k);
+  if(!activeChip.has(k)&&!activeSF2.has(k)) return;
+  susDecay(k); susCancel(k); hl(k,false);
+  log('Потолок ноты: нота '+k+' заглушена — прозвучала 1 целую ('+bpm+' BPM).');
 }
-function capCancel(k){
-  const t=capTimers.get(k);
-  if(t){clearTimeout(t);capTimers.delete(k);}
-}
-function capClearAll(){
-  for(const t of capTimers.values())clearTimeout(t);
-  capTimers.clear();
-}
-function capFire(k){
-  capTimers.delete(k);
-  if(susTimers.has(k))return; /* сустейн-планировщик уже ведёт этот голос */
-  susDecay(k);
-  log('CAP: нота заглушена потолком (1 целая).');
-}
+function clearCeiling(k){ const t=killTimers.get(k); if(t){clearTimeout(t);killTimers.delete(k);} }
+function scheduleCeiling(k){ clearCeiling(k); killTimers.set(k,setTimeout(()=>ceilingKill(k),240000/bpm)); }
+
 function susSchedule(key){ /* нота живёт ПОСЛЕ отпускания до границы доли */
   const now=performance.now();
   const v=activeChip.get(key)||activeSF2.get(key);
@@ -1126,10 +1094,11 @@ function noteOn(k,v){
   susCancel(k); /* повторное нажатие: старый отложенный хвост снимается, голос пересоздаётся */
   state.mode==='sf2'?sfOn(k,v):chipOn(k,v);
   const nv=activeChip.get(k)||activeSF2.get(k);
-  if(nv){ nv.st=performance.now(); capArm(k); } /* метка старта ноты + предохранитель целой ноты */
+  if(nv) nv.st=performance.now(); /* метка старта ноты — от неё отсчитывается доля */
+  scheduleCeiling(k); /* предохранитель: максимум 1 целая */
 }
 function noteOff(k){
-  capCancel(k); /* обычное (или сустейн) отпускание: потолок снят, дальше рулит susSchedule/hardOff */
+  clearCeiling(k);
   if(susMode){ susSchedule(k); return; }
   hardOff(k);
 }
@@ -1137,26 +1106,20 @@ $('#susBtn8').addEventListener('click',()=>setSusMode(susMode==='1/8'?'':'1/8'))
 $('#susBtn4').addEventListener('click',()=>setSusMode(susMode==='1/4'?'':'1/4'));
 $('#susBtn2').addEventListener('click',()=>setSusMode(susMode==='1/2'?'':'1/2'));
 
-/* ===== v1.0.24: ползунок ТЕМП — пересчёт предохранителей живых голосов ===== */
-$('#tempo').addEventListener('input',e=>{
-  BPM=+e.target.value;
-  $('#tempoVal').textContent=BPM+' BPM';
-  for(const [k,t] of capTimers){
+/* ТЕМП: ползунок 40–300 BPM; при смене предохранители живых голосов пересчитываются */
+$('#bpm').addEventListener('input',e=>{
+  bpm=Math.max(40,Math.min(300,Math.round(+e.target.value||120)));
+  const bv=$('#bpmVal'); if(bv) bv.textContent=bpm+' BPM';
+  const now=performance.now();
+  for(const [k,t] of killTimers){
     clearTimeout(t);
-    capTimers.set(k,setTimeout(()=>capFire(k),240000/BPM));
+    const v=activeChip.get(k)||activeSF2.get(k);
+    if(!v){killTimers.delete(k);continue;}
+    const rem=Math.max(0,(v.st||now)+240000/bpm-now);
+    killTimers.set(k,setTimeout(()=>ceilingKill(k),rem));
   }
-  log('ТЕМП: '+BPM+' BPM — целая нота '+(240/BPM).toFixed(2)+' с');
+  log('ТЕМП: '+bpm+' BPM — целая нота '+(240/bpm).toFixed(2)+' с.');
 });
-
-/* ===== v1.0.25: кнопки чувствительности ===== */
-function setSens(m){
-  sensMode=m;
-  document.querySelectorAll('.sensBtn').forEach(b=>b.classList.toggle('on',b.id==='sens'+m.charAt(0).toUpperCase()+m.slice(1)));
-  log('ЧУВСТВИТЕЛЬНОСТЬ: '+m.toUpperCase()+' — '+(m==='soft'?'мягкий диапазон 40–65%':m==='hard'?'полный динамический диапазон':'фиксированные 80%'));
-}
-$('#sensSoft').addEventListener('click',()=>setSens('soft'));
-$('#sensHard').addEventListener('click',()=>setSens('hard'));
-$('#sensFixed').addEventListener('click',()=>setSens('fixed'));
 
 /* ============ загрузка SF2 ============ */
 $('#sf2file').addEventListener('change',async e=>{
@@ -1262,11 +1225,29 @@ const LOW=48, HIGH=84; /* C3..C6 */
       box.appendChild(d); keyEls.set(k,d);
     } else wIdx++;
   }
+  /* ============ ТУШЕ: чувствительность ============ */
+  let sensMode='hard'; /* soft | hard | fixed */
+  function applySens(relY){
+    if(sensMode==='soft')  return Math.round(40+25*relY);  /* SOFT: мягкий диапазон 40–65% */
+    if(sensMode==='fixed') return 80;                      /* FIXED: всегда 80% */
+    return Math.round(1+99*relY);                          /* HARD: полный 1–100% */
+  }
+  window.__setSens=function(m){
+    sensMode=m;
+    const el={soft:document.getElementById('sensSoft'),hard:document.getElementById('sensHard'),fixed:document.getElementById('sensFixed')};
+    for(const k in el){ if(el[k]) el[k].classList.toggle('on',k===m); }
+    const names={soft:'SOFT — мягкий диапазон 40–65%',hard:'HARD — полный динамический диапазон 1–100%',fixed:'FIXED — фиксированные 80%'};
+    log('ТУШЕ: '+names[m]+'.');
+  };
+  ['sensSoft','sensHard','sensFixed'].forEach((id,i)=>{
+    const b=document.getElementById(id); if(!b) return;
+    b.addEventListener('click',()=>__setSens(['soft','hard','fixed'][i]));
+  });
   box.addEventListener('pointerdown',e=>{
     const el=e.target.closest('.wk,.bk'); if(!el) return;
     const r=el.getBoundingClientRect();
     const relY=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));
-    const vel=applySens(relY); /* v1.0.25: конец клавиши громче вершины — инверсия вылечена */
+    const vel=applySens(relY);
     ensureAudio(); noteOwner.set(+el.dataset.key,'@ext'); noteOn(+el.dataset.key,vel);
     try{el.setPointerCapture(e.pointerId);}catch(_){}
   });
@@ -1360,7 +1341,8 @@ function updVoices(){
   if(el) el.textContent=activeChip.size+activeSF2.size;
 }
 function panicAll(){
-  sustainOn=false; sustained.clear(); susClearAll(); capClearAll(); noteOwner.clear();
+  sustainOn=false; sustained.clear(); susClearAll(); noteOwner.clear();
+  for(const t of killTimers.values()) clearTimeout(t); killTimers.clear();
   [...activeSF2.keys()].forEach(k=>sfOff(k));
   [...activeChip.keys()].forEach(k=>chipOff(k));
   updVoices();
@@ -1404,7 +1386,7 @@ function onMIDI(ev){
     ensureAudio();
     sustained.delete(d1);
     noteOwner.set(d1,'@ext');
-    noteOn(d1,applySens(d2/127)); /* v1.0.25: velocity контроллера проходит через кривую чувствительности */
+    noteOn(d1, applySens(d2/127));
   } else if(st===0x80||(st===0x90&&d2===0)){
     if(sustainOn){ sustained.add(d1); }
     else if(noteOwner.get(d1)==='@ext'){ noteOwner.delete(d1); noteOff(d1); }
@@ -1430,7 +1412,7 @@ $('#panicBtn').addEventListener('click',panicAll);
 
 /* ============ старт ============ */
 document.addEventListener('click',()=>ensureAudio(),{once:true});
-log('BUILD v1.0.25 «ТУШЕ»: SOFT/HARD/FIXED Интеграция для android Клавиши не залипают на сенсоре.');
+log('BUILD v1.0.25 «ТУШЕ»: SOFT/HARD/FIXED, интеграция для android — залипание клавиш отключено, сенсор без вспышек. ТЕМП 40–300 BPM и потолок ноты 1 целая (4 доли) на борту.');
 </script>
 </body>
 </html>
