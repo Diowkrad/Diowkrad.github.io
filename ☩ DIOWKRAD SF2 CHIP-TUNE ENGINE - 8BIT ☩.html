@@ -224,18 +224,19 @@ border:2px solid #f90;
 /* .lbl — подпись ноты на клавише: внизу по центру, серая,
    не перехватывает клики. (Два старых правила .lbl слиты в одно) */
 .lbl{
-  font-size:0.55rem;
-  position:absolute;
-  bottom:4px;
-  width:100%;
-  text-align:center;
-  color:#111;
-  pointer-events:none;
-  font-size: 12px;
-    text-emphasis-style: "☩";
-    text-shadow: 2px 2px 6px #222;
+  font-size: 0.75rem;
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    pointer-events: none;
+    text-shadow: 2px 2px 6px #00000080;;
+    background: #00000080;
+	text-emphasis-style: "☩";
+    border-radius: 8px;
+    CORNER-SHAPE: SUPERELLIPSE(-0.7);
 }
-
 /* .lcd — LCD-экран: тёмно-зелёный фон, inset-рамка, зелёный текст,
    фиксированные 300x450 с прокруткой */
 .lcd{
