@@ -7,11 +7,27 @@
 <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
 <style>
 /* ============================================================
-   ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS-ШАБЛОН ☩
-   Селекторы отсортированы по группам, внутри группы — по алфавиту:
-   1) ТЕГИ и служебные селекторы;  2) ID;  3) КЛАССЫ;  4) АНИМАЦИЯ.
-   Эталон Build v1.1.1 «GLOBAL MIDI»: банк GM × 128, три режима, хвосты короче (релиз 55%). База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»: две клавиатуры, фирменный размер, полный ролл в обоих режимах.
+	☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS - ☩
+	Селекторы отсортированы по группам, внутри группы — по алфавиту:
+	1) ТЕГИ и служебные селекторы;  
+	2) ID;  
+	3) КЛАССЫ;  
+	4) АНИМАЦИЯ.
+	BUILD v1.2.5 «Finale»: 
+  
+	База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»: 
    ============================================================ */
+   /* ---------- 0.Пписание в нижней понели ---------- */
+.span_b{
+	display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    flex-wrap: nowrap;
+    align-items: center;
+    background: #031;
+    padding: 8px;
+    border: 6px inset #1a1a2e;
+}
 
 /* ---------- 1. ТЕГИ И СЛУЖЕБНЫЕ СЕЛЕКТОРЫ ---------- */
 
@@ -413,7 +429,7 @@ body.kb-single #keys2{ display:none !important; }
   90%{color:#FF9;}
   100%{color:#666;}
   /* Дополнение в стилях и структуре */
- 
+
 
 /* МОБИЛЬНЫЙ РОЛЛ v1.0.37: на экранах до 768px высота ролла 75% —
    scaleY(0.75) сжимает только по вертикали (152→114 у белых, 94→70.5 у чёрных),
@@ -435,37 +451,48 @@ body.kb-single #keys2{ display:none !important; }
 		<div class="panel_lcd">
 			<!-- LCD #1: состояние движка (в рабочей версии обновляется скриптом) -->
 			<div class="lcd" id="lcd">
-				☩ DIOWKRAD - ENGINE - 8BIT ☩ [Build v1.1.1] Интеграция для android.Залипание клавиш отключено .<hr>
-				MODE: [CHIP-TUNE] — Чип: [2A03]
-				Голос: [□ PULSE 50%] (квадрат -1 октава)
-				Подсказка: кнопки ТИП ВОЛНЫ — выбор чипового голоса.
-				SoundFont: загрузите банк .sf2 и нажмите SoundFont.
+				☩ DIOWKRAD - ENGINE - 8BIT ☩ <hr>[Build v1.2.5]<hr> 
+				Интеграция для android.
+				Залипание клавиш отключено .<hr>
+				
 			</div>
 			<!-- LCD #2: нотный журнал (в рабочей версии пишет скрипт) -->
 			<div class="lcd">
-      ☩ НОТНЫЙ - ЖУРНАЛ ☩<hr>
+      ☩ ЛОГ - ЖУРНАЛ ☩<hr>
       <p id="log">— журнал пуст —</p>
     </div>
 		</div>
 		
 	<div class="panel_buttons_c">
+		
+		 <div class="row">
+		  <span>Громкость:</span>
+		  <input type="range" id="vol" min="0" max="100" value="50">
+		  <span>Голоса: <b id="voiceCnt">0</b></span>
+		</div>
+		<div class="row">
+		  <span>ТЕМП:</span>
+		  <input type="range" id="bpm" min="40" max="300" value="120">
+		  <span id="bpmVal">120 BPM</span>
+		</div>
 		<div class="row">
 		  <span>Midi-Keys:</span>
 		  <button id="midiBtn">Подключить MIDI</button>
 		  <select id="midiSel"><option value="all">Все устройства</option></select>
 		</div>
 		<div class="row">
-		  <span>ГОЛОС ЧИПА:</span><span>Голоса: <b id="voiceCnt">0</b></span>
-		  <select id="chipVoiceSel"><option>— заглушка —</option></select>
-		</div>
-		<div class="row">
 		  <span>ГОЛОС MIDI:</span>
 		  <select id="midiVoiceSel"><option value="0">Acoustic Grand Piano</option></select>
 		</div>
+		<div class="row">
+		  <span>ГОЛОС ЧИПА:</span>
+		  <select id="chipVoiceSel"><option>— заглушка —</option></select>
+		</div>
+		
 		
 		
 		<div class="row">
-		  <span>ЗАГРУЗЧИК:</span>
+		  <span>SF2 ЗАГРУЗЧИК:</span>
 		  <input type="file" id="sf2file" accept=".sf2,.sf3">
 		</div>
 		<div class="row">
@@ -476,15 +503,7 @@ body.kb-single #keys2{ display:none !important; }
 
 		  <select id="instSel" disabled><option value="-1">— авто —</option></select>
 		  </div>
-		  <div class="row">
-		  <span>Громкость:</span>
-		  <input type="range" id="vol" min="0" max="100" value="50">
-		</div>
-		  <div class="row">
-		  <span>ТЕМП:</span>
-		  <input type="range" id="bpm" min="40" max="300" value="120">
-		  <span id="bpmVal">120 BPM</span>
-		</div>
+		 
 		</div>
 		<!-- КОЛОНКА РЕЖИМОВ: заглушки кнопок и списков, обработчиков нет -->
 	<div class="panel_buttons" id="wavePanel">
@@ -494,7 +513,7 @@ body.kb-single #keys2{ display:none !important; }
       <button id="btnChip" class="on">CHIP-TUNE</button>
       <button id="btnSf2">SoundFont [.sf2]</button>
 	   <button id="btnMidi">MIDI [GM]</button>
-	   <button id="panicBtn">REBOOT</button>
+	  
     </div>
     <div class="row">
       <span>ТУШЕ:</span>
@@ -509,20 +528,24 @@ body.kb-single #keys2{ display:none !important; }
       <button id="susBtn2">СУСТЕЙН 1/2</button>
     </div>
     <div class="row">
-      <span>ТУМБЛЕРЫ:</span>
+      <span>КЛАВИАТУРА:</span>
       <button id="kbToggle" class="on">КЛАВИАТУРА: ВКЛ</button>
       <button id="lay2" class="on">2 РЯДА</button>
       <button id="lay1">1 РЯД</button>
     </div>
 		<div class="row">
-			<span>КЛАВИАТУРЫ:</span>
+			<span>ПИАНО РОЛЛ:</span>
 			<button id="kb2" class="on">2 КЛАВИАТУРЫ</button>
 			<button id="kb1">1 КЛАВИАТУРА</button>
-			<button id="rollLock">СКРОЛЛ РОЛЛА: СВОБОДА</button>
+			<button id="rollLock">СКРОЛЛ: ОТКРЫТ</button>
+		</div>
+		<div class="row">
+			<span>ЗВУК:</span>
 			<button id="octDn">− ОКТАВА</button>
 			<button id="octUp">+ ОКТАВА</button>
+			<button id="panicBtn">ЗАГЛУШИТЬ</button>
 		</div>
-	<div class="row">
+		<div class="row">
 			<span>ТИП ВОЛНЫ:</span>
 			<button class="wbtn on" data-wave="pulse50">□ ПУЛЬС 50%</button>
 			<button class="wbtn" data-wave="pulse25">□ ПУЛЬС 25%</button>
@@ -547,10 +570,34 @@ body.kb-single #keys2{ display:none !important; }
 <div id="strip2" class="kbd-strip"><div class="tape"><div class="tape-thumb"></div></div></div>
 
 <!-- ПОДСКАЗКА РАСКЛАДКИ: полный текст управления движком -->
-<div class="row_b"><span>КЛАВИАТУРА ПК — 2 ряда: Z S X D C V G B H N J M , L . ; / ' — нижняя октава C4…F5 (/=E5) · Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ] — верхняя октава C5…F#6 (I=C6) · 1 ряд: A W S E D F T G Y H U J K O L P ; ' ] — хроматика C4…F#5 · стрелки ←/→ или кнопки ОКТАВА −/+ — смена октавы · Num7/Num8/Num9 — сустейн 1/8 · 1/4 · 1/2. Velocity мышью: чем ниже по клавише, тем громче. Сустейн: нота поёт после отпускания до границы доли, затем затухание; подсветка клавиши гаснет вместе со звуком.</span><p>Build v1.1.1</p></div>
+<div class="row_b">
+	<span class="span_b" >
+		<p class="Bottom_a">КЛАВИАТУРА ПК</p>
+			<p class="Bottom_b">2 ряда: —  Q…] верхняя октава — хроматика C…F#</p>
+			<p class="Bottom_b">2 ряда: —  Z…' нижняя октава — хроматика C…F </p>
+			</p>
+			<p class="Bottom_b">
+			1 ряд: A…]	центральная октава — хроматика C…F#5 
+			</p>
+	</span>
+	<span class="span_b">
+		<p class="Bottom_a">Управление :</p>
+		<p class="Bottom_c">←/→ или кнопки ОКТАВА −/+ — смена октавы </p>
+		<p class="Bottom_c">Num7/Num8/Num9 — сустейн 1/8 · 1/4 · 1/2. </p>
+		<p class="Bottom_c">Velocity мышью: чем ниже по клавише, тем громче.</p>
+	</span>
+	<span class="span_b">
+		<p class="Bottom_a">Особенности:</p>
+		<p class="Bottom_c">Сустейн: нота поёт после отпускания до границы доли, затемзатухание; подсветка клавиши гаснет вместе со звуком.</p>
+		<p class="Bottom_c">(Для удобства в мобилных браузерах рекомендую уменьшить страницу в браузере через настройки до 75%)</p>
+	</span>
+	<span class="span_b" >
+		<p class="Bottom_d">BUILD</p> 
+		<p class="Bottom_d"> v1.2.5</p> 
+		<p class="Bottom_d">«Finale»</p>
+	</span>
+</div>
 
-<!-- ФУТЕР: класс Bottom_Buld, стилей нет — дизайн ваш -->
-<div class="Bottom_Buld">ГЛОБАЛЬНЫЙ MIDI: банк GM × 128 · селектор ГОЛОС MIDI · хвосты короче (релиз 55%) · МОБИЛЬНЫЙ РОЛЛ (Для удобства рекомендую уменьшить страницу в браузере через настройки до 75%) · BUILD v1.1.1 «GLOBAL MIDI»</div>
 
 <script>
 "use strict";
@@ -559,7 +606,7 @@ const state={mode:'chip',chipVoice:'pulse50',sf2:null,presetIdx:0,instIdx:-1,ins
 let audioCtx=null,master=null;
 const activeChip=new Map(),activeSF2=new Map(),activeMidi=new Map();
 const $=s=>document.querySelector(s);
-const LOG_MAX=6;const logLines=[];
+const LOG_MAX=10;const logLines=[];
 function log(msg){
   const el=$('#log'); if(!el) return;
   logLines.unshift(msg); if(logLines.length>LOG_MAX) logLines.length=LOG_MAX;
@@ -1431,7 +1478,7 @@ tapeSetup(document.getElementById('strip2'),document.getElementById('wrap2'));
 let rollLocked=false;
 function rollLockApply(){
   const btn=document.getElementById('rollLock');
-  if(btn){ btn.textContent=rollLocked?'СКРОЛЛ РОЛЛА: ЗАМОК':'СКРОЛЛ РОЛЛА: СВОБОДА'; btn.classList.toggle('on',rollLocked); }
+  if(btn){ btn.textContent=rollLocked?'СКРОЛЛ: ЗАМОК':'СКРОЛЛ: ОТКРЫТ'; btn.classList.toggle('on',rollLocked); }
   for(const id of ['wrap1','wrap2']){
     const w=document.getElementById(id); if(!w) continue;
     w.style.overflowX=rollLocked?'hidden':'auto';
@@ -1441,7 +1488,7 @@ function rollLockApply(){
     s.style.opacity=rollLocked?'0.4':'';
     s.style.pointerEvents=rollLocked?'none':'';
   }
-  lcd(rollLocked?'Скролл ролла: ЗАМОК':'Скролл ролла: СВОБОДА');
+  lcd(rollLocked?'Скролл: ЗАМОК':'Скролл: ОТКРЫТ');
 }
 $('#rollLock').addEventListener('click',()=>{ rollLocked=!rollLocked; rollLockApply(); });
 /* ===== ОКТАВНЫЙ ПУЛЬТ v1.0.37: кнопки дёргают ту же механику pcBase, что и
@@ -1724,7 +1771,16 @@ $('#midiVoiceSel').addEventListener('change',e=>{
 buildMidiSel();
 buildKeys();
 document.addEventListener('click',()=>ensureAudio(),{once:true});
-log('BUILD v1.1.1 «GLOBAL MIDI»: банк GM × 128 вживлён в эталон — кнопка MIDI [GM] в ряду РЕЖИМ, селектор ГОЛОС MIDI с 16 семействами, синтез по рецептам с velocity-яркостью. Хвосты короче: релиз 55% по приёмке. База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»: полный ролл C1..C8, ЗАМОК РОЛЛА, кнопки ОКТАВА −/+, мобильный масштаб, ТУШЕ SOFT/HARD/FIXED, интеграция для android.');
+log('BUILD v1.2.5 «Finale»');
+log('Загружен основной код Движка');
+log('Загружен Чип RP 2A03 E - Темастер');
+log('Загружен Контроллер Midi x 128');
+log('Загружен SF2 Парсер');
+log('Загружен SF2 Кньроллер');
+log('Загружен SF2 Микропроцессор');
+log('Опросс модулей прошел успешно');
+log('Приятной игры ;-)');
+log('BUILD v1.2.5 «Finale»');
 </script>
 </body>
 </html>
