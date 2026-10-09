@@ -1787,6 +1787,28 @@ log('Загружен SF2 Микропроцессор');
 log('Опросс модулей прошел успешно');
 log('Приятной игры ;-)');
 log('BUILD v1.2.5 «Finale»');
+
+function hasTouch() {
+  return 'ontouchstart' in document.documentElement ||
+         navigator.maxTouchPoints > 0 ||
+         navigator.msMaxTouchPoints > 0;
+}
+
+if (hasTouch()) {
+  // Удаляем все правила с :hover из CSS-листа
+  try {
+    for (let si = document.styleSheets.length - 1; si >= 0; si--) {
+      const styleSheet = document.styleSheets[si];
+      if (!styleSheet.rules) continue;
+      for (let ri = styleSheet.rules.length - 1; ri >= 0; ri--) {
+        if (!styleSheet.rules[ri].selectorText) continue;
+        if (styleSheet.rules[ri].selectorText.match(':hover')) {
+          styleSheet.deleteRule(ri);
+        }
+      }
+    }
+  } catch (ex) {}
+}
 </script>
 </body>
 </html>
