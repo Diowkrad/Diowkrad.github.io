@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SF2 ENGINE — тестовый стенд</title>
+<link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
+<style>
+:root{
+  --bg:#0f0f1b; --panel:#1a1a2e; --gold:#f7d51d; --cyan:#3bc3d6;
+  --key-white:#e8e8e0; --key-black:#16161d; --accent:#e94f64;
+}
+*{box-sizing:border-box; margin:1px; padding:0;}
+body{
+  background:var(--bg); color:#cfd2e8;
+  font-family:'Courier New', monospace;
+  padding:16px;
+}
+.lbl{ font-size:0.5rem; }
+h1{
+  color:var(--gold);
+  font-size:1.4rem;
+  letter-spacing:3px;
+  margin-bottom:12px;
+  text-shadow:2px 2px 0 #7a5c00;
+  border: 4px outset #950;
+  background: #1a1a2e;
+  padding: 6px;
+}
+.panel{
+  background: #1a1a2e;
+    border: 4px outset #950;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+       flex-direction: row;
+    align-content: flex-start;
+    padding: 3px;
+    margin-bottom: 10px;
+}
+.row{
+	display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 8px;
+    align-content: flex-start;
+    justify-content: flex-start;
+	}
+button{
+  font-family:inherit;
+  background:#222;
+  color:var(--gold);
+  border: 4px outset #950;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.85rem;
+}
+button.on{ background:var(--gold); color:#111; }
+.row span{
+  font-family: inherit;
+  background: #0a2a12;
+  color: #7dff8a;
+  border: 6px inset #1a1a2e;
+  padding: 6px 14px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #000;
+  font-size:0.8rem;
+}
+.row span.plain{ background:none; border:none; box-shadow:none; color:#cfd2e8; padding:0; }
+select, input[type=file]{
+  font-family:inherit;
+  background:#111;
+  color:var(--cyan);
+  border: 4px outset #950;
+  padding:4px;
+  max-width:340px;
+  font-size:0.8rem;
+}
+#lcd{
+  
+}
+.lcd{
+  background: #0a2a12;
+    border: 6px inset #1a1a2e;
+    color: #7dff8a;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    height: 160px;
+    margin: 5px 0;
+    width: 280px;
+    max-width: 100%;
+    overflow: auto;
+}
+#keys{
+  position:relative;
+  height:180px;
+  width:100%;
+  user-select:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border: 4px outset #950;
+  margin-bottom:10px;
+}
+.wk{
+  flex:1; background:var(--key-white); border:1px solid #555;
+  position:relative; cursor:pointer;
+}
+.bk{
+  position:absolute; top:0; height:60%;
+  background:var(--key-black); border:2px solid #000;
+  z-index:2; cursor:pointer;
+}
+.wk.act, .bk.act{ background:var(--accent) !important; }
+.lbl{ position:absolute; bottom:4px; width:100%; text-align:center;
+      font-size:0.55rem; color:#777; pointer-events:none;}
+input[type=range]{ accent-color:#3bc3d6; width:140px; }
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #140;
+  border: 1px solid #950;
+  border-radius: 1px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #207;
+  border-radius: 4px;
+  border: 3px solid #950;
+}
+.row_b{
+  background: #1a1a2e;
+  border: 4px outset #950;
+  padding:8px;
+  display: flex;
+}
+.row_b span{
+  font-family:'Courier New', monospace;
+  color:#f7d51d;
+  font-size:0.75rem;
+  letter-spacing:1px;
+}
+.panel_lcd{    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+	    margin: 0px 15px;
+
+	}
+.panel_buttons{    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    
+    margin: 5px 15px;
+    flex-direction: column;
+
+	}
+</style>
+</head>
+<body>
+<h1>☩ SF2 ENGINE ☩</h1>
+	<div class="panel">
+		<div class="panel_lcd">
+			<div class="lcd" id="lcd">MODE: [SoundFont]
+				Банк: [-] — Пресетов: [0]
+				Пресет: [-] — Нота: [-]
+				Подсказка: загрузите банк .sf2 — пресеты появятся в списке.
+			</div>
+			<div class="lcd">
+				<span class="plain" style="height:110px; width:96%; overflow:auto;"><div id="log">— журнал пуст —</div></span>
+			</div>
+		</div>
+		<div class="panel_buttons">
+			<div class="row">
+				<button id="midiBtn">Подключить MIDI</button>
+				<select id="midiSel"><option value="all">Все устройства</option></select>
+			</div>
+			<div class="row">
+				<span>БАНК:</span>
+				<input type="file" id="sf2file" accept=".sf2,.sf3">
+				<select id="presetSel" disabled><option>— загрузите .sf2 —</option></select>
+			</div>
+			<div class="row">
+				<span>Громкость:</span>
+				<input type="range" id="vol" min="0" max="100" value="50">
+			</div>
+			<div class="row">
+				<span>Голоса: <b id="voiceCnt">0</b></span>
+				<button id="panicBtn">Reboot</button>
+			</div>
+		</div>
+	</div>
+
+<div class="row" style="color:#f7d51d; font-size:0.85rem; letter-spacing:1px;">КЛАВИАТУРА — C3..C6 (мышь и ПК):</div>
+<div id="keys"></div>
+
+<script>
+"use strict";
+/* ============ состояние ============ */
+const state={mode:'sf2',sf2:null,presetIdx:0,sampleCache:new Map()};
+let audioCtx=null,master=null;
+const activeChip=new Map(),activeSF2=new Map();
+const keyEls=new Map();
+const $=s=>document.querySelector(s);
+function log(msg){const el=$('#log');el.innerHTML=msg+'<br>'+el.innerHTML;}
+function lcd(msg){$('#lcd').textContent=msg;}
+$('#vol').addEventListener('input',e=>{if(master)master.gain.value=(+e.target.value)/100;});
+function ensureAudio(){
+  if(!audioCtx){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    master=audioCtx.createGain(); master.gain.value=(+$('#vol').value)/100;
+    master.connect(audioCtx.destination);
+  }
+  if(audioCtx.state==='suspended')audioCtx.resume();
+}
+const freqOf=k=>440*Math.pow(2,(k-69)/12);
+const tc2s=tc=>Math.pow(2,(tc||0)/1200);
+const sgn=v=>v>32767?v-65536:v;
+
+/* ============ CHIP-фолбэк ============ */
+function chipOn(key,vel=100){
+  ensureAudio();
+  if(activeChip.has(key)) return;
+  const t=audioCtx.currentTime;
+  const osc=audioCtx.createOscillator();
+  osc.type='triangle'; osc.frequency.value=freqOf(key);
+  try{osc.detune.value=bendCents;}catch(_){}
+  const g=audioCtx.createGain();
+  const peak=0.25*Math.pow(vel/127,1.3);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(peak,t+0.005);
+  g.gain.setTargetAtTime(peak*0.35,t+0.005,0.08);
+  osc.connect(g); g.connect(master); osc.start(t);
+  activeChip.set(key,{osc,g});
+  hl(key,true);
+}
+function chipOff(key){
+  const v=activeChip.get(key); if(!v) return;
+  const t=audioCtx.currentTime;
+  v.g.gain.cancelScheduledValues(t);
+  v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
+  v.g.gain.setTargetAtTime(0,t,0.05);
+  v.osc.stop(t+0.4);
+  activeChip.delete(key); hl(key,false);
+}
+
+/* ============ ПАРСЕР SF2 (живучий: обход RIFF/LIST + RIFX + сигнатурный поиск) ============ */
+const REC={phdr:38,pbag:4,pmod:4,inst:22,ibag:4,igen:4,shdr:46};
+function parseSF2(buf){
+  const N=buf.byteLength;
+  if(N<64) throw new Error('файл слишком мал ('+N+' байт)');
+  const dv=new DataView(buf), u8=new Uint8Array(buf);
+  const str=(o,n)=>{let t='';for(let i=0;i<n&&o+i<N;i++){const c=u8[o+i];if(c<32||c>126)break;t+=String.fromCharCode(c);}return t;};
+  const head=str(0,4);
+  if(head!=='RIFF'&&head!=='RIFX')
+    throw new Error('это не SoundFont2: сигнатура "'+head+'"');
+  const le=(head!=='RIFX');
+  const u32=o=>(o>=0&&o+4<=N)?dv.getUint32(o,le):0;
+  const u16=o=>(o>=0&&o+2<=N)?dv.getUint16(o,le):0;
+  const s16=o=>(o>=0&&o+2<=N)?dv.getInt16(o,le):0;
+  const found={};
+  /* --- уровень 1: структурный обход с спуском в RIFF/LIST --- */
+  const walk=(from,to,depth)=>{
+    if(depth>10) return;
+    let p=from;
+    while(p+8<=to){
+      const cid=str(p,4), cs=u32(p+4);
+      if(cs<0||cs>N-p){ /* битый размер — считаем до конца уровня и выходим */
+        const rest=to-(p+8);
+        if(cid&&!found[cid]&&cid!=='LIST'&&cid!=='RIFF'&&cid!=='RIFX') found[cid]={start:p+8,size:rest};
+        break;
+      }
+      if(cid==='LIST'||cid==='RIFF'||cid==='RIFX'){
+        const inner=p+12, end=Math.min(p+8+cs,N);
+        if(cs>=4) walk(inner,end,depth+1);
+        p=end; if(cs%2)p++;
+      }else{
+        if(!found[cid]) found[cid]={start:p+8,size:cs};
+        p+=8+cs+(cs%2);
+      }
+      if(p<=from) break;
+    }
+  };
+  walk(12,N,0);
+  /* --- уровень 2: сигнатурный поиск для недостающих критичных чанков --- */
+  const req=['phdr','pbag','pmod','inst','ibag','imap','igen','shdr'];
+  const need=req.filter(id=>!found[id]);
+  if(need.length){
+    for(const id of need){
+      const a=id.charCodeAt(0),b=id.charCodeAt(1),c=id.charCodeAt(2),d=id.charCodeAt(3);
+      let best=-1,bestScore=-1,bestSize=0;
+      const rec=REC[id]||0;
+      for(let i=0;i+12<=N;i++){
+        if(u8[i]!==a||u8[i+1]!==b||u8[i+2]!==c||u8[i+3]!==d) continue;
+        const cs=u32(i+4);
+        if(cs<=0||i+8+cs>N) continue;
+        const even=(cs%rec)===0;
+        const score=(even?1e12:0)+i; /* кратный размеру записи + самая поздняя позиция */
+        if(score>=bestScore){best=i;bestScore=score;bestSize=cs;}
+      }
+      if(best>=0) found[id]={start:best+8,size:bestSize};
+    }
+  }
+  /* --- smpl (данные сэмплов) --- */
+  let sampleStart=0, sampleEnd=N;
+  if(found['smpl']){
+    sampleStart=found['smpl'].start;
+    sampleEnd=Math.min(sampleStart+found['smpl'].size,N);
+  }else{
+    let best=-1,bestSize=0;
+    const a=115,b=109,c=112,d=108; /* 'smpl' */
+    for(let i=0;i+12<=N;i++){
+      if(u8[i]!==a||u8[i+1]!==b||u8[i+2]!==c||u8[i+3]!==d) continue;
+      const cs=u32(i+4);
+      if(cs<=0||i+8+cs>N) continue;
+      if(cs>bestSize){best=i;bestSize=cs;}
+    }
+    if(best>=0){sampleStart=best+8;sampleEnd=best+8+bestSize;}
+  }
+  /* --- версии: предупредить о SF3 --- */
+  if(found['ifil']){
+    const maj=u16(found['ifil'].start);
+    if(maj>=3) log('ПРЕДУПРЕЖДЕНИЕ: банк SF3 (сжатые сэмплы) — звук будет шумом, нужен SF2');
+  }
+  const miss=['phdr','pbag','inst','ibag','igen','shdr'].filter(id=>!found[id]);
+  if(miss.length)
+    throw new Error('в банке нет чанков: '+miss.join(', ')+' | найдены: '+Object.keys(found).join(', '));
+  /* --- разбор записей с защитой границ --- */
+  const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+  const phdrN=Math.floor(found['phdr'].size/38);
+  const pbagN=Math.floor(found['pbag'].size/4);
+  const pgenN=found['pgen']?Math.floor(found['pgen'].size/4):0;
+  const instN=Math.floor(found['inst'].size/22);
+  const ibagN=Math.floor(found['ibag'].size/4);
+  const igenN=Math.floor(found['igen'].size/4);
+  const shdrN=Math.floor(found['shdr'].size/46);
+  if(phdrN<2) throw new Error('phdr пуст ('+phdrN+' записей)');
+  const pbags=[],pgens=[],insts=[],ibags=[],igens=[],shdrs=[],presets=[];
+  for(let i=0;i<pbagN;i++) pbags.push({gi:u16(found['pbag'].start+i*4)});
+  for(let i=0;i<pgenN;i++) pgens.push({op:u16(found['pgen'].start+i*4),amt:u16(found['pgen'].start+i*4+2)});
+  for(let i=0;i<instN;i++){
+    const o=found['inst'].start+i*22;
+    insts.push({name:str(o,20),bag:u16(o+20)});
+  }
+  for(let i=0;i<ibagN;i++) ibags.push({gi:u16(found['ibag'].start+i*4)});
+  for(let i=0;i<igenN;i++) igens.push({op:u16(found['igen'].start+i*4),amt:u16(found['igen'].start+i*4+2)});
+  for(let i=0;i<shdrN;i++){
+    const o=found['shdr'].start+i*46;
+    let sr=u32(o+36); if(sr<8000||sr>96000) sr=44100;
+    shdrs.push({name:str(o,20),start:u32(o+20),end:u32(o+24),
+      startLoop:u32(o+28),endLoop:u32(o+32),sampleRate:sr,
+      origPitch:u8[o+40],pitchCorr:(u8[o+41]>127?u8[o+41]-256:u8[o+41])});
+  }
+  for(let i=0;i<phdrN-1;i++){
+    const o=found['phdr'].start+i*38;
+    presets.push({name:str(o,20),preset:u16(o+20),bank:u16(o+22),
+      bag:u16(o+24),bagEnd:u16(found['phdr'].start+(i+1)*38+24)});
+  }
+  const zones=(bagArr,genArr,b0,b1)=>{
+    b0=clamp(b0|0,0,bagArr.length);
+    b1=clamp(b1|0,b0,bagArr.length);
+    const out=[];
+    for(let b=b0;b<b1;b++){
+      const g0=clamp(bagArr[b].gi|0,0,genArr.length);
+      const g1=clamp(b+1<bagArr.length?bagArr[b+1].gi|0:genArr.length,g0,genArr.length);
+      const gens={};
+      for(let g=g0;g<g1;g++) gens[genArr[g].op]=genArr[g].amt;
+      out.push({gens});
+    }
+    return out;
+  };
+  const sf={dv,le,sampleStart,sampleEnd,presets,pbags,pgens,insts,ibags,igens,shdrs,zones};
+  (sf.presets||[]).forEach((p,i)=>p.spans=buildSpans(sf,i));
+  return sf;
+}
+function buildSpans(sf,pi){
+  const p=sf.presets[pi];
+  const pz=sf.zones(sf.pbags,sf.pgens,p.bag,p.bagEnd);
+  const pg=(pz.find(z=>z.gens[41]===undefined)||{gens:{}}).gens;
+  const spans=[];
+  for(const z of pz){
+    const instIdx=z.gens[41]; if(instIdx===undefined) continue;
+    const ins=sf.insts[instIdx]; if(!ins) continue;
+    const ibEnd=(instIdx+1<sf.insts.length)?sf.insts[instIdx+1].bag:sf.ibags.length;
+    const iz=sf.zones(sf.ibags,sf.igens,ins.bag,ibEnd);
+    const ig=(iz.find(z2=>z2.gens[53]===undefined)||{gens:{}}).gens;
+    for(const z2 of iz){
+      const sIdx=z2.gens[53]; if(sIdx===undefined) continue;
+      const h=sf.shdrs[sIdx]; if(!h) continue;
+      const G=Object.assign({},pg,ig,z2.gens);
+      let lo=0,hi=127;
+      if(G[43]!==undefined){lo=G[43]&0xFF;hi=(G[43]>>8)&0xFF;}
+      if(z.gens[43]!==undefined){lo=Math.max(lo,z.gens[43]&0xFF);hi=Math.min(hi,(z.gens[43]>>8)&0xFF);}
+      let vlo=0,vhi=127;
+      if(G[44]!==undefined){vlo=G[44]&0xFF;vhi=(G[44]>>8)&0xFF;}
+      const root=G[58]!==undefined?G[58]:h.origPitch;
+      spans.push({lo,hi,vlo,vhi,sample:sIdx,
+        root:(root>0&&root<=127)?root:60,
+        coarse:G[51]!==undefined?sgn(G[51]):0,
+        fine:G[52]!==undefined?sgn(G[52]):0,
+        attack:tc2s(G[34]!==undefined?sgn(G[34]):-12000),
+        hold:tc2s(G[35]!==undefined?sgn(G[35]):-12000),
+        decay:tc2s(G[36]!==undefined?sgn(G[36]):-12000),
+        sustain:G[37]!==undefined?sgn(G[37]):0,
+        release:tc2s(G[38]!==undefined?sgn(G[38]):-12000),
+        atten:G[48]!==undefined?sgn(G[48]):0,
+        modes:G[54]||0,corr:h.pitchCorr});
+    }
+  }
+  return spans;
+}
+
+/* ============ воспроизведение SF2 ============ */
+function getBuffer(sf,sIdx){
+  if(state.sampleCache.has(sIdx)) return state.sampleCache.get(sIdx);
+  const h=sf.shdrs[sIdx];
+  let len=Math.max(0,h.end-h.start);
+  const avail=Math.floor((sf.sampleEnd-sf.sampleStart)/2);
+  len=Math.min(len,Math.max(0,avail-h.start));
+  if(len<=0){ state.sampleCache.set(sIdx,null); return null; }
+  const ab=audioCtx.createBuffer(1,len,h.sampleRate);
+  const data0=ab.getChannelData(0);
+  for(let i=0;i<len;i++) data0[i]=sf.dv.getInt16(sf.sampleStart+(h.start+i)*2,sf.le)/32768;
+  let entry={buffer:ab,loopStart:null,loopEnd:null};
+  if(h.startLoop<h.endLoop&&h.startLoop>=h.start&&h.endLoop<=h.start+len){
+    entry.loopStart=(h.startLoop-h.start)/h.sampleRate;
+    entry.loopEnd=(h.endLoop-h.start)/h.sampleRate;
+  }
+  state.sampleCache.set(sIdx,entry);
+  return entry;
+}
+function sfOn(key,vel=100){
+  ensureAudio();
+  const sf=state.sf2;
+  const p=sf&&sf.presets[state.presetIdx];
+  if(!sf||!p){ log('Банк не загружен — играет CHIP.'); chipOn(key,vel); return; }
+  if(!p.spans.length){ log('Пресет пуст или не выбран — играет CHIP.'); chipOn(key,vel); return; }
+  let span=p.spans.find(s=>key>=s.lo&&key<=s.hi&&vel>=s.vlo&&vel<=s.vhi);
+  if(!span) span=p.spans.find(s=>key>=s.lo&&key<=s.hi);
+  if(!span){
+    const los=Math.min(...p.spans.map(s=>s.lo)), his=Math.max(...p.spans.map(s=>s.hi));
+    log('Нота '+key+' вне диапазона пресета ['+los+'–'+his+'] — играет CHIP.');
+    chipOn(key,vel); return;
+  }
+  const entry=getBuffer(sf,span.sample);
+  if(!entry){ log('Сэмпл '+span.sample+' пуст — играет CHIP.'); chipOn(key,vel); return; }
+  const src=audioCtx.createBufferSource();
+  src.buffer=entry.buffer;
+  const cents=(key-span.root)*100+span.corr+span.coarse*100+span.fine+bendCents;
+  src.playbackRate.value=Math.pow(2,cents/1200);
+  if(entry.loopStart!==null&&(span.modes===1||span.modes===3)){
+    src.loop=true; src.loopStart=entry.loopStart; src.loopEnd=entry.loopEnd;
+  }
+  const g=audioCtx.createGain(), t=audioCtx.currentTime;
+  const A=Math.max(span.attack,0.002), H=Math.max(span.hold,0);
+  const D=Math.max(span.decay,0.01);
+  const peak=Math.pow(vel/127,1.5)*Math.pow(10,-span.atten/200)*0.9;
+  const sus=Math.max(0.0005,Math.pow(10,span.sustain/200));
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(peak,t+A);
+  g.gain.setValueAtTime(peak,t+A+H);
+  g.gain.exponentialRampToValueAtTime(Math.max(peak*sus,0.0005),t+A+H+D);
+  src.connect(g); g.connect(master); src.start(t);
+  activeSF2.set(key,{src,g,rel:Math.max(span.release,0.02),rate:src.playbackRate.value});
+  hl(key,true);
+}
+function sfOff(key){
+  const v=activeSF2.get(key); if(!v) return;
+  const t=audioCtx.currentTime;
+  v.g.gain.cancelScheduledValues(t);
+  v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
+  v.g.gain.setTargetAtTime(0,t,v.rel/3);
+  v.src.stop(t+v.rel*2);
+  activeSF2.delete(key); hl(key,false);
+}
+function noteOn(k,v){ sfOn(k,v); }
+function noteOff(k){ sfOff(k)||chipOff(k); }
+
+/* ============ загрузка SF2 ============ */
+$('#sf2file').addEventListener('change',async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const sf=parseSF2(await f.arrayBuffer());
+    state.sf2=sf; state.presetIdx=0; state.sampleCache.clear();
+    const sel=$('#presetSel'); sel.innerHTML=''; sel.disabled=false;
+    (sf.presets||[]).forEach((pr,i)=>{
+      const o=document.createElement('option');
+      o.value=i; o.textContent=(pr.bank+':'+pr.preset)+' '+pr.name;
+      sel.appendChild(o);
+    });
+    lcd('MODE: [SoundFont]\nБанк: ['+f.name+'] — Пресетов: ['+sf.presets.length+']\nПресет: [—] — Нота: [—]\nВыберите пресет в списке — и играйте.');
+    log('Загружен банк: '+f.name+' ('+(f.size/1048576).toFixed(1)+' МБ) — пресетов: '+sf.presets.length+'; '+(sf.le?'RIFF':'RIFX'));
+  }catch(err){ log('Ошибка SF2: '+err.message); lcd('SF2 ERROR: '+err.message); }
+  finally{ $('#sf2file').value=''; }
+});
+$('#presetSel').addEventListener('change',e=>{
+  state.presetIdx=+e.target.value;
+  const p=state.sf2.presets[state.presetIdx];
+  lcd('MODE: [SoundFont]\nБанк: [загружен] — Пресетов: ['+state.sf2.presets.length+']\nПресет: ['+p.name+'] — Зон: ['+p.spans.length+']');
+  if(!p.spans.length) log('Пресет "'+p.name+'" пуст (0 зон) — выберите другой.');
+});
+
+/* ============ клавиатура (мышь) ============ */
+const LOW=48, HIGH=84; /* C3..C6 */
+(function buildKeys(){
+  const box=$('#keys');
+  const isBlack=m=>[1,3,6,8,10].includes(m);
+  const NOTE=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  for(let k=LOW;k<=HIGH;k++){
+    const m=k%12;
+    if(!isBlack(m)){
+      const d=document.createElement('div');
+      d.className='wk'; d.dataset.key=k;
+      d.innerHTML='<span class="lbl">'+NOTE[m]+(Math.floor(k/12)-1)+'</span>';
+      box.appendChild(d); keyEls.set(k,d);
+    }
+  }
+  const whites=[...box.querySelectorAll('.wk')];
+  const wW=100/whites.length;
+  let wIdx=0;
+  for(let k=LOW;k<=HIGH;k++){
+    const m=k%12;
+    if(isBlack(m)){
+      const d=document.createElement('div');
+      d.className='bk'; d.dataset.key=k;
+      d.style.width=(wW*0.62)+'%';
+      d.style.left=(wIdx*wW-wW*0.31)+'%';
+      box.appendChild(d); keyEls.set(k,d);
+    } else wIdx++;
+  }
+  box.addEventListener('pointerdown',e=>{
+    const el=e.target.closest('.wk,.bk'); if(!el) return;
+    const r=el.getBoundingClientRect();
+    const relY=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));
+    const vel=Math.round(40+87*(1-relY));
+    ensureAudio(); noteOn(+el.dataset.key,vel);
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  box.addEventListener('pointerup',e=>{
+    const el=e.target.closest('.wk,.bk'); if(!el) return;
+    noteOff(+el.dataset.key);
+  });
+  box.addEventListener('pointercancel',e=>{
+    const el=e.target.closest('.wk,.bk'); if(!el) return;
+    noteOff(+el.dataset.key);
+  });
+})();
+function hl(k,on){ const el=keyEls.get(k); if(el) el.classList.toggle('act',on); updVoices(); }
+
+/* ============ клавиатура ПК ============ */
+const MAP_LO='zsxdcvgbhnjm,l./;'.split('');
+const MAP_HI='q2w3er5t6y7ui'.split('');
+let pcBase=60;
+const heldKeys=new Set();
+document.addEventListener('keydown',e=>{
+  if(e.repeat) return;
+  if(e.key==='ArrowLeft'){ pcBase=Math.max(LOW,pcBase-12);
+    lcd('PC-клавиатура: октава от ноты '+pcBase); return; }
+  if(e.key==='ArrowRight'){ pcBase=Math.min(HIGH-24,pcBase+12);
+    lcd('PC-клавиатура: октава от ноты '+pcBase); return; }
+  if(heldKeys.has(e.code)) return;
+  const k=e.key.toLowerCase();
+  const l=MAP_LO.indexOf(k), h=MAP_HI.indexOf(k);
+  if(l>=0){ heldKeys.add(e.code); ensureAudio(); noteOn(pcBase+l,100); }
+  else if(h>=0){ heldKeys.add(e.code); ensureAudio(); noteOn(pcBase+12+h,100); }
+});
+document.addEventListener('keyup',e=>{
+  if(!heldKeys.has(e.code)) return;
+  heldKeys.delete(e.code);
+  const k=e.key.toLowerCase();
+  const l=MAP_LO.indexOf(k), h=MAP_HI.indexOf(k);
+  if(l>=0) noteOff(pcBase+l);
+  else if(h>=0) noteOff(pcBase+12+h);
+});
+
+/* ============ MIDI-клавиатура ============ */
+let midiAccess=null;
+let sustainOn=false;
+const sustained=new Set();
+let bendCents=0;
+function updVoices(){
+  const el=$('#voiceCnt');
+  if(el) el.textContent=activeChip.size+activeSF2.size;
+}
+function panicAll(){
+  sustainOn=false; sustained.clear();
+  [...activeSF2.keys()].forEach(k=>sfOff(k));
+  [...activeChip.keys()].forEach(k=>chipOff(k));
+  updVoices();
+  log('PANIC: все голоса заглушены.');
+  lcd('PANIC — все голоса заглушены. Модель: ['+(state.sf2?'SoundFont':'CHIP')+']');
+}
+function applyBend(){
+  activeSF2.forEach(v=>{ if(v.rate) v.src.playbackRate.value=v.rate*Math.pow(2,bendCents/1200); });
+  activeChip.forEach(v=>{ try{v.osc.detune.value=bendCents;}catch(_){} });
+}
+function initMIDI(){
+  if(!navigator.requestMIDIAccess){
+    log('Web MIDI API не поддерживается этим браузером (Chrome, Edge, Opera — да; Firefox — нет).');
+    lcd('MIDI: браузер не поддерживает Web MIDI API');
+    return;
+  }
+  navigator.requestMIDIAccess({sysex:false}).then(acc=>{
+    midiAccess=acc;
+    fillMidiSel(acc);
+    acc.onstatechange=()=>{ fillMidiSel(acc); };
+    log('MIDI доступ получен — устройства подключаются автоматически (в том числе «горячее» включение).');
+  }).catch(err=>log('MIDI: доступ не получен — '+err.message));
+}
+function fillMidiSel(acc){
+  const sel=$('#midiSel'); const cur=sel.value;
+  sel.innerHTML='<option value="all">Все устройства</option>';
+  acc.inputs.forEach(inp=>{
+    const o=document.createElement('option');
+    o.value=inp.id; o.textContent=inp.name||('MIDI-вход '+(inp.id||''));
+    sel.appendChild(o);
+  });
+  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+  acc.inputs.forEach(inp=>{ inp.onmidimessage=onMIDI; });
+}
+function onMIDI(ev){
+  const sel=$('#midiSel');
+  if(sel.value!=='all'&&sel.value!==ev.target.id) return;
+  const data=ev.data; if(!data||data.length<2) return;
+  const st=data[0]&0xF0, d1=data[1], d2=data.length>2?data[2]:0;
+  if(st===0x90&&d2>0){
+    ensureAudio();
+    sustained.delete(d1);
+    noteOn(d1,d2);
+  } else if(st===0x80||(st===0x90&&d2===0)){
+    if(sustainOn){ sustained.add(d1); }
+    else noteOff(d1);
+  } else if(st===0xB0){
+    if(d1===64){
+      const was=sustainOn;
+      sustainOn=d2>=64;
+      if(was&&!sustainOn){
+        [...sustained].forEach(k=>noteOff(k));
+        sustained.clear();
+        log('Сустейн: педаль отпущена — хвосты сняты.');
+      }
+    } else if(d1===120||d1===123){
+      panicAll();
+    }
+  } else if(st===0xE0&&data.length>=3){
+    bendCents=Math.round((((d2&0x7F)<<7|(d1&0x7F))-8192)/8192*200);
+    applyBend();
+  }
+}
+$('#midiBtn').addEventListener('click',initMIDI);
+$('#panicBtn').addEventListener('click',panicAll);
+
+/* ============ старт ============ */
+document.addEventListener('click',()=>ensureAudio(),{once:true});
+</script>
+</body>
+</html>

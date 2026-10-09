@@ -1,0 +1,700 @@
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☩ CHIP-TUNE NES-PIANO 8-bit ☩</title>
+<link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
+<style>
+:root{
+    --bg:#0f0f1b; --panel:#1a1a2e; --gold:#f7d51d; --cyan:#3bc3d6;
+    --key-white:#e8e8e0; --key-black:#16161d; --accent:#e94f64;
+  }
+  *{box-sizing:border-box; margin:1px; padding:0;}
+  body{margin:0; background:var(--bg); color:#cfd2e8;
+    font-family:'Courier New', monospace; padding:16px; overflow-x:auto;}
+  .wrap{min-width:1250px;}
+  h1{color:var(--gold); font-size:1.4rem; letter-spacing:3px; margin-bottom:12px;
+    text-shadow:2px 2px 0 #7a5c00; border:4px outset #950; background:var(--panel);
+    padding:6px; text-align:center;}
+  .intro{color:#8f8fb0; text-align:center; font-size:14px; margin:6px 0 14px;}
+  .panel{background:var(--panel); border:4px outset #950;     padding: 5px 5px;
+    margin: 5px 5px; border-radius:4px; display:flex; flex-wrap:wrap;
+    align-items:stretch; align-content:center;}
+  .lbl{color:var(--gold); font-size:12px; letter-spacing:1px; margin:4px 0;display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px;}
+  .row span{    font-family: inherit;
+    background: #0a2a12;
+    color: #7dff8a;
+    border: 4px inset var(--panel);
+    padding: 6px 14px;
+    box-shadow: 2px 2px 0 #000;
+    font-size: 0.8rem;}
+  button{font-family:inherit; background:#222; color:var(--gold); border:4px outset #950;
+    padding:6px 14px; cursor:pointer; box-shadow:2px 2px 0 #000; font-size:0.85rem;}
+  button:active{border-style:inset;}
+  button.on{background:var(--gold); color:#111;}
+  .wbtn.on{background:var(--gold); color:#111;}
+  select,input[type=file]{font-family:inherit; background:#111; color:var(--cyan);
+    border:4px outset #950; padding:4px; max-width:340px; font-size:0.8rem;}
+  input[type=range]{accent-color:var(--gold);}
+  kbd{background:#222; border:1px solid #950; padding:1px 5px; font-size:11px;}
+  .note{color:#8f8fb0; font-size:12px; margin-top:8px;}
+  footer{color:#8f8fb0; font-size:11px; text-align:center; margin-top:14px;}
+  #lcd{background:#0a2a12; border:6px inset var(--panel); color:#7dff8a;
+    padding:8px 12px; font-size:0.9rem; white-space:pre-wrap; min-height:44px;
+    margin:5px; width:530px;}
+  .kwrap{overflow-x:auto; border:4px inset #950; background:var(--key-black); padding:10px; margin-top:4px;}
+  .kbdrow{position:relative; height:180px; min-width:1180px; user-select:none; display:flex;
+    box-shadow:4px 4px 0 #000; border:4px outset #950; background:var(--key-black);}
+  .wk{flex:1; min-width:12px; background:var(--key-white); border:1px solid #555;
+    position:relative; cursor:pointer;}
+  .bk{position:absolute; top:0; height:60%; width:60%; min-width:8px;
+    background:var(--key-black); border:2px solid #000; z-index:2; cursor:pointer;}
+  .wk.dn, .bk.dn{background:var(--accent) !important;}
+  .wk span{position:absolute; bottom:4px; width:100%; text-align:center;
+    font-size:0.55rem; color:#777; pointer-events:none;}
+  ::-webkit-scrollbar{width:12px;}
+  ::-webkit-scrollbar-track{background:#140; border:1px solid #950; border-radius:1px;}
+  ::-webkit-scrollbar-thumb{background-color:#207; border-radius:4px; border:3px solid #950;}
+.center_fix{     
+	display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background: #020;    border: 4px outset #950;
+	
+}
+
+</style>
+</head>
+</head>
+<body>
+<div class="wrap">
+<h1>☩ [CHIP-TUNE] [NES-PIANO] [8-bit] ☩</h1>
+<div class="intro">CHIP-TUNE-синтезатор. В режиме [MODE: CHIP-TUNE] играет чип 2A03. Для перехода в режим [MODE: SoundFont] загрузите банк с расширением [.sf2].</div>
+<div class="center_fix">
+<div class="panel">
+<div class="lcd" id="lcd">MODE: [CHIP-TUNE] — Чип: [2A03] — Канал: [PULSE A] — Волна: [□] — Октава: [C4]</div>
+</div>
+
+<div class="panel">
+<div class="lbl">ВОЛНА:</div>
+<div class="row">
+<button data-wave="pulse" class="on">□ Квадрат</button>
+<button data-wave="saw">◺ Пила</button>
+<button data-wave="tri">△ Треугольник</button>
+<button data-wave="sine">∿ Синус</button>
+</div>
+<div class="lbl" style="margin-top:10px">РЕЖИМ:</div>
+<div class="row">
+<button id="mChip" class="on">CHIP-TUNE</button>
+<button id="mSf">SoundFont [.sf2]</button>
+<input type="file" id="sfFile" accept=".sf2" style="display:none">
+</div>
+</div>
+
+<div class="panel">
+<div class="lbl">ОКТАВА:</div>
+<div class="row">
+<button id="octDown">OCT−</button>
+<span id="octDisp" class="lbl" style="font-size:16px;border:3px inset #995500;padding:4px 14px;background:#0d1a0d;color:#7dff5a">C4</span>
+<button id="octUp">OCT+</button>
+<button id="pcKbBtn" style="margin-left:16px">Клавиатура ПК: ВЫКЛ</button>
+</div>
+</div>
+
+<div class="panel">
+<div class="lbl">КАНАЛЫ 2A03:</div>
+<div class="row">
+<span class="lbl">Duty A:</span>
+<button class="dutyA" data-d="0.125">12.5%</button>
+<button class="dutyA" data-d="0.25">25%</button>
+<button class="dutyA on" data-d="0.5">50%</button>
+<button class="dutyA" data-d="0.75">75%</button>
+<span class="lbl">Duty B:</span>
+<button class="dutyB" data-d="0.125">12.5%</button>
+<button class="dutyB on" data-d="0.25">25%</button>
+<button class="dutyB" data-d="0.5">50%</button>
+<button class="dutyB" data-d="0.75">75%</button>
+</div>
+<div class="row" style="margin-top:8px">
+<span class="lbl">Detune B: <span id="dtV">0</span> ц</span>
+<input type="range" id="detune" min="-50" max="50" value="0" style="width:140px">
+<button id="noiseMode">Шум: ДЛИННЫЙ</button>
+</div>
+<div class="row" style="margin-top:8px">
+<span class="lbl">Громкость: <span id="volV">80%</span></span>
+<input type="range" id="vol" min="0" max="100" value="80" style="width:130px">
+<span class="lbl">Вибрато: <span id="vibV">0</span></span>
+<input type="range" id="vib" min="0" max="50" value="0" style="width:120px">
+<span class="lbl">Атака: <span id="atkV">5 мс</span></span>
+<input type="range" id="atk" min="0" max="200" value="5" style="width:110px">
+<span class="lbl">Релиз: <span id="relV">150 мс</span></span>
+<input type="range" id="rel" min="10" max="1000" value="150" style="width:110px">
+</div>
+<div class="row" style="margin-top:8px">
+<span class="lbl">Микшер A: <span id="mixAV">100%</span></span>
+<input type="range" id="mixA" min="0" max="100" value="100" style="width:90px">
+<span class="lbl">B: <span id="mixBV">100%</span></span>
+<input type="range" id="mixB" min="0" max="100" value="100" style="width:90px">
+<span class="lbl">N: <span id="mixNV">100%</span></span>
+<input type="range" id="mixN" min="0" max="100" value="100" style="width:90px">
+</div>
+</div>
+
+<div class="panel">
+<div class="row">
+<span class="lbl">MIDI-канал:</span>
+<select id="midiChan"><option value="-1">Все каналы</option></select>
+<span class="lbl">Пресет sf2:</span>
+<select id="sfPreset"><option value="0">— загрузите .sf2 —</option></select>
+<span class="lbl">База октавы:</span>
+<select id="octBase"></select>
+</div>
+<div class="note">Примечание: Web MIDI работает только в Chrome/Edge и в защищённом контексте (localhost или https).</div>
+</div></div>
+
+<div class="panel">
+<div class="lbl">КЛАВИАТУРА — 88 КЛАВИШ (мышь и MIDI):</div>
+<div class="kwrap"><div class="kbdrow" id="keys"></div></div>
+</div>
+
+<footer>☩ CHIP-TUNE NES-PIANO — каналы 2A03: PULSE A/B, NOISE (LFSR 32767/93) ☩</footer>
+</div>
+
+<script>
+"use strict";
+var AC = window.AudioContext || window.webkitAudioContext;
+var ctx = null;
+function audio(){ if(!ctx) ctx = new AC(); if(ctx.state === "suspended") ctx.resume(); return ctx; }
+
+var NOTE_NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+function noteName(n){ return NOTE_NAMES[n % 12] + (Math.floor(n / 12) - 1); }
+function noteFreq(n){ return 440 * Math.pow(2, (n - 69) / 12); }
+
+var S = {
+  mode:"chip", wave:"pulse", dutyA:0.5, dutyB:0.25, detuneB:0,
+  vol:0.8, vib:0, atk:5, rel:150,
+  mixA:1.0, mixB:1.0, mixN:1.0,
+  noiseLong:true, base:60, pcKb:false,
+  voices:{}, midiChan:-1,
+  sf:null, sfPreset:0
+};
+
+/* ---------- гармоники пульса (как APU 2A03) ---------- */
+var pulseCache = {};
+function pulseWave(duty){
+  var key = Math.round(duty * 1000);
+  if(pulseCache[key]) return pulseCache[key];
+  var N = 32, re = new Float32Array(N), im = new Float32Array(N);
+  for(var n = 1; n < N; n++){
+    im[n] = 2 / (n * Math.PI) * Math.sin(n * Math.PI * duty);
+  }
+  var w = audio().createPeriodicWave(re, im);
+  pulseCache[key] = w;
+  return w;
+}
+
+/* ---------- шум LFSR 2A03 ---------- */
+var noiseBufLong = null, noiseBufShort = null;
+function lfsrBuffer(period){
+  var N = 32767, bits = new Uint8Array(N), reg = 0x7FFF, i;
+  for(i = 0; i < N; i++){
+    var fb = ((reg >> 0) ^ (reg >> 6)) & 1;
+    reg = ((reg >> 1) | (fb << 14)) & 0x7FFF;
+    bits[i] = fb ? 1 : 0;
+  }
+  var out = new Float32Array(period), k;
+  for(k = 0; k < period; k++){
+    var idx = k * N / period | 0;
+    out[k] = bits[idx] ? 0.3 : -0.3;
+  }
+  var buf = audio().createBuffer(1, period, audio().sampleRate);
+  buf.copyToChannel(out, 0);
+  return buf;
+}
+function noiseBuffer(){
+  if(S.noiseLong){
+    if(!noiseBufLong) noiseBufLong = lfsrBuffer(32767);
+    return {buf: noiseBufLong, base: 111860.8 / 32767};
+  } else {
+    if(!noiseBufShort) noiseBufShort = lfsrBuffer(93);
+    return {buf: noiseBufShort, base: 111860.8 / 93};
+  }
+}
+function noiseRate(f){
+  var nb = noiseBuffer();
+  var fund = nb.base; /* Гц основного цикла буфера */
+  return Math.max(0.01, Math.min(64, f / fund));
+}
+
+/* ---------- голоса ---------- */
+function makeGain(atk){
+  var g = audio().createGain();
+  var t = audio().currentTime;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.8, t + Math.max(0.001, atk / 1000));
+  return g;
+}
+function chipOn(note, vel){
+  if(S.voices[note]) return;
+  var a = audio(), f = noteFreq(note);
+  var nodes = [], i;
+  var g = makeGain(S.atk);
+  g.gain.value = Math.min(0.9, 0.2 + (vel || 100) / 128 * 0.7);
+  var master = audio().createGain();
+  master.gain.value = S.vol;
+  g.connect(master); master.connect(a.destination);
+
+  if(S.wave === "pulse"){
+    var oA = a.createOscillator(); oA.setPeriodicWave(pulseWave(S.dutyA));
+    oA.frequency.value = f; oA.connect(g); oA.start(); nodes.push(oA);
+    var oB = a.createOscillator(); oB.setPeriodicWave(pulseWave(S.dutyB));
+    oB.frequency.value = f; oB.detune.value = S.detuneB;
+    var gB = a.createGain(); gB.gain.value = S.mixB * 0.9;
+    oB.connect(gB); gB.connect(master); oB.start(); nodes.push(oB);
+  } else {
+    var types = {saw:"sawtooth", tri:"triangle", sine:"sine"};
+    var o = a.createOscillator();
+    o.type = types[S.wave] || "sine";
+    o.frequency.value = f; o.connect(g); o.start(); nodes.push(o);
+  }
+  if(S.wave === "pulse" && S.mixN > 0.01){
+    var nb = noiseBuffer();
+    var ns = a.createBufferSource(); ns.buffer = nb.buf; ns.loop = true;
+    ns.playbackRate.value = noiseRate(f);
+    var gN = a.createGain(); gN.gain.value = S.mixN * 0.35;
+    ns.connect(gN); gN.connect(master); ns.start(); nodes.push(ns);
+  }
+  var vib = 0;
+  if(S.vib > 0){
+    var lfo = a.createOscillator(); lfo.frequency.value = 6;
+    var lg = a.createGain(); lg.gain.value = S.vib;
+    lfo.connect(lg); lg.connect(g); lfo.start(); nodes.push(lfo);
+    vib = 1;
+  }
+  S.voices[note] = {nodes: nodes, g: g, gB: gB, master: master, hold: S.rel, vib: vib};
+  updateLCD();
+}
+function chipOff(note){
+  var v = S.voices[note];
+  if(!v) return;
+  var relMs = v.sfRel ? v.sfRel * 1000 : S.rel;
+  var t = audio().currentTime, r = Math.max(0.01, relMs / 1000);
+  try{
+    v.g.gain.cancelScheduledValues(t);
+    v.g.gain.setValueAtTime(Math.max(v.g.gain.value, 0.0001), t);
+    if(v.sfRel){ v.g.gain.setTargetAtTime(0, t, r / 3); }
+    else { v.g.gain.exponentialRampToValueAtTime(0.0001, t + r); }
+  }catch(e){}
+  var list = v.nodes, vref = v, rdel = v.sfRel ? r * 2.5 : r;
+  setTimeout(function(){
+    for(var i = 0; i < list.length; i++){ try{ list[i].stop(); }catch(e){} }
+    try{ vref.master.disconnect(); }catch(e){}
+  }, rdel * 1000 + 60);
+  delete S.voices[note];
+  updateLCD();
+}
+
+/* ---------- SoundFont (.sf2)
+(Очень нежная ромашка ломаеться как школьница на вписке) ---------- */
+function sgn16(v){ return v > 32767 ? v - 65536 : v; }
+function tc2s(tc){ return Math.pow(2, (tc || 0) / 1200); } /* timecents -> секунды */
+
+function parseSF2(buf){
+  var dv = new DataView(buf), u8 = new Uint8Array(buf);
+  function str(o, n){ var s = ""; for(var i = 0; i < n; i++){ var c = u8[o + i]; if(!c) break; s += String.fromCharCode(c); } return s; }
+  if(str(0, 4) !== "RIFF" || str(8, 4) !== "sfbk") throw new Error("Это не SoundFont2");
+  var sampleStart = 0;
+  var chunks = {phdr:null, pbag:null, pgen:null, inst:null, ibag:null, igen:null, shdr:null};
+  var pos = 12;
+  while(pos < dv.byteLength - 8){
+    var id = str(pos, 4), size = dv.getUint32(pos + 4, true);
+    if(id === "LIST"){
+      var type = str(pos + 8, 4), inner = pos + 12, listEnd = Math.min(pos + 8 + size, dv.byteLength);
+      while(inner < listEnd - 8){
+        var cid = str(inner, 4), csize = dv.getUint32(inner + 4, true), body = inner + 8;
+        if(type === "sdta" && cid === "smpl"){ sampleStart = body; }
+        else if(type === "pdta" && chunks[cid] !== undefined){ chunks[cid] = {start: body, size: csize}; }
+        inner += 8 + csize + (csize % 2);
+      }
+    }
+    pos += 8 + size + (size % 2);
+  }
+  for(var ck in chunks){ if(!chunks[ck]) throw new Error("Повреждённый банк: нет чанка " + ck); }
+  var phdrN = chunks.phdr.size / 38 | 0, pbagN = chunks.pbag.size / 4 | 0, pgenN = chunks.pgen.size / 4 | 0;
+  var instN = chunks.inst.size / 22 | 0, ibagN = chunks.ibag.size / 4 | 0, igenN = chunks.igen.size / 4 | 0, shdrN = chunks.shdr.size / 46 | 0;
+  var presets = [], pbags = [], pgens = [], insts = [], ibags = [], igens = [], shdrs = [];
+  var i, o;
+  for(i = 0; i < pbagN; i++) pbags.push({gi: dv.getUint16(chunks.pbag.start + i * 4, true)});
+  for(i = 0; i < pgenN; i++) pgens.push({op: dv.getUint16(chunks.pgen.start + i * 4, true),
+                                          amt: dv.getUint16(chunks.pgen.start + i * 4 + 2, true)});
+  for(i = 0; i < ibagN; i++) ibags.push({gi: dv.getUint16(chunks.ibag.start + i * 4, true)});
+  for(i = 0; i < igenN; i++) igens.push({op: dv.getUint16(chunks.igen.start + i * 4, true),
+                                          amt: dv.getUint16(chunks.igen.start + i * 4 + 2, true)});
+  for(i = 0; i < instN; i++)
+    insts.push({name: str(chunks.inst.start + i * 22, 20), bag: dv.getUint16(chunks.inst.start + i * 22 + 20, true)});
+  for(i = 0; i < shdrN; i++){
+    o = chunks.shdr.start + i * 46;
+    shdrs.push({name: str(o, 20), start: dv.getUint32(o + 20, true), end: dv.getUint32(o + 24, true),
+      loopStart: dv.getUint32(o + 28, true), loopEnd: dv.getUint32(o + 32, true),
+      sampleRate: dv.getUint32(o + 36, true) || 44100, origPitch: u8[o + 40],
+      pitchCorr: dv.getInt8(o + 41)});
+  }
+  for(i = 0; i < phdrN - 1; i++){
+    o = chunks.phdr.start + i * 38;
+    presets.push({name: str(o, 20), preset: dv.getUint16(o + 20, true),
+      bank: dv.getUint16(o + 22, true), bag: dv.getUint16(o + 24, true),
+      bagEnd: dv.getUint16(chunks.phdr.start + (i + 1) * 38 + 24, true)});
+  }
+  var sf = {dv: dv, sampleStart: sampleStart, presets: presets, pbags: pbags, pgens: pgens,
+            insts: insts, ibags: ibags, igens: igens, shdrs: shdrs, _cache: {},
+            zones: function(bagArr, genArr, b0, b1){
+              b0 = Math.max(0, Math.min(b0, bagArr.length));
+              b1 = Math.max(b0, Math.min(b1, bagArr.length));
+              var out = [], b, g0, g1, gens, g;
+              for(b = b0; b < b1; b++){
+                g0 = bagArr[b].gi; g1 = (b + 1 < b1 ? bagArr[b + 1].gi : genArr.length);
+                g0 = Math.max(0, Math.min(g0, genArr.length)); g1 = Math.max(g0, Math.min(g1, genArr.length));
+                gens = {};
+                for(g = g0; g < g1; g++) gens[genArr[g].op] = genArr[g].amt;
+                out.push({gens: gens});
+              }
+              return out;
+            }};
+  for(i = 0; i < presets.length; i++) presets[i].spans = buildSpans(sf, i);
+  return sf;
+}
+function buildSpans(sf, pi){
+  var p = sf.presets[pi];
+  var pz = sf.zones(sf.pbags, sf.pgens, p.bag, p.bagEnd);
+  var pg = {};
+  for(var q = 0; q < pz.length; q++){ if(pz[q].gens[41] === undefined){ pg = pz[q].gens; break; } }
+  var spans = [];
+  for(var z = 0; z < pz.length; z++){
+    var zg = pz[z].gens;
+    var instIdx = zg[41]; if(instIdx === undefined) continue;
+    if(instIdx < 0 || instIdx >= sf.insts.length) continue;
+    var iEnd = instIdx + 1 < sf.insts.length ? sf.insts[instIdx + 1].bag : sf.igens.length;
+    var iz = sf.zones(sf.ibags, sf.igens, sf.insts[instIdx].bag, iEnd);
+    var ig = {};
+    for(var q2 = 0; q2 < iz.length; q2++){ if(iz[q2].gens[53] === undefined){ ig = iz[q2].gens; break; } }
+    for(var z2 = 0; z2 < iz.length; z2++){
+      var sIdx = iz[z2].gens[53]; if(sIdx === undefined) continue;
+      if(sIdx < 0 || sIdx >= sf.shdrs.length) continue;
+      var sh = sf.shdrs[sIdx];
+      if(sh.end <= sh.start) continue; /* EOS-заглушка */
+      var G = {}; var kk;
+      for(kk in pg) G[kk] = pg[kk];
+      for(kk in ig) G[kk] = ig[kk];
+      for(kk in iz[z2].gens) G[kk] = iz[z2].gens[kk];
+      var lo = 0, hi = 127;
+      if(G[43] !== undefined){ lo = G[43] & 0xFF; hi = (G[43] >> 8) & 0xFF; }
+      if(zg[43] !== undefined){ lo = Math.max(lo, zg[43] & 0xFF); hi = Math.min(hi, (zg[43] >> 8) & 0xFF); }
+      if(hi < lo) continue;
+      var vlo = 0, vhi = 127;
+      if(G[44] !== undefined){ vlo = G[44] & 0xFF; vhi = (G[44] >> 8) & 0xFF; }
+      var root = G[58] !== undefined ? G[58] : sh.origPitch;
+      if(!(root > 0 && root <= 127)) root = 60;
+      spans.push({lo: lo, hi: hi, vlo: vlo, vhi: vhi, sample: sIdx, root: root,
+        coarse: G[51] !== undefined ? sgn16(G[51]) : 0,
+        fine: G[52] !== undefined ? sgn16(G[52]) : 0,
+        att: G[48] !== undefined ? sgn16(G[48]) : 0,
+        attack: tc2s(G[34] !== undefined ? sgn16(G[34]) : -12000),
+        decay: tc2s(G[36] !== undefined ? sgn16(G[36]) : -12000),
+        sustain: G[37] !== undefined ? sgn16(G[37]) : 0,
+        release: tc2s(G[38] !== undefined ? sgn16(G[38]) : -12000),
+        modes: G[54] || 0, corr: sh.pitchCorr});
+    }
+  }
+  return spans;
+}
+function getBuffer(sf, sIdx){
+  if(sf._cache[sIdx]) return sf._cache[sIdx];
+  var h = sf.shdrs[sIdx], len = Math.max(0, h.end - h.start);
+  if(len < 8) return null;
+  var a = audio();
+  var ab = a.createBuffer(1, len, h.sampleRate || 44100);
+  var ch = ab.getChannelData(0);
+  for(var i = 0; i < len; i++) ch[i] = sf.dv.getInt16(sf.sampleStart + (h.start + i) * 2, true) / 32768;
+  var entry = {buffer: ab, loopStart: null, loopEnd: null};
+  if(h.loopStart < h.loopEnd && h.loopEnd <= h.end){
+    entry.loopStart = (h.loopStart - h.start) / (h.sampleRate || 44100);
+    entry.loopEnd = (h.loopEnd - h.start) / (h.sampleRate || 44100);
+  }
+  sf._cache[sIdx] = entry;
+  return entry;
+}
+function sfOn(note, vel){
+  if(!S.sf || !S.sf.presets.length) return false;
+  var pr = S.sf.presets[S.sfPreset] || S.sf.presets[0];
+  if(!pr.spans || !pr.spans.length) return false;
+  var v = vel || 100, span = null, i;
+  for(i = 0; i < pr.spans.length; i++){
+    var sp = pr.spans[i];
+    if(note >= sp.lo && note <= sp.hi && v >= sp.vlo && v <= sp.vhi){ span = sp; break; }
+  }
+  if(!span){ /* velocity-слой не совпал — берём зону по клавише */
+    for(i = 0; i < pr.spans.length; i++){
+      if(note >= pr.spans[i].lo && note <= pr.spans[i].hi){ span = pr.spans[i]; break; }
+    }
+  }
+  if(!span) return false;
+  var entry = getBuffer(S.sf, span.sample);
+  if(!entry) return false;
+  var a = audio();
+  var src = a.createBufferSource();
+  src.buffer = entry.buffer;
+  var cents = (note - span.root) * 100 + span.corr + span.coarse * 100 + span.fine;
+  src.playbackRate.value = Math.pow(2, cents / 1200);
+  if(entry.loopStart !== null && (span.modes === 1 || span.modes === 3)){
+    src.loop = true; src.loopStart = entry.loopStart; src.loopEnd = entry.loopEnd;
+  }
+  var g = a.createGain(), t = a.currentTime;
+  var peak = Math.pow(v / 127, 1.5) * Math.pow(10, -span.att / 200) * 0.9;
+  var sus = span.sustain < 0 ? Math.pow(10, span.sustain / 200) : 1;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(peak, t + Math.max(span.attack, 0.002));
+  g.gain.setTargetAtTime(peak * sus, t + Math.max(span.attack, 0.002), Math.max(span.decay / 3, 0.01));
+  var master = a.createGain(); master.gain.value = S.vol;
+  src.connect(g); g.connect(master); master.connect(a.destination);
+  src.start(t);
+  S.voices[note] = {nodes: [src], g: g, gB: null, master: master, sfRel: Math.max(span.release, 0.02)};
+  updateLCD();
+  return true;
+}
+
+
+/* ---------- MIDI ---------- */
+function initMIDI(){
+  if(!navigator.requestMIDIAccess) return;
+  navigator.requestMIDIAccess().then(function(ma){
+    ma.inputs.forEach(function(inp){
+      inp.onmidimessage = function(e){
+        var d = e.data;
+        var cmd = d[0] & 0xF0, ch = d[0] & 0x0F;
+        if(S.midiChan >= 0 && ch !== S.midiChan) return;
+        if(cmd === 0x90 && d[2] > 0){ noteOn(d[1], d[2]); }
+        else if(cmd === 0x80 || (cmd === 0x90 && d[2] === 0)){ noteOff(d[1]); }
+      };
+    });
+  }, function(){});
+}
+
+function noteOn(note, vel){
+  if(S.voices[note]) return;
+  if(S.mode === "sf" && sfOn(note, vel)) return;
+  chipOn(note, vel);
+}
+function noteOff(note){ chipOff(note); }
+
+/* ---------- клавиатура 88 клавиш ---------- */
+var keysWrap = document.getElementById("keys");
+(function buildKeys(){
+  var whites = [0,2,4,5,7,9,11];
+  var html = "", i;
+  var wcount = 0;
+  for(i = 21; i <= 108; i++){
+    var pc = i % 12;
+    if(whites.indexOf(pc) >= 0) wcount++;
+  }
+  var wIdx = 0;
+  var blackInfo = [];
+  for(i = 21; i <= 108; i++){
+    var pc2 = i % 12;
+    if(whites.indexOf(pc2) >= 0){
+      var bottom = noteName(i).indexOf("#") < 0 ? noteName(i) : "";
+      html += '<div class="wk" data-n="' + i + '"><span>' + (i === 21 || i % 12 === 0 ? noteName(i) : "") + '</span></div>';
+      blackInfo.push({idx: wIdx, has: false});
+      wIdx++;
+    }
+  }
+  keysWrap.innerHTML = html;
+  var kids = keysWrap.children;
+  var bpos = 0;
+  for(i = 21; i <= 108; i++){
+    var pc3 = i % 12;
+    if([1,3,6,8,10].indexOf(pc3) >= 0){
+      var prevWhite = i - 1;
+      var el = null;
+      for(var j = 0; j < kids.length; j++){ if(+kids[j].getAttribute("data-n") === prevWhite){ el = kids[j]; break; } }
+      if(el){
+        var b = document.createElement("div");
+        b.className = "bk"; b.setAttribute("data-n", i);
+        el.appendChild(b);
+      }
+    }
+  }
+})();
+
+keysWrap.addEventListener("mousedown", function(e){
+  var t = e.target;
+  if(t.dataset && t.dataset.n){ noteOn(+t.dataset.n, 100); t.classList.add("dn"); e.preventDefault(); }
+});
+document.addEventListener("mouseup", function(e){
+  var t = e.target;
+  if(t.classList && t.classList.contains("dn")){ t.classList.remove("dn"); noteOff(+t.dataset.n); }
+});
+keysWrap.addEventListener("mouseover", function(e){
+  var t = e.target;
+  if(t.dataset && t.dataset.n && e.buttons === 1 && !t.classList.contains("dn")){ noteOn(+t.dataset.n, 100); t.classList.add("dn"); }
+});
+
+/* ---------- клавиатура ПК ---------- */
+var KEYMAP_LO = {KeyZ:0, KeyS:1, KeyX:2, KeyD:3, KeyC:4, KeyV:5, KeyG:6, KeyB:7, KeyH:8, KeyN:9, KeyJ:10, KeyM:11, Comma:12, KeyL:13, Period:14, Slash:15};
+var KEYMAP_HI = {KeyQ:12, Digit2:13, KeyW:14, Digit3:15, KeyE:16, KeyR:17, Digit5:18, KeyT:19, Digit6:20, KeyY:21, Digit7:22, KeyU:23, KeyI:24};
+var heldKeys = {};
+document.addEventListener("keydown", function(e){
+  if(!S.pcKb) { if(e.code === "ArrowLeft"){ octShift(-1); e.preventDefault(); } else if(e.code === "ArrowRight"){ octShift(1); e.preventDefault(); } return; }
+  if(e.repeat) return;
+  if(e.code === "ArrowLeft"){ octShift(-1); return; }
+  if(e.code === "ArrowRight"){ octShift(1); return; }
+  var off = KEYMAP_LO[e.code] !== undefined ? KEYMAP_LO[e.code] : (KEYMAP_HI[e.code] !== undefined ? KEYMAP_HI[e.code] : null);
+  if(off === null) return;
+  var n = S.base + off;
+  if(heldKeys[e.code]) return;
+  heldKeys[e.code] = n;
+  noteOn(n, 100);
+});
+document.addEventListener("keyup", function(e){
+  var n = heldKeys[e.code];
+  if(n !== undefined){ delete heldKeys[e.code]; noteOff(n); }
+});
+
+/* ---------- интерфейс ---------- */
+function updateLCD(){
+  var waveNames = {pulse:"□", saw:"◺", tri:"△", sine:"∿"};
+  var chanTxt = S.mode === "chip" ? "Канал: [PULSE A/B + NOISE]" : "Канал: [sf2-пресет]";
+  var lcd = document.getElementById("lcd");
+  if(lcd) lcd.textContent = "MODE: [" + (S.mode === "chip" ? "CHIP-TUNE" : "SoundFont") + "] — Чип: [2A03] — " + chanTxt + " — Волна: [" + waveNames[S.wave] + "] — Октава: [" + noteName(S.base) + "]";
+}
+function octShift(d){
+  var nb = S.base + d * 12;
+  if(nb < 24 || nb > 96) return;
+  S.base = nb;
+  document.getElementById("octDisp").textContent = noteName(S.base);
+  var sel = document.getElementById("octBase");
+  for(var i = 0; i < sel.options.length; i++){ if(+sel.options[i].value === S.base) sel.selectedIndex = i; }
+  updateLCD();
+}
+
+(function initUI(){
+  var ob = document.getElementById("octBase");
+  var names = ["C1","C2","C3","C4","C5","C6","C7"];
+  for(var i = 0; i < names.length; i++){
+    var o = document.createElement("option");
+    o.value = 24 + i * 12; o.textContent = names[i];
+    if(24 + i * 12 === 60) o.selected = true;
+    ob.appendChild(o);
+  }
+  for(var c = 0; c < 16; c++){
+    var mc = document.createElement("option");
+    mc.value = c; mc.textContent = "Канал " + (c + 1);
+    document.getElementById("midiChan").appendChild(mc);
+  }
+  ob.onchange = function(){ S.base = +ob.value; document.getElementById("octDisp").textContent = noteName(S.base); updateLCD(); };
+  document.getElementById("midiChan").onchange = function(e){ S.midiChan = +e.target.value; };
+
+  document.getElementById("octDown").onclick = function(){ octShift(-1); };
+  document.getElementById("octUp").onclick = function(){ octShift(1); };
+
+  var waveBtns = document.querySelectorAll("[data-wave]");
+  for(var w = 0; w < waveBtns.length; w++){
+    waveBtns[w].onclick = (function(btn){
+      return function(){
+        S.wave = btn.dataset.wave;
+        for(var k = 0; k < waveBtns.length; k++) waveBtns[k].classList.remove("on");
+        btn.classList.add("on");
+        updateLCD();
+      };
+    })(waveBtns[w]);
+  }
+
+  document.getElementById("mChip").onclick = function(){
+    S.mode = "chip";
+    this.classList.add("on");
+    document.getElementById("mSf").classList.remove("on");
+    updateLCD();
+  };
+  document.getElementById("mSf").onclick = function(){
+    S.mode = "sf";
+    this.classList.add("on");
+    document.getElementById("mChip").classList.remove("on");
+    updateLCD();
+  };
+  document.getElementById("sfFile").onchange = function(e){
+    var f = e.target.files[0];
+    if(!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      try{
+        S.sf = parseSF2(rd.result);
+        var sel = document.getElementById("sfPreset");
+        sel.innerHTML = "";
+        for(var i = 0; i < S.sf.presets.length; i++){
+          var o = document.createElement("option");
+          o.value = i; o.textContent = S.sf.presets[i].name;
+          sel.appendChild(o);
+        }
+        S.sfPreset = 0;
+        sel.onchange = function(ev){ S.sfPreset = +ev.target.value; };
+        updateLCD();
+      }catch(err){
+        alert("Ошибка SF2: " + err.message);
+      }
+    };
+    rd.readAsArrayBuffer(f);
+  };
+  document.getElementById("mSf").addEventListener("dblclick", function(){ document.getElementById("sfFile").click(); });
+  document.getElementById("mChip").addEventListener("dblclick", function(){ document.getElementById("sfFile").value = ""; });
+
+  var dutyA = document.querySelectorAll(".dutyA");
+  for(var da = 0; da < dutyA.length; da++){
+    dutyA[da].onclick = (function(btn){
+      return function(){
+        S.dutyA = +btn.dataset.d;
+        for(var k = 0; k < dutyA.length; k++) dutyA[k].classList.remove("on");
+        btn.classList.add("on");
+        pulseCache = {};
+      };
+    })(dutyA[da]);
+  }
+  var dutyB = document.querySelectorAll(".dutyB");
+  for(var db = 0; db < dutyB.length; db++){
+    dutyB[db].onclick = (function(btn){
+      return function(){
+        S.dutyB = +btn.dataset.d;
+        for(var k = 0; k < dutyB.length; k++) dutyB[k].classList.remove("on");
+        btn.classList.add("on");
+        pulseCache = {};
+      };
+    })(dutyB[db]);
+  }
+  document.getElementById("detune").oninput = function(e){ S.detuneB = +e.target.value; document.getElementById("dtV").textContent = e.target.value; };
+  document.getElementById("noiseMode").onclick = function(){
+    S.noiseLong = !S.noiseLong;
+    noiseBufLong = null; noiseBufShort = null;
+    this.textContent = "Шум: " + (S.noiseLong ? "ДЛИННЫЙ" : "КОРОТКИЙ");
+  };
+  document.getElementById("vol").oninput = function(e){ S.vol = e.target.value / 100; document.getElementById("volV").textContent = e.target.value + "%"; };
+  document.getElementById("vib").oninput = function(e){ S.vib = +e.target.value; document.getElementById("vibV").textContent = e.target.value; };
+  document.getElementById("atk").oninput = function(e){ S.atk = +e.target.value; document.getElementById("atkV").textContent = e.target.value + " мс"; };
+  document.getElementById("rel").oninput = function(e){ S.rel = +e.target.value; document.getElementById("relV").textContent = e.target.value + " мс"; };
+  document.getElementById("mixA").oninput = function(e){ S.mixA = e.target.value / 100; document.getElementById("mixAV").textContent = e.target.value + "%"; };
+  document.getElementById("mixB").oninput = function(e){ S.mixB = e.target.value / 100; document.getElementById("mixBV").textContent = e.target.value + "%"; };
+  document.getElementById("mixN").oninput = function(e){ S.mixN = e.target.value / 100; document.getElementById("mixNV").textContent = e.target.value + "%"; };
+  document.getElementById("pcKbBtn").onclick = function(){
+    S.pcKb = !S.pcKb;
+    this.textContent = "Клавиатура ПК: " + (S.pcKb ? "ВКЛ" : "ВЫКЛ");
+    this.classList.toggle("on", S.pcKb);
+  };
+
+  updateLCD();
+  initMIDI();
+})();
+</script>
+</body>
+</html>
