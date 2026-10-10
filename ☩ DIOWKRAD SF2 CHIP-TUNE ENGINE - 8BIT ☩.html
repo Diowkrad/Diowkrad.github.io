@@ -106,6 +106,8 @@ h1{
   border:4px outset #950;
   background:#1a1a2e;
   padding:6px;
+      background-image: /* Первый слой: мелкие темно-серые точки */ repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px), /* Второй слой: светлые пиксельные блики для объема */ repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
+    background-size: 12px 12px, 18px 18px;
 }
 
 /* input[type=file] и select — загрузчик банка и выпадающие списки:
@@ -245,7 +247,7 @@ border:2px solid #f90;
 .lcd{
   background:#0a2a12;
   border:6px inset #1a1a2e;
-  color:#7dff8a;
+  color:#c8ff7d;
   padding:8px 12px;
   font-size:0.9rem;
   margin: 10px 5px 0px 5px;
@@ -254,6 +256,9 @@ border:2px solid #f90;
   max-width:100%;
   overflow:auto;
   line-height:150%;
+  background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #16161d 2px, #0a2a12 2px, #0a2a12 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #140 0px, rgba(255, 255, 255, 0.12) 1px, #000 1px, #1a1a2e 6px);
+  background-size: 8px 8px, 12px 12px;
+  
 }
 
 /* .logotype — анимированная вывеска: перелив цвета по кейфрейму gradientMove */
@@ -273,6 +278,23 @@ border:2px solid #f90;
   flex-direction:row;
   align-content:flex-start;
   margin-bottom:12px;
+  background-image: 
+  /* 1. Лёгкий шум (зерно) */
+  repeating-radial-gradient(circle at 50% 50%, transparent, rgba(255,255,255,0.015) 1px, transparent 2px),
+  
+  /* 2. Основной объёмный слой */
+  radial-gradient(at 0% 0%, rgba(0, 0, 0, 0.1) 0px, transparent 80%),
+  radial-gradient(at 100% 0%, rgba(70, 86, 105, 0.22) 0px, transparent 72%),
+  radial-gradient(at 50% 100%, rgba(0, 0, 0, 0.07) 0px, transparent 88%),
+  radial-gradient(at 80% 50%, rgba(120, 138, 164, 0.24) 0px, transparent 78%),
+  
+  /* 3. Полупрозрачная вуаль с лёгким сдвигом цвета */
+  linear-gradient(90deg, rgba(5, 5, 15, 0.55), rgba(8, 8, 22, 0.55));
+  
+background-attachment: fixed;
+background-size: cover;
+background-position: center;
+background-blend-mode: overlay, multiply, overlay, overlay, normal; /* смешивание слоёв */
 }
 
 /* .panel_buttons — правая колонка панели: ряды кнопок в столбик, без переноса */
@@ -354,14 +376,19 @@ border:2px solid #f90;
   border:4px outset #950;
   padding:8px;
   display:flex;
+      background-image: /* Первый слой: мелкие темно-серые точки */ repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px), /* Второй слой: светлые пиксельные блики для объема */ repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
+    background-size: 12px 12px, 18px 18px;
 }
 
 /* .row_b span — текст подсказки: золотой моноширинный с разрядкой */
 .row_b span{
   font-family:'Courier New', monospace;
-  color:#f7d51d;
+  
   font-size:0.75rem;
   letter-spacing:1px;
+  color: #c8ff7d;
+    background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #16161d 2px, #0a2a12 2px, #0a2a12 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #140 0px, rgba(255, 255, 255, 0.12) 1px, #000 1px, #1a1a2e 6px);
+    background-size: 8px 8px, 12px 12px;
 }
 
 /* .wk — белая клавиша: растёт на всю ширину ряда, светлая, тонкий бордер */
