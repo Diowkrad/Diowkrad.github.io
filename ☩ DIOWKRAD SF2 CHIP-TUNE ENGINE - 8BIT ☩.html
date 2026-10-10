@@ -91,10 +91,16 @@ button{
   font-size:0.85rem;
   width:180px;
   height:40px;
+     background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #111 0px, #333 1px, #111 1px, #222 6px);
+    background-size: 2px 2px, 18px 18px;
 }
 
 /* button.on — активная кнопка: золотая заливка, тёмный текст */
-button.on{ background:var(--gold); color:#111; }
+button.on{ background: #f79e1d;
+    color: #99fffc;
+    background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #000000 0px, #000000 1px, #1a1a2e 1px, #03000b 6px);
+    background-size: 2px 2px, 9px 9px;
+    border: 4px outset #4f8ee9; }
 
 /* h1 — заголовок-вывеска: золото с тенью, рамка outset, панельный фон */
 h1{
@@ -247,7 +253,7 @@ border:2px solid #f90;
 .lcd{
   background:#0a2a12;
   border:6px inset #1a1a2e;
-  color:#c8ff7d;
+  color: var(--cyan);
   padding:8px 12px;
   font-size:0.9rem;
   margin: 10px 5px 0px 5px;
@@ -256,8 +262,8 @@ border:2px solid #f90;
   max-width:100%;
   overflow:auto;
   line-height:150%;
-  background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #16161d 2px, #0a2a12 2px, #0a2a12 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #140 0px, rgba(255, 255, 255, 0.12) 1px, #000 1px, #1a1a2e 6px);
-  background-size: 8px 8px, 12px 12px;
+       background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+    background-size: 2px 3px, 12px 12px;
   
 }
 
@@ -278,6 +284,8 @@ border:2px solid #f90;
   flex-direction:row;
   align-content:flex-start;
   margin-bottom:12px;
+  background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+    background-size: 2px 1px, 18px 18px;
 }
 
 /* .panel_buttons — правая колонка панели: ряды кнопок в столбик, без переноса */
@@ -333,7 +341,7 @@ border:2px solid #f90;
 .row span{
     font-family: inherit;
     background: #000;
-    color: #c8ff7d;
+    color: var(--cyan);
     border: 6px inset #1a1a2e;
     padding: 6px 14px;
     cursor: pointer;
@@ -341,8 +349,8 @@ border:2px solid #f90;
     font-size: 0.8rem;
     width: 180px;
     height: 40px;
-           background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #16161d 2px, #001409 2px, #0a2a12 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #004433 0px, rgb(88 60 0) 1px, #24400f 1px, #1a1a2e 6px);
-    background-size: 6px 8px, 6px 8px;
+                  background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+    background-size: 2px 3px, 12px 12px;
 }
 
 /* .row span.plain — тот же span без экрана и рамки: просто текст */
@@ -370,9 +378,9 @@ border:2px solid #f90;
   
   font-size:0.75rem;
   letter-spacing:1px;
-  color: #c8ff7d;
-    background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #16161d 2px, #0a2a12 2px, #0a2a12 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #140 0px, rgba(255, 255, 255, 0.12) 1px, #000 1px, #1a1a2e 6px);
-    background-size: 8px 8px, 12px 12px;
+  color: var(--cyan);
+           background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+    background-size: 2px 3px, 12px 12px;
 }
 
 /* .wk — белая клавиша: растёт на всю ширину ряда, светлая, тонкий бордер */
