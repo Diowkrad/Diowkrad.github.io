@@ -1380,8 +1380,8 @@ function buildKeys(){
     if(!box) continue;
     els.clear(); box.innerHTML='';
     const lo=KB_LO, hi=KB_HI; /* полный ролл: C1..C8 в обоих режимах */
-    if(kbMode===2){ box.style.width='2900px'; box.style.height='152px'; }
-    else { box.style.width='2900px'; box.style.height='152px'; } /* единый размер: белые 58x152 */
+    if(kbMode===2){ box.style.width='2906px'; box.style.height='164px'; }
+    else { box.style.width='2906px'; box.style.height='164px'; } /* единый размер: белые 58x152 */
     for(let k=lo;k<=hi;k++){
       const m=k%12;
       if(!isBlackM(m)){
