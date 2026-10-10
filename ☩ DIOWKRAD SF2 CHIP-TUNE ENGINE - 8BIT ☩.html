@@ -332,8 +332,8 @@ border:2px solid #f90;
 /* .row span — «кнопка-подпись» в LCD-стиле: зелёный экран, inset-рамка */
 .row span{
     font-family: inherit;
-    background: #0a2a12;
-    color: #7dff8a;
+    background: #000;
+    color: #c8ff7d;
     border: 6px inset #1a1a2e;
     padding: 6px 14px;
     cursor: pointer;
@@ -341,7 +341,8 @@ border:2px solid #f90;
     font-size: 0.8rem;
     width: 180px;
     height: 40px;
-    text-align: center;
+           background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #16161d 2px, #001409 2px, #0a2a12 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #004433 0px, rgb(88 60 0) 1px, #24400f 1px, #1a1a2e 6px);
+    background-size: 6px 8px, 6px 8px;
 }
 
 /* .row span.plain — тот же span без экрана и рамки: просто текст */
