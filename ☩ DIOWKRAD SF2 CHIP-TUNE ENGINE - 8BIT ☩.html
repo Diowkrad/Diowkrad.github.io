@@ -496,6 +496,7 @@ body.kb-single #keys2{ display:none !important; }
 		</div>
 		<div class="row">
 		  <span>Midi-Keys:</span>
+		   <span>FPS: <b id="fpsDisplay">0</b></span>
 		  <button id="midiBtn">Подключить MIDI</button>
 		  <select id="midiSel"><option value="all">Все устройства</option></select>
 		</div>
@@ -1821,6 +1822,23 @@ if (hasTouch()) {
     }
   } catch (ex) {}
 }
+
+// FPS метр :
+let frameCount = 0;
+let lastTime = performance.now();
+
+function updateFPS() {
+  const now = performance.now();
+  frameCount++;
+  if (now - lastTime >= 1000) {
+    document.getElementById('fpsDisplay').textContent = frameCount;
+    frameCount = 0;
+    lastTime = now;
+  }
+  requestAnimationFrame(updateFPS);
+}
+
+updateFPS();
 </script>
 </body>
 </html>
