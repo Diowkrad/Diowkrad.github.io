@@ -278,23 +278,6 @@ border:2px solid #f90;
   flex-direction:row;
   align-content:flex-start;
   margin-bottom:12px;
-  background-image: 
-  /* 1. Лёгкий шум (зерно) */
-  repeating-radial-gradient(circle at 50% 50%, transparent, rgba(255,255,255,0.015) 1px, transparent 2px),
-  
-  /* 2. Основной объёмный слой */
-  radial-gradient(at 0% 0%, rgba(0, 0, 0, 0.1) 0px, transparent 80%),
-  radial-gradient(at 100% 0%, rgba(70, 86, 105, 0.22) 0px, transparent 72%),
-  radial-gradient(at 50% 100%, rgba(0, 0, 0, 0.07) 0px, transparent 88%),
-  radial-gradient(at 80% 50%, rgba(120, 138, 164, 0.24) 0px, transparent 78%),
-  
-  /* 3. Полупрозрачная вуаль с лёгким сдвигом цвета */
-  linear-gradient(90deg, rgba(5, 5, 15, 0.55), rgba(8, 8, 22, 0.55));
-  
-background-attachment: fixed;
-background-size: cover;
-background-position: center;
-background-blend-mode: overlay, multiply, overlay, overlay, normal; /* смешивание слоёв */
 }
 
 /* .panel_buttons — правая колонка панели: ряды кнопок в столбик, без переноса */
