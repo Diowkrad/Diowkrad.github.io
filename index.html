@@ -167,6 +167,42 @@
   .kbd.note{ color:var(--accent); border-color:var(--accent); }
 
   /* ══ КНОПКИ-ДЕЙСТВИЯ ══ */
+  
+  /* --- Стили для Маскота (Teddy) --- */
+#mascot-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100px; height: 100px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-out;
+  z-index: 999; /* Важно: выше всего интерфейса, но ниже модальных окон, если есть */
+}
+#mascot-svg.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.bear-jumping {
+  animation: bear-jump-anim 0.3s forwards;
+  transform-origin: bottom center;
+}
+@keyframes bear-jump-anim {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-40px) scale(1.1); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Цвета (палитра под твой ретро-стиль) */
+.c-fur-main { fill: #6d4c41; }
+.c-fur-light { fill: #a1887f; }
+.c-fur-dark { fill: #3e2723; }
+.c-scarf { fill: #ef5350; }
+.c-button { fill: #212121; }
+.c-nose { fill: #1b1b1b; }
+.c-eye { fill: #000; }
+.c-cheek { fill: #ffab91; }
+.c-palm { fill: #bcaaa4; }
+  
   .act{
     display:inline-block;
     font-family:inherit;
@@ -204,6 +240,44 @@
   }
   .blink{ animation:blink 1.2s steps(2) infinite; }
   @keyframes blink{ 50%{ opacity:.25; } }
+  
+  /* --- Стили для Маскота (Teddy) --- */
+#mascot-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100px; height: 100px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-out;
+  z-index: 999; /* Важно: выше всего интерфейса, но ниже модальных окон, если есть */
+}
+#mascot-svg.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.bear-jumping {
+  animation: bear-jump-anim 0.3s forwards;
+  transform-origin: bottom center;
+}
+@keyframes bear-jump-anim {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-40px) scale(1.1); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Цвета (палитра под твой ретро-стиль) */
+.c-fur-main { fill: #6d4c41; }
+.c-fur-light { fill: #a1887f; }
+.c-fur-dark { fill: #3e2723; }
+.c-scarf { fill: #ef5350; }
+.c-button { fill: #212121; }
+.c-nose { fill: #1b1b1b; }
+.c-eye { fill: #000; }
+.c-cheek { fill: #ffab91; }
+.c-palm { fill: #bcaaa4; }
+
+  
+  
 </style>
 </head>
 <body>
@@ -355,6 +429,93 @@
 Одна вёрстка под все устройства.<br>
 Приложение должно работать и выглядеть одинаково везде — независимо от того, какого размера экран и чем отличается браузер, если у него под капотом движок Chromium.
 </span>
+<h2>Специфекация движка:</h2>
+	<span class="k"><b>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ ☩ BUILD v1.2.5 «Final» ☩ ☩</b><br><br><br><br>
+	# DIOWKRAD SF2 CHIP-TUNE ENGINE — Спецификация (v1.2.5 Final)
+
+## О проекте
+Финальная сборка движка для синтеза звука с эмуляцией чипа 2A03 (NES), поддержкой 4 типов волн, MIDI на 16 каналов, роллом и кастомной клавиатурой.  
+Без внешних библиотек, без дебага, без changelog. Полностью оффлайн.
+
+## Порядок загрузки скриптов
+1. core-init.js
+2. synth-engine.js
+3. wave-generator.js
+4. midi-handler.js
+5. midi-select.js
+6. keyboard-render.js
+7. octave-control.js
+8. roll-render.js
+9. roll-scroll.js
+10. ui-controls.js
+
+> Важно: менять порядок нельзя — нарушатся зависимости.
+
+## Карта модулей
+
+| Модуль | Назначение | Ключевые ID / селекторы | Зависимости |
+|--------|------------|---------------------------|-------------|
+| core-init.js | Инициализация ядра, проверка DOM, запуск SynthAPI | `start-btn`, `mute-btn` | — |
+| synth-engine.js | Ядро синтезатора, эмуляция 2A03 | Внутренние переменные движка | core-init.js |
+| wave-generator.js | Генерация 4 волн: синус, пила, квадрат, треугольник | `.wave-type` | synth-engine.js |
+| midi-handler.js | Обработка MIDI, каналы 1–16 | `.midi-status`, `#midiVoiceSel` | synth-engine.js |
+| midi-select.js | Построение селектора голосов | `#midiVoiceSel` | midi-handler.js |
+| keyboard-render.js | Отрисовка клавиш, полифония | `.keyboard`, `.key` | core-init.js, synth-engine.js |
+| octave-control.js | Переключатель октав, границы | `.octave-controls`, `#octave-display` | keyboard-render.js |
+| roll-render.js | Ролл (ноты по времени) | `#roll-container`, `.roll-note` | keyboard-render.js, octave-control.js |
+| roll-scroll.js | Скролл ролла, синхронизация | `#roll-viewport`, `.roll-track` | roll-render.js |
+| ui-controls.js | Группировка UI: переключатели, чекбоксы, скролы | `.ui-group-switches`, `.ui-group-checks` | — |
+
+## Карта ключевых ID
+
+### Управление
+- `start-btn`: запуск синтезатора (`SynthAPI.init()`).
+- `mute-btn`: глушение звука.
+
+### MIDI
+- `#midiVoiceSel`: селектор голосов (заполняется `buildMidiSel()`).
+- `.midi-status`: индикатор статуса MIDI.
+
+### Клавиатура
+- `.keyboard`: контейнер всех клавиш.
+- `.key`: отдельные клавиши.
+
+### Октавы
+- `.octave-controls`: группа переключателей октав.
+- `#octave-display`: отображение текущей октавы.
+
+### Ролл
+- `#roll-container`: общий контейнер.
+- `#roll-viewport`: область прокрутки.
+- `.roll-note`: отдельная нота.
+- `.roll-track`: дорожка/временная шкала.
+
+### UI‑группы
+- `.ui-group-switches`: переключатели.
+- `.ui-group-checks`: чекбоксы и ползунки.
+
+## Важные константы и границы
+- `PC_MIN()` = 24, `PC_MAX()` = 78 — границы нот (до C8).  
+  Единый источник истины: `core-init.js`. Не дублировать в других модулях.
+
+## Архитектурные решения
+- Дебаг и changelog исключены из релиза.
+- Переключатель октав и С4 по умолчанию — финальное решение.
+- Все стили — через CSS‑переменные; JS не меняет стили напрямую.
+
+## Рекомендации для внесения изменений
+1. Перед правкой модуля — проверь зависимости в таблице.
+2. Не меняй ID без обновления спецификации.
+3. Новые модули добавляй в конец списка, явно указывая зависимости.
+4. При изменении границ нот — меняй только в `core-init.js`.
+
+## Статус
+- Версия: v1.2.5 «Final».
+- Разработка завершена. Дальнейшее расширение не планируется.
+
+
+</span>
+
   
 </section>
 
@@ -420,7 +581,108 @@
   });
   activate('about');
 })();
+
 </script>
+<script>
+(function() {
+  // --- КОНФИГУРАЦИЯ ---
+  const requiredPresses = 10;
+  const ease = 0.15; // Скорость инерции (0.1-0.3)
+  
+  // --- СОСТОЯНИЯ ---
+  let keyPresses = 0;
+  let isUnlocked = false;
+  let isFollowing = false;
+  
+  const teddyBody = document.getElementById('teddy-body');
+  const svgEl = document.getElementById('mascot-svg');
+  
+  if (!teddyBody || !svgEl) return; // Защита, если SVG не загрузился
+
+  // --- ЛОГИКА ПАСХАЛКИ (10 НАЖАТИЙ) ---
+  document.addEventListener('keydown', () => {
+    if (isUnlocked) return;
+    
+    keyPresses++;
+    
+    // Тут можно обновлять свой UI счетчик, если он есть на сайте
+    // Например: document.getElementById('my-counter').innerText = keyPresses;
+    
+    if (keyPresses >= requiredPresses) {
+      unlockMascot();
+    }
+  });
+
+  function unlockMascot() {
+    isUnlocked = true;
+    svgEl.classList.add('active');
+    console.log('MASCOT UNLOCKED');
+    
+    // Инициализация позиции в левом нижнем углу
+    const stageRect = document.documentElement.getBoundingClientRect(); // Или твой игровой контейнер
+    const startX = 20;
+    const startY = stageRect.height - 120;
+    
+    currentX = startX;
+    currentY = startY;
+    targetX = startX;
+    targetY = startY;
+    
+    isFollowing = true;
+  }
+
+  // --- ЛОГИКА ДВИЖЕНИЯ ---
+  let targetX = -150;
+  let targetY = -150;
+  let currentX = -150;
+  let currentY = -150;
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isFollowing) return;
+    
+    const rect = svgEl.getBoundingClientRect();
+    const halfW = rect.width / 2;
+    const halfH = rect.height / 2;
+    
+    targetX = e.clientX - halfW;
+    targetY = e.clientY - halfH;
+  });
+
+  function animate() {
+    if (isFollowing) {
+      currentX += (targetX - currentX) * ease;
+      currentY += (targetY - currentY) * ease;
+      
+      teddyBody.style.transform = `translate(${currentX}px, ${currentY}px)`;
+    }
+    requestAnimationFrame(animate);
+  }
+
+  // --- ЛОГИКА КЛИКА ---
+  svgEl.addEventListener('click', () => {
+    if (!isUnlocked) return;
+    
+    teddyBody.classList.add('bear-jumping');
+    
+    // ВЫЗОВ ТВОЕГО SYNTHAPI
+    if (typeof SynthAPI !== 'undefined' && SynthAPI.playEffect) {
+      SynthAPI.playEffect('mascot_jump', 1);
+    } else {
+      console.log('Teddy Jumped!');
+    }
+
+    setTimeout(() => {
+      teddyBody.classList.remove('bear-jumping');
+    }, 300);
+  });
+
+  // Запуск цикла анимации
+  animate();
+})();
+</script>
+
+
+
 
 </body>
 </html>

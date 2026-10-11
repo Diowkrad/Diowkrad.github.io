@@ -1,0 +1,305 @@
+ /* Импорт качественного футуристичного шрифта */
+    @import url('https://googleapis.com');
+
+    /* Единый источник стилей по спецификации — Кастомная палитра */
+    :root {
+      --bg-main: #0a0c10;
+      --bg-panel: #121620;
+      --bg-input: #1a1f2c;
+      --border-color: #2d3548;
+      
+      --accent-neon: #00ff66;
+      --accent-glow: rgba(0, 255, 102, 0.2);
+      --accent-alert: #ff3366;
+      --accent-alert-glow: rgba(255, 51, 102, 0.05);
+      
+      --text-lcd: #33ff77;
+      --text-main: #e2e8f0;
+      --text-muted: #6272a4;
+      
+      --key-white: #f8fafc;
+      --key-white-border: #cbd5e1;
+      --key-black: #0f1319;
+      --key-active: #00ff66;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      margin: 0;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 255, 102, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(255, 51, 102, 0.03) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Главный контейнер-стойка рэка */
+    .rack-mount {
+      width: 100%;
+      max-width: 1400px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Модульный блок панели */
+    .rack-section {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+
+    /* Жидкокристаллический LCD Дисплей */
+    .lcd-display {
+      background: #040806;
+      border: 1px solid #143a1d;
+      border-radius: 6px;
+      padding: 12px 16px;
+      height: 94px;
+      color: var(--text-lcd);
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 255, 102, 0.05);
+      text-shadow: 0 0 4px var(--accent-glow);
+    }
+    .lcd-display::-webkit-scrollbar { width: 4px; }
+    .lcd-display::-webkit-scrollbar-thumb { background: #143a1d; border-radius: 2px; }
+
+    /* Кнопки, переключатели, селекторы */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button, select {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    button:hover, select:hover {
+      border-color: var(--text-muted);
+      background: #222938;
+    }
+
+    button.on {
+      background: rgba(0, 255, 102, 0.15);
+      color: var(--accent-neon);
+      border-color: var(--accent-neon);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    button.on:hover { background: rgba(0, 255, 102, 0.25); }
+
+    button#panicBtn {
+      border-color: #5a1d29;
+      color: #ff6688;
+    }
+    button#panicBtn:hover {
+      background: rgba(255, 51, 102, 0.1);
+      border-color: var(--accent-alert);
+    }
+    button#panicBtn:active {
+      background: var(--accent-alert);
+      color: #ffffff;
+      box-shadow: 0 0 15px var(--accent-alert-glow);
+    }
+
+    select {
+      padding-right: 24px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='10' height='10' fill='%236272a4'><polygon points='0,3 10,3 5,8'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    /* Фейдеры / Ползунки управления */
+    .fader-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 140px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .fader-cell span { display: flex; justify-content: space-between; }
+    .fader-cell span i { color: var(--text-main); font-style: normal; }
+
+    input[type="range"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #0c0f16;
+      border-radius: 3px;
+      border: 1px solid var(--border-color);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 14px;
+      height: 18px;
+      border-radius: 3px;
+      background: var(--text-main);
+      border: 1px solid var(--bg-main);
+      cursor: col-resize;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--accent-neon);
+    }
+
+    /* Окно терминала логов */
+    .log-container {
+      background: #05070a;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      height: 110px;
+      padding: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      overflow-y: auto;
+    }
+    .log-container::-webkit-scrollbar { width: 4px; }
+    .log-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+    /* Оболочка клавиатурного полотна */
+    .keyboard-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      background: #05070a;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+    .keyboard-wrapper::-webkit-scrollbar { display: none; }
+
+    .keyboard-strip {
+      position: relative;
+      background: var(--key-black);
+    }
+
+    /* Стили фортепианных клавиш */
+    .wk {
+      background: linear-gradient(to bottom, #ffffff 0%, #edf2f7 85%, #e2e8f0 100%);
+      border: 1px solid var(--key-white-border);
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      width: 58px;
+      height: 152px;
+      z-index: 1;
+      transition: background 0.05s ease;
+    }
+
+    .bk {
+      background: linear-gradient(to bottom, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #000000;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+      z-index: 2;
+    }
+
+    .wk.act, .bk.act {
+      background: linear-gradient(to bottom, var(--key-active) 0%, #00d652 100%) !important;
+      box-shadow: 0 0 15px rgba(0, 255, 102, 0.4), inset 0 2px 4px rgba(255,255,255,0.4);
+      border-color: var(--key-active) !important;
+    }
+
+    .lbl {
+      font-size: 9px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      pointer-events: none;
+      letter-spacing: -0.2px;
+    }
+    .wk.act .lbl, .bk.act .lbl { color: #004d1a; }
+
+    /* Стилизованные ленты горизонтального скролла */
+    .tape-track {
+      width: 100%;
+      height: 10px;
+      background: #090c12;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      position: relative;
+      margin-top: -6px;
+      margin-bottom: 12px;
+    }
+
+    .tape-thumb {
+      height: 100%;
+      background: var(--text-muted);
+      border-radius: 4px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: grab;
+      transition: background 0.15s ease;
+    }
+    .tape-thumb:hover { background: var(--text-main); }
+    .tape-thumb:active { cursor: grabbing; background: var(--accent-neon); }
+
+    /* Нижний статус-бар */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 4px 6px 0 6px;
+      font-weight: 700;
+    }
+    .status-bar span { color: var(--accent-neon); }
+
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: -6px;
+      font-weight: 700;
+      padding-left: 4px;
+    }

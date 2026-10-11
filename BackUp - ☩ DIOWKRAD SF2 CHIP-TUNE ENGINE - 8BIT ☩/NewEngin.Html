@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIOWKRAD SF2 CHIP-TUNE ENGINE (v1.2.5 Final)</title>
+  <link rel="stylesheet" href="css/style2.css">
+</head>
+<body>
+
+  <!-- ГЛАВНАЯ СТОЙКА СИНТЕЗАТОРА -->
+  <div class="rack-mount">
+    
+    <!-- СЕКЦИЯ 1: МОНИТОРИНГ И РЕЖИМЫ -->
+    <div class="main-grid">
+      <div>
+        <div id="lcd" class="lcd-display">DIOWKRAD ENGINE v1.2.5 READY<br>Включите аудио-сервер кнопкой СТАРТ и выберите режим синтеза.</div>
+        <div class="btn-group" style="margin-top: 12px;">
+          <button id="start-btn" class="on">СТАРТ АУДИО</button>
+          <button id="btnChip" class="on">CHIP 2A03</button>
+          <button id="btnSf2">SOUNDFONT</button>
+          <button id="btnMidi">MIDI GM</button>
+          <button id="panicBtn">PANIC</button>
+        </div>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="fader-cell">
+          <span>ОБЩАЯ ГРОМКОСТЬ <i id="volVal">80%</i></span>
+          <input type="range" id="vol" min="0" max="100" value="80" oninput="document.getElementById('volVal').textContent = this.value + '%'">
+        </div>
+        <div class="fader-cell">
+          <span>СКОРОСТЬ ТЕМПА <i id="bpmVal">120 BPM</i></span>
+          <input type="range" id="bpm" min="40" max="300" value="120">
+        </div>
+      </div>
+    </div>
+
+    <!-- СЕКЦИЯ 2: МАРШРУТИЗАЦИЯ СИГНАЛОВ -->
+    <div class="rack-section">
+      <div class="btn-group">
+        <select id="chipVoiceSel"></select>
+        <select id="midiVoiceSel"></select>
+      </div>
+      
+      <div class="btn-group">
+        <button id="midiBtn">ПОДКЛЮЧИТЬ MIDI</button>
+        <select id="midiSel"><option value="all">ВСЕ УСТРОЙСТВА</option></select>
+        <button id="rollLock">СКРОЛЛ: ОТКРЫТ</button>
+      </div>
+    </div>
+
+    <!-- СЕКЦИЯ 3: ПЕРИФЕРИЙНЫЕ КОНТРОЛЛЕРЫ И ЗАГРУЗЧИК -->
+    <div class="rack-section">
+      <div class="btn-group">
+        <span style="font-size:11px; color:var(--text-muted); align-self:center; font-weight:700; margin-right:4px;">ПЕДАЛЬ:</span>
+        <button id="susBtn8">1/8</button>
+        <button id="susBtn4">1/4</button>
+        <button id="susBtn2">1/2</button>
+      </div>
+
+      <div class="btn-group" style="margin-left: 16px;">
+        <span style="font-size:11px; color:var(--text-muted); align-self:center; font-weight:700; margin-right:4px;">ТУШЕ:</span>
+        <button id="sensSoft">SOFT</button>
+        <button id="sensHard" class="on">HARD</button>
+        <button id="sensFixed">FIXED</button>
+      </div>
+
+      <div class="btn-group" style="margin-left: 16px;">
+        <span style="font-size:11px; color:var(--text-muted); align-self:center; font-weight:700; margin-right:4px;">ОКТАВА:</span>
+        <button id="octDn">-ОКТ</button>
+        <button id="octUp">+ОКТ</button>
+      </div>
+
+      <div class="btn-group" style="margin-left: auto;">
+        <input type="file" id="sf2file" accept=".sf2" style="display:none;">
+        <button onclick="document.getElementById('sf2file').click()" class="on" style="border-color: #4b526d; color:#a3b1e0;">ВЫБРАТЬ .SF2</button>
+        <select id="bankSel" disabled><option>БАНК —</option></select>
+        <select id="presetSel" disabled><option>ПРЕСЕТ —</option></select>
+        <select id="instSel" disabled><option>ИНСТРУМЕНТ —</option></select>
+      </div>
+    </div>
+
+    <!-- ТЕРМИНАЛ СИСТЕМНЫХ ЛОГОВ -->
+    <div class="section-title">СИСТЕМНЫЙ ЖУРНАЛ СИНТЕСА</div>
+    <div id="log" class="log-container"></div>
+
+    <!-- КЛАВИАТУРНОЕ ПОЛОТНО I -->
+    <div class="section-title" id="kbdHdr">КЛАВИАТУРА I — C1..C8 (МЫШЬ И ПК)</div>
+    <div>
+      <div id="wrap1" class="keyboard-wrapper">
+        <div id="keys" class="keyboard-strip"></div>
+      </div>
+      <div id="strip1" class="tape-track"><div class="tape-thumb"></div></div>
+    </div>
+
+    <!-- КЛАВИАТУРНОЕ ПОЛОТНО II -->
+    <div class="section-title">КЛАВИАТУРА II — ДУБЛИРУЮЩИЙ ТРЭК СИНХРОНИЗАЦИИ</div>
+    <div>
+      <div id="wrap2" class="keyboard-wrapper">
+        <div id="keys2" class="keyboard-strip"></div>
+      </div>
+      <div id="strip2" class="tape-track"><div class="tape-thumb"></div></div>
+    </div>
+
+    <!-- НИЖНИЙ СТАТУС-БАР -->
+    <div class="status-bar">
+      <div>ПОЛИФОНИЯ: <span id="voiceCnt">0</span> ГЛОС.</div>
+      <div>РЕНДЕРИНГ: <span id="fpsDisplay">0</span> FPS</div>
+      <div>ВЕРСИЯ: v1.2.5 «FINALE»</div>
+    </div>
+
+  </div>
+
+  <!-- ПОДКЛЮЧЕНИЕ СКОМПИЛИРОВАННОГО МОНОЛИТА ИЛИ ЦЕПОЧКИ СКРИПТОВ -->
+  <!-- Если вы используете раздельные 13 файлов, тег ниже можно заменить на их последовательное подключение -->
+   <!-- ПОДКЛЮЧЕНИЕ СКОМПИЛИРОВАННОГО МНОГОЛИТА -->
+  <script defer src="js/01_state.js"></script>  <!-- Состояние движка, лог, LCD, аудиограф (ensureAudio) -->
+<script defer src="js/02_chip_engine_2a03.js"></script>  <!-- CHIP-движок 2A03: пульсы, пила, треугольник, шум, N-волна -->
+<script defer src="js/03_sf2_parser.js"></script>  <!-- ПАРСЕР SF2 (живучий: RIFF/LIST + RIFX + сигнатурный поиск) -->
+<script defer src="js/04_sf2_playback.js"></script>  <!-- Воспроизведение SF2: огибающие, лупы, питч -->
+<script defer src="js/05_sustain.js"></script>  <!-- Сустейн 1/8 · 1/4 · 1/2 (доля + затухание) -->
+<script defer src="js/06_sensitivity2.js"></script>  <!-- ТУШЕ: режимы чувствительности (soft/hard/fixed) -->
+<script defer src="js/07_sf2_loader.js"></script>  <!-- Загрузка SF2-файла, выбор пресета и инструмента -->
+<script defer src="js/08_keyboard_mouse2.js"></script>  <!-- Клавиатура (мышь): сборка клавиш, ленты скролла, замок ролла -->
+<script defer src="js/09_keyboard_pc2.js"></script>  <!-- Клавиатура ПК: раскладки, зигзаг, октавы -->
+<script defer src="js/10_midi_keyboard.js"></script>  <!-- MIDI-клавиатура: Web MIDI, педаль сустейна, питч-бенд, PANIC -->
+<script defer src="js/11_midi_gm128.js"></script>  <!-- MIDI GM × 128 — синтез по рецептам (v1.1.1 «GLOBAL MIDI») -->
+<script defer src="js/12_start.js"></script>  <!-- СТАРТ: инициализация и стартовые логи -->
+<script defer src="js/13_touch_fps.js"></script>  <!-- Touch-детект (снятие :hover) + FPS-метр -->
+</body>
+</html>

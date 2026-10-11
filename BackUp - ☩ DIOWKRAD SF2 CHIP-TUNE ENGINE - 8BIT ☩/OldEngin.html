@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SF2 ENGINE — CHIP-TUNE + SoundFont + MIDI GM</title>
+  <!-- Стили вынесены в отдельный файл. Перенесите сюда CSS из вашего HTML:
+       всё, что между <style> и </style>, минус <style>/<style>, -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ЗАГОЛОВОК: вывеска движка (анимация цвета через .logotype) -->
+<h1 class="logotype"> ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ </h1>
+
+<!-- ГЛАВНАЯ ПАНЕЛЬ: слева два LCD, справа колонка рядов кнопок -->
+<div class="panel">
+	
+		<div class="panel_lcd">
+			<!-- LCD #1: состояние движка (в рабочей версии обновляется скриптом) -->
+			<div class="lcd" id="lcd">
+				☩ DIOWKRAD - ENGINE - 8BIT ☩ <hr>[Build v1.2.5] «Finale»<hr> 
+				Интеграция для android.
+				Залипание клавиш отключено .<hr>
+				
+			</div>
+			<!-- LCD #2: нотный журнал (в рабочей версии пишет скрипт) -->
+			<div class="lcd">
+      ☩ ЛОГ - ЖУРНАЛ ☩<hr>
+      <p id="log">— журнал пуст —</p>
+    </div>
+		</div>
+		
+	<div class="panel_buttons_c">
+		
+		 <div class="row">
+		  <span>Громкость:</span>
+		  <input type="range" id="vol" min="0" max="100" value="50">
+		  <span>Голоса: <b id="voiceCnt">0</b></span>
+		</div>
+		<div class="row">
+		  <span>ТЕМП:</span>
+		  <input type="range" id="bpm" min="40" max="300" value="120">
+		  <span id="bpmVal">120 BPM</span>
+		</div>
+		<div class="row">
+		  <span>Midi-Keys:</span>
+		   <span>FPS: <b id="fpsDisplay">0</b></span>
+		  <button id="midiBtn">Подключить MIDI</button>
+		  <select id="midiSel"><option value="all">Все устройства</option></select>
+		</div>
+		<div class="row">
+		  <span>ГОЛОС MIDI:</span>
+		  <select id="midiVoiceSel"><option value="0">Acoustic Grand Piano</option></select>
+		</div>
+		<div class="row">
+		  <span>ГОЛОС ЧИПА:</span>
+		  <select id="chipVoiceSel"><option>— заглушка —</option></select>
+		</div>
+		
+		
+		
+		<div class="row">
+		  <span>SF2 ЗАГРУЗЧИК:</span>
+		  <input type="file" id="sf2file" accept=".sf2,.sf3">
+		</div>
+		<div class="row">
+		  <span>SF2 ШАБЛОН:</span>
+		  <select id="bankSel" disabled><option>— загрузите .sf2 —</option></select>
+
+		  <select id="presetSel" disabled><option>— загрузите .sf2 —</option></select>
+
+		  <select id="instSel" disabled><option value="-1">— авто —</option></select>
+		  </div>
+		 
+		</div>
+		<!-- КОЛОНКА РЕЖИМОВ: заглушки кнопок и списков, обработчиков нет -->
+	<div class="panel_buttons" id="wavePanel">
+    <div class="row">
+		
+      <span>РЕЖИМ:</span>
+      <button id="btnChip" class="on">CHIP-TUNE</button>
+      <button id="btnSf2">SoundFont [.sf2]</button>
+	   <button id="btnMidi">MIDI [GM]</button>
+	  
+    </div>
+    <div class="row">
+      <span>ТУШЕ:</span>
+      <button id="sensSoft">SOFT</button>
+      <button id="sensHard" class="on">HARD</button>
+      <button id="sensFixed">FIXED</button>
+    </div>
+    <div class="row">
+      <span>СУСТЕЙН:</span>
+      <button id="susBtn8">СУСТЕЙН 1/8</button>
+      <button id="susBtn4">СУСТЕЙН 1/4</button>
+      <button id="susBtn2">СУСТЕЙН 1/2</button>
+    </div>
+    <div class="row">
+      <span>КЛАВИАТУРА:</span>
+      <button id="kbToggle" class="on">КЛАВИАТУРА: ВКЛ</button>
+      <button id="lay2" class="on">2 РЯДА</button>
+      <button id="lay1">1 РЯД</button>
+    </div>
+		<div class="row">
+			<span>ПИАНО РОЛЛ:</span>
+			<button id="kb2" class="on">2 КЛАВИАТУРЫ</button>
+			<button id="kb1">1 КЛАВИАТУРА</button>
+			<button id="rollLock">СКРОЛЛ: ОТКРЫТ</button>
+		</div>
+		<div class="row">
+			<span>ЗВУК:</span>
+			<button id="octDn">− ОКТАВА</button>
+			<button id="octUp">+ ОКТАВА</button>
+			<button id="panicBtn">ЗАГЛУШИТЬ</button>
+		</div>
+		<div class="row">
+			<span>ТИП ВОЛНЫ:</span>
+			<button class="wbtn on" data-wave="pulse50">□ ПУЛЬС 50%</button>
+			<button class="wbtn" data-wave="pulse25">□ ПУЛЬС 25%</button>
+			<button class="wbtn" data-wave="pulse12">□ ПУЛЬС 12,5%</button>
+			<button class="wbtn" data-wave="saw">◺ ПИЛА</button>
+			<button class="wbtn" data-wave="tri">△ ТРЕУГ.</button>
+			<button class="wbtn" data-wave="sine">∿ СИНУС</button>
+			<button class="wbtn" data-wave="square">□ КВАДРАТ</button>
+			<button class="wbtn" data-wave="pulseR">ᵓ ПУЛЬС КРУГЛ.</button>
+			<button class="wbtn" data-wave="nwave">⟋⟋ N-ВОЛНА</button>
+			<button class="wbtn" data-wave="noiseL">ШУМ ДЛИН.</button>
+			<button class="wbtn" data-wave="noiseS">ШУМ КОРОТ.</button>
+		</div>
+	</div>
+  </div>
+
+<!-- ЭКРАННАЯ КЛАВИАТУРА: в шаблоне пустая — клавиши .wk/.bk рисует скрипт -->
+<div id="strip1" class="kbd-strip"><div class="tape"><div class="tape-thumb"></div></div></div>
+<div id="wrap1" class="kbd-wrap"><div id="keys"></div></div>
+<div id="wrap2" class="kbd-wrap"><div id="keys2"></div></div>
+<div id="strip2" class="kbd-strip"><div class="tape"><div class="tape-thumb"></div></div></div>
+
+<!-- ПОДСКАЗКА РАСКЛАДКИ: полный текст управления движком -->
+<div class="row_b">
+	<span class="span_b" >
+		<p class="Bottom_a">КЛАВИАТУРА ПК</p>
+			<p class="Bottom_b">2 ряда: —  Q…] верхняя октава — хроматика C…F#</p>
+			<p class="Bottom_b">2 ряда: —  Z…' нижняя октава — хроматика C…F </p>
+			</p>
+			<p class="Bottom_b">
+			1 ряд: A…]	центральная октава — хроматика C…F#5 
+			</p>
+	</span>
+	<span class="span_b">
+		<p class="Bottom_a">Управление :</p>
+		<p class="Bottom_c">←/→ или кнопки ОКТАВА −/+ — смена октавы </p>
+		<p class="Bottom_c">Num7/Num8/Num9 — сустейн 1/8 · 1/4 · 1/2. </p>
+		<p class="Bottom_c">Velocity мышью: чем ниже по клавише, тем громче.</p>
+	</span>
+	<span class="span_b">
+		<p class="Bottom_a">Особенности:</p>
+		<p class="Bottom_c">Сустейн: нота поёт после отпускания до границы доли, затемзатухание; подсветка клавиши гаснет вместе со звуком.</p>
+		<p class="Bottom_c">(Для удобства в мобилных браузерах рекомендую уменьшить страницу в браузере через настройки до 75%)</p>
+	</span>
+	<span class="span_b" >
+		<p class="Bottom_d">BUILD</p> 
+		<p class="Bottom_d"> v1.2.5</p> 
+		<p class="Bottom_d">«Finale»</p>
+	</span>
+</div>
+
+<script defer src="js/01_state.js"></script>  <!-- Состояние движка, лог, LCD, аудиограф (ensureAudio) -->
+<script defer src="js/02_chip_engine_2a03.js"></script>  <!-- CHIP-движок 2A03: пульсы, пила, треугольник, шум, N-волна -->
+<script defer src="js/03_sf2_parser.js"></script>  <!-- ПАРСЕР SF2 (живучий: RIFF/LIST + RIFX + сигнатурный поиск) -->
+<script defer src="js/04_sf2_playback.js"></script>  <!-- Воспроизведение SF2: огибающие, лупы, питч -->
+<script defer src="js/05_sustain.js"></script>  <!-- Сустейн 1/8 · 1/4 · 1/2 (доля + затухание) -->
+<script defer src="js/06_sensitivity.js"></script>  <!-- ТУШЕ: режимы чувствительности (soft/hard/fixed) -->
+<script defer src="js/07_sf2_loader.js"></script>  <!-- Загрузка SF2-файла, выбор пресета и инструмента -->
+<script defer src="js/08_keyboard_mouse.js"></script>  <!-- Клавиатура (мышь): сборка клавиш, ленты скролла, замок ролла -->
+<script defer src="js/09_keyboard_pc.js"></script>  <!-- Клавиатура ПК: раскладки, зигзаг, октавы -->
+<script defer src="js/10_midi_keyboard.js"></script>  <!-- MIDI-клавиатура: Web MIDI, педаль сустейна, питч-бенд, PANIC -->
+<script defer src="js/11_midi_gm128.js"></script>  <!-- MIDI GM × 128 — синтез по рецептам (v1.1.1 «GLOBAL MIDI») -->
+<script defer src="js/12_start.js"></script>  <!-- СТАРТ: инициализация и стартовые логи -->
+<script defer src="js/13_touch_fps.js"></script>  <!-- Touch-детект (снятие :hover) + FPS-метр -->
+
+</body>
+</html>
