@@ -1414,24 +1414,8 @@ function tapeSetup(strip,wrap){
 }
 tapeSetup(document.getElementById('strip1'),document.getElementById('wrap1'));
 tapeSetup(document.getElementById('strip2'),document.getElementById('wrap2'));
-/* ===== ЗАМОК РОЛЛА v1.0.37: блокирует все три канала горизонтального скролла
-   (бегунок, колесо, нативный скролл); позиция ролла сохраняется ===== */
-let rollLocked=false;
-function rollLockApply(){
-  const btn=document.getElementById('rollLock');
-  if(btn){ btn.textContent=rollLocked?'СКРОЛЛ: ЗАМОК':'СКРОЛЛ: ОТКРЫТ'; btn.classList.toggle('on',rollLocked); }
-  for(const id of ['wrap1','wrap2']){
-    const w=document.getElementById(id); if(!w) continue;
-    w.style.overflowX=rollLocked?'hidden':'auto';
-  }
-  for(const s of [document.getElementById('strip1'),document.getElementById('strip2')]){
-    if(!s) continue;
-    s.style.opacity=rollLocked?'0.4':'';
-    s.style.pointerEvents=rollLocked?'none':'';
-  }
-  lcd(rollLocked?'Скролл: ЗАМОК':'Скролл: ОТКРЫТ');
-}
-$('#rollLock').addEventListener('click',()=>{ rollLocked=!rollLocked; rollLockApply(); });
+
+
 /* ===== ОКТАВНЫЙ ПУЛЬТ v1.0.37: кнопки дёргают ту же механику pcBase, что и
    стрелки; зажим PC_MIN/PC_MAX; обработчики стрелок не тронуты ===== */
 function octBtn(d){
