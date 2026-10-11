@@ -25,7 +25,8 @@
       --key-white: #f8fafc;
       --key-white-border: #cbd5e1;
       --key-black: #0f1319;
-      --key-active: #130241;
+          --key-active: #001a00;
+
 
     }
 
@@ -89,7 +90,7 @@
       border: 1px solid #143a1d;
       border-radius: 6px;
       padding: 12px 16px;
-      height: 94px;
+          height: 128px;
       color: var(--text-lcd);
       font-size: 13px;
       line-height: 1.5;
@@ -97,6 +98,8 @@
       overflow-y: auto;
       box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 255, 102, 0.05);
       text-shadow: 0 0 4px var(--accent-glow);
+	      background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+    background-size: 2px 3px, 12px 12px;width: 50%;
     }
     .lcd-display::-webkit-scrollbar { width: 4px; }
     .lcd-display::-webkit-scrollbar-thumb { background: #143a1d; border-radius: 2px; }
@@ -202,11 +205,16 @@
       background: #05070a;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      height: 77px;
+         height: 128px;
       padding: 12px 24px;
       font-size: 11px;
       color: var(--text-lcd);
       overflow-y: auto;
+	      background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+    background-size: 2px 3px, 12px 12px;
+	    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 255, 102, 0.05);
+    text-shadow: 0 0 4px var(--accent-glow);
+	width: 50%;
     }
     .log-container::-webkit-scrollbar { width: 4px; }
     .log-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
@@ -315,6 +323,14 @@
       font-weight: 700;
       padding-left: 4px;
     }
+	.display-flex{
+	display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-content: stretch;
+    justify-content: space-between;
+    align-items: stretch;
+	}
   </style>
 </head>
 <body>
@@ -325,14 +341,9 @@
     <!-- СЕКЦИЯ 1: МОНИТОРИНГ И РЕЖИМЫ -->
     <div class="main-grid">
       <div>
-        <div id="lcd" class="lcd-display">DIOWKRAD ENGINE v1.2.5 READY<br>Включите аудио-сервер кнопкой СТАРТ и выберите режим синтеза.</div>
-        <div class="btn-group" style="margin-top: 12px;">
-          <button id="start-btn" class="on">СТАРТ АУДИО</button>
-          <button id="btnChip" class="on">CHIP 2A03</button>
-          <button id="btnSf2">SOUNDFONT</button>
-          <button id="btnMidi">MIDI GM</button>
-          <button id="panicBtn">PANIC</button>
-        </div>
+			 <div class="display-flex"><div id="lcd" class="lcd-display">
+		DIOWKRAD ENGINE v1.2.5 READY<br>Включите аудио-сервер кнопкой СТАРТ и выберите режим синтеза.</div><div id="log" class="log-container"></div></div>
+       
       </div>
       
       <div style="display:flex; flex-direction:column; gap:12px;">
@@ -349,55 +360,55 @@
 
     <!-- СЕКЦИЯ 2: МАРШРУТИЗАЦИЯ СИГНАЛОВ -->
     <div class="rack-section">
-      <div class="btn-group">
-        <select id="chipVoiceSel"></select>
-        <select id="midiVoiceSel"></select>
-      </div>
-      
-      <div class="btn-group">
+	   <div class="btn-group" style="margin-top: 12px;">
+          <div class="btn-group"><button id="btnChip" class="on">CHIP 2A03</button>
+			<div class="btn-group">
+				<select id="chipVoiceSel"></select>
+			</div></div>
+			<div class="btn-group"><button id="btnMidi">MIDI GM</button>
+			<div class="btn-group">
+				<select id="midiVoiceSel"></select>
+			</div>
+			</div>
+			 <div class="btn-group"><button id="btnSf2">SOUNDFONT</button>
+		  <div class="btn-group">
+        <input type="file" id="sf2file" accept=".sf2" style="display:none;">
+        <button onclick="document.getElementById('sf2file').click()" class="on" style="border-color: #4b526d; color:#a3b1e0;">ВЫБРАТЬ .SF2</button>
+        <select id="bankSel" disabled><option>БАНК —</option></select>
+        <select id="presetSel" disabled><option>ПРЕСЕТ —</option></select>
+        <select id="instSel" disabled><option>ИНСТРУМЕНТ —</option></select>
+		</div>
+	  </div>
+          <button id="panicBtn">Заглушить</button>
+		  <div class="btn-group">
         <button id="midiBtn">ПОДКЛЮЧИТЬ MIDI</button>
         <select id="midiSel"><option value="all">ВСЕ УСТРОЙСТВА</option></select>
-        <button id="rollLock">СКРОЛЛ: ОТКРЫТ</button>
+        
       </div>
-    </div>
-
-    <!-- СЕКЦИЯ 3: ПЕРИФЕРИЙНЫЕ КОНТРОЛЛЕРЫ И ЗАГРУЗЧИК -->
-    <div class="rack-section">
-      <div class="btn-group">
-        <span style="font-size:11px; color:var(--text-muted); align-self:center; font-weight:700; margin-right:4px;">ПЕДАЛЬ:</span>
+	   <div class="btn-group">
+        
         <button id="susBtn8">1/8</button>
         <button id="susBtn4">1/4</button>
         <button id="susBtn2">1/2</button>
       </div>
 
       <div class="btn-group" style="margin-left: 16px;">
-        <span style="font-size:11px; color:var(--text-muted); align-self:center; font-weight:700; margin-right:4px;">ТУШЕ:</span>
+        
         <button id="sensSoft">SOFT</button>
         <button id="sensHard" class="on">HARD</button>
         <button id="sensFixed">FIXED</button>
       </div>
 
       <div class="btn-group" style="margin-left: 16px;">
-        <span style="font-size:11px; color:var(--text-muted); align-self:center; font-weight:700; margin-right:4px;">ОКТАВА:</span>
+        
         <button id="octDn">-ОКТ</button>
         <button id="octUp">+ОКТ</button>
+		<button id="rollLock">СКРОЛЛ: ОТКРЫТ</button>
       </div>
-
-      <div class="btn-group" style="margin-left: auto;">
-        <input type="file" id="sf2file" accept=".sf2" style="display:none;">
-        <button onclick="document.getElementById('sf2file').click()" class="on" style="border-color: #4b526d; color:#a3b1e0;">ВЫБРАТЬ .SF2</button>
-        <select id="bankSel" disabled><option>БАНК —</option></select>
-        <select id="presetSel" disabled><option>ПРЕСЕТ —</option></select>
-        <select id="instSel" disabled><option>ИНСТРУМЕНТ —</option></select>
-      </div>
+        </div>
     </div>
-
-    <!-- ТЕРМИНАЛ СИСТЕМНЫХ ЛОГОВ -->
-    <div class="section-title">СИСТЕМНЫЙ ЖУРНАЛ СИНТЕСА</div>
-    <div id="log" class="log-container"></div>
-
     <!-- КЛАВИАТУРНОЕ ПОЛОТНО I -->
-    <div class="section-title" id="kbdHdr">КЛАВИАТУРА I — C1..C8 (МЫШЬ И ПК)</div>
+    <div class="section-title" id="kbdHdr"><div>ПОЛИФОНИЯ: <span id="voiceCnt">0</span> Звук.</div></div>
     <div>
       <div id="wrap1" class="keyboard-wrapper">
         <div id="keys" class="keyboard-strip"></div>
@@ -406,7 +417,7 @@
     </div>
 
     <!-- КЛАВИАТУРНОЕ ПОЛОТНО II -->
-    <div class="section-title">КЛАВИАТУРА II — ДУБЛИРУЮЩИЙ ТРЭК СИНХРОНИЗАЦИИ</div>
+    <div class="section-title"> <div>РЕНДЕРИНГ: <span id="fpsDisplay">0</span> FPS</div></div>
     <div>
       <div id="wrap2" class="keyboard-wrapper">
         <div id="keys2" class="keyboard-strip"></div>
@@ -416,16 +427,10 @@
 
     <!-- НИЖНИЙ СТАТУС-БАР -->
     <div class="status-bar">
-      <div>ПОЛИФОНИЯ: <span id="voiceCnt">0</span> ГЛОС.</div>
-      <div>РЕНДЕРИНГ: <span id="fpsDisplay">0</span> FPS</div>
       <div>ВЕРСИЯ: v1.2.5 «FINALE»</div>
     </div>
 
   </div>
-
-  <!-- ПОДКЛЮЧЕНИЕ СКОМПИЛИРОВАННОГО МОНОЛИТА ИЛИ ЦЕПОЧКИ СКРИПТОВ -->
-  <!-- Если вы используете раздельные 13 файлов, тег ниже можно заменить на их последовательное подключение -->
-   <!-- ПОДКЛЮЧЕНИЕ СКОМПИЛИРОВАННОГО МНОГОЛИТА -->
 <script>
 "use strict";
 /* ============================================================
