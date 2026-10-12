@@ -1,706 +1,763 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
 <style>
-  :root{
-    --bg:#0b0b12;
-    --panel-bg:#12121ddb;
-    --gold:#e8c15a;
-    --gold-dim:#950;
-    --gold-bright:#ffd700;
-    --text:#d8d8c8;
-    --text-dim:#8a8a7a;
-    --accent:#5ac8e8;
-    --ok:#7dd87d;
-    --warn:#e88a5a;
-  }
-  *{ box-sizing:border-box; margin:0; padding:0; }
-  body{
-    background-image: url('img.png');
-    color:var(--text);
-    font-family:'Press Start 2P', monospace;
-    font-size:10px;
-    line-height:1.9;
-    padding:24px 16px 60px;
-    max-width:980px;
-    margin:0 auto;
-   
-  }
-  a{ color:var(--accent); text-decoration:none; }
-  a:hover{ color:var(--gold-bright); }
+/* ============================================================
+   ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS - ☩
+   Селекторы отсортированы по группам, внутри группы — по алфавиту:
+   1) ТЕГИ и служебные селекторы;
+   2) ID;
+   3) КЛАССЫ;
+   4) АНИМАЦИЯ.
+   BUILD v1.2.5 «Finale»
+   База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»
+   ============================================================ */
 
-  /* ══ ШАПКА ══ */
-  .header{
-    text-align:center;
-    padding:28px 12px 20px;
-    border: 4px outset #950;
-    background:var(--panel-bg);
-    margin-bottom:22px;
-  }
-  .header h1{
-    color:var(--gold-bright);
-    font-size:14px;
-    letter-spacing:2px;
-    text-shadow:0 0 12px rgba(255,215,0,.35);
-    margin-bottom:14px;
-  }
-  .header .sub{
-    color:var(--text-dim);
-    font-size:8px;
-    letter-spacing:1px;
-  }
-  .header .build{
-    margin-top:14px;
-    color:var(--gold);
-    font-size:8px;
-  }
+.rack-mount {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+	      background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+    background-size: 2px 1px, 18px 18px;
+    }
 
-  /* ══ ТАБ-БАР: кнопки-переключатели ══ */
-  .tab-bar{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    justify-content:center;
-    margin-bottom:0; 
-  }
-  .tab-btn{
-    font-family:inherit;
-    font-size:10px;
-    letter-spacing:1px;
-    color:var(--gold);
-    background:#181826;
-    border:4px outset var(--gold-dim);
-    padding:10px 16px;
-    cursor:pointer;
-    text-transform:uppercase;
-  }
-  .tab-btn:hover{
-    border-color:var(--gold-bright);
-    color:var(--gold-bright);
-  }
-  .tab-btn.active{
-    background:var(--gold);
-    color:#12121d;
-    border-color:var(--gold-bright);
-    box-shadow:0 0 10px rgba(255,215,0,.4);
-  }
 
-  /* ══ ОКНА ТАБОВ — стиль .panel из движка ══ */
-  .panel{
-    display:none;
-    border:3px double var(--gold);
-    background:var(--panel-bg);
-    padding:22px 20px;
-    margin-top:14px;
-    animation:fadeIn .18s steps(4);
-  }
-  .panel.active{ display:block; }
-  @keyframes fadeIn{
-    from{ opacity:0; transform:translateY(4px); }
-    to{ opacity:1; transform:none; }
-  }
-  .panel h2{
-    color:var(--gold-bright);
-    font-size:11px;
-    letter-spacing:2px;
-    margin-bottom:14px;
-    padding-bottom:10px;
-    border-bottom:1px dashed var(--gold-dim);
-  }
-  .panel h2::before{ content:"☩ "; color:var(--gold); }
-  .panel h2::after{ content:" ☩"; color:var(--gold); }
-  .panel h3{
-    color:var(--gold);
-    font-size:12px;
-    letter-spacing:1px;
-    margin:18px 0 8px;
-    text-transform:uppercase;
-  }
-  .panel p{ font-size: 12px;
-    text-align: center; }
-  .panel li{ margin:6px 0 6px 18px; font-size:11px; }
-  .panel ul{ list-style:square; margin:8px 0; }
-  .k{ color:var(--gold-bright); }
-  .dim{ color:var(--text-dim); }
-  .ok{ color:var(--ok); }
-  .warn{ color:var(--warn); }
-  .acc{ color:var(--accent); }
 
-  /* ══ ТАБЛИЦЫ ══ */
-  table{
-    width:100%;
-    border-collapse:collapse;
-    margin:12px 0;
-    font-size:8px;
-  }
-  th{
-    color:var(--gold-bright);
-    border:1px solid var(--gold-dim);
-    padding:8px 6px;
-    text-align:left;
-    background:#181826;
-  }
-  td{
-    border:1px solid #2a2a3a;
-    padding:8px 6px;
-    vertical-align:top;
-  }
-  tr:nth-child(even) td{ background:#14141f; }
-
-  /* ══ КЛАВИШИ ══ */
-  .kbd{
-    display:inline-block;
-    border:1px solid var(--gold-dim);
-    background:#1c1c2a;
-    color:var(--gold-bright);
-    padding:2px 6px;
-    margin:1px;
-    font-size:8px;
-  }
-  .kbd.note{ color:var(--accent); border-color:var(--accent); }
-
-  /* ══ КНОПКИ-ДЕЙСТВИЯ ══ */
-  
-  /* --- Стили для Маскота (Teddy) --- */
-#mascot-svg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100px; height: 100px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease-out;
-  z-index: 999; /* Важно: выше всего интерфейса, но ниже модальных окон, если есть */
-}
-#mascot-svg.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-.bear-jumping {
-  animation: bear-jump-anim 0.3s forwards;
-  transform-origin: bottom center;
-}
-@keyframes bear-jump-anim {
-  0% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-40px) scale(1.1); }
-  100% { transform: translateY(0) scale(1); }
+/* ---------- 0. Подпись в нижней панели ---------- */
+.span_b{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-evenly;
+  flex-wrap:nowrap;
+  align-items:center;
+  background:#031;
+  padding:8px;
+  border:6px inset #1a1a2e;
 }
 
-/* Цвета (палитра под твой ретро-стиль) */
-.c-fur-main { fill: #6d4c41; }
-.c-fur-light { fill: #a1887f; }
-.c-fur-dark { fill: #3e2723; }
-.c-scarf { fill: #ef5350; }
-.c-button { fill: #212121; }
-.c-nose { fill: #1b1b1b; }
-.c-eye { fill: #000; }
-.c-cheek { fill: #ffab91; }
-.c-palm { fill: #bcaaa4; }
-  
-  .act{
-    display:inline-block;
-    font-family:inherit;
-    font-size:10px;
-    letter-spacing:1px;
-    color:#12121d;
-    background:var(--gold);
-    border: 4px outset #950;
-    padding:12px 20px;
-    cursor:pointer;
-    text-transform:uppercase;
-    text-decoration:none;
-    margin:6px 8px 6px 0;
-  }
-  .act:hover{
-    border: 4px outset var(--gold-bright);
-    box-shadow:0 0 14px rgba(255,215,0,.5);
-	    background: transparent;
-  }
-  .act.ghost{
-    background:transparent;
-    color:var(--gold);
-    border-color:var(--gold-dim);
-  }
-  .act.ghost:hover{ color:var(--gold-bright); border-color:var(--gold-bright); }
+/* ---------- 1. ТЕГИ И СЛУЖЕБНЫЕ СЕЛЕКТОРЫ ---------- */
 
-  /* ══ ФУТЕР ══ */
-  .footer{
-    margin-top:26px;
-    border-top:1px dashed var(--gold-dim);
-    padding-top:14px;
-    font-size:8px;
-    color:var(--text-dim);
-    text-align:center;
-  }
-  .blink{ animation:blink 1.2s steps(2) infinite; }
-  @keyframes blink{ 50%{ opacity:.25; } }
-  
-  /* --- Стили для Маскота (Teddy) --- */
-#mascot-svg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100px; height: 100px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease-out;
-  z-index: 999; /* Важно: выше всего интерфейса, но ниже модальных окон, если есть */
-}
-#mascot-svg.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-.bear-jumping {
-  animation: bear-jump-anim 0.3s forwards;
-  transform-origin: bottom center;
-}
-@keyframes bear-jump-anim {
-  0% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-40px) scale(1.1); }
-  100% { transform: translateY(0) scale(1); }
+:root{
+  --bg: #0f0f1b;
+  --panel: #1a1a2e;
+  --gold: #f7cc1d;
+  --cyan: #7dff8a;
+  --key-white: #fff;
+  --key-black: #16161d;
+  --accent: #4f8ee9;
 }
 
-/* Цвета (палитра под твой ретро-стиль) */
-.c-fur-main { fill: #6d4c41; }
-.c-fur-light { fill: #a1887f; }
-.c-fur-dark { fill: #3e2723; }
-.c-scarf { fill: #ef5350; }
-.c-button { fill: #212121; }
-.c-nose { fill: #1b1b1b; }
-.c-eye { fill: #000; }
-.c-cheek { fill: #ffab91; }
-.c-palm { fill: #bcaaa4; }
+/* ЧЕЛЛЕНДЖ-ЛОГ: tap-highlight живёт строго на таче */
+@media (pointer: coarse) {
+  * { -webkit-tap-highlight-color: transparent; }
+}
 
-  
-  
+/* глобальный сброс */
+*{ box-sizing:border-box; margin:1px; padding:0; }
+
+::-webkit-scrollbar{ width:12px; }
+
+::-webkit-scrollbar-track{
+  background:#140;
+  border:1px solid #950;
+  border-radius:1px;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color:#207;
+  border-radius:4px;
+  border:3px solid #950;
+}
+
+body{
+	background-image: url('img.png');
+      color: var(--text-main);
+      margin: 0;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+}
+
+/* чип-кнопка */
+button{
+  font-family:inherit;
+  background:#222;
+  color:var(--gold);
+  border:4px outset #950;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.85rem;
+  width:180px;
+  height:40px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #111 0px, #333 1px, #111 1px, #222 6px);
+  background-size: 2px 2px, 18px 18px;
+}
+
+/* активная кнопка */
+button.on{
+  background:#f79e1d;
+  color:#99fffc;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 0px, #000000 1px, #1a1a2e 1px, #03000b 6px);
+  background-size: 2px 2px, 9px 9px;
+  border:4px outset #4f8ee9;
+}
+
+/* вывеска */
+h1 h2 h3{
+  color:var(--gold);
+  font-size:1.4rem;
+  letter-spacing:3px;
+  margin-bottom:12px;
+  text-shadow:2px 2px 0 #7a5c00;
+  border:4px outset #950;
+  background:#1a1a2e;
+  padding:6px;
+  background-image:
+    repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px),
+    repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
+  background-size: 12px 12px, 18px 18px;
+}
+
+/* загрузчик банка и выпадающие списки */
+input[type=file],
+select{
+  font-family:inherit;
+  background:#111;
+  color:var(--cyan);
+  border:4px outset #950;
+  padding:4px;
+  max-width:340px;
+  font-size:0.8rem;
+}
+
+/* ползунки */
+input[type=range]{
+  accent-color:#3bc3d6;
+  width:140px;
+}
+input[type=range]{
+  accent-color:#f90;
+  width:460px;
+  -webkit-appearance:none;
+  background:#0a2a12;
+  border:4px outset #950;
+  outline:none;
+  border-radius:16px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+  margin-top:-5px;
+  box-shadow:0 0 4px rgba(249,153,0,.6);
+}
+input[type=range]::-moz-range-track{
+  height:6px;
+  background:#0a2a12;
+  border:1px solid var(--gold);
+  border-radius:3px;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+}
+
+/* ---------- 2. ID ---------- */
+
+#keys{
+  position:relative;
+  height:152px;
+  width:100%;
+  user-select:none;
+  touch-action:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border:4px outset #950;
+  margin-bottom:10px;
+}
+
+#keys2{
+  position:relative;
+  height:152px;
+  width:100%;
+  user-select:none;
+  touch-action:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border:4px outset #950;
+  margin-bottom:10px;
+}
+
+
+
+/* ---------- 3. КЛАССЫ ---------- */
+
+a.btn{
+  display:inline-block;
+  font-family:inherit;
+  background:#222;
+  color:var(--gold);
+  border:4px outset #950;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.85rem;
+  width:180px;
+  height:40px;
+  line-height:22px;
+  text-align:center;
+  text-decoration:none;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #111 0px, #333 1px, #111 1px, #222 6px);
+  background-size:2px 2px, 18px 18px;
+}
+a.btn:hover{ filter:brightness(1.25); }
+a.btn:active{ border-style:inset; }
+
+
+.bk{
+  position:absolute;
+  top:0;
+  height:60%;
+  background:var(--key-black);
+  border:2px solid #000;
+  z-index:2;
+  cursor:pointer;
+  touch-action:none;
+  transition:0.2s;
+  CORNER-SHAPE: SUPERELLIPSE(0.4);
+  border-radius: 0px 0px 12px 12px;
+}
+.bk:hover{
+  background:#333;
+  border:2px solid #f90;
+}
+.bk.act{ background:var(--accent) !important; }
+
+.lbl{
+  font-size:0.75rem;
+  position:absolute;
+  bottom:2px;
+  width:96%;
+  text-align:center;
+  color:#ffffff;
+  pointer-events:none;
+  text-shadow:2px 2px 6px #00000080;
+  background:#00000080;
+  text-emphasis-style:"☩";
+  border-radius:8px;
+  CORNER-SHAPE: SUPERELLIPSE(-0.7);
+  border:1px double #950;
+}
+
+/* LCD-экран */
+.lcd{
+  background:#0a2a12;
+  border:6px inset #1a1a2e;
+  color:var(--cyan);
+  padding:8px 12px;
+  font-size:0.9rem;
+  margin:10px 5px 0px 5px;
+  height:320px;
+  width:240px;
+  max-width:100%;
+  overflow:auto;
+  line-height:150%;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+  background-size: 2px 3px, 12px 12px;
+}
+
+/* анимированная вывеска */
+.logotype{
+  padding:5px 5px;
+  animation:gradientMove 30s ease infinite;
+}
+
+/* окно-панель (и таб-бар) */
+.panel{
+  background:#1a1a2e;
+  border:4px outset #950;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content: center;
+  flex-direction:row;
+  align-content:flex-start;
+  margin: 12px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+  background-size: 2px 1px, 18px 18px;
+}
+
+.panel_2{
+  background:#1a1a2e;
+  border:1px outset #950;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content: center;
+  flex-direction:row;
+  align-content:flex-start;
+  margin: 12px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+  background-size: 2px 1px, 18px 18px;
+}
+/* правая колонка панели */
+.panel_buttons{
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:flex-start;
+  margin:10px 15px;
+  flex-direction:column;
+  width:760px;
+}
+
+/* панель с кнопками под LCD */
+.panel_buttons_c{
+  display:inline-grid;
+  grid-auto-flow:row dense;
+  justify-items:start;
+  align-items:center;
+  justify-content:start;
+  align-content:start;
+}
+
+/* внутренний ряд панели */
+.panel_lcd{
+    display: flex;
+    justify-content: flex-start;
+    align-content: flex-start;
+    margin: 15px;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+/* горизонтальный ряд */
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:8px;
+  align-content:flex-start;
+  justify-content:flex-start;
+}
+
+/* «кнопка-подпись» в LCD-стиле */
+.row span{
+  font-family:inherit;
+  background:#000;
+  color:var(--cyan);
+  border:6px inset #1a1a2e;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.8rem;
+  width:180px;
+  height:40px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+  background-size: 2px 3px, 12px 12px;
+}
+
+/* span без экрана и рамки */
+.row span.plain{
+  background:none;
+  border:none;
+  box-shadow:none;
+  color:#cfd2e8;
+  padding:0;
+}
+
+/* нижняя панель подсказки */
+.row_b{
+  background:#1a1a2e;
+  border:4px outset #950;
+  padding:8px;
+  display:flex;
+  background-image:
+    repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px),
+    repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
+  background-size: 12px 12px, 18px 18px;
+}
+
+/* текст подсказки */
+.row_b span{
+  font-family:'Courier New', monospace;
+  font-size:0.75rem;
+  letter-spacing:1px;
+  color:var(--cyan);
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+  background-size: 2px 3px, 12px 12px;
+}
+
+/* белая клавиша */
+.wk{
+  flex:1;
+  background:var(--key-white);
+  border:1px solid #555;
+  position:relative;
+  cursor:pointer;
+  touch-action:none;
+  transition:0.2s;
+  CORNER-SHAPE: SUPERELLIPSE(0.3);
+  border-radius:0px 0px 10px 10px;
+}
+.wk:hover{
+  background:#CCC;
+  border:1px solid #309;
+}
+.wk.act{ background:var(--accent) !important; }
+
+/* обёртка прокрутки клавиатуры */
+.kbd-wrap{
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+}
+.kbd-wrap::-webkit-scrollbar{ display:none; }
+
+/* фирменная лента скролла */
+.kbd-strip{
+  height:18px;
+  margin-bottom:6px;
+  box-shadow:2px 2px 0 #000;
+  border:2px inset #950;
+  background:#14101e;
+  overflow:hidden;
+  cursor:pointer;
+  user-select:none;
+  touch-action:none;
+}
+.tape{ position:relative; width:100%; height:100%; }
+.tape-thumb{
+  position:absolute;
+  top:1px;
+  height:12px;
+  background:var(--accent);
+  border:2px solid #000;
+  cursor:grab;
+  touch-action:none;
+  transition:0.15s;
+}
+.tape-thumb:active{ cursor:grabbing; }
+
+/* режим «1 КЛАВИАТУРА» */
+body.kb-single #strip2{ display:none !important; }
+body.kb-single #keys2{ display:none !important; }
+
+/* ---------- 4. АНИМАЦИЯ ---------- */
+
+@keyframes gradientMove{
+  10%{color:#FFA;}
+  20%{color:#F6F;}
+  30%{color:#AFF;}
+  40%{color:#AF9;}
+  50%{color:#AAF;}
+  60%{color:#fAF;}
+  70%{color:#96F;}
+  80%{color:#F93;}
+  90%{color:#FF9;}
+  100%{color:#666;}
+}
+
+/* ---------- 5. ДОПОЛНЕНИЕ ДЛЯ САЙТА-ВИЗИТКИ ---------- */
+
+/* логотип-шапка на всю ширину */
+#logo{ width:100%; text-align:center; }
+
+/* скрытие/показ секций-вкладок */
+.view-hidden{ display:none; }
+
+/* таб-бар без лишнего отступа ряда */
+.tabs .row{ margin-bottom:0; }
+
+/* текстовые блоки: полный объём вместо узкого 240px */
+.lcd-full{
+        width: 100%;
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* подзаголовки внутри LCD */
+.lcd h2{ font-size:0.95rem; color:var(--gold); margin:6px 0 4px; }
+.lcd h3{ font-size:0.85rem; color:#99fffc; margin:6px 0 2px; }
+.lcd p, .lcd li{ margin:2px 0; }
+
+/* МОБИЛЬНЫЙ РОЛЛ v1.0.37 */
+@media (max-width:768px){
+  #keys, #keys2{ transform:scaleY(0.75); transform-origin:top left; }
+  .kbd-wrap{ height:114px; }
+}
 </style>
 </head>
 <body>
-
-<div class="header">
-  <h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</h1>
-  <div class="sub">CHIP-TUNE + SOUNDFONT + MIDI x 128 · 2A03 · PULSE 50/25/12.5 · ПИЛА · ТРЕУГ. · СИНУС · ШУМ</div>
-  <div class="build">BUILD v1.2.5 «Finale»</div>
-</div>
-
-<div class="tab-bar" id="tabBar">
-  <button class="tab-btn active" data-tab="about">О ПРОЕКТЕ</button>
-  <button class="tab-btn" data-tab="features">ВОЗМОЖНОСТИ</button>
-  <button class="tab-btn" data-tab="controls">УПРАВЛЕНИЕ</button>
-  <button class="tab-btn" data-tab="log">Дисклеймер</button>
-  <button class="tab-btn" data-tab="download">СКАЧАТЬ</button>
-</div>
-
-<!-- ═══ О ПРОЕКТЕ ═══ -->
-<section class="panel active" id="about">
-  <h2>О ПРОЕКТЕ</h2>
-  <p>DIOWKRAD SF2 CHIP-TUNE ENGINE
-  <BR> — это гибридный звуковой движок в одном HTML-файле:<Br>
-  <BR><span class="k">чиптюн-синтез</span> в духе NES и <span class="k">SoundFont-плейер</span> (.sf2) 
-  <Br> в одной шине.
-  <Br><Br>Всё работает локально, в браузере, без сервера и интернета.</p>
-  <Br><Br>
-  <p>Проект вырос из простой идеи: сделать <Br>«файловый обменни в стиле старых игр для локального сервера»<Br> в инструмент, который открывается двойным кликом
-  и <Br>Просто работает. <Br><Br>
-  <h3>Философия и особенности:</h3>
-  <ul>
-	<li><span class="k">Дизайн в духе NES:</span>
-	<hr>Минималестичная знакомая многим с децтва атмосфера картреджей для Денди.</li>
-	<li><span class="k">Это просто работает:</span><hr> - Отладка не ложится на плече пользователя </li>
-	<li><span class="k">Много этапная тестировка:</span><hr> Отладка - производится на месте ,а баги устраняются . К вам попадает всегда стабильный Билд. с минимум отладочной информации или без нее во все </li>
-	<li><span class="k">без интернета:</span><hr> — файл просто живёт на диске;</li>
-    <li><span class="k">один файл:</span><hr> — ни установок, ни зависимостей;</li>
-    <li><span class="k">Три мира звука:</span><hr> Закоторые отвичают свои звуковые движки.<hr></li>
-	<li><span class="k">Чип: [RP2A03G] </span>
-	<hr> Которым была оснащена каждая Nintendo Famicom {NES}
-	<br>Она-жа наша Русская Денди.
-	<br>{ Этот звук знает каждый но мало у кого получалось воссоздать его так как он звучит в приставке .}
-	<hr></li>
-	
-	<li><span class="k">Контроллер: [soundfonts-2 {.sf2}] Для Звуковых банков .</span>
-	<hr> Которые также используются в не безызвестных
-	<br>Perfect Piano и Walk band На андроид.
-	<br>{А также в различных VST и VST3 сиквенсорах}
-	<hr></li>
-	
-	<li><span class="k">Микро процессор: [Midi-GM x 128] и собственный не зависимый Midi Банк.</span>
-	<hr> Как это было реализовано в Старых кнопочных телефонах.
-	<br>Nokia 6233 или SonyEricson k750i.
-	<br>{Раньше не существовало единого стандарта Midi Банков. По этому каждый делал по своему.От этого одна итаже мелодия могла звучать по разному. }
-	<hr></li>
-	
-    <li><span class="k">честное управления с любого устройства:</li>
-    <li><span class="k">честная история правок:</span> Неважно с компютера или телефона . <hr> Одни дезайн и Один функционал  везде. <hr> Без лишнего адаптива по мобильные устройства </li>
-  </ul>
-  <p class="dim">// 
-(Для удобства в мобилных браузерах рекомендую уменьшить страницу в браузере через настройки до 75%) </p>
-</section>
-
-<!-- ═══ ВОЗМОЖНОСТИ ═══ -->
-<section class="panel" id="features">
-  <h2>ВОЗМОЖНОСТИ</h2>
-  <h3>Режим: CHIP-TUNE</h3>
-  <ul>
-    <li>11 голосов: ПУЛЬС 50% / 25% / 12,5%, ПИЛА, ТРЕУГ., СИНУС, КВАДРАТ, ПУЛЬС КРУГЛ., N-ВОЛНА, ШУМ ДЛИН./КОРОТ.</li>
-    <li>Полифония, отдельная громкость голоса чипа, режим «квадрат −1 октава»</li>
-  </ul>
-  <h3>Режим: soundfonts-2 {.sf2}</h3>
-  <ul>
-    <li>Загрузка любого банка .sf2, выбор банка → пресета → инструмента</li>
-    <li>Фолбэк: нота вне зон пресета уходит в CHIP-голос — тишины не бывает</li>
-  </ul>
-  <h3>Режим: [Midi-GM]</h3>
-  <ul>
-    <li>Загрузка встроенного банка ,с выбором инструмента</li>
-    <li>Для удобства иструменты разбиты по категориям .</li>
-  </ul>
-  <h3>Сустейн</h3>
-  <ul>
-    <li>Три доли: 1/8 (250/900 мс) · 1/4 (500/700) · 1/2 (700/500)</li>
-    <li>Нота звучит после отпускания до границы доли, затем затухание; подсветка гаснет вместе со звуком</li>
-    <li>Смена режима пересчитывает играющие хвосты — зависших звука нет</li>
-  </ul>
-  <h3>Ввод</h3>
-  <ul>
-    <li>ПК-клавиатура: две раскладки — <span class="k"> и 2 РЯДА клавиш .</span> 
-  </ul>
-</section>
-
-<!-- ═══ УПРАВЛЕНИЕ ═══ -->
-<section class="panel" id="controls">
-  <h2>УПРАВЛЕНИЕ</h2>
-  <h3>2 ряда — зигзаг на две октавы</h3>
-  <p>Нижний ряд <span class="dim">(C4…F5)</span>:
-    <span class="kbd">Z</span><span class="kbd">S</span><span class="kbd">X</span><span class="kbd">D</span><span class="kbd">C</span><span class="kbd">V</span><span class="kbd">G</span><span class="kbd">B</span><span class="kbd">H</span><span class="kbd">N</span><span class="kbd">J</span><span class="kbd">M</span><span class="kbd">,</span><span class="kbd">L</span><span class="kbd">.</span><span class="kbd">;</span><span class="kbd">/</span><span class="kbd">'</span><br>
-    <span class="dim">// ;=D#5 · /=E5 · '=F5</span></p>
-  <p>Верхний ряд <span class="dim">(C5…F#6, ровно октава выше)</span>:
-    <span class="kbd">Q</span><span class="kbd">2</span><span class="kbd">W</span><span class="kbd">3</span><span class="kbd">E</span><span class="kbd">R</span><span class="kbd">5</span><span class="kbd">T</span><span class="kbd">6</span><span class="kbd">Y</span><span class="kbd">7</span><span class="kbd">U</span><span class="kbd">I</span><span class="kbd">9</span><span class="kbd">O</span><span class="kbd">0</span><span class="kbd">P</span><span class="kbd">[</span><span class="kbd">]</span><br>
-    <span class="dim">// Q=C5 · I=C6 · октавные «до» на одинаковых позициях рядов</span></p>
-  <h3>1 ряд — полная хроматика <span class="dim">(C4…F#5)</span></h3>
-  <p><span class="kbd">A</span><span class="kbd">W</span><span class="kbd">S</span><span class="kbd">E</span><span class="kbd">D</span><span class="kbd">F</span><span class="kbd">T</span><span class="kbd">G</span><span class="kbd">Y</span><span class="kbd">H</span><span class="kbd">U</span><span class="kbd">J</span><span class="kbd">K</span><span class="kbd">O</span><span class="kbd">L</span><span class="kbd">P</span><span class="kbd">;</span><span class="kbd">'</span><span class="kbd">]</span>
-  <span class="dim">// 19 клавиш без пропусков и дублей</span></p>
-  <h3>Прочее</h3>
-  <ul>
-    <li><span class="kbd note">←</span><span class="kbd note">→</span> — смена октавы</li>
-    <li><span class="kbd note">Num7</span><span class="kbd note">Num8</span><span class="kbd note">Num9</span> — сустейн 1/8 · 1/4 · 1/2</li>
-    <li>Раскладка привязана к физическим кодам клавиш — ЙЦУКЕН работает сам собой</li>
-    <li>Тумблер КЛАВИАТУРА глушит только ПК-ряд; MIDI и мышь всегда живые</li>
-  </ul>
-</section>
-
-<!-- ═══ Дисклеймер ═══ -->
-<section class="panel" id="log">
-  <h2>Дисклеймер</h2>
-	<span class="k"><b>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ ☩ BUILD v1.2.5 «Final» ☩ ☩</b><br>
-Разработка завершена.<br>
-☩ Бело принято решение не раздувать дальше проект.<hr>
-
-Проект задумывался как проба пера разработки вместе с AI.<br>
-Я взял на себя:<br>
-Отладку, Дизайн, Тестировку, Разработку, Управление проектом, Командование проектом.<br>
-Взял на себя AI {В нашем случае была выбрана Алиса}:<br>
-Сборку кода, Внесение правок по промту, Дополнительный дебаг, Компиляцию проекта, Написание механик с нуля.<hr>
-
-Здесь о я говорюсь.<br>
-После заимствования готового решения Алиса сбросила накопленный опыт и веса, накопленные в нейросети.<br>
-Это послужило основной причиной, почему я продолжать дальше не буду.<hr>
-
-Я позиционирую себя как JavaScript‑разработчика Junior+ или Middle.<br>
-Код, сгенерированный AI, требует знаний Middle+, а лучше Senior, которыми я не обладаю в достаточной мере, чтобы понимать весь код от корки до корки.<br>
-Ананизм мне не к чему.<hr>
-
-Основные критерии и требования к разработке:<br>
-0 — Внешних ссылок;<br>
-0 — Привязок;<br>
-0 — Фреймворков: чистый HTML5 / CSS3 / JavaScript без примесей.<br>
-1 — HTML‑файл: высокое качество, как у мобильных приложений.<hr>
-
-Работа веб‑приложения без интернета — с рабочего стола или из папки мобильного телефона.<br>
-Интеграция с мобильными устройствами.<br>
-Работа веб‑приложения исключительно в браузере.<br>
-В качестве движка был избран Chromium, как наиболее популярный движок для браузеров — он есть у каждого.<hr>
-
-Работа в онлайн‑версии без PHP и MySQL, с возможностями, которые даёт GitHub.<br>
-Одна вёрстка под все устройства.<br>
-Приложение должно работать и выглядеть одинаково везде — независимо от того, какого размера экран и чем отличается браузер, если у него под капотом движок Chromium.
-</span>
-<h2>Специфекация движка:</h2>
-	<span class="k"><b>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ ☩ BUILD v1.2.5 «Final» ☩ ☩</b><br><br><br><br>
-	# DIOWKRAD SF2 CHIP-TUNE ENGINE — Спецификация (v1.2.5 Final)
-
-# DIOWKRAD SF2 CHIP-TUNE ENGINE — Спецификация (v1.2.5 Finale)
-
-## О проекте
-Финальная сборка аудио-движка для синтеза звука, объединяющая три режима генерации: эмуляцию чипа **RP 2A03 (NES)** с кастомными волновыми таблицами, воспроизведение **SoundFont2 (SF2)** с динамическим парсингом RIFF-структур, и **MIDI GM × 128** синтез по встроенным рецептам гармоник.  
-Движок разработан без использования внешних библиотек, имеет встроенную защиту от клиппинга, независимые системы сустейна/цепочек таймаутов, поддержку Web MIDI API и оптимизирован для работы на Android-устройствах (отключено залипание клавиш).
-
-## Архитектура и структура исходного кода
-Проект представляет собой монолитную архитектуру, разделенную на **13 логических модулей (файлов)**. Для корректной сборки/склейки или последовательного подключения файлов критически важно соблюдать числовой индекс в их названиях:
-
-1. `01_state.js` — Глобальное состояние ядра, кэш сэмплов, инициализация AudioContext и многоступенчатая цепь фильтрации (DC-блок, клиппер, лимитер).
-2. `02_chip_engine_2a03.js` — Движок эмуляции чипа NES 2A03, генерация буферов скважности (Duty 50/25/12.5%), псевдошумов LFSR, N-волн и управление голосами чипа.
-3. `03_sf2_parser.js` — Живучий парсер SoundFont2 файлов с поддержкой RIFF/RIFX структур, зон пресетов и генераторов параметров (EG, аттенюация, петли).
-4. `04_sf2_playback.js` — Контроллер полифонии и воспроизведения SoundFont сэмплов с расчетом питча в центах и огибающей AHDS.
-5. `05_sustain.js` — Матрица ритмического сустейна (доли 1/8, 1/4, 1/2) и предохранительный таймаут «потолка» звучания ноты (1 целая нота относительно текущего BPM).
-6. `06_sensitivity.js` — Модуль «Туше» (кривые чувствительности скорости нажатия нот Soft, Hard, Fixed) и глобальные триггеры `noteOn`/`noteOff`.
-7. `07_piano_roll.js` — Внутренний компонент визуализации и рендеринга нотного стана во времени.
-8. `08_keyboard_mouse.js` — Рендеринг двух виртуальных клавиатур `C1..C8` с независимой pointer-механикой, скролл-лентами (`tape-thumb`) и блокировкой ролла (`rollLock`).
-9. `09_keyboard_pc.js` — Контроллер клавиатуры ПК. Поддерживает 2-рядную («зигзаг») и 1-рядную хроматические раскладки, а также управление октавным сдвигом.
-10. `10_midi_keyboard.js` — Интеграция с Web MIDI API, «горячее» подключение физических MIDI-контроллеров, педали сустейна (CC64) и обработка Pitch Bend.
-11. `11_midi_gm128.js` — Синтезатор стандарта General MIDI на 128 инструментов на основе аддитивного синтеза гармоник и фильтрации.
-12. `12_start.js` — Точка входа. Автоматический запуск рендеринга интерфейса, построение селекторов и опрос готовности модулей.
-13. `13_touch_fps.js` — Микромодуль оптимизации тач-скринов (динамическое удаление CSS-правил `:hover`) и цикличный счетчик кадров FPS через `requestAnimationFrame`.
-
-> **Важно:** Порядок индексов `01`–`13` отражает строгую топологию зависимостей. Изменение порядка или исключение модулей гарантированно приведет к ошибкам `ReferenceError` в глобальной области видимости.
-
-## Карта глобальных коллекций и состояния
-Вся логика распределения голосов и отслеживания нажатых клавиш завязана на единый источник истины из `01_state.js`, `09_keyboard_pc.js` и `10_midi_keyboard.js`:
-* `state` — Системный объект конфигурации (текущий режим `mode`, активный голос, кэш сэмплов `sampleCache`).
-* `activeChip` — `Map` активных осцилляторов чипа.
-* `activeSF2` — `Map` активных SoundFont-сэмплов (лимит полифонии: `VOICE_MAX = 32`).
-* `activeMidi` — `Map` активных GM-инструментов.
-* `heldKeys` — `Map` зажатых клавиш на клавиатуре ПК (код клавиши -> номер MIDI-ноты).
-* `noteOwner` — `Map` владельцев нот для предотвращения конфликтов отпускания (нота -> код клавиши / `@ext` для мыши или внешнего MIDI).
-
-## Техническое описание логики и интерфейса
-
-### 1. Логика работы звукового ядра и эффектов
-* **Защита от клиппинга и щелчков:** Реализована в `01_state.js`. При инициализации контекста создается цепочка узлов: `DC-блок` (BiquadFilter highpass, 20 Гц для отсечения постоянной составляющей), `статичный мягкий клиппер` (узел `WaveShaper` на 2048 точек с функцией гиперболического тангенса `Math.tanh`) и `мягкий лимитер` (`DynamicsCompressor` с порогом -3 dB и плавным коленом).
-* **Ритмический сустейн и защита от залипания:** Сустейн-режимы (`1/8`, `1/4`, `1/2`) рассчитывают время удержания ноты от момента ее взятия (`performance.now()`) до жесткой границы музыкальной доли, вычисляемой на основе текущего `BPM`. При отпускании клавиши звук переходит в фазу затухания строго по сетке долей. Предохранитель `ceilingKill` автоматически тушит любую ноту, если она звучит дольше одной целой ноты, что полностью предотвращает зависание голосов при обрыве MIDI-событий.
-* **Динамический Pitch Bend:** Модуль обработки бенда пересчитывает частоты в реальном времени. Для SoundFont-сэмплов изменяется свойство `playbackRate.value`, для чип-генераторов применяется кастомный метод отслеживания, а для MIDI GM-инструментов на лету меняется параметр `frequency.setValueAtTime` для каждого осциллятора в массиве активных гармоник.
-
-### 2. Специфика рендеринга и CSS-интерфейса
-* **Концепция стилизации:** Интерфейс оформлен в ретро-стиле (8-bit палитра, фиксированные моноширинные шрифты, outset-рамки). Текстурирование кнопок (`button`), заголовков (`h1`) и экранов (`.lcd`) выполнено программно с помощью многослойных пиксельных градиентов `repeating-radial-gradient`, имитирующих зернистость железных дисплеев и микроблики кремниевых плат.
-* **Кастомная логика скролла (Ленты):** Механизм горизонтального перемещения по диапазону `C1..C8` реализован через связку скролл-боксов (`.kbd-wrap`) и координатных лент (`.kbd-strip`). Скрипт высчитывает пропорцию видимой области, динамически задает ширину ползунка `.tape-thumb` и позиционирует его с помощью `style.left`. Поддерживается независимый скролл для двух клавиатур, управление мышью (PointerCapture) и горизонтальная прокрутка колесом мыши (`wheel`).
-* **Мобильная Touch-оптимизация:** Для предотвращения визуальных багов на тач-экранах мобильных устройств, модуль `13_touch_fps.js` при запуске сканирует CSS-правила всех таблиц стилей приложения и аппаратно удаляет все селекторы, содержащие псевдокласс `:hover`.
-
-## Сводная карта DOM-селекторов (UI и Инпуты)
-
-Для корректной работы скрипта HTML-документ обязан содержать следующие селекторы:
-
-### Глобальное управление и индикация
-* `#vol` — Ползунок (`input[type="range"]`) регулировки общей громкости (0–100). В CSS имеет фиксированную ширину `460px` и кастомный бегунок `::-webkit-slider-thumb`.
-* `#log` — Контейнер для вывода системных логов (журнал событий, ограничение до 10 строк через тег `<hr>`).
-* `#lcd` — Главный текстовый дисплей статуса движка (индикация выбранного инструмента, банка или паники).
-* `#voiceCnt` — Элемент динамического счетчика активных голосов полифонии (`Golos: **0**`).
-* `#fpsDisplay` — Текстовое поле вывода текущей частоты кадров (FPS).
-
-### Элементы управления режимами и интерфейсом
-* `#btnChip` — Кнопка переключения в режим `CHIP-TUNE`.
-* `#btnSf2` — Кнопка переключения в режим `SoundFont`.
-* `#btnMidi` — Кнопка переключения в режим `MIDI GM`.
-* `#chipVoiceSel` — Выпадающий список (`select`) голосов чипа 2A03.
-* `#midiVoiceSel` — Выпадающий список голосов General MIDI (автоматически группируется по категориям `optgroup`).
-* `#wavePanel .wbtn` — Группа кнопок быстрого выбора формы волны чипа (через `dataset.wave`).
-
-### Инструменты сустейна и темпа
-* `#bpm` — Ползунок установки темпа (диапазон 40–300 BPM).
-* `#bpmVal` — Текстовый индикатор текущего значения BPM.
-* `#susBtn8`, `#susBtn4`, `#susBtn2` — Кнопки переключения режимов ритмического сустейна (`1/8`, `1/4`, `1/2` доли).
-
-### Чувствительность («Туше»)
-* `#sensSoft`, `#sensHard`, `#sensFixed` — Кнопки переключения кривых чувствительности скорости нажатия нот.
-
-### MIDI-коммутация и Паника
-* `#midiBtn` — Кнопка инициализации Web MIDI API и получения прав доступа у браузера (`Подключить MIDI`).
-* `#midiSel` — Выпадающий список доступных физических/виртуальных MIDI-входов.
-* `#panicBtn` — Кнопка экстренного глушения всех звуковых каналов, очистки таймеров и сброса педалей (`panicAll()`).
-
-### Интерактивная клавиатура и Скролл
-* `#keys` / `#keys2` — Контейнеры первой и второй клавиатур. Наполняются динамически элементами `.wk` (белые, базовый размер 58x152px) и `.bk` (черные, размер 36x94px, с инлайн-расчетом сдвига `style.left`).
-* `#wrap1` / `#wrap2` — Родительские скролл-боксы для клавиатур с классом `.kbd-wrap`, реализующие горизонтальную прокрутку.
-* `#strip1` / `#strip2` — Контейнеры кастомных ленточных трекбаров (`.kbd-strip`) для визуализации положения скролла. Внутри содержат элемент `.tape-thumb`.
-* `#rollLock` — Кнопка блокировки горизонтального скролла (`rollLocked`). Переводит контейнеры клавиатур в `overflowX = 'hidden'` и снижает непрозрачность лент скролла до `0.4`.
-* `#octDn` / `#octUp` — Кнопки октавного сдвига для физической клавиатуры ПК (`− ОКТАВА` / `+ ОКТАВА`).
-
-## Важные константы и границы диапазона
-* `PC_MIN = () => 24;` — Минимальная доступная нота для позиционирования октавы (Нота `C1`).
-* `PC_MAX = () => 78;` — Максимальная доступная нота для позиционирования октавы (Нота `F#5` / Граница до `C8`).
-* Константы диапазона рендеринга клавиш: `KB_LO = 24`, `KB_HI = 108` (Полный диапазон `C1..C8`).
-
-## Стилизация и правила модификации интерфейса
-1. **Прямое управление стилями из JS (Критично):** Скрипт активно управляет визуальным отображением элементов напрямую через инлайн-стили (`style.width`, `style.left`, `style.overflowX`, `style.opacity`). При изменении CSS-каркаса учитывайте, что JS перетирает данные свойства элементов `#wrap`, `#strip`, `.bk` и `.tape-thumb`.
-
-
-
-</span>
-
+<div class="rack-mount">
+<!-- ================= ШАПКА ================= -->
+<header class="panel">
+  <h1 class="logotype">☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</h1>
+</header>
+<div class="panel_2"
+style="
+animation: gradientMove 60s ease infinite;    text-align: center;
+"
+>
+ <h3 class="logotype">CHIP-TUNE + SOUNDFONT + MIDI x 128 · 2A03 · PULSE 50/25/12.5 · ПИЛА · ТРЕУГ. · СИНУС · ШУМ BUILD v1.2.5 «Finale»</h3>
+ </div>
+<!-- ================= ТАБ-БАР ================= -->
+<nav class="panel_2 tabs" id="tabs" style="border: 0px outset #950;
+margin: 1px;
+">
   
-</section>
+    <button class="on" data-view="view-about">О ПРОЕКТЕ</button>
+    <button data-view="view-features">ВОЗМОЖНОСТИ</button>
+    <button data-view="view-controls">УПРАВЛЕНИЕ</button>
+    <button data-view="view-disclaimer">Дисклеймер</button>
+    <button data-view="view-download">СКАЧАТЬ</button>
+ 
+</nav>
 
-<!-- ═══ СКАЧАТЬ ═══ -->
-<section class="panel" id="download">
+<!-- ================= ГЛАВНЫЙ БЛОК ================= -->
+<main>
+
+  <!-- ---------- ВКЛАДКА: О ПРОЕКТЕ ---------- -->
+  <section id="view-about">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        <h2>О ПРОЕКТЕ</h2>
+        <p>DIOWKRAD SF2 CHIP-TUNE ENGINE — это гибридный звуковой движок в одном HTML-файле:
+        чиптюн-синтез в духе NES и SoundFont-плеер (.sf2) в одной шине.
+        Всё работает локально, в браузере, без сервера и интернета.</p>
+        <p>Проект вырос из простой идеи: сделать «файловый обменник в стиле старых игр
+        для локального сервера» в инструмент, который открывается двойным кликом и просто работает.</p>
+        <h3>Философия и особенности:</h3>
+        <ul>
+          <li>Дизайн в духе NES: минималистичная знакомая многим с детства атмосфера картриджа для Денди.</li>
+          <li>Это просто работает: отладка не ложится на плечи пользователя.</li>
+          <li>Многоэтапная тестировка: отладка производится на месте, а баги устраняются.
+              К вам попадает всегда стабильный билд, с минимумом отладочной информации или без неё.</li>
+          <li>Без интернета: файл просто живёт на диске.</li>
+          <li>Один файл: ни установок, ни зависимостей.</li>
+          <li>Три мира звука: за которые отвечают свои звуковые движки.</li>
+          <li>Чип: [RP2A03G] — им была оснащена каждая Nintendo Famicom {NES},
+              она же наша Русская Денди. Этот звук знает каждый, но мало у кого получалось
+              воссоздать его так, как он звучит в приставке.</li>
+          <li>Контроллер: [soundfonts-2 {.sf2}] — для звуковых банков, которые также используются
+              в небезызвестных Perfect Piano и Walk band на Android,
+              а также в различных VST и VST3-секвенсорах.</li>
+          <li>Микропроцессор: [Midi-GM x 128] и собственный независимый MIDI-банк —
+              как это было реализовано в старых кнопочных телефонах Nokia 6233 или SonyEricsson k750i.
+              Раньше не существовало единого стандарта MIDI-банков, поэтому каждый делал по-своему.
+              От этого одна и та же мелодия могла звучать по-разному.</li>
+          <li>Честное управление с любого устройства.</li>
+          <li>Честная история правок: неважно с компьютера или телефона —
+              один дизайн и один функционал везде, без лишнего адаптива под мобильные устройства.</li>
+        </ul>
+        <p>// (Для удобства в мобильных браузерах рекомендую уменьшить страницу
+        в браузере через настройки до 75%)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: ВОЗМОЖНОСТИ ---------- -->
+  <section id="view-features" class="view-hidden">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        <h2>ВОЗМОЖНОСТИ</h2>
+        <h3>Режим: CHIP-TUNE</h3>
+        <ul>
+          <li>11 голосов: ПУЛЬС 50% / 25% / 12,5%, ПИЛА, ТРЕУГ., СИНУС, КВАДРАТ,
+              ПУЛЬС КРУГЛ., N-ВОЛНА, ШУМ ДЛИН./КОРОТ.</li>
+          <li>Полифония, отдельная громкость голоса чипа, режим «квадрат −1 октава».</li>
+        </ul>
+        <h3>Режим: soundfonts-2 {.sf2}</h3>
+        <ul>
+          <li>Загрузка любого банка .sf2, выбор банка → пресета → инструмента.</li>
+          <li>Фолбэк: нота вне зон пресета уходит в CHIP-голос — тишины не бывает.</li>
+        </ul>
+        <h3>Режим: [Midi-GM]</h3>
+        <ul>
+          <li>Загрузка встроенного банка, с выбором инструмента.</li>
+          <li>Для удобства инструменты разбиты по категориям.</li>
+        </ul>
+        <h3>Сустейн</h3>
+        <ul>
+          <li>Три доли: 1/8 (250/900 мс) · 1/4 (500/700) · 1/2 (700/500).</li>
+          <li>Нота звучит после отпускания до границы доли, затем затухание;
+              подсветка гаснет вместе со звуком.</li>
+          <li>Смена режима пересчитывает играющие хвосты — зависшего звука нет.</li>
+        </ul>
+        <h3>Ввод</h3>
+        <ul>
+          <li>ПК-клавиатура: две раскладки — и 2 ряда клавиш.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: УПРАВЛЕНИЕ ---------- -->
+  <section id="view-controls" class="view-hidden">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        <h2>УПРАВЛЕНИЕ</h2>
+        <h3>2 ряда — зигзаг на две октавы</h3>
+        <p>Нижний ряд (C4…F5): ZSXDCVGBHNJM,L.;/'// ;=D#5 · /=E5 · '=F5</p>
+        <p>Верхний ряд (C5…F#6, ровно октава выше): Q2W3ER5T6Y7UI9O0P[]//
+        Q=C5 · I=C6 · октавные «до» на одинаковых позициях рядов.</p>
+        <h3>1 ряд — полная хроматика (C4…F#5)</h3>
+        <p>AWSEDFTGYHUJKOLP;']// — 19 клавиш без пропусков и дублей.</p>
+        <h3>Прочее</h3>
+        <ul>
+          <li>←→ — смена октавы.</li>
+          <li>Num7 Num8 Num9 — сустейн 1/8 · 1/4 · 1/2.</li>
+          <li>Раскладка привязана к физическим кодам клавиш — ЙЦУКЕН работает сам собой.</li>
+          <li>Тумблер КЛАВИАТУРА глушит только ПК-ряд; MIDI и мышь всегда живые.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: ДИСКЛЕЙМЕР ---------- -->
+  <section id="view-disclaimer" class="view-hidden">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        <h2>Дисклеймер</h2>
+        <p>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ ☩ BUILD v1.2.5 «Final» ☩</p>
+        <p>☩ Разработка завершена. ☩ Было принято решение не раздувать дальше проект.
+        Проект задумывался как проба пера разработки вместе с AI.
+        Я взял на себя: отладку, дизайн, тестировку, разработку, управление проектом, командование проектом.
+        Взял на себя AI {в нашем случае была выбрана Алиса}: сборку кода, внесение правок по промту,
+        дополнительный дебаг, компиляцию проекта, написание механик с нуля.
+        Здесь о я говорюсь. После заимствования готового решения Алиса сбросила накопленный опыт
+        и веса, накопленные в нейросети. Это послужило основной причиной, почему я продолжать дальше не буду.
+        Я позиционирую себя как JavaScript-разработчика Junior+ или Middle.
+        Код, сгенерированный AI, требует знаний Middle+, а лучше Senior, которыми я не обладаю
+        в достаточной мере, чтобы понимать весь код от корки до корки. Ананизм мне не к чему.</p>
+        <p>Основные критерии и требования к разработке:</p>
+        <ul>
+          <li>0 — внешних ссылок;</li>
+          <li>0 — привязок;</li>
+          <li>0 — фреймворков: чистый HTML5 / CSS3 / JavaScript без примесей;</li>
+          <li>1 — HTML-файл: высокое качество, как у мобильных приложений.
+              Работа веб-приложения без интернета — с рабочего стола или из папки мобильного телефона.
+              Интеграция с мобильными устройствами.
+              Работа веб-приложения исключительно в браузере.
+              В качестве движка был избран Chromium как наиболее популярный движок для браузеров — он есть у каждого.
+              Работа в онлайн-версии без PHP и MySQL, с возможностями, которые даёт GitHub.
+              Одна вёрстка под все устройства. Приложение должно работать и выглядеть одинаково везде —
+              независимо от того, какого размера экран и чем отличается браузер,
+              если у него под капотом движок Chromium.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: СКАЧАТЬ ---------- -->
+  <section id="view-download" class="view-hidden">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+
   <h2>СКАЧАТЬ</h2>
-	 <p> ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ </p>
+  <p>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</p>
   <p>
-    <a class="act" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ RT.zip">▼ СКАЧАТЬ</a>
-    <a class="act ghost" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Remaster☩.html">◄ Онлайн версия ☩Remaster☩</a>
-	 <a class="act ghost" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Legacy☩.html">◄ Онлайн версия ☩Legacy☩</a>
+    <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ RT.zip" download>▼ СКАЧАТЬ</a>
   </p>
-  <Br><Br><Br><Br><Br>
-  <hr>
-  <h2>Это протатипы Модулей проэкта они могут работать с багами и являються инструментами отстройки . </h2>
-  <h2> Воспринимайте их как этапы рахработки . </h2>
-	<p> ☩ RP2A03C ENGINE-final ☩ </p>
+  <p>Онлайн версия:</p>
   <p>
-    <a class="act" href="RP2A03C ENGINE-final.zip">▼ СКАЧАТЬ</a>
-    <a class="act ghost" href="RP2A03C ENGINE-final.html">◄ Онлайн версия</a>
+    <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Remaster☩.html" target="_blank">☩Remaster☩</a>
+    <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Legacy☩.html" target="_blank">☩Legacy☩</a>
   </p>
-  <p> ☩ SF2-ENGINE-final ☩ </p>
+
+  <h2>Это прототипы модулей проекта: они могут работать с багами и являются инструментами отстройки.</h2>
+  <h2>Воспринимайте их как этапы разработки.</h2>
+
+  <p>☩ RP2A03C ENGINE-final ☩</p>
   <p>
-    <a class="act" href="SF2-ENGINE-final.zip">▼ СКАЧАТЬ</a>
-    <a class="act ghost" href="SF2-ENGINE-final.html">◄ Онлайн версия</a>
+    <a class="btn" href="RP2A03C ENGINE-final.zip" download>▼ СКАЧАТЬ</a>
+    <a class="btn" href="RP2A03C ENGINE-final.html" target="_blank">◄ Онлайн версия</a>
   </p>
-  <p> ☩ piano_RP2A03E ☩ </p>
+
+  <p>☩ SF2-ENGINE-final ☩</p>
   <p>
-    <a class="act" href="piano_RP2A03E.zip">▼ СКАЧАТЬ</a>
-    <a class="act ghost" href="piano_RP2A03E.html">◄ Онлайн версия</a>
+    <a class="btn" href="SF2-ENGINE-final.zip" download>▼ СКАЧАТЬ</a>
+    <a class="btn" href="SF2-ENGINE-final.html" target="_blank">◄ Онлайн версия</a>
   </p>
-  <p> ☩ piano_Chip_tune ☩ </p>
+
+  <p>☩ piano_RP2A03E ☩</p>
   <p>
-    <a class="act" href="piano_RP2A03E.zip">▼ СКАЧАТЬ</a>
-    <a class="act ghost" href="piano_RP2A03E.html">◄ Онлайн версия</a>
+    <a class="btn" href="piano_RP2A03E.zip" download>▼ СКАЧАТЬ</a>
+    <a class="btn" href="piano_RP2A03E.html" target="_blank">◄ Онлайн версия</a>
   </p>
+
+  <p>☩ piano_Chip_tune ☩</p>
+  <p>
+    <a class="btn" href="piano_Chip_tune.zip" download>▼ СКАЧАТЬ</a>
+    <a class="btn" href="piano_Chip_tune.html" target="_blank">◄ Онлайн версия</a>
+  </p>
+
   <p class="dim">// ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</p>
-  <p class="dim blink">// Внимание: Это демастрационный стенд . </p>
-  <p class="dim blink">// Внимание: Полная версия защищена Авторскими правами. </p>
-  <p class="dim blink">// Внимание: Продукт не для комерческого использования. </p>
-</section>
+  <p class="dim blink">// Внимание: Это демонстрационный стенд.</p>
+  <p class="dim blink">// Внимание: Полная версия защищена авторскими правами.</p>
+  <p class="dim blink">// Внимание: Продукт не для коммерческого использования.</p>
 
-<div class="footer">
-  ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ © 2026<br>
-  <span class="blink">▮</span> Diowkrad Studio ® 2011-2026
 </div>
+    </div>
+  </section>
 
+</main>
+
+<!-- ================= ФУТЕР ================= -->
+<footer class="panel row_b">
+  <span>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ © 2026▮ Diowkrad Studio ® 2011-2026</span>
+</footer>
+</div>
 <script>
-(function(){
-  var bar = document.getElementById('tabBar');
-  var panels = document.querySelectorAll('.panel');
-  function activate(id){
-    var btns = bar.querySelectorAll('.tab-btn');
-    for (var i=0;i<btns.length;i++){
-      btns[i].classList.toggle('active', btns[i].getAttribute('data-tab')===id);
-    }
-    for (var j=0;j<panels.length;j++){
-      panels[j].classList.toggle('active', panels[j].id===id);
-    }
-  }
-  bar.addEventListener('click', function(e){
-    var t = e.target;
-    if (t && t.classList.contains('tab-btn')) activate(t.getAttribute('data-tab'));
+// Переключение вкладок таб-бара
+document.querySelectorAll('#tabs button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#tabs button').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on');
+    document.querySelectorAll('main section').forEach(function(s){ s.classList.add('view-hidden'); });
+    var target = document.getElementById(btn.dataset.view);
+    if (target) target.classList.remove('view-hidden');
   });
-  activate('about');
-})();
-
+});
 </script>
-<script>
-(function() {
-  // --- КОНФИГУРАЦИЯ ---
-  const requiredPresses = 10;
-  const ease = 0.15; // Скорость инерции (0.1-0.3)
-  
-  // --- СОСТОЯНИЯ ---
-  let keyPresses = 0;
-  let isUnlocked = false;
-  let isFollowing = false;
-  
-  const teddyBody = document.getElementById('teddy-body');
-  const svgEl = document.getElementById('mascot-svg');
-  
-  if (!teddyBody || !svgEl) return; // Защита, если SVG не загрузился
-
-  // --- ЛОГИКА ПАСХАЛКИ (10 НАЖАТИЙ) ---
-  document.addEventListener('keydown', () => {
-    if (isUnlocked) return;
-    
-    keyPresses++;
-    
-    // Тут можно обновлять свой UI счетчик, если он есть на сайте
-    // Например: document.getElementById('my-counter').innerText = keyPresses;
-    
-    if (keyPresses >= requiredPresses) {
-      unlockMascot();
-    }
-  });
-
-  function unlockMascot() {
-    isUnlocked = true;
-    svgEl.classList.add('active');
-    console.log('MASCOT UNLOCKED');
-    
-    // Инициализация позиции в левом нижнем углу
-    const stageRect = document.documentElement.getBoundingClientRect(); // Или твой игровой контейнер
-    const startX = 20;
-    const startY = stageRect.height - 120;
-    
-    currentX = startX;
-    currentY = startY;
-    targetX = startX;
-    targetY = startY;
-    
-    isFollowing = true;
-  }
-
-  // --- ЛОГИКА ДВИЖЕНИЯ ---
-  let targetX = -150;
-  let targetY = -150;
-  let currentX = -150;
-  let currentY = -150;
-
-  document.addEventListener('mousemove', (e) => {
-    if (!isFollowing) return;
-    
-    const rect = svgEl.getBoundingClientRect();
-    const halfW = rect.width / 2;
-    const halfH = rect.height / 2;
-    
-    targetX = e.clientX - halfW;
-    targetY = e.clientY - halfH;
-  });
-
-  function animate() {
-    if (isFollowing) {
-      currentX += (targetX - currentX) * ease;
-      currentY += (targetY - currentY) * ease;
-      
-      teddyBody.style.transform = `translate(${currentX}px, ${currentY}px)`;
-    }
-    requestAnimationFrame(animate);
-  }
-
-  // --- ЛОГИКА КЛИКА ---
-  svgEl.addEventListener('click', () => {
-    if (!isUnlocked) return;
-    
-    teddyBody.classList.add('bear-jumping');
-    
-    // ВЫЗОВ ТВОЕГО SYNTHAPI
-    if (typeof SynthAPI !== 'undefined' && SynthAPI.playEffect) {
-      SynthAPI.playEffect('mascot_jump', 1);
-    } else {
-      console.log('Teddy Jumped!');
-    }
-
-    setTimeout(() => {
-      teddyBody.classList.remove('bear-jumping');
-    }, 300);
-  });
-
-  // Запуск цикла анимации
-  animate();
-})();
-</script>
-
-<footer>
-© Diowkrad, 2026.
-Все права защищены. Использование материалов без согласия правообладателя запрещено.
-</footer>  
-
 
 </body>
 </html>
