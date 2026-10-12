@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</title>
+<link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
+<style>
+/* ============================================================
+   ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS - ☩
+   Селекторы отсортированы по группам, внутри группы — по алфавиту:
+   1) ТЕГИ и служебные селекторы;
+   2) ID;
+   3) КЛАССЫ;
+   4) АНИМАЦИЯ.
+   BUILD v1.2.5 «Finale»
+   База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»
+   ============================================================ */
+
+.rack-mount {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+	      background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+    background-size: 2px 1px, 18px 18px;
+    }
+
+
+
+/* ---------- 0. Подпись в нижней панели ---------- */
+.span_b{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-evenly;
+  flex-wrap:nowrap;
+  align-items:center;
+  background:#031;
+  padding:8px;
+  border:6px inset #1a1a2e;
+}
+
+/* ---------- 1. ТЕГИ И СЛУЖЕБНЫЕ СЕЛЕКТОРЫ ---------- */
+
+:root{
+  --bg: #0f0f1b;
+  --panel: #1a1a2e;
+  --gold: #f7cc1d;
+  --cyan: #7dff8a;
+  --key-white: #fff;
+  --key-black: #16161d;
+  --accent: #4f8ee9;
+}
+
+/* ЧЕЛЛЕНДЖ-ЛОГ: tap-highlight живёт строго на таче */
+@media (pointer: coarse) {
+  * { -webkit-tap-highlight-color: transparent; }
+}
+
+/* глобальный сброс */
+*{ box-sizing:border-box; margin:1px; padding:0; }
+
+::-webkit-scrollbar{ width:12px; }
+
+::-webkit-scrollbar-track{
+  background:#140;
+  border:1px solid #950;
+  border-radius:1px;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color:#207;
+  border-radius:4px;
+  border:3px solid #950;
+}
+
+body{
+  background-image: url('img.png');
+      color: var(--text-main);
+      margin: 0;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 255, 102, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(255, 51, 102, 0.03) 0px, transparent 50%);
+      background-attachment: fixed;
+}
+
+/* чип-кнопка */
+button{
+  font-family:inherit;
+  background:#222;
+  color:var(--gold);
+  border:4px outset #950;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.85rem;
+  width:180px;
+  height:40px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #111 0px, #333 1px, #111 1px, #222 6px);
+  background-size: 2px 2px, 18px 18px;
+}
+
+/* активная кнопка */
+button.on{
+  background:#f79e1d;
+  color:#99fffc;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 0px, #000000 1px, #1a1a2e 1px, #03000b 6px);
+  background-size: 2px 2px, 9px 9px;
+  border:4px outset #4f8ee9;
+}
+
+/* вывеска */
+h1 h2 h3{
+  color:var(--gold);
+  font-size:1.4rem;
+  letter-spacing:3px;
+  margin-bottom:12px;
+  text-shadow:2px 2px 0 #7a5c00;
+  border:4px outset #950;
+  background:#1a1a2e;
+  padding:6px;
+  background-image:
+    repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px),
+    repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
+  background-size: 12px 12px, 18px 18px;
+}
+
+/* загрузчик банка и выпадающие списки */
+input[type=file],
+select{
+  font-family:inherit;
+  background:#111;
+  color:var(--cyan);
+  border:4px outset #950;
+  padding:4px;
+  max-width:340px;
+  font-size:0.8rem;
+}
+
+/* ползунки */
+input[type=range]{
+  accent-color:#3bc3d6;
+  width:140px;
+}
+input[type=range]{
+  accent-color:#f90;
+  width:460px;
+  -webkit-appearance:none;
+  background:#0a2a12;
+  border:4px outset #950;
+  outline:none;
+  border-radius:16px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+  margin-top:-5px;
+  box-shadow:0 0 4px rgba(249,153,0,.6);
+}
+input[type=range]::-moz-range-track{
+  height:6px;
+  background:#0a2a12;
+  border:1px solid var(--gold);
+  border-radius:3px;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+}
+
+/* ---------- 2. ID ---------- */
+
+#keys{
+  position:relative;
+  height:152px;
+  width:100%;
+  user-select:none;
+  touch-action:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border:4px outset #950;
+  margin-bottom:10px;
+}
+
+#keys2{
+  position:relative;
+  height:152px;
+  width:100%;
+  user-select:none;
+  touch-action:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border:4px outset #950;
+  margin-bottom:10px;
+}
+
+
+
+/* ---------- 3. КЛАССЫ ---------- */
+
+.bk{
+  position:absolute;
+  top:0;
+  height:60%;
+  background:var(--key-black);
+  border:2px solid #000;
+  z-index:2;
+  cursor:pointer;
+  touch-action:none;
+  transition:0.2s;
+  CORNER-SHAPE: SUPERELLIPSE(0.4);
+  border-radius: 0px 0px 12px 12px;
+}
+.bk:hover{
+  background:#333;
+  border:2px solid #f90;
+}
+.bk.act{ background:var(--accent) !important; }
+
+.lbl{
+  font-size:0.75rem;
+  position:absolute;
+  bottom:2px;
+  width:96%;
+  text-align:center;
+  color:#ffffff;
+  pointer-events:none;
+  text-shadow:2px 2px 6px #00000080;
+  background:#00000080;
+  text-emphasis-style:"☩";
+  border-radius:8px;
+  CORNER-SHAPE: SUPERELLIPSE(-0.7);
+  border:1px double #950;
+}
+
+/* LCD-экран */
+.lcd{
+  background:#0a2a12;
+  border:6px inset #1a1a2e;
+  color:var(--cyan);
+  padding:8px 12px;
+  font-size:0.9rem;
+  margin:10px 5px 0px 5px;
+  height:320px;
+  width:240px;
+  max-width:100%;
+  overflow:auto;
+  line-height:150%;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+  background-size: 2px 3px, 12px 12px;
+}
+
+/* анимированная вывеска */
+.logotype{
+  padding:5px 5px;
+  animation:gradientMove 30s ease infinite;
+}
+
+/* окно-панель (и таб-бар) */
+.panel{
+  background:#1a1a2e;
+  border:4px outset #950;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content: center;
+  flex-direction:row;
+  align-content:flex-start;
+  margin: 12px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+  background-size: 2px 1px, 18px 18px;
+}
+
+.panel_2{
+  background:#1a1a2e;
+  border:1px outset #950;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content: center;
+  flex-direction:row;
+  align-content:flex-start;
+  margin: 12px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+  background-size: 2px 1px, 18px 18px;
+}
+/* правая колонка панели */
+.panel_buttons{
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:flex-start;
+  margin:10px 15px;
+  flex-direction:column;
+  width:760px;
+}
+
+/* панель с кнопками под LCD */
+.panel_buttons_c{
+  display:inline-grid;
+  grid-auto-flow:row dense;
+  justify-items:start;
+  align-items:center;
+  justify-content:start;
+  align-content:start;
+}
+
+/* внутренний ряд панели */
+.panel_lcd{
+    display: flex;
+    justify-content: flex-start;
+    align-content: flex-start;
+    margin: 15px;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+/* горизонтальный ряд */
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:8px;
+  align-content:flex-start;
+  justify-content:flex-start;
+}
+
+/* «кнопка-подпись» в LCD-стиле */
+.row span{
+  font-family:inherit;
+  background:#000;
+  color:var(--cyan);
+  border:6px inset #1a1a2e;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.8rem;
+  width:180px;
+  height:40px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+  background-size: 2px 3px, 12px 12px;
+}
+
+/* span без экрана и рамки */
+.row span.plain{
+  background:none;
+  border:none;
+  box-shadow:none;
+  color:#cfd2e8;
+  padding:0;
+}
+
+/* нижняя панель подсказки */
+.row_b{
+  background:#1a1a2e;
+  border:4px outset #950;
+  padding:8px;
+  display:flex;
+  background-image:
+    repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px),
+    repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
+  background-size: 12px 12px, 18px 18px;
+}
+
+/* текст подсказки */
+.row_b span{
+  font-family:'Courier New', monospace;
+  font-size:0.75rem;
+  letter-spacing:1px;
+  color:var(--cyan);
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+  background-size: 2px 3px, 12px 12px;
+}
+
+/* белая клавиша */
+.wk{
+  flex:1;
+  background:var(--key-white);
+  border:1px solid #555;
+  position:relative;
+  cursor:pointer;
+  touch-action:none;
+  transition:0.2s;
+  CORNER-SHAPE: SUPERELLIPSE(0.3);
+  border-radius:0px 0px 10px 10px;
+}
+.wk:hover{
+  background:#CCC;
+  border:1px solid #309;
+}
+.wk.act{ background:var(--accent) !important; }
+
+/* обёртка прокрутки клавиатуры */
+.kbd-wrap{
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+}
+.kbd-wrap::-webkit-scrollbar{ display:none; }
+
+/* фирменная лента скролла */
+.kbd-strip{
+  height:18px;
+  margin-bottom:6px;
+  box-shadow:2px 2px 0 #000;
+  border:2px inset #950;
+  background:#14101e;
+  overflow:hidden;
+  cursor:pointer;
+  user-select:none;
+  touch-action:none;
+}
+.tape{ position:relative; width:100%; height:100%; }
+.tape-thumb{
+  position:absolute;
+  top:1px;
+  height:12px;
+  background:var(--accent);
+  border:2px solid #000;
+  cursor:grab;
+  touch-action:none;
+  transition:0.15s;
+}
+.tape-thumb:active{ cursor:grabbing; }
+
+/* режим «1 КЛАВИАТУРА» */
+body.kb-single #strip2{ display:none !important; }
+body.kb-single #keys2{ display:none !important; }
+
+/* ---------- 4. АНИМАЦИЯ ---------- */
+
+@keyframes gradientMove{
+  10%{color:#FFA;}
+  20%{color:#F6F;}
+  30%{color:#AFF;}
+  40%{color:#AF9;}
+  50%{color:#AAF;}
+  60%{color:#fAF;}
+  70%{color:#96F;}
+  80%{color:#F93;}
+  90%{color:#FF9;}
+  100%{color:#666;}
+}
+
+/* ---------- 5. ДОПОЛНЕНИЕ ДЛЯ САЙТА-ВИЗИТКИ ---------- */
+
+/* логотип-шапка на всю ширину */
+#logo{ width:100%; text-align:center; }
+
+/* скрытие/показ секций-вкладок */
+.view-hidden{ display:none; }
+
+/* таб-бар без лишнего отступа ряда */
+.tabs .row{ margin-bottom:0; }
+
+/* текстовые блоки: полный объём вместо узкого 240px */
+.lcd-full{
+        width: 100%;
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* подзаголовки внутри LCD */
+.lcd h2{ font-size:0.95rem; color:var(--gold); margin:6px 0 4px; }
+.lcd h3{ font-size:0.85rem; color:#99fffc; margin:6px 0 2px; }
+.lcd p, .lcd li{ margin:2px 0; }
+
+/* МОБИЛЬНЫЙ РОЛЛ v1.0.37 */
+@media (max-width:768px){
+  #keys, #keys2{ transform:scaleY(0.75); transform-origin:top left; }
+  .kbd-wrap{ height:114px; }
+}
+</style>
+</head>
+<body>
+<div class="rack-mount">
+<!-- ================= ШАПКА ================= -->
+<header class="panel">
+  <h1 class="logotype">☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</h1>
+</header>
+<div class="panel_2"
+style="
+animation: gradientMove 60s ease infinite;    text-align: center;
+"
+>
+ <h3 class="logotype">CHIP-TUNE + SOUNDFONT + MIDI x 128 · 2A03 · PULSE 50/25/12.5 · ПИЛА · ТРЕУГ. · СИНУС · ШУМ BUILD v1.2.5 «Finale»</h3>
+ </div>
+<!-- ================= ТАБ-БАР ================= -->
+<nav class="panel_2 tabs" id="tabs" style="border: 0px outset #950;
+margin: 1px;
+">
+  
+    <button class="on" data-view="view-about">О ПРОЕКТЕ</button>
+    <button data-view="view-features">ВОЗМОЖНОСТИ</button>
+    <button data-view="view-controls">УПРАВЛЕНИЕ</button>
+    <button data-view="view-disclaimer">Дисклеймер</button>
+    <button data-view="view-download">СКАЧАТЬ</button>
+ 
+</nav>
+
+<!-- ================= ГЛАВНЫЙ БЛОК ================= -->
+<main>
+
+  <!-- ---------- ВКЛАДКА: О ПРОЕКТЕ ---------- -->
+  <section id="view-about">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        <h2>О ПРОЕКТЕ</h2>
+        <p>DIOWKRAD SF2 CHIP-TUNE ENGINE — это гибридный звуковой движок в одном HTML-файле:
+        чиптюн-синтез в духе NES и SoundFont-плеер (.sf2) в одной шине.
+        Всё работает локально, в браузере, без сервера и интернета.</p>
+        <p>Проект вырос из простой идеи: сделать «файловый обменник в стиле старых игр
+        для локального сервера» в инструмент, который открывается двойным кликом и просто работает.</p>
+        <h3>Философия и особенности:</h3>
+        <ul>
+          <li>Дизайн в духе NES: минималистичная знакомая многим с детства атмосфера картриджа для Денди.</li>
+          <li>Это просто работает: отладка не ложится на плечи пользователя.</li>
+          <li>Многоэтапная тестировка: отладка производится на месте, а баги устраняются.
+              К вам попадает всегда стабильный билд, с минимумом отладочной информации или без неё.</li>
+          <li>Без интернета: файл просто живёт на диске.</li>
+          <li>Один файл: ни установок, ни зависимостей.</li>
+          <li>Три мира звука: за которые отвечают свои звуковые движки.</li>
+          <li>Чип: [RP2A03G] — им была оснащена каждая Nintendo Famicom {NES},
+              она же наша Русская Денди. Этот звук знает каждый, но мало у кого получалось
+              воссоздать его так, как он звучит в приставке.</li>
+          <li>Контроллер: [soundfonts-2 {.sf2}] — для звуковых банков, которые также используются
+              в небезызвестных Perfect Piano и Walk band на Android,
+              а также в различных VST и VST3-секвенсорах.</li>
+          <li>Микропроцессор: [Midi-GM x 128] и собственный независимый MIDI-банк —
+              как это было реализовано в старых кнопочных телефонах Nokia 6233 или SonyEricsson k750i.
+              Раньше не существовало единого стандарта MIDI-банков, поэтому каждый делал по-своему.
+              От этого одна и та же мелодия могла звучать по-разному.</li>
+          <li>Честное управление с любого устройства.</li>
+          <li>Честная история правок: неважно с компьютера или телефона —
+              один дизайн и один функционал везде, без лишнего адаптива под мобильные устройства.</li>
+        </ul>
+        <p>// (Для удобства в мобильных браузерах рекомендую уменьшить страницу
+        в браузере через настройки до 75%)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: ВОЗМОЖНОСТИ ---------- -->
+  <section id="view-features" class="view-hidden">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        <h2>ВОЗМОЖНОСТИ</h2>
+        <h3>Режим: CHIP-TUNE</h3>
+        <ul>
+          <li>11 голосов: ПУЛЬС 50% / 25% / 12,5%, ПИЛА, ТРЕУГ., СИНУС, КВАДРАТ,
+              ПУЛЬС КРУГЛ., N-ВОЛНА, ШУМ ДЛИН./КОРОТ.</li>
+          <li>Полифония, отдельная громкость голоса чипа, режим «квадрат −1 октава».</li>
+        </ul>
+        <h3>Режим: soundfonts-2 {.sf2}</h3>
+        <ul>
+          <li>Загрузка любого банка .sf2, выбор банка → пресета → инструмента.</li>
+          <li>Фолбэк: нота вне зон пресета уходит в CHIP-голос — тишины не бывает.</li>
+        </ul>
+        <h3>Режим: [Midi-GM]</h3>
+        <ul>
+          <li>Загрузка встроенного банка, с выбором инструмента.</li>
+          <li>Для удобства инструменты разбиты по категориям.</li>
+        </ul>
+        <h3>Сустейн</h3>
+        <ul>
+          <li>Три доли: 1/8 (250/900 мс) · 1/4 (500/700) · 1/2 (700/500).</li>
+          <li>Нота звучит после отпускания до границы доли, затем затухание;
+              подсветка гаснет вместе со звуком.</li>
+          <li>Смена режима пересчитывает играющие хвосты — зависшего звука нет.</li>
+        </ul>
+        <h3>Ввод</h3>
+        <ul>
+          <li>ПК-клавиатура: две раскладки — и 2 ряда клавиш.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: УПРАВЛЕНИЕ ---------- -->
+  <section id="view-controls" class="view-hidden">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        <h2>УПРАВЛЕНИЕ</h2>
+        <h3>2 ряда — зигзаг на две октавы</h3>
+        <p>Нижний ряд (C4…F5): ZSXDCVGBHNJM,L.;/'// ;=D#5 · /=E5 · '=F5</p>
+        <p>Верхний ряд (C5…F#6, ровно октава выше): Q2W3ER5T6Y7UI9O0P[]//
+        Q=C5 · I=C6 · октавные «до» на одинаковых позициях рядов.</p>
+        <h3>1 ряд — полная хроматика (C4…F#5)</h3>
+        <p>AWSEDFTGYHUJKOLP;']// — 19 клавиш без пропусков и дублей.</p>
+        <h3>Прочее</h3>
+        <ul>
+          <li>←→ — смена октавы.</li>
+          <li>Num7 Num8 Num9 — сустейн 1/8 · 1/4 · 1/2.</li>
+          <li>Раскладка привязана к физическим кодам клавиш — ЙЦУКЕН работает сам собой.</li>
+          <li>Тумблер КЛАВИАТУРА глушит только ПК-ряд; MIDI и мышь всегда живые.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: ДИСКЛЕЙМЕР ---------- -->
+  <section id="view-disclaimer" class="view-hidden">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        <h2>Дисклеймер</h2>
+        <p>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ ☩ BUILD v1.2.5 «Final» ☩</p>
+        <p>☩ Разработка завершена. ☩ Было принято решение не раздувать дальше проект.
+        Проект задумывался как проба пера разработки вместе с AI.
+        Я взял на себя: отладку, дизайн, тестировку, разработку, управление проектом, командование проектом.
+        Взял на себя AI {в нашем случае была выбрана Алиса}: сборку кода, внесение правок по промту,
+        дополнительный дебаг, компиляцию проекта, написание механик с нуля.
+        Здесь о я говорюсь. После заимствования готового решения Алиса сбросила накопленный опыт
+        и веса, накопленные в нейросети. Это послужило основной причиной, почему я продолжать дальше не буду.
+        Я позиционирую себя как JavaScript-разработчика Junior+ или Middle.
+        Код, сгенерированный AI, требует знаний Middle+, а лучше Senior, которыми я не обладаю
+        в достаточной мере, чтобы понимать весь код от корки до корки. Ананизм мне не к чему.</p>
+        <p>Основные критерии и требования к разработке:</p>
+        <ul>
+          <li>0 — внешних ссылок;</li>
+          <li>0 — привязок;</li>
+          <li>0 — фреймворков: чистый HTML5 / CSS3 / JavaScript без примесей;</li>
+          <li>1 — HTML-файл: высокое качество, как у мобильных приложений.
+              Работа веб-приложения без интернета — с рабочего стола или из папки мобильного телефона.
+              Интеграция с мобильными устройствами.
+              Работа веб-приложения исключительно в браузере.
+              В качестве движка был избран Chromium как наиболее популярный движок для браузеров — он есть у каждого.
+              Работа в онлайн-версии без PHP и MySQL, с возможностями, которые даёт GitHub.
+              Одна вёрстка под все устройства. Приложение должно работать и выглядеть одинаково везде —
+              независимо от того, какого размера экран и чем отличается браузер,
+              если у него под капотом движок Chromium.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: СКАЧАТЬ ---------- -->
+  <section id="view-download" class="view-hidden">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full">
+        
+  <h2>СКАЧАТЬ</h2>
+	 <p> ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ </p>
+  <p>
+    <button href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ RT.zip">▼ СКАЧАТЬ</button><Br><Br>
+	<p>Онлайн версия</p><Br><Br>
+    <button href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Remaster☩.html">☩Remaster☩</button>
+	<Br><Br>
+	 <button href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Legacy☩.html">☩Legacy☩</button>
+  </p>
+  <Br><Br><Br><Br>
+  <h2>Это протатипы Модулей проэкта они могут работать с багами и являються инструментами отстройки . </h2>
+  <h2> Воспринимайте их как этапы рахработки . </h2>
+	<p> ☩ RP2A03C ENGINE-final ☩ </p>
+  <p>
+    <button href="RP2A03C ENGINE-final.zip">▼ СКАЧАТЬ</button>
+    <button href="RP2A03C ENGINE-final.html">◄ Онлайн версия</button>
+  </p>
+  <p> ☩ SF2-ENGINE-final ☩ </p>
+  <p>
+    <button href="SF2-ENGINE-final.zip">▼ СКАЧАТЬ</button>
+    <button href="SF2-ENGINE-final.html">◄ Онлайн версия</button>
+  </p>
+  <p> ☩ piano_RP2A03E ☩ </p>
+  <p>
+    <button  href="piano_RP2A03E.zip">▼ СКАЧАТЬ</button>
+    <button  href="piano_RP2A03E.html">◄ Онлайн версия</button>
+  </p>
+  <p> ☩ piano_Chip_tune ☩ </p>
+  <p>
+    <button  href="piano_RP2A03E.zip">▼ СКАЧАТЬ</button>
+    <button  href="piano_RP2A03E.html">◄ Онлайн версия</button>
+  </p>
+  <Br><Br><Br><Br><Br>
+  <p class="dim">// ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</p>
+  <p class="dim blink">// Внимание: Это демастрационный стенд . </p>
+  <p class="dim blink">// Внимание: Полная версия защищена Авторскими правами. </p>
+  <p class="dim blink">// Внимание: Продукт не для комерческого использования. </p>
+
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= ФУТЕР ================= -->
+<footer class="panel row_b">
+  <span>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ © 2026▮ Diowkrad Studio ® 2011-2026</span>
+</footer>
+</div>
+<script>
+// Переключение вкладок таб-бара
+document.querySelectorAll('#tabs button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#tabs button').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on');
+    document.querySelectorAll('main section').forEach(function(s){ s.classList.add('view-hidden'); });
+    var target = document.getElementById(btn.dataset.view);
+    if (target) target.classList.remove('view-hidden');
+  });
+});
+</script>
+
+</body>
+</html>
