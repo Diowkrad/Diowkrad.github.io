@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DIOWKRAD SF2 CHIP-TUNE ENGINE (v1.2.5 Final)</title>
-  <link rel="stylesheet" href="css/style2.css">
+  <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
   <style>
 		/* Единый источник стилей по спецификации — Кастомная палитра */
     :root {
@@ -64,18 +64,20 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+	      background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+    background-size: 2px 1px, 18px 18px;
     }
 
     /* Модульный блок панели */
     .rack-section {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      align-items: center;
+      background: rgb(0 0 0 / 50%);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
     }
 
     .main-grid {
