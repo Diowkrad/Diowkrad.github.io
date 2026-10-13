@@ -67,6 +67,24 @@ canvas{display:block; width:100%; border:1px solid var(--line2); border-radius:4
 .tape-thumb{position:absolute; top:2px; height:14px; min-width:24px; background:#2d6a2d;
   border:1px solid var(--ink2); border-radius:3px; cursor:grab; touch-action:none;}
 body.kb-single .kbSec2{display:none;}
+
+/* ☩ ЧЕЛЛЕНДЖ-ЛОГ ☩ Баг (v1.0.26): -webkit-tap-highlight-color работает
+   только на сенсорных устройствах. Без адаптива селектор слеп на десктопе
+   и бесполезен. Обёрнут в @media (pointer: coarse) — живёт строго на таче. */
+@media (pointer: coarse) {
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+}
+/* МОБИЛЬНЫЙ РОЛЛ v1.0.37: на экранах до 768px высота ролла 75% —
+   scaleY(0.75) сжимает только по вертикали (152→114 у белых, 94→70.5 у чёрных),
+   ширина и ленты не тронуты — бегунок остаётся синхронен клавиатуре */
+@media (max-width:768px){
+  #keys, #keys2{ transform:scaleY(0.75); transform-origin:top left; }
+  .kbd-wrap{ height:114px; }
+}
+
+
 </style>
 </head>
 <body>
