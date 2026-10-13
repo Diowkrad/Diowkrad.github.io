@@ -16,8 +16,14 @@
 	BUILD v1.2.5 «Finale»: 
   
 	База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»: 
+	 ============================================================ 
+	
    ============================================================ */
    /* ---------- 0.Пписание в нижней понели ---------- */
+   
+   
+   
+   
 .span_b{
 	display: flex;
     flex-direction: column;
@@ -75,8 +81,34 @@ body{
   background:var(--bg);
   color:#cfd2e8;
   font-family:'Courier New', monospace;
-  padding:16px;
+   margin: 0;
+      padding: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 255, 102, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(255, 51, 102, 0.03) 0px, transparent 50%);
+      background-attachment: fixed;
 }
+/* ---------- Огибающий всю верстку блок коррекции adaptive_fix ---------- */
+.adaptive_fix {
+      width: 100%;
+      max-width: 2960px;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+	      background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+    background-size: 2px 1px, 18px 18px;border:4px outset #950;
+    }
+/* ---------- -----------------------------------------------  ---------- */
 
 /* button — чип-кнопка: тёмная, золотой текст, рамка outset, тень 8-bit,
    фиксированный размер 180x40 */
@@ -133,11 +165,11 @@ select{
    бегунок 460px оранжевый #f90 под цвет чип-панели (правка скролла громкости) */
 input[type=range]{
   accent-color:#3bc3d6;
-  width:140px;
+  width: 21rem;
 }
 input[type=range]{
     accent-color: #f90;
-    width: 460px;
+    width: 21rem;
     -webkit-appearance: none;
     background: #0a2a12;
     border: 4px outset #950;
@@ -470,7 +502,7 @@ body.kb-single #keys2{ display:none !important; }
 	</style>
 </head>
 <body>
-
+<div class="adaptive_fix">
   <!-- ЗАГОЛОВОК: вывеска движка (анимация цвета через .logotype) -->
 <h1 class="logotype"> ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ </h1>
 
@@ -575,14 +607,18 @@ body.kb-single #keys2{ display:none !important; }
 			<button id="octUp">+ ОКТАВА</button>
 			<button id="panicBtn">ЗАГЛУШИТЬ</button>
 		</div>
-		<div class="row">
+		<div class="row" id="wavePanel">
 			<span>ТИП ВОЛНЫ:</span>
 			<button class="wbtn on" data-wave="pulse50">□ ПУЛЬС 50%</button>
 			<button class="wbtn" data-wave="pulse25">□ ПУЛЬС 25%</button>
 			<button class="wbtn" data-wave="pulse12">□ ПУЛЬС 12,5%</button>
+			<button class="wbtn" data-wave="pulse6">□ ПУЛЬС 6,25%</button>
 			<button class="wbtn" data-wave="saw">◺ ПИЛА</button>
+			<button class="wbtn" data-wave="sawBass">◺ ПИЛА БАС</button>
 			<button class="wbtn" data-wave="tri">△ ТРЕУГ.</button>
+			<button class="wbtn" data-wave="triBass">△ ТРЕУГ. БАС</button>
 			<button class="wbtn" data-wave="sine">∿ СИНУС</button>
+			<button class="wbtn" data-wave="sineBass">∿ СИНУС БАС</button>
 			<button class="wbtn" data-wave="square">□ КВАДРАТ</button>
 			<button class="wbtn" data-wave="pulseR">ᵓ ПУЛЬС КРУГЛ.</button>
 			<button class="wbtn" data-wave="nwave">⟋⟋ N-ВОЛНА</button>
@@ -689,19 +725,28 @@ const CHIP_VOICES=[
   {id:'pulseR',name:'ᵓ ПУЛЬС КРУГЛ.',round:true,octave:-1},
   {id:'nwave',name:'⟋⟋ N-ВОЛНА',nwave:true,octave:0},
   {id:'noiseL',name:'ШУМ — длинный цикл',noise:'long',octave:0},
-  {id:'noiseS',name:'ШУМ — короткий цикл',noise:'short',octave:0}
+  {id:'noiseS',name:'ШУМ — короткий цикл',noise:'short',octave:0},
+  {id:'pulse6',name:'□ ПУЛЬС 6,25%',duty:0.0625,octave:-1},
+  {id:'triBass',name:'△ ТРЕУГ. БАС',type:'triangle',octave:-1},
+  {id:'sawBass',name:'◺ ПИЛА БАС',type:'sawtooth',octave:-1},
+  {id:'sineBass',name:'∿ СИНУС БАС',type:'sine',octave:-1}
 ];
 const chipVoiceById=id=>CHIP_VOICES.find(v=>v.id===id);
 const chipDutyWaves={},chipNoiseCache=new Map();
-const DUTY_PAT={0.5:[0,1,1,1,1,0,0,0],0.25:[0,1,1,0,0,0,0,0],0.125:[0,1,0,0,0,0,0,0]};
-function dutyBuffer(d,f){ /* duty-паттерн 2A03: 8 шагов на период, жёсткие фронты — тембр как на железе */
+const DUTY_PAT={0.0625:[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],0.5:[0,1,1,1,1,0,0,0],0.25:[0,1,1,0,0,0,0,0],0.125:[0,1,0,0,0,0,0,0]};
+
+function dacQ(x){ return Math.round((x+1)*7.5)/7.5-1; }
+
+function dutyBuffer(d,f){ /* duty-паттерн 2A03: 8/16 шагов на период, жёсткие фронты */
   const k='d'+d+'@'+f.toFixed(2);
   if(chipDutyWaves[k]) return chipDutyWaves[k];
   const pat=DUTY_PAT[d]||DUTY_PAT[0.5];
   const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
   const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
   const ch=buf.getChannelData(0);
-  for(let i=0;i<N;i++) ch[i]=pat[(i*8/N)|0]?(1-d):(-d); /* DC-развязка: среднее ноль */
+  for(let i=0;i<N;i++) ch[i]=pat[(i*pat.length/N)|0]?(1-d):(-d);
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn; /* DC-развязка */
   chipDutyWaves[k]=buf; return buf;
 }
 function noiseBuffer(mode){ /* 15-битный LFSR: 32767 шагов (длинный) или 93 (короткий, бит 6 = feedback) */
@@ -717,10 +762,10 @@ function noiseBuffer(mode){ /* 15-битный LFSR: 32767 шагов (длин�
     ch[i]=(reg&1)?1:-1;
   }
   let mn=0; for(let i=0;i<steps;i++) mn+=ch[i]; mn/=steps;
-  for(let i=0;i<steps;i++) ch[i]-=mn; /* DC-развязка */
+  for(let i=0;i<steps;i++) ch[i]-=mn;
   chipNoiseCache.set(mode,buf); return buf;
 }
-function roundedPulseBuffer(f){ /* пульс с закруглённым фронтом: smoothstep-атака ~12% периода, DC-развязка */
+function roundedPulseBuffer(f){ /* пульс со скруглённым фронтом: smoothstep-атака ~12% периода */
   const k='r'+f.toFixed(2);
   if(chipDutyWaves[k]) return chipDutyWaves[k];
   const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
@@ -729,16 +774,16 @@ function roundedPulseBuffer(f){ /* пульс с закруглённым фро
   const R=Math.max(2,Math.round(N*0.12));
   for(let i=0;i<N;i++){
     const p=i/N; let x;
-    if(p<R/N){ const u=i/R; x=-1+2*u*u*(3-2*u); }       /* smoothstep: -1 -> +1 */
-    else if(p<0.5) x=1;                                  /* полка до середины */
-    else x=-1;                                           /* резкий спад */
+    if(p<R/N){ const u=i/R; x=-1+2*u*u*(3-2*u); }
+    else if(p<0.5) x=1;
+    else x=-1;
     ch[i]=x;
   }
   let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
-  for(let i=0;i<N;i++) ch[i]-=mn; /* DC-развязка */
+  for(let i=0;i<N;i++) ch[i]-=mn;
   chipDutyWaves[k]=buf; return buf;
 }
-function nWaveBuffer(f){ /* N-волна: зигзаг подъём-спад-подъём, три сегмента, среднее ноль */
+function nWaveBuffer(f){ /* N-волна: зигзаг подъём-спад-подъём, среднее ноль по построению */
   const k='n'+f.toFixed(2);
   if(chipDutyWaves[k]) return chipDutyWaves[k];
   const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
@@ -746,13 +791,54 @@ function nWaveBuffer(f){ /* N-волна: зигзаг подъём-спад-п�
   const ch=buf.getChannelData(0);
   for(let i=0;i<N;i++){
     const p=i/N; let x;
-    if(p<1/3) x=-1+6*p;                                  /* подъём -1 -> +1 */
-    else if(p<2/3) x=1-6*(p-1/3);                        /* спад +1 -> -1 */
-    else x=-1+6*(p-2/3);                                 /* подъём -1 -> +1, скачок на стыке периода */
+    if(p<1/3) x=-1+6*p;
+    else if(p<2/3) x=1-6*(p-1/3);
+    else x=-1+6*(p-2/3);
     ch[i]=x;
   }
   chipDutyWaves[k]=buf; return buf;
 }
+function triBuffer2A03(f){ /* треугольник 2A03: 32 шага, 4-бит лестница */
+  const k='T'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(32,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++){
+    const s=Math.floor(i*32/N)%32;
+    const lvl=s<=15?s:31-s;
+    ch[i]=(lvl/15)*2-1;
+  }
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn;
+  chipDutyWaves[k]=buf; return buf;
+}
+function vrc6SawBuffer(f){ /* пила VRC6: 7 ступеней на период */
+  const k='S'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(14,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++){
+    const step=Math.min(6,Math.floor(i*7/N));
+    ch[i]=step/6*2-1;
+  }
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn;
+  chipDutyWaves[k]=buf; return buf;
+}
+function sineQBuffer(f){ /* синус через 4-бит DAC (15 уровней) */
+  const k='Si'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++) ch[i]=dacQ(Math.sin(2*Math.PI*i/N));
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn;
+  chipDutyWaves[k]=buf; return buf;
+}
+
 function chipKill(key){ /* немедленное глушение — при повторном нажатии и при смене режима */
   const v=activeChip.get(key); if(!v) return;
   const t=audioCtx.currentTime;
@@ -769,81 +855,87 @@ function chipOn(key,vel=100){
   const v=chipVoiceById(state.chipVoice)||CHIP_VOICES[0];
   const t=audioCtx.currentTime;
   const g=audioCtx.createGain();
-  const peak=(v.nes?0.28:0.25)*Math.pow(vel/127,1.3); /* 0.28 — как в NES-PIANO */
+  const peak=(v.nes?0.28:0.25)*Math.pow(vel/127,1.3);
   g.gain.setValueAtTime(0,t);
   g.gain.linearRampToValueAtTime(peak,t+0.005);
   g.gain.setTargetAtTime(peak*0.35,t+0.005,0.08);
-   // ... (начало функции chipOn без изменений)
   const nodes=[]; let rate=null, info='';
   if(v.noise){
-    const idx=Math.min(NTSC_NOISE.length-1,Math.max(0,Math.floor((key-24)*(NTSC_NOISE.length/84))));
+    /* ИСПРАВЛЕНО: шум растёт вверх по клавиатуре.
+       NTSC_NOISE[0] — таймер 4 (высокий шум), [15] — 4068 (низкий гул).
+       rel: 0 внизу клавиатуры .. 1 вверху; инвертируем: верх -> индекс 0 */
+    const lo=(typeof KB_LO!=='undefined')?KB_LO:21;
+    const hi=(typeof KB_HI!=='undefined')?KB_HI:108;
+    const rel=(key-lo)/(hi-lo);
+    const idx=Math.min(NTSC_NOISE.length-1,Math.max(0,
+      Math.round((1-rel)*(NTSC_NOISE.length-1))));
     const timer=NTSC_NOISE[idx];
     const src=audioCtx.createBufferSource();
     src.buffer=noiseBuffer(v.noise); src.loop=true;
     const shift=CPU_NTSC/(2*(timer+1)); /* тики LFSR */
     rate=shift/audioCtx.sampleRate;     /* буфер: 1 тик = 1 сэмпл */
-    
-    /* ИСПРАВЛЕНИЕ: Применяем текущий бенд прямо при старте ноты шума */
-    src.playbackRate.setValueAtTime(rate * Math.pow(2, bendCents/1200), t);
-    
+    /* бенд применяется прямо при старте ноты шума */
+    src.playbackRate.setValueAtTime(rate*Math.pow(2,bendCents/1200),t);
     src.connect(g); src.start(t); nodes.push(src);
     info='таймер='+timer+' (сдвиг ~'+shift.toFixed(0)+' Гц)';
   } else {
-    let div=16, freq, osc, note;
+    let freq, osc, note;
     if(v.duty!==undefined){                 /* пульсы: -1 октава, делитель 16 */
-      note=key-12;
+      note=key+(v.octave||0)*12;
       const period=Math.round(CPU_NTSC/(16*freqOf(note))-1);
       if(period<8){ g.disconnect(); log('PULSE: период '+period+' < 8 — канал молчит (как на 2A03).'); return; }
       freq=CPU_NTSC/(16*(period+1));
       osc=audioCtx.createBufferSource();
       osc.buffer=dutyBuffer(v.duty,freq); osc.loop=true;
-      osc.connect(g); osc.start(t); nodes.push(osc);       /* БАГ ДВОЙНОГО ЗВУКА (2/2): путь один — без параллельного osc.connect(g) */
-      rate=1;                                              /* питч-бенд: множим скорость буфера */
-      info='t='+period+' f='+freq.toFixed(2)+' Гц (-1 октава, паттерн 2A03)';
-    } else if(v.type==='sawtooth'){          /* пила: пресеты пульса (делитель 16) */
-      const period=Math.round(CPU_NTSC/(16*freqOf(key))-1);
+      osc.connect(g); osc.start(t); nodes.push(osc);       /* БАГ ДВОЙНОГО ЗВУКА (2/2): путь один */
+      rate=1;
+      info='t='+period+' f='+freq.toFixed(2)+' Гц ('+((v.octave||0)<0?'-1 октава, ':'')+'паттерн 2A03)';
+    } else if(v.type==='sawtooth'){          /* пила VRC6: 7 ступеней, делитель 14 */
+      note=key+(v.octave||0)*12;
+      const period=Math.round(CPU_NTSC/(14*freqOf(note))-1);
       if(period<8){ g.disconnect(); log('SAW: период '+period+' < 8 — канал молчит.'); return; }
-      freq=CPU_NTSC/(16*(period+1));
-      osc=audioCtx.createOscillator();
-      osc.type='sawtooth'; osc.frequency.value=freq;
-      const lp=audioCtx.createBiquadFilter();
-      lp.type='lowpass'; lp.frequency.value=6000;
-      osc.connect(lp); lp.connect(g); osc.start(t); nodes.push(osc);
-      info='t='+period+' f='+freq.toFixed(2)+' Гц';
-    } else if(v.nes){                         /* квадрат NES-PIANO: прямой осциллятор + lowpass 4 кГц, без квантования периода */
-      freq=freqOf(key);
+      freq=CPU_NTSC/(14*(period+1));
+      osc=audioCtx.createBufferSource();
+      osc.buffer=vrc6SawBuffer(freq); osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      rate=1;
+      info='t='+period+' f='+freq.toFixed(2)+' Гц (VRC6, 7 ступеней)';
+    } else if(v.nes){                        /* квадрат NES-PIANO: осциллятор + lowpass 4 кГц, без квантования периода */
+      freq=freqOf(key+(v.octave||0)*12);
       osc=audioCtx.createOscillator();
       osc.type='square'; osc.frequency.value=freq;
       const lp=audioCtx.createBiquadFilter();
       lp.type='lowpass'; lp.frequency.value=4000;
       osc.connect(lp); lp.connect(g); osc.start(t); nodes.push(osc);
       info='f='+freq.toFixed(2)+' Гц (схема NES-PIANO, lowpass 4 кГц)';
-    } else if(v.round){                      /* пульс с закруглённым фронтом: -1 октава, таймер 2A03 */
-      note=key-12;
+    } else if(v.round){                      /* пульс со скруглённым фронтом: -1 октава, таймер 2A03 */
+      note=key+(v.octave||0)*12;
       const period=Math.round(CPU_NTSC/(16*freqOf(note))-1);
       if(period<8){ g.disconnect(); log('PULSE-R: период '+period+' < 8 — канал молчит (как на 2A03).'); return; }
       freq=CPU_NTSC/(16*(period+1));
       osc=audioCtx.createBufferSource();
       osc.buffer=roundedPulseBuffer(freq); osc.loop=true;
       osc.connect(g); osc.start(t); nodes.push(osc);
-      rate=1;                                /* питч-бенд: множим скорость буфера */
-      info='t='+period+' f='+freq.toFixed(2)+' Гц (-1 октава, скруглённый фронт)';
+      rate=1;
+      info='t='+period+' f='+freq.toFixed(2)+' Гц ('+((v.octave||0)<0?'-1 октава, ':'')+'скруглённый фронт)';
     } else if(v.nwave){                      /* N-волна: зигзаг, прямой регистр */
-      freq=freqOf(key);
+      freq=freqOf(key+(v.octave||0)*12);
       osc=audioCtx.createBufferSource();
       osc.buffer=nWaveBuffer(freq); osc.loop=true;
       osc.connect(g); osc.start(t); nodes.push(osc);
       rate=1;
       info='f='+freq.toFixed(2)+' Гц (N-волна, два зубца)';
-    } else {                                  /* треугольник и синус: делитель 32 */
-      div=32;
-      const period=Math.round(CPU_NTSC/(32*freqOf(key))-1);
+    } else {                                 /* треугольник и синус: делитель 32 */
+      note=key+(v.octave||0)*12;
+      const period=Math.round(CPU_NTSC/(32*freqOf(note))-1);
       if(period<1){ g.disconnect(); log('CH: период '+period+' — вне диапазона чипа.'); return; }
       freq=CPU_NTSC/(32*(period+1));
-      osc=audioCtx.createOscillator();
-      osc.type=v.type; osc.frequency.value=freq;
+      osc=audioCtx.createBufferSource();
+      osc.buffer=(v.type==='triangle')?triBuffer2A03(freq):sineQBuffer(freq);
+      osc.loop=true;
       osc.connect(g); osc.start(t); nodes.push(osc);
-      info='t='+period+' f='+freq.toFixed(2)+' Гц';
+      rate=1;
+      info='t='+period+' f='+freq.toFixed(2)+' Гц (32 шага, 4-бит)';
     }
   }
   g.connect(master);
@@ -860,7 +952,7 @@ function chipOff(key){
   v.g.gain.setTargetAtTime(0,t,0.05);
   v.nodes.forEach(n=>{try{n.stop(t+0.4);}catch(_){}});
   activeChip.delete(key); hl(key,false);
-  setTimeout(()=>{ try{ v.g.disconnect(); }catch(_){} },450); /* уборка узла после хвоста релиза */
+  setTimeout(()=>{ try{ v.g.disconnect(); }catch(_){} },450);
 }
 /* ---------- режимы и выбор голоса ---------- */
 function setMode(m){
@@ -1996,6 +2088,7 @@ updateFPS();
 <footer>
 © Diowkrad, 2026.
 Все права защищены. Использование материалов без согласия правообладателя запрещено.
-</footer>  
+</footer> 
+</div> 
 </body>
 </html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☩ CHIP-DEBUG BENCH — 2A03 ☩</title>
+<style>
+:root{
+  --bg:#0f0f1b; --panel:#1a1a2e; --gold:#f7cc1d; --cyan:#7dff8a;
+  --accent:#4f8ee9; --key-black:#16161d;
+}
+*{ box-sizing:border-box; margin:1px; padding:0; }
+body{ background:var(--bg); color:#cfd2e8; font-family:'Courier New',monospace; padding:16px; }
+h1{ color:var(--gold); font-size:1.3rem; letter-spacing:3px; margin-bottom:12px;
+    text-shadow:2px 2px 0 #7a5c00; border:4px outset #950; background:#1a1a2e; padding:6px; text-align:center; }
+.panel{ background:#1a1a2e; border:4px outset #950; padding:8px; margin-bottom:12px; }
+.row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+.row span.plain{ color:#cfd2e8; font-size:0.8rem; }
+button{ font-family:inherit; background:#222; color:var(--gold); border:4px outset #950;
+  padding:6px 14px; cursor:pointer; box-shadow:2px 2px 0 #000; font-size:0.85rem; min-width:170px; height:40px; }
+button.on{ background:#f79e1d; color:#99fffc; border:4px outset #4f8ee9; }
+.lcdrow{ display:flex; gap:10px; flex-wrap:wrap; }
+.lcd{ background:#0a2a12; border:6px inset #1a1a2e; color:var(--cyan); padding:8px 12px;
+  font-size:0.9rem; height:210px; width:420px; max-width:100%; overflow:auto; line-height:150%;
+  text-shadow:1px 1px 2px #000; }
+.lcd b{ color:#aef5b2; }
+#log{ font-size:0.78rem; }
+#keys{ position:relative; height:152px; width:100%; overflow-x:auto; user-select:none;
+  touch-action:none; border:4px outset #950; box-shadow:4px 4px 0 #000; background:#0b0b14; }
+#kbInner{ position:relative; height:100%; margin:0; }
+.wk{ position:absolute; top:0; margin:0; background:#fff; border:1px solid #555;
+  cursor:pointer; touch-action:none; transition:0.2s; border-radius:0 0 10px 10px; }
+.wk:hover{ background:#ccc; border:1px solid #309; }
+.wk.act{ background:var(--accent) !important; }
+.bk{ position:absolute; top:0; margin:0; width:36px; height:94px; background:var(--key-black);
+  border:2px solid #000; z-index:2; cursor:pointer; touch-action:none; transition:0.2s;
+  border-radius:0 0 12px 12px; }
+.bk:hover{ background:#333; border:2px solid #f90; }
+.bk.act{ background:var(--accent) !important; }
+.lbl{ font-size:0.7rem; position:absolute; bottom:2px; width:96%; text-align:center;
+  color:#fff; pointer-events:none; text-shadow:1px 1px 2px #000; background:#00000080;
+  border-radius:8px; border:1px double #950; }
+canvas{ display:block; width:100%; height:140px; background:#041a0c; border:4px outset #950; }
+input[type=range]{ width:260px; vertical-align:middle; }
+footer{ color:#7d84a8; font-size:0.75rem; margin-top:10px; text-align:center; }
+</style>
+</head>
+<body>
+
+<h1>☩ CHIP-DEBUG BENCH — 2A03 ☩</h1>
+
+<div class="panel">
+  <div class="lcdrow">
+    <div class="lcd" id="lcd">ИНИЦИАЛИЗАЦИЯ...</div>
+    <div class="lcd" id="log"><b>// отладочный журнал</b></div>
+  </div>
+</div>
+
+<div class="panel" id="wavePanel">
+  <div class="row"><span class="plain">ГОЛОС ЧИПА (11):</span></div>
+  <div class="row" id="voiceBtns"></div>
+  <div class="row">
+    <select id="chipVoiceSel"></select>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="row">
+    <span class="plain">ГРОМКОСТЬ:</span>
+    <input type="range" id="vol" min="0" max="100" value="70">
+    <span class="plain">ПИТЧ-БЕНД:</span>
+    <input type="range" id="bend" min="-200" max="200" value="0" step="1">
+    <span class="plain" id="bendVal">0 ц</span>
+  </div>
+  <div class="row">
+    <button id="btnAllOff">■ ALL NOTES OFF</button>
+    <button id="btnArp">▶ ТЕСТ-АРПЕДЖИО</button>
+    <button id="btnOctDown">◄ ОКТАВА −</button>
+    <button id="btnOctUp">ОКТАВА + ►</button>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="row"><span class="plain">КЛАВИАТУРА C3..B5 — мышь и ПК-ряд (зигзаг: Z..' + Q..]) · ←→ октава</span></div>
+  <div id="keys"><div id="kbInner"></div></div>
+</div>
+
+<div class="panel">
+  <div class="row"><span class="plain">ОСЦИЛЛОГРАФ — форма волны мастер-шины:</span></div>
+  <canvas id="scope" width="900" height="140"></canvas>
+</div>
+
+<footer>// ☩ CHIP-DEBUG BENCH — отладочный стенд движка 2A03 · режим CHIP-TUNE ☩</footer>
+
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+
+/* ============ АУДИО-ШИНА ============ */
+let audioCtx=null, master=null, analyser=null;
+function ensureAudio(){
+  if(audioCtx) return;
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  master=audioCtx.createGain();
+  master.gain.value=parseInt($('#vol').value,10)/100;
+  analyser=audioCtx.createAnalyser(); analyser.fftSize=2048;
+  master.connect(analyser); analyser.connect(audioCtx.destination);
+}
+$('#vol').addEventListener('input',e=>{ if(master) master.gain.value=e.target.value/100; lcdState(); });
+
+/* ============ СОСТОЯНИЕ ============ */
+const state={mode:'chip',chipVoice:'pulse50'};
+let bendCents=0, octShift=0;
+const activeChip=new Map(), keyEls=new Map();
+const freqOf=key=>440*Math.pow(2,(key-69)/12);
+
+/* ============ CHIP-движок 2A03 (как в движке) ============ */
+const CPU_NTSC=1789773;
+const NTSC_NOISE=[4,8,16,32,64,96,128,160,202,254,380,508,762,1016,2034,4068];
+const CHIP_VOICES=[
+  {id:'pulse50',name:'□ PULSE 50%',duty:0.5,octave:-1},
+  {id:'pulse25',name:'□ PULSE 25%',duty:0.25,octave:-1},
+  {id:'pulse12',name:'□ PULSE 12,5%',duty:0.125,octave:-1},
+  {id:'saw',name:'◺ ПИЛА',type:'sawtooth',octave:0},
+  {id:'tri',name:'△ ТРЕУГОЛЬНИК',type:'triangle',octave:0},
+  {id:'sine',name:'∿ СИНУС',type:'sine',octave:0},
+  {id:'square',name:'□ КВАДРАТ',type:'square',octave:0,nes:true},
+  {id:'pulseR',name:'ᵓ ПУЛЬС КРУГЛ.',round:true,octave:-1},
+  {id:'nwave',name:'⟋⟋ N-ВОЛНА',nwave:true,octave:0},
+  {id:'noiseL',name:'ШУМ — длинный цикл',noise:'long',octave:0},
+  {id:'noiseS',name:'ШУМ — короткий цикл',noise:'short',octave:0}
+];
+const chipVoiceById=id=>CHIP_VOICES.find(v=>v.id===id);
+const chipDutyWaves={}, chipNoiseCache=new Map();
+const DUTY_PAT={0.5:[0,1,1,1,1,0,0,0],0.25:[0,1,1,0,0,0,0,0],0.125:[0,1,0,0,0,0,0,0]};
+
+function dutyBuffer(d,f){
+  const k='d'+d+'@'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const pat=DUTY_PAT[d]||DUTY_PAT[0.5];
+  const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++) ch[i]=pat[(i*8/N)|0]?(1-d):(-d);
+  chipDutyWaves[k]=buf; return buf;
+}
+function noiseBuffer(mode){
+  if(chipNoiseCache.has(mode)) return chipNoiseCache.get(mode);
+  const steps=mode==='short'?93:32767;
+  const buf=audioCtx.createBuffer(1,steps,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  let reg=1;
+  for(let i=0;i<steps;i++){
+    const fb=(reg&1)^((reg>>1)&1);
+    reg=(reg>>1)|(fb<<14);
+    if(mode==='short') reg=(reg&~(1<<6))|(fb<<6);
+    ch[i]=(reg&1)?1:-1;
+  }
+  let mn=0; for(let i=0;i<steps;i++) mn+=ch[i]; mn/=steps;
+  for(let i=0;i<steps;i++) ch[i]-=mn;
+  chipNoiseCache.set(mode,buf); return buf;
+}
+function roundedPulseBuffer(f){
+  const k='r'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  const R=Math.max(2,Math.round(N*0.12));
+  for(let i=0;i<N;i++){
+    const p=i/N; let x;
+    if(p<R/N){ const u=i/R; x=-1+2*u*u*(3-2*u); }
+    else if(p<0.5) x=1;
+    else x=-1;
+    ch[i]=x;
+  }
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn;
+  chipDutyWaves[k]=buf; return buf;
+}
+function nWaveBuffer(f){
+  const k='n'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++){
+    const p=i/N; let x;
+    if(p<1/3) x=-1+6*p;
+    else if(p<2/3) x=1-6*(p-1/3);
+    else x=-1+6*(p-2/3);
+    ch[i]=x;
+  }
+  chipDutyWaves[k]=buf; return buf;
+}
+
+function chipKill(key){
+  const v=activeChip.get(key); if(!v) return;
+  const t=audioCtx.currentTime;
+  v.g.gain.cancelScheduledValues(t);
+  v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
+  v.g.gain.setTargetAtTime(0,t,0.01);
+  v.nodes.forEach(n=>{try{n.stop(t+0.08);}catch(_){}});
+  activeChip.delete(key); hl(key,false);
+}
+
+function chipOn(key,vel){
+  ensureAudio();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  if(activeChip.has(key)) chipKill(key);
+  vel=vel||100;
+  const v=chipVoiceById(state.chipVoice)||CHIP_VOICES[0];
+  const t=audioCtx.currentTime;
+  const g=audioCtx.createGain();
+  const peak=(v.nes?0.28:0.25)*Math.pow(vel/127,1.3);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(peak,t+0.005);
+  g.gain.setTargetAtTime(peak*0.35,t+0.005,0.08);
+  const nodes=[]; let rate=null, info='';
+  if(v.noise){
+    const idx=Math.min(NTSC_NOISE.length-1,Math.max(0,Math.floor((key-24)*(NTSC_NOISE.length/84))));
+    const timer=NTSC_NOISE[idx];
+    const src=audioCtx.createBufferSource();
+    src.buffer=noiseBuffer(v.noise); src.loop=true;
+    const shift=CPU_NTSC/(2*(timer+1));
+    rate=shift/audioCtx.sampleRate;
+    src.playbackRate.setValueAtTime(rate*Math.pow(2,bendCents/1200),t);
+    src.connect(g); src.start(t); nodes.push(src);
+    info='таймер='+timer+' (сдвиг ~'+shift.toFixed(0)+' Гц)';
+  } else {
+    let freq, osc, note;
+    if(v.duty!==undefined){
+      note=key-12;
+      const period=Math.round(CPU_NTSC/(16*freqOf(note))-1);
+      if(period<8){ g.disconnect(); log('PULSE: период '+period+' < 8 — канал молчит (как на 2A03).'); return; }
+      freq=CPU_NTSC/(16*(period+1));
+      osc=audioCtx.createBufferSource();
+      osc.buffer=dutyBuffer(v.duty,freq); osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      rate=1;
+      info='t='+period+' f='+freq.toFixed(2)+' Гц (-1 октава, паттерн 2A03)';
+    } else if(v.type==='sawtooth'){
+      const period=Math.round(CPU_NTSC/(16*freqOf(key))-1);
+      if(period<8){ g.disconnect(); log('SAW: период '+period+' < 8 — канал молчит.'); return; }
+      freq=CPU_NTSC/(16*(period+1));
+      osc=audioCtx.createOscillator();
+      osc.type='sawtooth'; osc.frequency.value=freq;
+      const lp=audioCtx.createBiquadFilter();
+      lp.type='lowpass'; lp.frequency.value=6000;
+      osc.connect(lp); lp.connect(g); osc.start(t); nodes.push(osc);
+      info='t='+period+' f='+freq.toFixed(2)+' Гц';
+    } else if(v.nes){
+      freq=freqOf(key);
+      osc=audioCtx.createOscillator();
+      osc.type='square'; osc.frequency.value=freq;
+      const lp=audioCtx.createBiquadFilter();
+      lp.type='lowpass'; lp.frequency.value=4000;
+      osc.connect(lp); lp.connect(g); osc.start(t); nodes.push(osc);
+      info='f='+freq.toFixed(2)+' Гц (схема NES-PIANO, lowpass 4 кГц)';
+    } else if(v.round){
+      note=key-12;
+      const period=Math.round(CPU_NTSC/(16*freqOf(note))-1);
+      if(period<8){ g.disconnect(); log('PULSE-R: период '+period+' < 8 — канал молчит (как на 2A03).'); return; }
+      freq=CPU_NTSC/(16*(period+1));
+      osc=audioCtx.createBufferSource();
+      osc.buffer=roundedPulseBuffer(freq); osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      rate=1;
+      info='t='+period+' f='+freq.toFixed(2)+' Гц (-1 октава, скруглённый фронт)';
+    } else if(v.nwave){
+      freq=freqOf(key);
+      osc=audioCtx.createBufferSource();
+      osc.buffer=nWaveBuffer(freq); osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      rate=1;
+      info='f='+freq.toFixed(2)+' Гц (N-волна, два зубца)';
+    } else {
+      const period=Math.round(CPU_NTSC/(32*freqOf(key))-1);
+      if(period<1){ g.disconnect(); log('CH: период '+period+' — вне диапазона чипа.'); return; }
+      freq=CPU_NTSC/(32*(period+1));
+      osc=audioCtx.createOscillator();
+      osc.type=v.type; osc.frequency.value=freq;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      info='t='+period+' f='+freq.toFixed(2)+' Гц (делитель 32)';
+    }
+  }
+  g.connect(master);
+  activeChip.set(key,{g,nodes,rate,
+    bend:c=>{ nodes.forEach(n=>{ try{ if(n.detune) n.detune.value=c; else if(rate!==null) n.playbackRate.value=rate*Math.pow(2,c/1200);}catch(_){} }); }});
+  hl(key,true);
+  log('CHIP: нота '+key+' ['+v.name+'] '+info);
+}
+
+function chipOff(key){
+  const v=activeChip.get(key); if(!v) return;
+  const t=audioCtx.currentTime;
+  v.g.gain.cancelScheduledValues(t);
+  v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
+  v.g.gain.setTargetAtTime(0,t,0.05);
+  v.nodes.forEach(n=>{try{n.stop(t+0.4);}catch(_){}});
+  activeChip.delete(key); hl(key,false);
+  setTimeout(()=>{ try{ v.g.disconnect(); }catch(_){} },450);
+}
+
+/* ============ РЕЖИМ / ГОЛОС ============ */
+function setMode(m){
+  if(state.mode===m) return;
+  state.mode=m;
+  [...activeChip.keys()].forEach(k=>chipKill(k));
+  lcdState();
+  log('Режим: '+m+' — голоса заглушены.');
+}
+function setChipVoice(id){
+  state.chipVoice=id;
+  document.querySelectorAll('#voiceBtns button').forEach(x=>x.classList.toggle('on',x.dataset.wave===id));
+  $('#chipVoiceSel').value=id;
+  const v=chipVoiceById(id);
+  lcdState();
+  log('Голос чипа: '+(v?v.name:id));
+}
+(function fillChipVoices(){
+  const wrap=$('#voiceBtns'), sel=$('#chipVoiceSel');
+  CHIP_VOICES.forEach(v=>{
+    const b=document.createElement('button');
+    b.textContent=v.name; b.dataset.wave=v.id;
+    b.classList.toggle('on',v.id===state.chipVoice);
+    b.addEventListener('click',()=>setChipVoice(v.id));
+    wrap.appendChild(b);
+    const o=document.createElement('option');
+    o.value=v.id; o.textContent=v.name; sel.appendChild(o);
+  });
+  sel.value=state.chipVoice;
+})();
+$('#chipVoiceSel').addEventListener('change',e=>setChipVoice(e.target.value));
+
+/* ============ ДИСПЛЕИ ============ */
+function lcdState(){
+  const v=chipVoiceById(state.chipVoice)||CHIP_VOICES[0];
+  $('#lcd').innerHTML='<b>MODE:</b> [CHIP-TUNE] 2A03<br>'+
+    '<b>ГОЛОС:</b> ['+v.name+']<br>'+
+    '<b>ОКТАВА:</b> '+(octShift>0?'+':'')+octShift+' (база C'+(4+octShift)+')<br>'+
+    '<b>БЕНД:</b> '+bendCents+' ц<br>'+
+    '<b>ГРОМК.:</b> '+$('#vol').value+'%<br>'+
+    '<b>АКТИВНО:</b> '+activeChip.size+' гол.';
+}
+let logN=0;
+function log(s){
+  const d=document.createElement('div');
+  const ts=new Date().toTimeString().slice(0,8);
+  d.textContent='['+ts+'] '+s;
+  const box=$('#log');
+  box.appendChild(d);
+  if(++logN>60){ box.removeChild(box.children[1]); logN--; }
+  box.scrollTop=box.scrollHeight;
+}
+
+/* ============ ПОДСВЕТКА ============ */
+function hl(k,on){
+  const e=keyEls.get(k);
+  if(e) e.classList.toggle('act',on);
+  lcdState();
+}
+
+/* ============ КЛАВИАТУРА (ровная сетка) ============ */
+const WW=58, BW=36, KH=152;
+const NOTE_L=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const isBlackM=m=>[1,3,6,8,10].indexOf(m)>=0;
+function buildKeys(){
+  const inner=$('#kbInner');
+  const lo=48, hi=83; /* C3..B5 */
+  inner.innerHTML=''; keyEls.clear();
+  let wc=0; for(let k=lo;k<=hi;k++) if(!isBlackM(k%12)) wc++;
+  inner.style.width=(wc*WW)+'px';
+  let w=0;
+  for(let k=lo;k<=hi;k++){
+    const m=k%12;
+    if(!isBlackM(m)){
+      const d=document.createElement('div');
+      d.className='wk'; d.dataset.key=k;
+      d.style.left=(w*WW)+'px'; d.style.width=WW+'px'; d.style.height='100%';
+      d.innerHTML='<span class="lbl">'+NOTE_L[m]+(Math.floor(k/12)-1)+'</span>';
+      inner.appendChild(d); keyEls.set(k,d);
+      w++;
+    }
+  }
+  w=0;
+  for(let k=lo;k<=hi;k++){
+    const m=k%12;
+    if(isBlackM(m)){
+      const d=document.createElement('div');
+      d.className='bk'; d.dataset.key=k;
+      d.style.left=(w*WW-BW/2)+'px';
+      inner.appendChild(d); keyEls.set(k,d);
+    } else w++;
+  }
+}
+
+/* мышь и тач */
+const kb=$('#keys');
+let mouseKey=null;
+kb.addEventListener('pointerdown',e=>{
+  ensureAudio();
+  const el=e.target.closest('.wk,.bk');
+  if(!el) return;
+  e.preventDefault();
+  try{ kb.setPointerCapture(e.pointerId); }catch(_){}
+  mouseKey=+el.dataset.key;
+  noteOn(mouseKey);
+});
+function mouseUp(){ if(mouseKey!==null){ noteOff(mouseKey); mouseKey=null; } }
+kb.addEventListener('pointerup',mouseUp);
+kb.addEventListener('pointercancel',mouseUp);
+kb.addEventListener('pointerleave',mouseUp);
+
+/* ============ ПК-КЛАВИАТУРА (зигзаг) ============ */
+const ROW_L={KeyZ:0,KeyS:1,KeyX:2,KeyD:3,KeyC:4,KeyV:5,KeyG:6,KeyB:7,KeyH:8,KeyN:9,KeyJ:10,KeyM:11,Comma:12,KeyL:13,Period:14,Semicolon:15,Slash:16,Quote:17};
+const ROW_U={KeyQ:12,Digit2:13,KeyW:14,Digit3:15,KeyE:16,KeyR:17,Digit5:18,KeyT:19,Digit6:20,KeyY:21,Digit7:22,KeyU:23,KeyI:24,Digit9:25,KeyO:26,Digit0:27,KeyP:28,BracketLeft:29,BracketRight:30};
+const downSet=new Set();
+function rowOffset(code){
+  if(ROW_L[code]!==undefined) return ROW_L[code];
+  if(ROW_U[code]!==undefined) return ROW_U[code];
+  return null;
+}
+document.addEventListener('keydown',e=>{
+  if(e.repeat) return;
+  if(e.code==='ArrowLeft'){ e.preventDefault(); octShift=Math.max(-3,octShift-1); lcdState(); return; }
+  if(e.code==='ArrowRight'){ e.preventDefault(); octShift=Math.min(3,octShift+1); lcdState(); return; }
+  const off=rowOffset(e.code);
+  if(off===null) return;
+  e.preventDefault();
+  ensureAudio();
+  downSet.add(e.code);
+  noteOn(60+octShift*12+off);
+});
+document.addEventListener('keyup',e=>{
+  const off=rowOffset(e.code);
+  if(off===null||!downSet.has(e.code)) return;
+  downSet.delete(e.code);
+  noteOff(60+octShift*12+off);
+});
+
+/* ============ ДИСПЕТЧЕР ============ */
+function noteOn(key){
+  if(state.mode==='chip') chipOn(key);
+}
+function noteOff(key){
+  if(state.mode==='chip') chipOff(key);
+}
+
+/* ============ ПУЛЬТ ============ */
+$('#btnAllOff').addEventListener('click',()=>{
+  [...activeChip.keys()].forEach(k=>chipKill(k));
+  downSet.clear(); log('ALL NOTES OFF — все голоса заглушены.');
+});
+$('#btnArp').addEventListener('click',()=>{
+  ensureAudio();
+  log('ТЕСТ-АРПЕДЖИО: C4 E4 G4 C5 E5 G5...');
+  const seq=[60,64,67,72,76,79,76,72,67,64,60];
+  let i=0;
+  const step=()=>{
+    if(i>=seq.length) return;
+    const n=seq[i];
+    noteOn(n);
+    setTimeout(()=>noteOff(n),120);
+    i++; setTimeout(step,150);
+  };
+  step();
+});
+$('#btnOctDown').addEventListener('click',()=>{ octShift=Math.max(-3,octShift-1); lcdState(); });
+$('#btnOctUp').addEventListener('click',()=>{ octShift=Math.min(3,octShift+1); lcdState(); });
+$('#bend').addEventListener('input',e=>{
+  bendCents=parseInt(e.target.value,10);
+  $('#bendVal').textContent=bendCents+' ц';
+  activeChip.forEach(v=>v.bend(bendCents));
+  lcdState();
+});
+
+/* ============ ОСЦИЛЛОГРАФ ============ */
+function drawScope(){
+  requestAnimationFrame(drawScope);
+  if(!analyser) return;
+  const c=$('#scope'), g=c.getContext('2d');
+  const data=new Uint8Array(analyser.fftSize);
+  analyser.getByteTimeDomainData(data);
+  g.fillStyle='#041a0c'; g.fillRect(0,0,c.width,c.height);
+  g.strokeStyle='#1f6b34'; g.beginPath();
+  for(let x=0;x<=c.width;x+=12){ g.moveTo(x,0); g.lineTo(x,c.height); }
+  g.stroke();
+  g.strokeStyle='#29ff00'; g.lineWidth=2; g.beginPath();
+  for(let i=0;i<data.length;i++){
+    const x=i/data.length*c.width, y=data[i]/255*c.height;
+    if(i) g.lineTo(x,y); else g.moveTo(x,y);
+  }
+  g.stroke();
+  g.lineWidth=1;
+}
+drawScope();
+
+/* ============ СТАРТ ============ */
+buildKeys();
+lcdState();
+log('Стенд готов. Клавиатура C3..B5 построена.');
+log('Голос по умолчанию: PULSE 50%. Выберите голос и сыграйте.');
+</script>
+
+</body>
+</html>
