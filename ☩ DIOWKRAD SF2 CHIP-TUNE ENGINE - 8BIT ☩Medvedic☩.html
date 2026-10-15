@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.1 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.2 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -256,7 +256,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
   <header class="panel">
-    <h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.1 «Medvedic Upgrade»</h1>
+    <h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.2 «Medvedic Upgrade»</h1>
     <div class="lcd" id="lcd">СИСТЕМА: ГОТОВА 
 		!!! Включен эксперементальный режим !!!</div>
 </header>
@@ -1794,6 +1794,17 @@ document.addEventListener('keydown', e => {
   if (e.code === 'Numpad7') { setSusMode('1/8'); e.preventDefault(); return; }
   if (e.code === 'Numpad8') { setSusMode('1/4'); e.preventDefault(); return; }
   if (e.code === 'Numpad9') { setSusMode('1/2'); e.preventDefault(); return; }
+  // Управление туше через Numpad (Num4/5/6 — по порядку кнопок на панели)
+  if (e.code === 'Numpad4') { setSensMode('soft'); e.preventDefault(); return; }
+  if (e.code === 'Numpad5') { setSensMode('hard'); e.preventDefault(); return; }
+  if (e.code === 'Numpad6') { setSensMode('fixed'); e.preventDefault(); return; }
+  // Октавы через Numpad +/-
+  if (e.code === 'NumpadAdd') { octBtn(1); e.preventDefault(); return; }
+  if (e.code === 'NumpadSubtract') { octBtn(-1); e.preventDefault(); return; }
+  // Num / — смена режима РОЛЛ 1 <-> 2
+  if (e.code === 'NumpadDivide') { setKbMode(kbMode===1?2:1); e.preventDefault(); return; }
+  // Num * — смена раскладки РЯД 1 <-> 2
+  if (e.code === 'NumpadMultiply') { setLayout(!layout2); e.preventDefault(); return; }
   if(e.key==='ArrowLeft'){ pcBase=Math.max(PC_MIN(),pcBase-12);
   lcd('PC-клавиатура: октава от ноты '+pcBase); return; }
   
