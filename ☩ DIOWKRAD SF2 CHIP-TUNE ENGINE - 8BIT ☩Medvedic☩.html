@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.3 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.4 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -178,7 +178,7 @@ body.kb-single .kbSec2{display:none;}
 }
 
 /* панели: скрыты по умолчанию, показывается только выбранная */
-.pane{display:none; flex-direction:row; gap:10px;}
+.pane{display:none; flex-direction:column; gap:10px; align-items:stretch;}
 #tb1:checked~#pane1,
 #tb2:checked~#pane2,
 #tb3:checked~#pane3,
@@ -187,62 +187,59 @@ body.kb-single .kbSec2{display:none;}
 #tb6:checked~#pane6,
 #tb7:checked~#pane7,
 #tb8:checked~#pane8{display:flex;
-    background: #222;
+    background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:10px;
 }
 
-.p_block{        
+.p_block{
 	display: flex;
-    width: 100%;
-    min-height: 10rem;
-        background: #111;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: inset 0 0 24px rgba(0,0,0,.5);
+    min-width: 0;
+}
+/* "голые" дивы внутри блока = строки (авто-ряды) */
+.p_block>div{
+    display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    flex-direction: row;
-    align-items: flex-start;
-    align-content: center;
-
+    gap: 6px;
+    align-items: center;    
 }
 
 .p_block button{
-	display: flex;
-    justify-content: center;
-    flex-wrap: nowrap;
     font-size: 14px;
-    padding: 12px;
+    padding: 10px 14px;
     text-align: center;
-    flex-direction: row;
-    align-items: center;
+    white-space: nowrap;
+	
 }
-.p_block .tag {
-	display: flex;
-    justify-content: center;
-    flex-wrap: nowrap;
-    font-size: 14px;
-    padding: 12px;
-    text-align: center;
-    flex-direction: row;
-    align-items: center;
-	border: 2px solid var(--line2);
+.p_block .tag{
+    color: var(--ink2);
+    font-size: .72rem;
+    letter-spacing: .08em;
+    white-space: nowrap;
+    padding: 4px 2px;
 }
 
 .p_block .lcd{
-	width: 480px;
-    min-width: 240px;
-    max-width: 481px;
+    flex: 1 1;
+    max-width: 100%;
+    min-height: 36px;
     height: 176px;
     max-height: 240px;
-    min-height: 36px;
-	    margin: 10px;
+    margin: 0;
 }
 
 .p_block .logbox{
-	width: 480px;
-    min-width: 240px;
-    max-width: 481px;
+    flex: 1 0;
+    max-width: 100%;
+    min-height: 36px;
     height: 176px;
     max-height: 240px;
-    min-height: 36px;
-	    margin: 10px;
+    margin: 0;
 }
 
 
@@ -254,12 +251,12 @@ body.kb-single .kbSec2{display:none;}
 
 
 .p_block h2{
-	
-	width: 10rem;
-    height: 1.75rem;
+    flex: 0 0 100%;
 }
-.p_block select, input[type=file]{
-	    width: 100%;
+.p_block select, .p_block input[type=file]{
+    flex: 1 1 140px;
+    min-width: 120px;
+    max-width: 100%;
 }
 .kbSec_ponel{
 	display:flex;
@@ -271,22 +268,163 @@ input[name="tb"]{display:none;}
 
 /* СПРАВКА: компактные таблицы (v1.4.3) */
 .helptbl{width:100%; border-collapse:collapse; font-size:12px; margin:4px 0 10px;}
-.helptbl td, .helptbl th{border:1px solid #444; padding:4px 8px; text-align:left;}
+.helptbl td, .helptbl th{border:1px solid var(--line2); padding:4px 8px; text-align:left;}
 .helptbl th{background:#244a0e; color:#e2f77e;}
 .helptbl .kbd{font-weight:bold; white-space:nowrap;}
-.helpwrap{width:100%; min-height:10rem; background:#222; padding:10px 14px; overflow:auto;}
+.helpwrap{width:100%; min-height:10rem; background:var(--panel2); padding:10px 14px; overflow:auto;}
+
+
+#tb1:checked~#pane1{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+#tb1:checked~#pane1>.p_block {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .5);
+    min-width: 0;
+    align-items: stretch;
+    flex-wrap: nowrap;
+}
+
+#tb1:checked~#pane1>#bend_sing{
+	display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .5);
+    min-width: 0;
+    align-items: stretch;    width: 100%;
+}
+
+#tb1:checked~#pane1>.p_block>div{
+	width: 100%;
+}
+
+#tb1:checked~#pane1>.p_block button{
+	width: 100%;
+}
+
+
+#tb2:checked~#pane2{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+#tb3:checked~#pane3{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+
+
+
+
+#tb6:checked~#pane6{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+#tb7:checked~#pane7{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+}
+
+#tb7:checked~#pane7 .row{
+	display: flex;
+    gap: 2px;
+    margin: 5px;
+    align-content: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+} 
+
+#tb7:checked~#pane7>.p_block button{
+	width: 100%;
+}
+
+#tb8:checked~#pane8{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    justify-content: space-between;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    align-content: stretch;
+
+}
+
+#tb8:checked~#pane8 .p_block>div {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    align-items: stretch;
+    flex-direction: row;
+}
+
+#tb8:checked~#pane8 .row{
+	display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 0px 0;
+    align-content: flex-end;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+} 
+
 </style>
 </head>
 <body>
-
-</head>
-<body>
-
-
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.3 «Medvedic Upgrade»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.4 «Medvedic Upgrade»</h1>
 	</header>
 
 
@@ -346,29 +484,6 @@ input[name="tb"]{display:none;}
 			
 			
 	</div>
-
-	<div class="p_block" >
-		<div class="row">
-		  <div>
-		  <span class="tag" style="min-width:0;">ПИТЧ-БЕНД:</span>
-			  <input type="range" id="bend" min="-400" max="400" value="0">
-			  <span class="lbl" id="bendLbl">0 ц</span>
-		  </div>
-		</div>
-		 <div class="row">
-		  <div>
-			<span class="tag">ГРОМКОСТЬ:</span>
-			<input type="range" id="vol" min="0" max="100" value="70">
-		  </div>
-		 </div>
-		<div class="row">
-		<div> 
-			<span class="tag">ТЕМП:</span><input type="range" id="bpm" min="40" max="300" value="120">
-			<span class="lbl" id="bpmVal">120 BPM</span>
-		</div>
-	  </div>
-	</div>
-
 	<div class="p_block" >
 		
 			<div><button id="octDn">ОКТАВА: −</button><button id="octUp">ОКТАВА: +</button></div>
@@ -383,12 +498,34 @@ input[name="tb"]{display:none;}
           <button id="kb1">РОЛЛ: 1</button><button id="kb2" class="on">РОЛЛ:2</button>
           <button id="lay1">РЯД: 1</button><button id="lay2">РЯД: 2</button>
 		 </div>
+          <div>
           <button id="kbToggle">КЛАВИАТУРА: ВКЛ</button>
         
         
           <button id="rollLock">🔒 ЛОК ПИАОЛРОЛЛА</button>
           <button id="panicBtn" style="color:#c84a3a;">■ PANIC</button>
-        
+        </div>
+		</div>
+		<div class="p_block" id="bend_sing">
+		<div class="row">
+		  <div>
+			<span class="tag">ГРОМКОСТЬ:</span>
+			<input type="range" id="vol" min="0" max="100" value="70">
+		  </div>
+		 </div>
+		<div class="row">
+		  <div>
+		  <span class="tag" style="min-width:0;">ПИТЧ-БЕНД:</span>
+			  <input type="range" id="bend" min="-400" max="400" value="0">
+			  <span class="lbl" id="bendLbl">0 ц</span>
+		  </div>
+		</div>
+		<div class="row">
+		<div> 
+			<span class="tag">ТЕМП:</span><input type="range" id="bpm" min="40" max="300" value="120">
+			<span class="lbl" id="bpmVal">120 BPM</span>
+		</div>
+	  </div> 
 	</div>
   
 	
@@ -534,11 +671,11 @@ input[name="tb"]{display:none;}
 			</div>
 			<div>
 				<div class="logbox" id="log"></div>
-				<div class="logbox" id="adLog" ></div>
 				<div class="row" id="adPanel">
 					<button class="wbtn" id="adFreeze">❄ СТОП-ТЕСТ</button>
 					<button class="wbtn" id="adResume">▶ ВОЗОБН.</button>
 				</div>
+				<div class="logbox" id="adLog" ></div>
 			</div>
 			<div>
 				<div class="lcd" id="adLcd">AUDIO: контекст ещё не создан</div>
