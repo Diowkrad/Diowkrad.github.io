@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.4 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.6 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -418,13 +418,19 @@ input[name="tb"]{display:none;}
     align-items: stretch;
 } 
 
+/* ТАЧ-ФИКС: касание по нотам и клавиатурам — не прокрутка страницы */
+#keys,#keys2{ touch-action:none; }
+.kwrap{ touch-action:none; }
+
+
+
 </style>
 </head>
 <body>
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.4 «Medvedic Upgrade»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.7 «Medvedic Upgrade»</h1>
 	</header>
 
 
@@ -1808,7 +1814,7 @@ function rollLockApply(){
 /* блокировка лент на фазе capture: перехват до обработчиков бегунков и колеса */
 document.addEventListener('pointerdown',e=>{
   if(!rollLocked||!e.target||!e.target.closest) return;
-  if(e.target.closest('.tape-thumb,#wrap1,#wrap2')) e.stopPropagation();
+  if(e.target.closest('.strip')) e.stopPropagation();
 },true);
 document.addEventListener('wheel',e=>{
   if(!rollLocked||!e.target||!e.target.closest) return;
