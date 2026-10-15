@@ -38,6 +38,8 @@ html.th12{filter:hue-rotate(77deg)}   /* МЯТНЫЙ */
 #themeRow .thbtn[data-th=th12]{}
 
 
+
+
 *{box-sizing:border-box; margin:0; padding:0;}
 body{background:var(--bg); color:var(--ink); font-family:var(--font); font-size:14px; line-height:1.35; padding:3px;}
 body::after{content:''; position:fixed; inset:0; pointer-events:none; z-index:99;
@@ -345,7 +347,8 @@ input[name="tb"]{display:none;}
 }
 
 
-
+#tb5:checked~#pane5{ display:none; }
+#kbdHdr{ display:none;}
 
 #tb6:checked~#pane6{
 	display: flex;
