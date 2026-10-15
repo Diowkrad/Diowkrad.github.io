@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.2 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.3 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -168,6 +168,9 @@ body.kb-single .kbSec2{display:none;}
 #tb2:checked~.tabbar label[for="tb2"],
 #tb3:checked~.tabbar label[for="tb3"],
 #tb4:checked~.tabbar label[for="tb4"],
+#tb6:checked~.tabbar label[for="tb6"],
+#tb7:checked~.tabbar label[for="tb7"],
+#tb8:checked~.tabbar label[for="tb8"],
 #tb5:checked~.tabbar label[for="tb5"]{
   background:#244a0e; color:#e2f77e;
   border-color:var(--ink2);
@@ -180,7 +183,10 @@ body.kb-single .kbSec2{display:none;}
 #tb2:checked~#pane2,
 #tb3:checked~#pane3,
 #tb4:checked~#pane4,
-#tb5:checked~#pane5{display:flex;}
+#tb5:checked~#pane5,
+#tb6:checked~#pane6,
+#tb7:checked~#pane7,
+#tb8:checked~#pane8{display:flex;}
 
 .p_block
 	{display: flex;
@@ -245,6 +251,13 @@ body.kb-single .kbSec2{display:none;}
 
 /* ТАБЫ: скрытые radio */
 input[name="tb"]{display:none;}
+
+/* СПРАВКА: компактные таблицы (v1.4.3) */
+.helptbl{width:100%; border-collapse:collapse; font-size:12px; margin:4px 0 10px;}
+.helptbl td, .helptbl th{border:1px solid #444; padding:4px 8px; text-align:left;}
+.helptbl th{background:#244a0e; color:#e2f77e;}
+.helptbl .kbd{font-weight:bold; white-space:nowrap;}
+.helpwrap{width:100%; min-height:10rem; background:#222; padding:10px 14px; overflow:auto;}
 </style>
 </head>
 <body>
@@ -256,7 +269,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
   <header class="panel">
-    <h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.2 «Medvedic Upgrade»</h1>
+    <h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.3 «Medvedic Upgrade»</h1>
     <div class="lcd" id="lcd">СИСТЕМА: ГОТОВА 
 		!!! Включен эксперементальный режим !!!</div>
 </header>
@@ -269,6 +282,9 @@ input[name="tb"]{display:none;}
 <input type="radio" name="tb" id="tb3">
 <input type="radio" name="tb" id="tb4">
 <input type="radio" name="tb" id="tb5">
+<input type="radio" name="tb" id="tb6">
+<input type="radio" name="tb" id="tb7">
+<input type="radio" name="tb" id="tb8">
 
 	<nav class="tabbar">
 		<span class="tag">РЕЖИМ: Движка</span>
@@ -282,6 +298,9 @@ input[name="tb"]{display:none;}
   <label for="tb3">ОСЦИЛЛОГРАФ</label>
   <label for="tb4">ТЕМЫ</label>
   <label for="tb5">GUI-OFF</label>
+<label for="tb6">УПРАВЛЕНИЕ</label>
+<label for="tb7">РЕЗЕРВ 1</label>
+<label for="tb8">РЕЗЕРВ 2</label>
 </nav>
 
 <!-- ═══ ВКЛАДКА 1: ЗВУК ═══ -->
@@ -465,6 +484,44 @@ input[name="tb"]{display:none;}
 <section class="pane" id="pane5">
 	<!-- ═══ ПУСТОЙ СЕЛЕКТОР ВЫКЛЮЧАЮЩИЙ ВСЕ НЕНУЖНЫЕ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ ═══ -->
 </section>
+
+  <section class="pane" id="pane6">
+    <div class="p_block">
+      <h2>НАМПАД И СТРЕЛКИ</h2>
+      <table class="helptbl">
+        <tr><th class="kbd">Num 7 / 8 / 9</th><td>Сустейн 1/8 / 1/4 / 1/2 (как кнопки пульта)</td></tr>
+        <tr><th class="kbd">Num 4 / 5 / 6</th><td>Туше SOFT / HARD / FIXED (по порядку кнопок на панели)</td></tr>
+        <tr><th class="kbd">Num + / Num −</th><td>Октава вверх / вниз (с границами диапазона)</td></tr>
+        <tr><th class="kbd">Num /</th><td>РОЛЛ: 1 ↔ 2 (смена числа клавиатур)</td></tr>
+        <tr><th class="kbd">Num *</th><td>РЯД: 1 ↔ 2 (смена раскладки)</td></tr>
+        <tr><th class="kbd">← / →</th><td>Октава вниз / вверх (стрелки)</td></tr>
+      </table>
+      <p style="font-size:12px;">NumLock: Num4–Num9 работают только с включённым NumLock. Num +/−, Num / и Num * от NumLock не зависят. При потере фокуса окна (alt-tab) все зажатые ноты глушатся автоматически.</p>
+    </div>
+    <div class="p_block">
+      <h2>НОТНЫЕ РЯДЫ И ПЕРЕКЛЮЧАТЕЛИ</h2>
+      <table class="helptbl">
+        <tr><th class="kbd">РЯД 1</th><td>Хроматика C4…F#5: A W S E D F T G Y H U J K O L P ; ' ]</td></tr>
+        <tr><th class="kbd">РЯД 2 низ</th><td>C4…F5: Z S X D C V G B H N J M , L . ; / '</td></tr>
+        <tr><th class="kbd">РЯД 2 верх</th><td>C5…F#6: Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ]</td></tr>
+        <tr><th class="kbd">КЛАВИАТУРА ВКЛ</th><td>При ВЫКЛ ПК-клавиши игнорируются — мышь и MIDI работают свободно</td></tr>
+        <tr><th class="kbd">Смена РОЛЛ / РЯД</th><td>Все зажатые ноты сбрасываются автоматически</td></tr>
+      </table>
+      <p style="font-size:12px;">Диапазон нот движка: 24–78. Ноты вне диапазона пишутся в журнал, звук не запускается.</p>
+    </div>
+  </section>
+
+  <section class="pane" id="pane7">
+    <div class="p_block">
+      <!-- РЕЗЕРВ 1: пусто, под оформление -->
+    </div>
+  </section>
+
+  <section class="pane" id="pane8">
+    <div class="p_block">
+      <!-- РЕЗЕРВ 2: пусто, под оформление -->
+    </div>
+  </section>
 
 	</div>
 
