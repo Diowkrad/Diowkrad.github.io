@@ -186,48 +186,66 @@ body.kb-single .kbSec2{display:none;}
 #tb5:checked~#pane5,
 #tb6:checked~#pane6,
 #tb7:checked~#pane7,
-#tb8:checked~#pane8{display:flex;}
-
-.p_block
-	{display: flex;
-    width: 100rem;
-    min-height: 10rem;
+#tb8:checked~#pane8{display:flex;
     background: #222;
+}
+
+.p_block{        
+	display: flex;
+    width: 100%;
+    min-height: 10rem;
+        background: #111;
     flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: center;
     flex-direction: row;
+    align-items: flex-start;
     align-content: center;
-    align-items: center;
 
 }
 
 .p_block button{
 	display: flex;
-    width: 7rem;
-    height: 3.2rem;
-    align-items: center;
     justify-content: center;
     flex-wrap: nowrap;
-	font-size: 12px;
+    font-size: 14px;
+    padding: 12px;
+    text-align: center;
+    flex-direction: row;
+    align-items: center;
 }
 .p_block .tag {
 	display: flex;
-        width: 13rem;
-    height: 2.2rem;
-    align-items: center;
     justify-content: center;
     flex-wrap: nowrap;
-	font-size: 12px;
-	border: 1px solid var(--line2);
-    border-radius: 4px;
-    padding: 7px 10px;
-	background:#111;
+    font-size: 14px;
+    padding: 12px;
+    text-align: center;
+    flex-direction: row;
+    align-items: center;
+	border: 2px solid var(--line2);
 }
 
 .p_block .lcd{
-	width: 100%;
-   height: 5.5rem;
+	width: 480px;
+    min-width: 240px;
+    max-width: 481px;
+    height: 176px;
+    max-height: 240px;
+    min-height: 36px;
+	    margin: 10px;
 }
+
+.p_block .logbox{
+	width: 480px;
+    min-width: 240px;
+    max-width: 481px;
+    height: 176px;
+    max-height: 240px;
+    min-height: 36px;
+	    margin: 10px;
+}
+
+
 
 .p_block button.on{
 	background:#244a0e; color:#e2f77e; border-color:var(--ink2); box-shadow:0 0 8px rgba(139,172,15,.4);
@@ -241,8 +259,7 @@ body.kb-single .kbSec2{display:none;}
     height: 1.75rem;
 }
 .p_block select, input[type=file]{
-	    width: 13rem;
-    height: 1.75rem;
+	    width: 100%;
 }
 .kbSec_ponel{
 	display:flex;
@@ -268,11 +285,9 @@ input[name="tb"]{display:none;}
 
 <div id="app">
   <!-- ШАПКА -->
-  <header class="panel">
-    <h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.3 «Medvedic Upgrade»</h1>
-    <div class="lcd" id="lcd">СИСТЕМА: ГОТОВА 
-		!!! Включен эксперементальный режим !!!</div>
-</header>
+	<header class="panel">
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.3 «Medvedic Upgrade»</h1>
+	</header>
 
 
 	<div class="rendring">
@@ -295,12 +310,12 @@ input[name="tb"]{display:none;}
 <nav class="tabbar">
   <label for="tb1">ЗВУК</label>
   <label for="tb2">ПУЛЬТ</label>
-  <label for="tb3">ОСЦИЛЛОГРАФ</label>
+  <label for="tb3">ПАРСЕРЫ</label>
   <label for="tb4">ТЕМЫ</label>
   <label for="tb5">GUI-OFF</label>
 <label for="tb6">УПРАВЛЕНИЕ</label>
-<label for="tb7">РЕЗЕРВ 1</label>
-<label for="tb8">РЕЗЕРВ 2</label>
+<label for="tb7">ОСЦИЛЛОГРАФ</label>
+<label for="tb8">МОНИТОРЫ</label>
 </nav>
 
 <!-- ═══ ВКЛАДКА 1: ЗВУК ═══ -->
@@ -333,8 +348,32 @@ input[name="tb"]{display:none;}
 	</div>
 
 	<div class="p_block" >
-		<div><button id="octDn">ОКТАВА: −</button><button id="octUp">ОКТАВА: +</button></div>
-		<div>
+		<div class="row">
+		  <div>
+		  <span class="tag" style="min-width:0;">ПИТЧ-БЕНД:</span>
+			  <input type="range" id="bend" min="-400" max="400" value="0">
+			  <span class="lbl" id="bendLbl">0 ц</span>
+		  </div>
+		</div>
+		 <div class="row">
+		  <div>
+			<span class="tag">ГРОМКОСТЬ:</span>
+			<input type="range" id="vol" min="0" max="100" value="70">
+		  </div>
+		 </div>
+		<div class="row">
+		<div> 
+			<span class="tag">ТЕМП:</span><input type="range" id="bpm" min="40" max="300" value="120">
+			<span class="lbl" id="bpmVal">120 BPM</span>
+		</div>
+	  </div>
+	</div>
+
+	<div class="p_block" >
+		
+			<div><button id="octDn">ОКТАВА: −</button><button id="octUp">ОКТАВА: +</button></div>
+			<div>
+		
           <button id="susBtn8">Sus: 1/8</button><button id="susBtn4">Sus: 1/4</button><button id="susBtn2">Sus: 1/2</button>
         </div>
         <div>
@@ -351,14 +390,6 @@ input[name="tb"]{display:none;}
           <button id="panicBtn" style="color:#c84a3a;">■ PANIC</button>
         
 	</div>
-	
-	<div class="p_block" >
-		  <div><span class="tag" style="min-width:0;">ПИТЧ-БЕНД:</span>
-		  <input type="range" id="bend" min="-400" max="400" value="0">
-		  <span class="lbl" id="bendLbl">0 ц</span></div>
-		  <div><span class="tag">ГРОМКОСТЬ:</span><input type="range" id="vol" min="0" max="100" value="70"></div>
-      <div> <span class="tag">ТЕМП:</span><input type="range" id="bpm" min="40" max="300" value="120"><span class="lbl" id="bpmVal">120 BPM</span></div>
-  </div>
   
 	
 </section>
@@ -384,26 +415,6 @@ input[name="tb"]{display:none;}
 	
   </div>
   <div class="p_block" >
-	<div>
-	<h2>CHIP-TUNE</h2>
-	<select id="chipVoiceSel" style="min-width:170px;"></select>
-	<button id="btnArp">♪ АРПЕДЖИО (C-мажор)</button></div>
-	
-	
-        <div><h2>SOUNDFONT</h2>
-        <input type="file" id="sf2file" accept=".sf2,.sf3" style="flex:1;">
-        <span class="tag">БАНК:</span><select id="bankSel" style="flex:1;"></select>
-        <span class="tag">ПРЕСЕТ:</span><select id="presetSel" style="flex:1;"></select>
-        <span class="tag">ИНСТР.:</span><select id="instSel" style="flex:1;"></select></div>
-      
-
-      <div>
-        <h2>MIDI GM × 128</h2>
-        <span class="tag">ГОЛОС:</span><select id="midiVoiceSel" style="flex:1;"></select></div>
-      
-	
-  </div>
-  <div class="p_block" >
 		 <button id="midiBtn">ПОДКЛЮЧИТЬ MIDI</button>
 	<span class="tag">УСТРОЙСТВО:</span><select id="midiSel" style="flex:1;"></select>
       <h2>MIDI OUT — NC-КАНАЛ И MIDI-ПОРТ (17)</h2>
@@ -423,43 +434,27 @@ input[name="tb"]{display:none;}
 
 <!-- ═══ ВКЛАДКА 3: СТЕНД ═══ -->
 <section class="pane" id="pane3">
-   <div class="p_block" >
-	<h2>ОСЦИЛЛОГРАФ</h2>
-	<canvas id="scope" width="560" height="200"></canvas>
-	<canvas id="scope2" width="560" height="200"></canvas>
-  </div>
-  <div class="p_block" >
   
-	 <h2>АУДИО-КОНТРОЛЬ</h2>
-      <div class="lcd" id="adLcd">AUDIO: контекст ещё не создан</div>
-	   <div class="lcd" id="sc2Lcd" style="margin:6px 0;">OSC: ожидание контекста</div>
-	   <div class="lcd" id="lcd2">CHIP — ГОТОВ</div>
-  </div>
-  
-	
-  
-  <div class="p_block" >
-	<h2>ЖУРНАЛ ДВИЖКА</h2>
-      <div class="logbox" id="log"></div><div class="logbox" id="adLog" ></div>
-  </div>
-  <div class="p_block" >
-	
-      
+	 <div class="p_block" >
+	<div>
+	<h2>CHIP-TUNE</h2>
+	<select id="chipVoiceSel" style="min-width:170px;"></select>
+	<button id="btnArp">♪ АРПЕДЖИО (C-мажор)</button></div>
+	</div>
+	<div class="p_block" >
+        <div><h2>SOUNDFONT</h2>
+        <input type="file" id="sf2file" accept=".sf2,.sf3" style="flex:1;">
+        <span class="tag">БАНК:</span><select id="bankSel" style="flex:1;"></select>
+        <span class="tag">ПРЕСЕТ:</span><select id="presetSel" style="flex:1;"></select>
+        <span class="tag">ИНСТР.:</span><select id="instSel" style="flex:1;"></select></div>
+    </div>
+	<div class="p_block" >
 
-      <h2>ДИАГНОСТИЧЕСКИЙ ПУЛЬТ</h2>
-	   <div class="row" id="adPanel">
-        <button class="wbtn" id="adFreeze">❄ СТОП-ТЕСТ</button>
-        <button class="wbtn" id="adResume">▶ ВОЗОБН.</button>
-      </div>
-      <div class="row" id="scope2Panel">
-        <button class="wbtn on" id="sc2Wave">~ ВОЛНА</button>
-        <button class="wbtn" id="sc2Spec">ıı СПЕКТР</button>
-        <button class="wbtn" id="sc2XY">⊗ ФИГУРА</button>
-        <button class="wbtn" id="sc2Freeze">❄ СТОП</button>
-      </div>
-      
-
+   <div>
+     <h2>MIDI GM × 128</h2>
+     <span class="tag">ГОЛОС:</span><select id="midiVoiceSel" style="flex:1;"></select></div>
   </div>
+
 </section>
 
 <!-- ═══ ВКЛАДКА 4: ТЕМЫ ═══ -->
@@ -513,14 +508,43 @@ input[name="tb"]{display:none;}
 
   <section class="pane" id="pane7">
     <div class="p_block">
-      <!-- РЕЗЕРВ 1: пусто, под оформление -->
+      <canvas id="scope" width="700" height="350"></canvas>
+    </div>
+	<div class="p_block">
+      
+      
+      <div class="row" id="scope2Panel">
+        <button class="wbtn on" id="sc2Wave">~ ВОЛНА</button>
+        <button class="wbtn" id="sc2Spec">ıı СПЕКТР</button>
+        <button class="wbtn" id="sc2XY">⊗ ФИГУРА</button>
+        <button class="wbtn" id="sc2Freeze">❄ СТОП</button>
+      </div>
+    </div>
+	<div class="p_block">
+      <canvas id="scope2" width="700" height="350"></canvas>
     </div>
   </section>
 
   <section class="pane" id="pane8">
-    <div class="p_block">
-      <!-- РЕЗЕРВ 2: пусто, под оформление -->
-    </div>
+    
+      <div class="p_block" >
+			<div>
+				<div class="lcd" id="lcd2">CHIP — ГОТОВ</div>
+				<div class="lcd" id="lcd">СИСТЕМА: ГОТОВА !!! Включен эксперементальный режим !!!</div>
+			</div>
+			<div>
+				<div class="logbox" id="log"></div>
+				<div class="logbox" id="adLog" ></div>
+				<div class="row" id="adPanel">
+					<button class="wbtn" id="adFreeze">❄ СТОП-ТЕСТ</button>
+					<button class="wbtn" id="adResume">▶ ВОЗОБН.</button>
+				</div>
+			</div>
+			<div>
+				<div class="lcd" id="adLcd">AUDIO: контекст ещё не создан</div>
+				<div class="lcd" id="sc2Lcd">OSC: ожидание контекста</div>
+			</div>
+	</div>
   </section>
 
 	</div>
