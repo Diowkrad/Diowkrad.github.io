@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.11 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.13 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -186,7 +186,7 @@ body.kb-single .kbSec2{display:none;}
 #tb5:checked~#pane5,
 #tb6:checked~#pane6,
 #tb7:checked~#pane7,
-#tb8:checked~#pane8{display:flex; 
+#tb8:checked~#pane8{display:flex;
     background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:10px;
 }
 
@@ -199,7 +199,7 @@ body.kb-single .kbSec2{display:none;}
     border-radius: 6px;
     padding: 10px;
     box-shadow: inset 0 0 24px rgba(0,0,0,.5);
-    min-width: 0;    overflow: auto;
+    min-width: 0;
 }
 /* "голые" дивы внутри блока = строки (авто-ряды) */
 .p_block>div{
@@ -449,7 +449,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.11 «Medvedic Upgrade»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.13 «Medvedic Upgrade»</h1>
 	</header>
 
 
@@ -710,17 +710,28 @@ input[name="tb"]{display:none;}
   <!-- КЛАВИАТУРЫ -->
   <div class="panel">
      <div class="kbSec_ponel">  <span class="rollrow">
-      <button id="piKb1">1 КЛАВИАТУРА</button>
+      <div><button id="piKb1">1 КЛАВИАТУРА</button>
       <button id="piKb2" class="on">2 КЛАВИАТУРЫ</button>
       <button id="piRoll">СКРОЛЛ: ОТКРЫТ</button>
-    </span> <span class="badge" id="voiceCnt">0</span></div>
+    </span>
+	<span class="tag">Нот нажато:</span>
+	<span class="badge" id="noteCnt1" title="Счётчик нажатых нот (клавиатура 1). Клик по счётчику — СБРОС.">0
+	</span> 
+	<span class="tag">Нот звучит:</span>
+	<span class="badge" id="voiceCnt">0
+	</span> 
+	<span class="tag">FPS:</span>
+	<span class="badge" id="fpsDisplay">0
+	</span>
+	</div>
+	</div>
     <div id="kbdHdr"></div>
     <div class="kbSec1">
       <div class="kwrap" id="wrap1"><div id="keys"></div></div>
       <div class="strip" id="strip1"><div class="tape-thumb"></div></div>
     </div>
     <div class="kbSec2" style="margin-top:12px;">
-		<div class="kbSec_ponel" ><span class="tag">FPS:</span><span class="badge" id="fpsDisplay">0</span></div>
+		<div class="kbSec_ponel" ></div>
       <div class="kwrap" id="wrap2"><div id="keys2"></div></div>
       <div class="strip" id="strip2"><div class="tape-thumb"></div></div>
     </div>
@@ -2945,6 +2956,39 @@ function wavSeqRun(mode){
 
   mLcd('17-OUT: модуль инициализирован · NC выключен · MIDI не выбран');
   mLog('17-OUT: модуль инициализирован (id='+TAB_ID+')');
+  
+  /* ---------- СЧЁТЧИК НОТ, КЛАВИАТУРА 1 ---------- */
+let noteCnt=0;
+function cntEl(){ return document.getElementById('noteCnt1'); }
+function noteCntBump(){
+  noteCnt++;
+  const el=cntEl();
+  if(el) el.textContent=noteCnt;
+}
+/* мышь и тач по первой клавиатуре */
+const keys1=document.getElementById('keys');
+if(keys1) keys1.addEventListener('pointerdown',e=>{
+  if(e.target.closest&&e.target.closest('.wk,.bk')) noteCntBump();
+});
+/* ПК-клавиатура: движок играет «КЛАВИАТУРУ I — мышь и ПК».
+   Слушатель срабатывает ПОСЛЕ движкового: если движок принял ноту,
+   он успел поставить noteOwner.set(n, e.code) — по этому и отличаем нажатие. */
+document.addEventListener('keydown',e=>{
+  if(e.repeat) return;
+  if(typeof codeToNote!=='function'||typeof noteOwner==='undefined') return;
+  const n=codeToNote(e);
+  if(n>=0&&noteOwner.get(n)===e.code) noteCntBump();
+});
+/* СБРОС: клик по самому счётчику */
+(function(){
+  const badge=cntEl();
+  if(!badge) return;
+  badge.addEventListener('click',()=>{
+    noteCnt=0;
+    badge.textContent='0';
+    if(typeof lcd==='function') lcd('СЧЁТЧИК НОТ: СБРОС');
+  });
+})();
 })();
 
 </script>
@@ -2998,53 +3042,49 @@ function wavSeqRun(mode){
   syncPiano();
 })();
 </script>
-
 <script>
-/* ═══ ЧИТ-КОД: РЕЖИМ РАЗРАБОТЧИКА (алиса) ═══ */
-/*(function(){
-  'use strict';
-  var SEQ = 'alisatyan';
-  var buf = '';
-  var on = false;
-  var labels = [];
-  function labels7(){
-    if(!labels.length){
-      var a = document.querySelectorAll('.tabbar label[for="tb7"],.tabbar label[for="tb8"]');
-      for(var i=0;i<a.length;i++) labels.push(a[i]);
-    }
-    return labels;
+/* ═══════════════ ЧИТ-КОД РАЗРАБОТЧИКА + СЧЁТЧИК НОТ (v1.4.13) ═══════════════
+   1) При старте: кнопки ОСЦИЛЛОГРАФ (tb7) и МОНИТОРЫ (tb8) прячутся.
+   2) Ввод «alisatyan» (регистр не важен): кнопки возвращаются + alert.
+   3) Повторный ввод: кнопки прячутся; если открыта отладочная вкладка —
+      выбор возвращается на ЗВУК (tb1), чтобы не остаться на скрытой панели.
+   4) Счётчик нажатых нот первой клавиатуры (#noteCnt1): мышь/тач по #keys
+      и ПК-клавиатура. Сброс — клик по самому счётчику. MIDI не учитывается. */
+
+/* ---------- ЧИТ-КОД: alisatyan ---------- *//*
+const SEQ='alisatyan';
+let buf='';
+let devOn=false;
+document.addEventListener('keydown',e=>{
+  if(e.repeat) return;
+  if(e.target&&e.target.closest&&e.target.closest('input,textarea,select')) return;
+  const k=e.key;
+  if(typeof k!=='string'||k.length!==1) return;
+  buf=(buf+k.toLowerCase()).slice(-SEQ.length);
+  if(buf!==SEQ) return;
+  buf='';
+  devOn=!devOn;
+  const l7=document.querySelector('label[for="tb7"]');
+  const l8=document.querySelector('label[for="tb8"]');
+  if(!l7||!l8) return;
+  l7.style.display=devOn?'flex':'none';
+  l8.style.display=devOn?'flex':'none';
+  const t7=document.getElementById('tb7'), t8=document.getElementById('tb8');
+  if(!devOn&&((t7&&t7.checked)||(t8&&t8.checked))){
+    const t1=document.getElementById('tb1');
+    if(t1) t1.checked=true;
   }
-  function hide(){
-    on = false;
-    labels7().forEach(function(l){ l.style.display = 'none'; });
-    // если осталась открытой скрытая отладочная панель — возвращаем ЗВУК
-    var t7 = document.getElementById('tb7');
-    var t8 = document.getElementById('tb8');
-    var t1 = document.getElementById('tb1');
-    if(t7 && t7.checked && t1) t1.checked = true;
-    else if(t8 && t8.checked && t1) t1.checked = true;
-  }
-  function show(){
-    on = true;
-    labels7().forEach(function(l){ l.style.display = 'flex'; });
-    alert('СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВКЛЮЧЕН !!!');
-  }
-  // при старте прячем отладочные вкладки
-  hide();
-  document.addEventListener('keydown', function(e){
-    if(e.repeat) return;
-    var t = e.target;
-    if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
-    if(e.key && e.key.length === 1){
-      buf = (buf + e.key.toLowerCase()).slice(-SEQ.length);
-      if(buf === SEQ){
-        buf = '';
-        if(on) hide(); else show();
-        if(!on) alert('СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВЫКЛЮЧЕН !!!');
-      }
-    }
-  });
+  alert(devOn?'СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВКЛЮЧЕН !!!':'СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВЫКЛЮЧЕН !!!');
+});
+
+/* старт: спрятать отладочные вкладки *//*
+(function(){
+  const l7=document.querySelector('label[for="tb7"]');
+  const l8=document.querySelector('label[for="tb8"]');
+  if(l7) l7.style.display='none';
+  if(l8) l8.style.display='none';
 })();*/
+
 </script>
 </body>
 </html>
