@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.13 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.15 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -449,7 +449,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.13 «Medvedic Upgrade»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.15 «Medvedic Upgrade»</h1>
 	</header>
 
 
@@ -710,12 +710,12 @@ input[name="tb"]{display:none;}
   <!-- КЛАВИАТУРЫ -->
   <div class="panel">
      <div class="kbSec_ponel">  <span class="rollrow">
-      <div><button id="piKb1">1 КЛАВИАТУРА</button>
+      <button id="piKb1">1 КЛАВИАТУРА</button>
       <button id="piKb2" class="on">2 КЛАВИАТУРЫ</button>
       <button id="piRoll">СКРОЛЛ: ОТКРЫТ</button>
     </span>
 	<span class="tag">Нот нажато:</span>
-	<span class="badge" id="noteCnt1" title="Счётчик нажатых нот (клавиатура 1). Клик по счётчику — СБРОС.">0
+	<span class="badge" id="noteCnt" title="Счётчик нажатых нот (клавиатура 1). Клик по счётчику — СБРОС.">0
 	</span> 
 	<span class="tag">Нот звучит:</span>
 	<span class="badge" id="voiceCnt">0
@@ -734,6 +734,8 @@ input[name="tb"]{display:none;}
 		<div class="kbSec_ponel" ></div>
       <div class="kwrap" id="wrap2"><div id="keys2"></div></div>
       <div class="strip" id="strip2"><div class="tape-thumb"></div></div>
+    </div>
+  </div>
     </div>
   </div>
 
@@ -1723,6 +1725,7 @@ function attachKb(box){
     const relY=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));
     const vel=applySens(relY);
     ensureAudio(); noteOwner.set(+el.dataset.key,'@ext'); noteOn(+el.dataset.key,vel);
+    if(box.id==='keys') bumpNoteCnt();
     try{el.setPointerCapture(e.pointerId);}catch(_){}
   });
   const up=e=>{
@@ -1731,6 +1734,17 @@ function attachKb(box){
   };
   box.addEventListener('pointerup',up);
   box.addEventListener('pointercancel',up);
+}
+/* ═══ СЧЁТЧИК НАЖАТЫХ НОТ (клавиатура 1) — v1.4.15 ═══ */
+const noteCntEl=document.getElementById('noteCnt');
+let noteCnt=0;
+function bumpNoteCnt(){ noteCnt++; if(noteCntEl) noteCntEl.textContent=String(noteCnt); }
+if(noteCntEl){
+  noteCntEl.style.cursor='pointer';
+  noteCntEl.addEventListener('click',()=>{
+    noteCnt=0; noteCntEl.textContent='0';
+    if(typeof lcd==='function') lcd('СЧЁТЧИК НОТ: СБРОС');
+  });
 }
 attachKb(document.getElementById('keys'));
 attachKb(document.getElementById('keys2'));
@@ -2064,6 +2078,7 @@ document.addEventListener('keydown', e => {
     ensureAudio(); // Активируем аудио-контекст
     noteOwner.set(n, e.code); 
     noteOn(n, 100); // Запускаем звук
+    bumpNoteCnt(); // счётчик нажатых нот (клавиатура 1)
   } else if (n >= 0) {
     log('Нота ПК ' + n + ' вне диапазона спецификации (24-78)');
   }
@@ -2164,6 +2179,7 @@ function onMIDI(ev){
     sustained.delete(d1);
     noteOwner.set(d1,'@ext');
     noteOn(d1,applySens(d2/127));
+    bumpNoteCnt(); /* счётчик: MIDI note-on (фильтры движка) */
   } else if(st===0x80||(st===0x90&&d2===0)){
     if(sustainOn){ sustained.add(d1); }
     else if(noteOwner.get(d1)==='@ext'){ noteOwner.delete(d1); noteOff(d1); }
@@ -2956,39 +2972,6 @@ function wavSeqRun(mode){
 
   mLcd('17-OUT: модуль инициализирован · NC выключен · MIDI не выбран');
   mLog('17-OUT: модуль инициализирован (id='+TAB_ID+')');
-  
-  /* ---------- СЧЁТЧИК НОТ, КЛАВИАТУРА 1 ---------- */
-let noteCnt=0;
-function cntEl(){ return document.getElementById('noteCnt1'); }
-function noteCntBump(){
-  noteCnt++;
-  const el=cntEl();
-  if(el) el.textContent=noteCnt;
-}
-/* мышь и тач по первой клавиатуре */
-const keys1=document.getElementById('keys');
-if(keys1) keys1.addEventListener('pointerdown',e=>{
-  if(e.target.closest&&e.target.closest('.wk,.bk')) noteCntBump();
-});
-/* ПК-клавиатура: движок играет «КЛАВИАТУРУ I — мышь и ПК».
-   Слушатель срабатывает ПОСЛЕ движкового: если движок принял ноту,
-   он успел поставить noteOwner.set(n, e.code) — по этому и отличаем нажатие. */
-document.addEventListener('keydown',e=>{
-  if(e.repeat) return;
-  if(typeof codeToNote!=='function'||typeof noteOwner==='undefined') return;
-  const n=codeToNote(e);
-  if(n>=0&&noteOwner.get(n)===e.code) noteCntBump();
-});
-/* СБРОС: клик по самому счётчику */
-(function(){
-  const badge=cntEl();
-  if(!badge) return;
-  badge.addEventListener('click',()=>{
-    noteCnt=0;
-    badge.textContent='0';
-    if(typeof lcd==='function') lcd('СЧЁТЧИК НОТ: СБРОС');
-  });
-})();
 })();
 
 </script>
@@ -3043,48 +3026,33 @@ document.addEventListener('keydown',e=>{
 })();
 </script>
 <script>
-/* ═══════════════ ЧИТ-КОД РАЗРАБОТЧИКА + СЧЁТЧИК НОТ (v1.4.13) ═══════════════
-   1) При старте: кнопки ОСЦИЛЛОГРАФ (tb7) и МОНИТОРЫ (tb8) прячутся.
-   2) Ввод «alisatyan» (регистр не важен): кнопки возвращаются + alert.
-   3) Повторный ввод: кнопки прячутся; если открыта отладочная вкладка —
-      выбор возвращается на ЗВУК (tb1), чтобы не остаться на скрытой панели.
-   4) Счётчик нажатых нот первой клавиатуры (#noteCnt1): мышь/тач по #keys
-      и ПК-клавиатура. Сброс — клик по самому счётчику. MIDI не учитывается. */
-
-/* ---------- ЧИТ-КОД: alisatyan ---------- *//*
-const SEQ='alisatyan';
-let buf='';
-let devOn=false;
-document.addEventListener('keydown',e=>{
-  if(e.repeat) return;
-  if(e.target&&e.target.closest&&e.target.closest('input,textarea,select')) return;
-  const k=e.key;
-  if(typeof k!=='string'||k.length!==1) return;
-  buf=(buf+k.toLowerCase()).slice(-SEQ.length);
-  if(buf!==SEQ) return;
-  buf='';
-  devOn=!devOn;
-  const l7=document.querySelector('label[for="tb7"]');
-  const l8=document.querySelector('label[for="tb8"]');
-  if(!l7||!l8) return;
-  l7.style.display=devOn?'flex':'none';
-  l8.style.display=devOn?'flex':'none';
-  const t7=document.getElementById('tb7'), t8=document.getElementById('tb8');
-  if(!devOn&&((t7&&t7.checked)||(t8&&t8.checked))){
-    const t1=document.getElementById('tb1');
-    if(t1) t1.checked=true;
-  }
-  alert(devOn?'СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВКЛЮЧЕН !!!':'СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВЫКЛЮЧЕН !!!');
-});
-
-/* старт: спрятать отладочные вкладки *//*
+/* ═══ ЧИТ-КОД: режим разработчика (v1.4.15) — прячет МОНИТОРЫ (tb8). Пароль: alisatyan ═══ */
 (function(){
-  const l7=document.querySelector('label[for="tb7"]');
-  const l8=document.querySelector('label[for="tb8"]');
-  if(l7) l7.style.display='none';
-  if(l8) l8.style.display='none';
-})();*/
-
+  const SEQ='alisatyan';
+  const lbl8=document.querySelector('label[for="tb8"]');
+  let buf='';
+  function hide(){ if(lbl8) lbl8.style.display='none'; }
+  function show(){ if(lbl8) lbl8.style.display='flex'; }
+  hide();
+  document.addEventListener('keydown',e=>{
+    if(e.repeat) return;
+    const t=e.target;
+    if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+    if(!e.key||e.key.length!==1) return;
+    buf=(buf+e.key.toLowerCase()).slice(-SEQ.length);
+    if(buf!==SEQ) return;
+    buf='';
+    if(lbl8&&lbl8.style.display!=='none'){
+      show();
+      alert('СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВКЛЮЧЕН !!!');
+    } else {
+      hide();
+      const tb8=document.getElementById('tb8');
+      if(tb8&&tb8.checked){ const tb1=document.getElementById('tb1'); if(tb1) tb1.checked=true; }
+      alert('СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВЫКЛЮЧЕН');
+    }
+  });
+})();
 </script>
 </body>
 </html>
