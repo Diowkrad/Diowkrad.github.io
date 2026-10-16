@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.6 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.8 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -36,8 +36,6 @@ html.th12{filter:hue-rotate(77deg)}   /* МЯТНЫЙ */
 #themeRow .thbtn[data-th=th10]{}
 #themeRow .thbtn[data-th=th11]{}
 #themeRow .thbtn[data-th=th12]{}
-
-
 
 
 *{box-sizing:border-box; margin:0; padding:0;}
@@ -269,10 +267,11 @@ body.kb-single .kbSec2{display:none;}
 input[name="tb"]{display:none;}
 
 /* СПРАВКА: компактные таблицы (v1.4.3) */
-.helptbl{width:100%; border-collapse:collapse; font-size:12px; margin:4px 0 10px;}
-.helptbl td, .helptbl th{border:1px solid var(--line2); padding:4px 8px; text-align:left;}
-.helptbl th{background:#244a0e; color:#e2f77e;}
-.helptbl .kbd{font-weight:bold; white-space:nowrap;}
+.hrow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:7px 2px; border-bottom:1px dashed var(--line);}
+.hrow:last-of-type{border-bottom:0;}
+.kcap{background:#071207; border:1px solid var(--line2); border-radius:4px; padding:4px 9px; color:var(--hot); text-shadow:0 0 6px rgba(155,188,15,.5); font-size:.72rem; letter-spacing:.05em; white-space:nowrap; box-shadow:0 0 8px rgba(139,172,15,.25); flex:0 0 auto;}
+.hdesc{color:var(--ink); font-size:.72rem; letter-spacing:.03em; flex:1 1 220px; min-width:180px;}
+.note{border-left:3px solid var(--line2); background:var(--panel2); padding:7px 10px; font-size:.68rem; color:var(--ink2); letter-spacing:.03em; border-radius:0 4px 4px 0;}
 .helpwrap{width:100%; min-height:10rem; background:var(--panel2); padding:10px 14px; overflow:auto;}
 
 
@@ -346,9 +345,9 @@ input[name="tb"]{display:none;}
     flex-wrap: nowrap;
 }
 
-
 #tb5:checked~#pane5{ display:none; }
 #kbdHdr{ display:none;}
+
 
 #tb6:checked~#pane6{
 	display: flex;
@@ -361,6 +360,23 @@ input[name="tb"]{display:none;}
     flex-wrap: nowrap;
     align-items: flex-start;
 }
+
+#tb6:checked~#pane6 .p_block {
+	display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .5);
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+	width: 50%;
+}
+
+
 #tb7:checked~#pane7{
 	display: flex;
     background: var(--panel2);
@@ -433,7 +449,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.7 «Medvedic Upgrade»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.8 «Medvedic Upgrade»</h1>
 	</header>
 
 
@@ -629,26 +645,22 @@ input[name="tb"]{display:none;}
   <section class="pane" id="pane6">
     <div class="p_block">
       <h2>НАМПАД И СТРЕЛКИ</h2>
-      <table class="helptbl">
-        <tr><th class="kbd">Num 7 / 8 / 9</th><td>Сустейн 1/8 / 1/4 / 1/2 (как кнопки пульта)</td></tr>
-        <tr><th class="kbd">Num 4 / 5 / 6</th><td>Туше SOFT / HARD / FIXED (по порядку кнопок на панели)</td></tr>
-        <tr><th class="kbd">Num + / Num −</th><td>Октава вверх / вниз (с границами диапазона)</td></tr>
-        <tr><th class="kbd">Num /</th><td>РОЛЛ: 1 ↔ 2 (смена числа клавиатур)</td></tr>
-        <tr><th class="kbd">Num *</th><td>РЯД: 1 ↔ 2 (смена раскладки)</td></tr>
-        <tr><th class="kbd">← / →</th><td>Октава вниз / вверх (стрелки)</td></tr>
-      </table>
-      <p style="font-size:12px;">NumLock: Num4–Num9 работают только с включённым NumLock. Num +/−, Num / и Num * от NumLock не зависят. При потере фокуса окна (alt-tab) все зажатые ноты глушатся автоматически.</p>
+      <div class="hrow"><span class="kcap">Num 7 / 8 / 9</span><span class="hdesc">Сустейн 1/8 / 1/4 / 1/2 (как кнопки пульта)</span></div>
+      <div class="hrow"><span class="kcap">Num 4 / 5 / 6</span><span class="hdesc">Туше SOFT / HARD / FIXED (по порядку кнопок на панели)</span></div>
+      <div class="hrow"><span class="kcap">Num + / Num −</span><span class="hdesc">Октава вверх / вниз (с границами диапазона)</span></div>
+      <div class="hrow"><span class="kcap">Num /</span><span class="hdesc">РОЛЛ: 1 ↔ 2 (смена числа клавиатур)</span></div>
+      <div class="hrow"><span class="kcap">Num *</span><span class="hdesc">РЯД: 1 ↔ 2 (смена раскладки)</span></div>
+      <div class="hrow"><span class="kcap">← / →</span><span class="hdesc">Октава вниз / вверх (стрелки)</span></div>
+      <div class="note">NumLock: Num4–Num9 работают только с включённым NumLock. Num +/−, Num / и Num * от NumLock не зависят. При потере фокуса окна (alt-tab) все зажатые ноты глушатся автоматически.</div>
     </div>
     <div class="p_block">
       <h2>НОТНЫЕ РЯДЫ И ПЕРЕКЛЮЧАТЕЛИ</h2>
-      <table class="helptbl">
-        <tr><th class="kbd">РЯД 1</th><td>Хроматика C4…F#5: A W S E D F T G Y H U J K O L P ; ' ]</td></tr>
-        <tr><th class="kbd">РЯД 2 низ</th><td>C4…F5: Z S X D C V G B H N J M , L . ; / '</td></tr>
-        <tr><th class="kbd">РЯД 2 верх</th><td>C5…F#6: Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ]</td></tr>
-        <tr><th class="kbd">КЛАВИАТУРА ВКЛ</th><td>При ВЫКЛ ПК-клавиши игнорируются — мышь и MIDI работают свободно</td></tr>
-        <tr><th class="kbd">Смена РОЛЛ / РЯД</th><td>Все зажатые ноты сбрасываются автоматически</td></tr>
-      </table>
-      <p style="font-size:12px;">Диапазон нот движка: 24–78. Ноты вне диапазона пишутся в журнал, звук не запускается.</p>
+      <div class="hrow"><span class="kcap">РЯД 1</span><span class="hdesc">Хроматика C4…F#5: A W S E D F T G Y H U J K O L P ; ' ]</span></div>
+      <div class="hrow"><span class="kcap">РЯД 2 низ</span><span class="hdesc">C4…F5: Z S X D C V G B H N J M , L . ; / '</span></div>
+      <div class="hrow"><span class="kcap">РЯД 2 верх</span><span class="hdesc">C5…F#6: Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ]</span></div>
+      <div class="hrow"><span class="kcap">КЛАВИАТУРА ВКЛ</span><span class="hdesc">При ВЫКЛ ПК-клавиши игнорируются — мышь и MIDI работают свободно</span></div>
+      <div class="hrow"><span class="kcap">Смена РОЛЛ / РЯД</span><span class="hdesc">Все зажатые ноты сбрасываются автоматически</span></div>
+      <div class="note">Диапазон нот движка: 24–78. Ноты вне диапазона пишутся в журнал, звук не запускается.</div>
     </div>
   </section>
 
