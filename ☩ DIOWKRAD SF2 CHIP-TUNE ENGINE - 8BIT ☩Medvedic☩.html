@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.10 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.11 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -449,7 +449,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.10 «Medvedic Upgrade»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.11 «Medvedic Upgrade»</h1>
 	</header>
 
 
@@ -2996,6 +2996,54 @@ function wavSeqRun(mode){
   if(typeof setKbMode==='function'){ const _skm=setKbMode; window.setKbMode=function(m){ _skm(m); syncPiano(); }; }
   if(typeof rollLockApply==='function'){ const _rla=rollLockApply; window.rollLockApply=function(){ _rla(); syncPiano(); }; }
   syncPiano();
+})();
+</script>
+
+<script>
+/* ═══ ЧИТ-КОД: РЕЖИМ РАЗРАБОТЧИКА (алиса) ═══ */
+(function(){
+  'use strict';
+  var SEQ = 'alisatyan';
+  var buf = '';
+  var on = false;
+  var labels = [];
+  function labels7(){
+    if(!labels.length){
+      var a = document.querySelectorAll('.tabbar label[for="tb7"],.tabbar label[for="tb8"]');
+      for(var i=0;i<a.length;i++) labels.push(a[i]);
+    }
+    return labels;
+  }
+  function hide(){
+    on = false;
+    labels7().forEach(function(l){ l.style.display = 'none'; });
+    // если осталась открытой скрытая отладочная панель — возвращаем ЗВУК
+    var t7 = document.getElementById('tb7');
+    var t8 = document.getElementById('tb8');
+    var t1 = document.getElementById('tb1');
+    if(t7 && t7.checked && t1) t1.checked = true;
+    else if(t8 && t8.checked && t1) t1.checked = true;
+  }
+  function show(){
+    on = true;
+    labels7().forEach(function(l){ l.style.display = 'flex'; });
+    alert('СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВКЛЮЧЕН !!!');
+  }
+  // при старте прячем отладочные вкладки
+  hide();
+  document.addEventListener('keydown', function(e){
+    if(e.repeat) return;
+    var t = e.target;
+    if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    if(e.key && e.key.length === 1){
+      buf = (buf + e.key.toLowerCase()).slice(-SEQ.length);
+      if(buf === SEQ){
+        buf = '';
+        if(on) hide(); else show();
+        if(!on) alert('СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВЫКЛЮЧЕН !!!');
+      }
+    }
+  });
 })();
 </script>
 </body>

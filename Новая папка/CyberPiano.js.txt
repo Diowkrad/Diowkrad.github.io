@@ -1,0 +1,23 @@
+/* ХОСТ: подсветка ПИАНО РОЛЛА + кнопки 1/2 КЛАВИАТУРЫ. Ставится ПОСЛЕ двигла. */
+(function(){
+  const kb1=document.getElementById('piKb1'),
+        kb2=document.getElementById('piKb2'),
+        roll=document.getElementById('piRoll');
+  function syncPiano(){
+    const single=document.body.classList.contains('kb-single');
+    kb1&&kb1.classList.toggle('on',single);
+    kb2&&kb2.classList.toggle('on',!single);
+    if(roll){
+      const rl=document.getElementById('rollLock');
+      const locked=rl?rl.classList.contains('on'):false;
+      roll.textContent='СКРОЛЛ: '+(locked?'ЗАКРЫТ':'ОТКРЫТ');
+      roll.classList.toggle('on',locked);
+    }
+  }
+  if(kb1) kb1.addEventListener('click',()=>{ if(typeof setKbMode==='function') setKbMode(1); syncPiano(); });
+  if(kb2) kb2.addEventListener('click',()=>{ if(typeof setKbMode==='function') setKbMode(2); syncPiano(); });
+  if(roll) roll.addEventListener('click',()=>{ const rl=document.getElementById('rollLock'); rl&&rl.click(); });
+  if(typeof setKbMode==='function'){ const _skm=setKbMode; window.setKbMode=function(m){ _skm(m); syncPiano(); }; }
+  if(typeof rollLockApply==='function'){ const _rla=rollLockApply; window.rollLockApply=function(){ _rla(); syncPiano(); }; }
+  syncPiano();
+})();

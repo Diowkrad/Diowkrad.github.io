@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.10 «Medvedic Upgrade»</title>
+<style>
+	<!-- ═══ Здесь лежат стили . Cyberpunk.css  ═══ -->
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ШАПКА -->
+	<header class="panel">
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.10 «Medvedic Upgrade»</h1>
+	</header>
+
+
+	<div class="rendring">
+<input type="radio" name="tb" id="tb1" checked>
+<input type="radio" name="tb" id="tb2">
+<input type="radio" name="tb" id="tb3">
+<input type="radio" name="tb" id="tb4">
+<input type="radio" name="tb" id="tb5">
+<input type="radio" name="tb" id="tb6">
+<input type="radio" name="tb" id="tb7">
+<input type="radio" name="tb" id="tb8">
+
+	<nav class="tabbar">
+		<span class="tag">РЕЖИМ: Движка</span>
+		<button id="btnChip" class="on">CHIP-TUNE</button>
+		<button id="btnSf2">SOUNDFONT</button>
+		<button id="btnMidi">MIDI GM</button>
+	</nav>
+<nav class="tabbar">
+  <label for="tb1">ЗВУК</label>
+  <label for="tb2">ПУЛЬТ</label>
+  <label for="tb3">ПАРСЕРЫ</label>
+  <label for="tb4">ТЕМЫ</label>
+  <label for="tb5">GUI-OFF</label>
+<label for="tb6">УПРАВЛЕНИЕ</label>
+<label for="tb7">ОСЦИЛЛОГРАФ</label>
+<label for="tb8">МОНИТОРЫ</label>
+</nav>
+
+<!-- ═══ ВКЛАДКА 1: ЗВУК ═══ -->
+<section class="pane" id="pane1">
+  <div class="p_block" id="wavePanel">
+			<div>
+				<button class="wbtn" data-wave="square">▣ КВАДРАТ</button>
+				<button class="wbtn" data-wave="pulse50">□ КВАДРАТ 50%</button>
+				<button class="wbtn" data-wave="pulse25">□ КВАДРАТ 25%</button>
+				<button class="wbtn" data-wave="pulse12">□ КВАДРАТ 12,5%</button>
+				<button class="wbtn" data-wave="pulse6">□ КВАДРАТ 6,25%</button>
+			</div>
+			<div>
+				<button class="wbtn" data-wave="tri">△ ТРЕУГОЛЬНИК</button>
+				<button class="wbtn" data-wave="triBass">▲ ТРЕУГОЛЬНИК БАС</button>
+				<button class="wbtn" data-wave="saw">◺ ПИЛА</button>
+				<button class="wbtn" data-wave="sawBass">◣ ПИЛА БАС</button>
+				<button class="wbtn" data-wave="noiseL">▩ NOISE </button>
+			</div>
+			<div>
+
+				<button class="wbtn" data-wave="sine">∿ СИНУС</button>
+				<button class="wbtn" data-wave="sineBass">〽︎ СИНУС БАС</button>
+				<button class="wbtn" data-wave="pulseR">〇 КРУГ</button>
+				<button class="wbtn" data-wave="nwave">⎚ N-ВОЛНА</button>
+				<button class="wbtn" data-wave="noiseS">▦ NOISE</button>
+			</div>
+			
+			
+	</div>
+	<div class="p_block" >
+		
+			<div><button id="octDn">ОКТАВА: −</button><button id="octUp">ОКТАВА: +</button></div>
+			<div>
+		
+          <button id="susBtn8">Sus: 1/8</button><button id="susBtn4">Sus: 1/4</button><button id="susBtn2">Sus: 1/2</button>
+        </div>
+        <div>
+          <button id="sensSoft">SOFT</button><button id="sensHard" class="on">HARD</button><button id="sensFixed">FIXED</button>
+        </div>
+         <div>
+          <button id="kb1">РОЛЛ: 1</button><button id="kb2" class="on">РОЛЛ:2</button>
+          <button id="lay1">РЯД: 1</button><button id="lay2">РЯД: 2</button>
+		 </div>
+          <div>
+          <button id="kbToggle">КЛАВИАТУРА: ВКЛ</button>
+        
+        
+          <button id="rollLock">🔒 ЛОК ПИАОЛРОЛЛА</button>
+          <button id="panicBtn" style="color:#c84a3a;">■ PANIC</button>
+        </div>
+		</div>
+		<div class="p_block" id="bend_sing">
+		<div class="row">
+		  <div>
+			<span class="tag">ГРОМКОСТЬ:</span>
+			<input type="range" id="vol" min="0" max="100" value="70">
+		  </div>
+		 </div>
+		<div class="row">
+		  <div>
+		  <span class="tag" style="min-width:0;">ПИТЧ-БЕНД:</span>
+			  <input type="range" id="bend" min="-400" max="400" value="0">
+			  <span class="lbl" id="bendLbl">0 ц</span>
+		  </div>
+		</div>
+		<div class="row">
+		<div> 
+			<span class="tag">ТЕМП:</span><input type="range" id="bpm" min="40" max="300" value="120">
+			<span class="lbl" id="bpmVal">120 BPM</span>
+		</div>
+	  </div> 
+	</div>
+  
+	
+</section>
+
+<!-- ═══ ВКЛАДКА 2: ПУЛЬТ ═══ -->
+<section class="pane" id="pane2">
+  <div class="p_block" >
+	
+	<h2>ТЕСТОВЫЙ СТЕНД WAV — ПОЛНАЯ ОБВЯЗКА</h2>
+      <div class="row" id="wavPanel">
+        <button class="wbtn" id="wavRec">● ЗАПИСЬ</button>
+        <button class="wbtn" id="wavStop">■ СТОП</button>
+        <button class="wbtn" id="wavExport">⬇ ЭКСПОРТ WAV</button>
+        <span class="tag">ВРЕМЯ:</span><span class="badge" id="wavTime">0.0 с</span>
+      </div>
+      <div class="row" id="wavPanel2">
+        <button class="wbtn" id="wavTone">♪ ТОН C4</button>
+        <button class="wbtn" id="wavScale">♪ ГАММА C-МАЖОР</button>
+        <button class="wbtn" id="wavNoise">♪ ШУМ L/S</button>
+        <button class="wbtn" id="wavVoices">♪ ПРОГОН 15 ГОЛОСОВ</button>
+      </div>
+      <div class="lcd" id="wavLcd">16-WAV: нажмите любой тест — контекст стартует по клику</div>
+	
+  </div>
+  <div class="p_block" >
+		 <button id="midiBtn">ПОДКЛЮЧИТЬ MIDI</button>
+	<span class="tag">УСТРОЙСТВО:</span><select id="midiSel" style="flex:1;"></select>
+      <h2>MIDI OUT — NC-КАНАЛ И MIDI-ПОРТ (17)</h2>
+      <div class="row">
+        <span class="tag">NC:</span>
+        <button id="moutTx">⟶ NC ПЕРЕДАЧА</button>
+        <button id="moutRx">⟵ NC ПРИЁМ</button>
+        <span class="tag">MIDI:</span>
+        <button id="moutScan">⟳ СКАН MIDI</button>
+        <select id="moutPort" style="min-width:170px;"><option value="">— нет выхода —</option></select>
+      </div>
+      <div class="lcd" id="moutLcd">17-OUT: инициализация…</div>
+    
+	
+	</div>
+</section>
+
+<!-- ═══ ВКЛАДКА 3: ПАРСЕРЫ ═══ -->
+<section class="pane" id="pane3">
+  
+	 <div class="p_block" >
+	<div>
+	<h2>CHIP-TUNE</h2>
+	<select id="chipVoiceSel" style="min-width:170px;"></select>
+	<button id="btnArp">♪ АРПЕДЖИО (C-мажор)</button></div>
+	</div>
+	<div class="p_block" >
+        <div><h2>SOUNDFONT</h2>
+        <input type="file" id="sf2file" accept=".sf2,.sf3" style="flex:1;">
+        <span class="tag">БАНК:</span><select id="bankSel" style="flex:1;"></select>
+        <span class="tag">ПРЕСЕТ:</span><select id="presetSel" style="flex:1;"></select>
+        <span class="tag">ИНСТР.:</span><select id="instSel" style="flex:1;"></select></div>
+    </div>
+	<div class="p_block" >
+
+   <div>
+     <h2>MIDI GM × 128</h2>
+     <span class="tag">ГОЛОС:</span><select id="midiVoiceSel" style="flex:1;"></select></div>
+  </div>
+
+</section>
+
+<!-- ═══ ВКЛАДКА 4: ТЕМЫ ═══ -->
+<section class="pane" id="pane4">
+	<div class="row_bg" id="themeRow">
+		<button class="thbtn" data-th="">ЗЕЛЁНЫЙ</button>
+		<button class="thbtn" data-th="th2">ЖЁЛТЫЙ</button>
+		<button class="thbtn" data-th="th3">ЯНТАРЬ</button>
+		<button class="thbtn" data-th="th4">ОРАНЖЕВЫЙ</button>
+		<button class="thbtn" data-th="th5">КРАСНЫЙ</button>
+		<button class="thbtn" data-th="th6">РОЗОВЫЙ</button>
+		<button class="thbtn" data-th="th7">МАГЕНТА</button>
+		<button class="thbtn" data-th="th8">ФИОЛЕТОВЫЙ</button>
+		<button class="thbtn" data-th="th9">СИНИЙ</button>
+		<button class="thbtn" data-th="th10">ГОЛУБОЙ</button>
+		<button class="thbtn" data-th="th11">ЦИАН</button>
+		<button class="thbtn" data-th="th12">МЯТНЫЙ</button>
+  </div>
+</section>
+
+<!-- ═══ ВКЛАДКА 5: GUI-OFF ═══ -->
+<section class="pane" id="pane5">
+	<!-- ═══ ПУСТОЙ СЕЛЕКТОР ВЫКЛЮЧАЮЩИЙ ВСЕ НЕНУЖНЫЕ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ ═══ -->
+</section>
+<!-- ═══ ВКЛАДКА 6: УПРАВЛЕНИЕ ═══ -->
+  <section class="pane" id="pane6">
+    <div class="p_block">
+      <h2>НАМПАД И СТРЕЛКИ</h2>
+      <div class="hrow"><span class="kcap">Num 7 / 8 / 9</span><span class="hdesc">Сустейн 1/8 / 1/4 / 1/2 (как кнопки пульта)</span></div>
+      <div class="hrow"><span class="kcap">Num 4 / 5 / 6</span><span class="hdesc">Туше SOFT / HARD / FIXED (по порядку кнопок на панели)</span></div>
+      <div class="hrow"><span class="kcap">Num + / Num −</span><span class="hdesc">Октава вверх / вниз (с границами диапазона)</span></div>
+      <div class="hrow"><span class="kcap">Num /</span><span class="hdesc">РОЛЛ: 1 ↔ 2 (смена числа клавиатур)</span></div>
+      <div class="hrow"><span class="kcap">Num *</span><span class="hdesc">РЯД: 1 ↔ 2 (смена раскладки)</span></div>
+      <div class="hrow"><span class="kcap">← / →</span><span class="hdesc">Октава вниз / вверх (стрелки)</span></div>
+      <div class="note">NumLock: Num4–Num9 работают только с включённым NumLock. Num +/−, Num / и Num * от NumLock не зависят. При потере фокуса окна (alt-tab) все зажатые ноты глушатся автоматически.</div>
+    </div>
+    <div class="p_block">
+      <h2>НОТНЫЕ РЯДЫ И ПЕРЕКЛЮЧАТЕЛИ</h2>
+      <div class="hrow"><span class="kcap">РЯД 1</span><span class="hdesc">Хроматика C4…F#5: A W S E D F T G Y H U J K O L P ; ' ]</span></div>
+      <div class="hrow"><span class="kcap">РЯД 2 низ</span><span class="hdesc">C4…F5: Z S X D C V G B H N J M , L . ; / '</span></div>
+      <div class="hrow"><span class="kcap">РЯД 2 верх</span><span class="hdesc">C5…F#6: Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ]</span></div>
+      <div class="hrow"><span class="kcap">КЛАВИАТУРА ВКЛ</span><span class="hdesc">При ВЫКЛ ПК-клавиши игнорируются — мышь и MIDI работают свободно</span></div>
+      <div class="hrow"><span class="kcap">Смена РОЛЛ / РЯД</span><span class="hdesc">Все зажатые ноты сбрасываются автоматически</span></div>
+      <div class="note">Диапазон нот движка: 24–78. Ноты вне диапазона пишутся в журнал, звук не запускается.</div>
+    </div>
+  </section>
+<!-- ═══ ВКЛАДКА 7: ОСЦИЛЛОГРАФ ═══ -->
+  <section class="pane" id="pane7">
+    <div class="p_block">
+      <canvas id="scope" width="700" height="350"></canvas>
+    </div>
+	<div class="p_block">
+      
+      
+      <div class="row" id="scope2Panel">
+        <button class="wbtn on" id="sc2Wave">~ ВОЛНА</button>
+        <button class="wbtn" id="sc2Spec">ıı СПЕКТР</button>
+        <button class="wbtn" id="sc2XY">⊗ ФИГУРА</button>
+        <button class="wbtn" id="sc2Freeze">❄ СТОП</button>
+      </div>
+    </div>
+	<div class="p_block">
+      <canvas id="scope2" width="700" height="350"></canvas>
+    </div>
+  </section>
+	<!-- ═══ ВКЛАДКА 8: МОНИТОРЫ ═══ -->
+  <section class="pane" id="pane8">
+    
+      <div class="p_block" >
+			<div>
+				<div class="lcd" id="lcd2">CHIP — ГОТОВ</div>
+				<div class="lcd" id="lcd">СИСТЕМА: ГОТОВА !!! Включен эксперементальный режим !!!</div>
+			</div>
+			<div>
+				<div class="logbox" id="log"></div>
+				<div class="row" id="adPanel">
+					<button class="wbtn" id="adFreeze">❄ СТОП-ТЕСТ</button>
+					<button class="wbtn" id="adResume">▶ ВОЗОБН.</button>
+				</div>
+				<div class="logbox" id="adLog" ></div>
+			</div>
+			<div>
+				<div class="lcd" id="adLcd">AUDIO: контекст ещё не создан</div>
+				<div class="lcd" id="sc2Lcd">OSC: ожидание контекста</div>
+			</div>
+	</div>
+  </section>
+
+	</div>
+
+  <!-- КЛАВИАТУРЫ -->
+  <div class="panel">
+     <div class="kbSec_ponel">  <span class="rollrow">
+      <button id="piKb1">1 КЛАВИАТУРА</button>
+      <button id="piKb2" class="on">2 КЛАВИАТУРЫ</button>
+      <button id="piRoll">СКРОЛЛ: ОТКРЫТ</button>
+    </span> <span class="badge" id="voiceCnt">0</span></div>
+    <div id="kbdHdr"></div>
+    <div class="kbSec1">
+      <div class="kwrap" id="wrap1"><div id="keys"></div></div>
+      <div class="strip" id="strip1"><div class="tape-thumb"></div></div>
+    </div>
+    <div class="kbSec2" style="margin-top:12px;">
+		<div class="kbSec_ponel" ><span class="tag">FPS:</span><span class="badge" id="fpsDisplay">0</span></div>
+      <div class="kwrap" id="wrap2"><div id="keys2"></div></div>
+      <div class="strip" id="strip2"><div class="tape-thumb"></div></div>
+    </div>
+  </div>
+
+
+
+	<!-- ═══  Следите за порядком подключения скриптов   ═══ -->
+	<!-- ═══  Не правельный порядко может работать не корректно   ═══ -->
+
+<!-- ═══ Здесь подключаеться движок . Medvedic.js  ═══ -->
+<script>
+	
+</script>
+
+	<!-- ═══ Здесь подключаеться движок для управления стилями . Cyberpunk.js  ═══ -->
+<script> 
+	
+</script>
+
+	<!-- ═══ Здесь подключаеться модуль для корректеой работы Пианоролла . CyberPiano.js  ═══ -->
+<script>
+	
+</script>
+
+</body>
+</html>
