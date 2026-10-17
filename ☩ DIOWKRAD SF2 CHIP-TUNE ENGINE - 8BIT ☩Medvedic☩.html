@@ -595,29 +595,30 @@ input[name="tb"]{display:none;}
         <button class="wbtn" id="wavExport">⬇ ЭКСПОРТ WAV</button>
         <span class="tag">ВРЕМЯ:</span><span class="badge" id="wavTime">0.0 с</span>
       </div>
-      <div class="row" id="wavPanel2">
+      <div class="lcd" id="wavLcd">16-WAV: нажмите любой тест — контекст стартует по клику</div>
+		<div class="row" id="wavPanel2">
         <button class="wbtn" id="wavTone">♪ ТОН C4</button>
         <button class="wbtn" id="wavScale">♪ ГАММА C-МАЖОР</button>
+		<button id="btnArp">♪ АРПЕДЖИО (C-мажор)</button>
         <button class="wbtn" id="wavNoise">♪ ШУМ L/S</button>
         <button class="wbtn" id="wavVoices">♪ ПРОГОН 15 ГОЛОСОВ</button>
       </div>
-      <div class="lcd" id="wavLcd">16-WAV: нажмите любой тест — контекст стартует по клику</div>
-	
   </div>
   <div class="p_block" >
 		 <button id="midiBtn">ПОДКЛЮЧИТЬ MIDI</button>
 	<span class="tag">УСТРОЙСТВО:</span><select id="midiSel" style="flex:1;"></select>
       <h2>MIDI OUT — NC-КАНАЛ И MIDI-ПОРТ (17)</h2>
-      <div class="row">
+     
+      <div class="lcd" id="moutLcd">17-OUT: инициализация…</div>
+	<div class="row">
+		<select id="moutPort" style="min-width:170px;"><option value="">— нет выхода —</option></select>
         <span class="tag">NC:</span>
         <button id="moutTx">⟶ NC ПЕРЕДАЧА</button>
         <button id="moutRx">⟵ NC ПРИЁМ</button>
         <span class="tag">MIDI:</span>
         <button id="moutScan">⟳ СКАН MIDI</button>
-        <select id="moutPort" style="min-width:170px;"><option value="">— нет выхода —</option></select>
-      </div>
-      <div class="lcd" id="moutLcd">17-OUT: инициализация…</div>
-    
+        
+     </div>
 	
 	</div>
 </section>
@@ -629,7 +630,7 @@ input[name="tb"]{display:none;}
 	<div>
 	<h2>CHIP-TUNE</h2>
 	<select id="chipVoiceSel" style="min-width:170px;"></select>
-	<button id="btnArp">♪ АРПЕДЖИО (C-мажор)</button></div>
+	</div>
 	</div>
 	<div class="p_block" >
         <div><h2>SOUNDFONT</h2>
