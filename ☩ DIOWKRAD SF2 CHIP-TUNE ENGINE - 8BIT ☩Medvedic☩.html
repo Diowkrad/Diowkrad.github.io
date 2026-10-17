@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.20 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.21 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -477,7 +477,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.20 «Medvedic Upgrade»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.21 «Medvedic Upgrade»</h1>
 	</header>
 
 
@@ -744,7 +744,7 @@ input[name="tb"]{display:none;}
       <button id="piRoll">СКРОЛЛ: ОТКРЫТ</button>
     </span>
 	<span class="tag">Нот нажато:</span>
-	<span class="badge" id="noteCnt" title="Счётчик нажатых нот (клавиатура 1). Клик по счётчику — СБРОС.">0
+	<span class="badge" id="noteCnt" title="Счётчик нажатых нот (обе клавиатуры). Клик по счётчику — СБРОС.">0
 	</span> 
 	<span class="tag">Нот звучит:</span>
 	<span class="badge" id="voiceCnt">0
@@ -1783,7 +1783,7 @@ function attachKb(box){
     const relY=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));
     const vel=applySens(relY);
     ensureAudio(); noteOwner.set(+el.dataset.key,'@ext'); noteOn(+el.dataset.key,vel);
-    if(box.id==='keys') bumpNoteCnt();
+    if(box.id==='keys'||box.id==='keys2') bumpNoteCnt(); /* v1.4.21: счётчик — обе клавиатуры */
     try{el.setPointerCapture(e.pointerId);}catch(_){}
   });
   const up=e=>{
@@ -1793,7 +1793,7 @@ function attachKb(box){
   box.addEventListener('pointerup',up);
   box.addEventListener('pointercancel',up);
 }
-/* ═══ СЧЁТЧИК НАЖАТЫХ НОТ (клавиатура 1) — v1.4.16 ═══ */
+/* ═══ СЧЁТЧИК НАЖАТЫХ НОТ (обе клавиатуры) — v1.4.16/21 ═══ */
 const noteCntEl=document.getElementById('noteCnt');
 let noteCnt=0;
 function bumpNoteCnt(){ noteCnt++; if(noteCntEl) noteCntEl.textContent=String(noteCnt); }
@@ -2136,7 +2136,7 @@ document.addEventListener('keydown', e => {
     ensureAudio(); // Активируем аудио-контекст
     noteOwner.set(n, e.code); 
     noteOn(n, 100); // Запускаем звук
-    bumpNoteCnt(); // счётчик нажатых нот (клавиатура 1)
+    bumpNoteCnt(); // счётчик нажатых нот
   } else if (n >= 0) {
     log('Нота ПК ' + n + ' вне диапазона спецификации (24-78)');
   }
