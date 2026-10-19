@@ -1,0 +1,3401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.28 «This is Rock»</title>
+<style>
+:root{
+  --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
+  --line:#1d3a1d; --line2:#174a17;
+  --ink:#8bac0f; --ink2:#5a7a0a;
+  --hot:#9bbc0f; --font:'Courier New',Courier,monospace;
+}
+
+html.th2{filter:hue-rotate(-18deg)}   /* ЖЁЛТЫЙ */
+html.th3{filter:hue-rotate(-33deg)}   /* ЯНТАРЬ */
+html.th4{filter:hue-rotate(-45deg)}   /* ОРАНЖЕВЫЙ */
+html.th5{filter:hue-rotate(-73deg)}   /* КРАСНЫЙ */
+html.th6{filter:hue-rotate(-103deg)}  /* РОЗОВЫЙ */
+html.th7{filter:hue-rotate(-133deg)}  /* МАГЕНТА */
+html.th8{filter:hue-rotate(-158deg)}  /* ФИОЛЕТОВЫЙ */
+html.th9{filter:hue-rotate(142deg)}   /* СИНИЙ */
+html.th10{filter:hue-rotate(122deg)}  /* ГОЛУБОЙ */
+html.th11{filter:hue-rotate(107deg)}  /* ЦИАН */
+html.th12{filter:hue-rotate(77deg)}   /* МЯТНЫЙ */
+
+#themeRow .thbtn{padding:6px 9px;}
+#themeRow .thbtn[data-th=th2]{}
+#themeRow .thbtn[data-th=th3]{}
+#themeRow .thbtn[data-th=th4]{}
+#themeRow .thbtn[data-th=th5]{}
+#themeRow .thbtn[data-th=th6]{}
+#themeRow .thbtn[data-th=th7]{}
+#themeRow .thbtn[data-th=th8]{}
+#themeRow .thbtn[data-th=th9]{}
+#themeRow .thbtn[data-th=th10]{}
+#themeRow .thbtn[data-th=th11]{}
+#themeRow .thbtn[data-th=th12]{}
+
+
+span.tag {
+    display: flex;
+    margin: 3px 5px;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+body{background:var(--bg); color:var(--ink); font-family:var(--font); font-size:14px; line-height:1.35; padding:3px;}
+body::after{content:''; position:fixed; inset:0; pointer-events:none; z-index:99;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px);}
+h1{font-size:1rem; letter-spacing:.12em; color:var(--hot);}
+h2{font-size:.75rem; letter-spacing:.1em; color:var(--ink2);
+   border-bottom:1px solid var(--line); padding-bottom:4px; margin:10px 0 8px;}
+#app{max-width:1920px; margin:0 auto; display:flex; flex-direction:column; gap:3px;}
+
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px;
+  box-shadow:inset 0 0 24px rgba(0,0,0,.5);}
+.row{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:6px 0;}
+.row>.tag{color:var(--ink2); font-size:.7rem; letter-spacing:.08em; min-width:96px;}
+.lcd{background:#071207; border:1px solid var(--line2); border-radius:4px; color:var(--hot);
+  font-family:var(--font); font-size:.78rem; padding:8px 10px; letter-spacing:.05em;
+  white-space:pre-wrap; text-shadow:0 0 6px rgba(155,188,15,.55); min-height:34px;}
+button{    font-family: var(--font);
+    font-size: .72rem;
+    letter-spacing: .04em;
+    background: var(--panel2);
+    color: var(--ink);
+    border: 1px solid var(--line2);
+    border-radius: 8px;
+    padding: 7px 10px;
+    cursor: pointer;
+    box-shadow: 2px 2px 6px rgb(139 172 15 / 30%);
+    text-shadow: 3px 3px 6px rgb(0 138 20);}
+button:hover{background:#16240f; color:var(--hot);}
+button.on{background:#244a0e; color:#e2f77e; border-color:var(--ink2); box-shadow:0 0 8px rgba(139,172,15,.4);}
+button:active{transform:translateY(1px);}
+.wbtn{padding:5px 8px; font-size:0.66rem; min-width:64px;}
+select,input[type=file]{font-family:var(--font); font-size:.72rem; background:#071207; color:var(--hot);
+  border:1px solid var(--line2); border-radius:4px; padding:5px 8px; max-width:100%;}
+input[type=range]{accent-color:var(--ink); width:280px;}
+.lbl{
+	font-size: 0.75rem;
+	pointer-events: none;
+    padding-bottom: 3px;
+    margin-bottom: 3px;
+    user-select: none;
+	
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+    text-align: center;}
+.badge{    display: inline-block;
+    background: #071207;
+    border: 1px solid var(--line2);
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: .85rem;
+    color: var(--hot);
+    min-width: 70px;
+    text-align: center;
+    margin: 0 4px;}
+.logbox{background:#071207; border:1px solid var(--line); border-radius:4px; font-size:    font-size: 0.78rem;
+  color:var(--ink2); padding:6px 8px; height:150px; overflow-y:auto; line-height:1.45;}
+.logbox hr{border:0; border-top:1px solid #132713; margin:2px 0;}
+.logbox::-webkit-scrollbar{width:6px;}
+.logbox::-webkit-scrollbar-thumb{background:var(--line2);}
+/* --- клавиатура --- */
+.kwrap{overflow-x:auto; overflow-y:hidden; width:100%; position:relative; border:1px solid var(--line);
+  border-radius:4px; background:#0a120a; padding:2px;}
+.kwrap::-webkit-scrollbar{height:8px;}
+.kwrap::-webkit-scrollbar-thumb{background:var(--line2);}
+.wk{position:absolute; width:58px; height:152px;
+  background:linear-gradient(#f2f5e4,#c6cfab); border:1px solid #4a554a;
+  border-radius:0 0 4px 4px; cursor:pointer;
+  display:flex; align-items:flex-end; justify-content:center;
+  CORNER-SHAPE: SUPERELLIPSE(0.3);
+    border-radius: 0px 0px 10px 10px;
+  }
+.wk .lbl{font-size:0.75rem; color:#3a4438; pointer-events:none; padding-bottom:3px;
+	user-select:none; -webkit-user-select:none;
+  -webkit-touch-callout:none; -webkit-user-drag:none;
+	color: #ffffff;
+    pointer-events: none;
+    text-shadow: 2px 2px 6px #00000080;
+    background: #00000080;
+    text-emphasis-style: "☩";
+    border-radius: 8px;
+    CORNER-SHAPE: SUPERELLIPSE(-0.7);
+    border: 1px double #226611;
+	border-radius: 8px;
+    CORNER-SHAPE: SUPERELLIPSE(-0.7);
+    border: 1px double var(--ink);
+    width: 90%;
+    color: #ffffff;
+    text-align: center;
+}
+.wk.act{background:var(--hot);}
+.bk{position:absolute; width:36px; height:94px; background:#181f18; border:1px solid #000;
+  border-radius:0 0 3px 3px; z-index:2; cursor:pointer;    CORNER-SHAPE: SUPERELLIPSE(0.4);
+    border-radius: 0px 0px 12px 12px;}
+.bk.act{background:var(--ink2); box-shadow:0 0 8px rgba(139,172,15,.5);}
+.strip{position:relative; height:20px; background:#0e150e; border:1px solid var(--line);
+  border-radius:4px; margin-top:6px;}
+.tape-thumb{position:absolute; top:2px; height:14px; min-width:24px; background:#2d6a2d;
+  border:1px solid var(--ink2); border-radius:3px; cursor:grab; touch-action:none;}
+body.kb-single .kbSec2{display:none;}
+
+/* ☩ ЧЕЛЛЕНДЖ-ЛОГ ☩ Баг (v1.0.26): -webkit-tap-highlight-color работает
+   только на сенсорных устройствах. Без адаптива селектор слеп на десктопе
+   и бесполезен. Обёрнут в @media (pointer: coarse) — живёт строго на таче. */
+@media (pointer: coarse) {
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+}
+/* МОБИЛЬНЫЙ РОЛЛ v1.0.37: на экранах до 768px высота ролла 75% —
+   scaleY(0.75) сжимает только по вертикали (152→114 у белых, 94→70.5 у чёрных),
+   ширина и ленты не тронуты — бегунок остаётся синхронен клавиатуре */
+@media (max-width:768px){
+  #keys, #keys2{ transform:scaleY(0.75); transform-origin:top left; }
+  .kwrap{ height:114px; }
+}
+
+.row_bg{    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 2px 14px;
+    justify-content: space-between;
+    padding-top: 14px;}
+.row_bg>.tag{color:var(--ink2); font-size:.7rem; letter-spacing:0.08em; min-width:96px;}
+.row_bg button{
+	
+    width: 6rem;
+    height: 2rem;
+}
+.tabbar input{display:none;}
+
+.tabbar{
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .5);
+    align-items: center;
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-direction: row;
+}
+.tabbar span{
+	font-family: var(--font);
+    font-size: .72rem;
+    letter-spacing: 0.04em;
+    background: var(--panel2);
+    color: var(--ink);
+    border: 1px solid var(--line2);
+    border-radius: 4px;
+    padding: 7px 10px;
+    cursor: crosshair;
+}
+
+
+.tabbar label{
+  font-family:var(--font); font-size:.72rem; letter-spacing:.05em;
+  background:var(--panel2); color:var(--ink);
+  border:1px solid var(--line2); border-radius:4px;
+  padding:7px 14px; cursor:pointer;
+  user-select:none; -webkit-user-select:none;
+}
+.tabbar label:hover{background:#16240f; color:var(--hot);}
+.tabbar label:active{transform:translateY(1px);}
+
+/* активная вкладка — тот же вид, что button.on */
+#tb1:checked~.tabbar label[for="tb1"],
+#tb2:checked~.tabbar label[for="tb2"],
+#tb3:checked~.tabbar label[for="tb3"],
+#tb4:checked~.tabbar label[for="tb4"],
+#tb6:checked~.tabbar label[for="tb6"],
+#tb7:checked~.tabbar label[for="tb7"],
+#tb8:checked~.tabbar label[for="tb8"],
+#tb5:checked~.tabbar label[for="tb5"]{
+  background:#244a0e; color:#e2f77e;
+  border-color:var(--ink2);
+  box-shadow:0 0 8px rgba(139,172,15,.4);
+}
+
+/* панели: скрыты по умолчанию, показывается только выбранная */
+.pane{display:none; flex-direction:column; gap:10px; align-items:stretch;}
+#tb1:checked~#pane1,
+#tb2:checked~#pane2,
+#tb3:checked~#pane3,
+#tb4:checked~#pane4,
+#tb5:checked~#pane5,
+#tb6:checked~#pane6,
+#tb7:checked~#pane7,
+#tb9:checked~#pane9,#tb8:checked~#pane8{display:flex;
+    background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:10px;
+}
+
+.p_block{
+	display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: inset 0 0 24px rgba(0,0,0,.5);
+    min-width: 0;overflow: auto;
+}
+/* "голые" дивы внутри блока = строки (авто-ряды) */
+.p_block>div{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;    
+}
+
+.p_block button{
+    font-size: 14px;
+    padding: 10px 14px;
+    text-align: center;
+    white-space: nowrap;
+	
+}
+.p_block .tag{
+    color: var(--ink2);
+    font-size: .72rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    padding: 4px 2px;
+    border-bottom: 2px solid var(--line2);
+    margin-bottom: 5px;
+}
+
+.p_block .lcd{
+    flex: 1 1;
+    max-width: 100%;
+    min-height: 36px;
+    height: 176px;
+    max-height: 240px;
+    margin: 0;
+}
+
+.p_block .tag {
+    color: var(--ink2);
+    font-size: .72rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    padding: 4px 2px;
+    border-bottom: 2px solid var(--line2);
+    margin-bottom: 5px;
+}
+
+
+.p_block .logbox{
+    flex: 1 0;
+    max-width: 100%;
+    min-height: 36px;
+    height: 176px;
+    max-height: 240px;
+    margin: 0;
+}
+
+
+
+.p_block button.on{
+	background:#244a0e; color:#e2f77e; border-color:var(--ink2); box-shadow:0 0 8px rgba(139,172,15,.4);
+}
+.p_block button:active{transform:translateY(1px);}
+
+
+.p_block h2{
+    flex: 0 0 100%;
+}
+.p_block select, .p_block input[type=file]{
+    flex: 1 1 140px;
+    min-width: 120px;
+    max-width: 100%;
+}
+.kbSec_ponel{
+	    display: flex;
+    justify-content: center;
+    overflow: auto;
+}
+
+/* ТАБЫ: скрытые radio */
+input[name="tb"]{display:none;}
+
+/* СПРАВКА: компактные таблицы (v1.4.3) */
+.hrow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:7px 2px; border-bottom:1px dashed var(--line);}
+.hrow:last-of-type{border-bottom:0;}
+.kcap{background:#071207; border:1px solid var(--line2); border-radius:4px; padding:4px 9px; color:var(--hot); text-shadow:0 0 6px rgba(155,188,15,.5); font-size:.72rem; letter-spacing:.05em; white-space:nowrap; box-shadow:0 0 8px rgba(139,172,15,.25); flex:0 0 auto;}
+.hdesc{color:var(--ink); font-size:.72rem; letter-spacing:.03em; flex:1 1 220px; min-width:180px;}
+.note{border-left:3px solid var(--line2); background:var(--panel2); padding:7px 10px; font-size:.68rem; color:var(--ink2); letter-spacing:.03em; border-radius:0 4px 4px 0;}
+.helpwrap{width:100%; min-height:10rem; background:var(--panel2); padding:10px 14px; overflow:auto;}
+
+
+#tb1:checked~#pane1{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+}
+
+#tb1:checked~#pane1>.p_block {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .5);
+    min-width: 0;
+    align-items: stretch;
+    flex-wrap: nowrap;
+}
+
+#tb1:checked~#pane1>#bend_sing{
+	    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .5);
+    min-width: 0;
+    align-items: flex-start;
+}
+
+#tb1:checked~#pane1>.p_block>div{
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+}
+
+#tb1:checked~#pane1>.p_block button{
+	width: 100%;
+	font-size: 12px;
+    padding: 8px 6px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+
+#tb2:checked~#pane2{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+#tb3:checked~#pane3{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+
+#tb5:checked~#pane5{ display:none; }
+#kbdHdr{ display:none;}
+
+
+#tb6:checked~#pane6{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+#tb6:checked~#pane6 .p_block {
+	display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, .5);
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+	width: 50%;
+}
+
+
+#tb7:checked~#pane7{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+}
+
+#tb7:checked~#pane7 .row{
+	display: flex;
+    gap: 2px;
+    margin: 5px;
+    align-content: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+} 
+
+#tb7:checked~#pane7>.p_block button{
+	width: 100%;
+}
+
+#tb9:checked~#pane9{display:flex;
+    flex-direction:column; gap:10px; padding:12px;
+}
+
+#tb8:checked~#pane8{
+	display: flex;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    justify-content: space-between;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    align-content: stretch;
+
+}
+
+#tb8:checked~#pane8 .p_block>div {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    align-items: stretch;
+    flex-direction: row;
+}
+
+#tb8:checked~#pane8 .row{
+	display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 0px 0;
+    align-content: flex-end;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+} 
+
+/* ТАЧ-ФИКС: касание по нотам и клавиатурам — не прокрутка страницы */
+#keys,#keys2{ touch-action:none; }
+.kwrap{ touch-action:none; }
+
+
+
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ШАПКА -->
+	<header class="panel">
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.28 «This is Rock»</h1>
+	</header>
+
+
+	<div class="rendring">
+		<!-- ═══ ТАББАР: 5 ВКЛАДОК (чистый CSS, radio как прямые дети #app) ═══ -->
+<input type="radio" name="tb" id="tb1" checked>
+<input type="radio" name="tb" id="tb2">
+<input type="radio" name="tb" id="tb3">
+<input type="radio" name="tb" id="tb4">
+<input type="radio" name="tb" id="tb5">
+<input type="radio" name="tb" id="tb6">
+<input type="radio" name="tb" id="tb7">
+<input type="radio" name="tb" id="tb8">
+<input type="radio" name="tb" id="tb9">
+
+	<nav class="tabbar">
+		<span class="tag">РЕЖИМ: Движка</span>
+		<button id="btnChip" class="on">CHIP-TUNE</button>
+		<button id="btnSf2">SOUNDFONT</button>
+		<button id="btnMidi">MIDI GM</button>
+	</nav>
+<nav class="tabbar">
+  <label for="tb1">ЗВУК</label>
+  <label for="tb2">ПУЛЬТ</label>
+  <label for="tb3">ПАРСЕРЫ</label>
+  <label for="tb4">ТЕМЫ</label>
+  <label for="tb5">GUI-OFF</label>
+<label for="tb6">УПРАВЛЕНИЕ</label>
+<label for="tb7">ОСЦИЛЛОГРАФ</label>
+<label for="tb8">МОНИТОРЫ</label>
+<label for="tb9">2A03 ПУЛЬТ</label>
+</nav>
+
+<!-- ═══ ВКЛАДКА 1: ЗВУК ═══ -->
+<section class="pane" id="pane1">
+  <div class="p_block" id="wavePanel">
+			<div>
+				<button class="wbtn" data-wave="square">▣ КВАДРАТ</button>
+				<button class="wbtn" data-wave="pulse50">□ КВАДРАТ 50%</button>
+				<button class="wbtn" data-wave="pulse25">□ КВАДРАТ 25%</button>
+				<button class="wbtn" data-wave="pulse12">□ КВАДРАТ 12,5%</button>
+				<button class="wbtn" data-wave="pulse6">□ КВАДРАТ 6,25%</button>
+			</div>
+			<div>
+				<button class="wbtn" data-wave="tri">△ ТРЕУГОЛЬНИК</button>
+				<button class="wbtn" data-wave="triBass">▲ ТРЕУГОЛЬНИК БАС</button>
+				<button class="wbtn" data-wave="saw">◺ ПИЛА</button>
+				<button class="wbtn" data-wave="sawBass">◣ ПИЛА БАС</button>
+				<!-- v1.4.24 ▣NOISE удалена — не использовалась -->
+			</div>
+			<div>
+
+				<button class="wbtn" data-wave="sine">∿ СИНУС</button>
+				<button class="wbtn" data-wave="sineBass">〽︎ СИНУС БАС</button>
+				<button class="wbtn" data-wave="pulseR">〇 КРУГ</button>
+				<button class="wbtn" data-wave="nwave">⎚ N-ВОЛНА</button>
+				<!-- v1.4.24 ▦NOISE удалена — не использовалась -->
+			</div>
+			
+			
+	</div>
+	<div class="p_block" >
+		
+			<div><button id="octDn">ОКТАВА: −</button><button id="octUp">ОКТАВА: +</button></div>
+			<div>
+		
+          <button id="susBtn8">Sus: 1/8</button><button id="susBtn4">Sus: 1/4</button><button id="susBtn2">Sus: 1/2</button>
+        </div>
+        <div>
+          <button id="sensSoft">SOFT</button><button id="sensHard" class="on">HARD</button><button id="sensFixed">FIXED</button>
+        </div>
+         <div>
+          <button id="kb1">РОЛЛ: 1</button><button id="kb2" class="on">РОЛЛ:2</button>
+          <button id="lay1">РЯД: 1</button><button id="lay2">РЯД: 2</button>
+		 </div>
+          <div>
+          <button id="kbToggle">КЛАВИАТУРА: ВКЛ</button>
+          <button id="pmToggle" class="on">🔇 PM: ВКЛ</button>
+          <button id="chrToggle" class="on">♯ CHR: ВКЛ</button>
+        
+        
+          <button id="rollLock">🔒 ЛОК ПИАОЛРОЛЛА</button>
+          <button id="panicBtn" style="color:#c84a3a;">■ PANIC</button>
+        </div>
+		</div>
+		<div class="p_block" id="bend_sing">
+		<div class="row">
+		  <div>
+			<span class="tag">ГРОМКОСТЬ:</span>
+			<input type="range" id="vol" min="0" max="100" value="70">
+		  </div>
+		 </div>
+		<div class="row">
+		  <div>
+		  <span class="tag" style="min-width:0;">ПИТЧ-БЕНД:</span>
+			  <input type="range" id="bend" min="-400" max="400" value="0">
+			  <span class="lbl" id="bendLbl">0 ц</span>
+		  </div>
+		</div>
+		<div class="row">
+		<div> 
+			<span class="tag">ТЕМП:</span><input type="range" id="bpm" min="40" max="300" value="120">
+			<span class="lbl" id="bpmVal">120 BPM</span>
+		</div>
+	  </div> 
+	</div>
+  
+	
+</section>
+
+<section class="pane" id="pane9">
+  <div class="p_block">
+    <div class="row"><span class="tag">2A03 ПУЛЬТ — РЭК ЧИПОВЫХ ЭФФЕКТОВ</span></div>
+    <div class="lcd" id="fxLcd">РЭК: СУХОЙ СИГНАЛ</div>
+    <div>
+      <button class="wbtn" id="fxDeBtn">⧉ DELAY: ВЫКЛ</button>
+      <button class="wbtn" id="fxRevBtn">≋ РЕВЕРБ: ВЫКЛ</button>
+      <button class="wbtn" id="fxDistBtn">⚡ ДИСТ: ВЫКЛ</button>
+      <button class="wbtn" id="btnFxOff">■ ВСЁ ВЫКЛ</button>
+    </div>
+    <div class="row"><span class="tag">ВРЕМЯ:</span><input type="range" id="fxDeT" min="20" max="500" value="250" step="1"><span class="tag" id="fxDeTv">250 мс</span></div>
+    <div class="row"><span class="tag">ОБРАТНАЯ СВЯЗЬ:</span><input type="range" id="fxDeF" min="0" max="90" value="30" step="1"><span class="tag" id="fxDeFv">30%</span></div>
+    <div class="row"><span class="tag">DELAY МИКС:</span><input type="range" id="fxDeM" min="0" max="100" value="0" step="1"><span class="tag" id="fxDeMv">0%</span></div>
+    <div class="row"><span class="tag">РЕВЕРБ МИКС:</span><input type="range" id="fxRevM" min="0" max="100" value="0" step="1"><span class="tag" id="fxRevMv">0%</span></div>
+    <div class="row"><span class="tag">ГРЕЙВ:</span><input type="range" id="fxDistD" min="1" max="100" value="20" step="1"><span class="tag" id="fxDistDv">20</span></div>
+    <div class="row"><span class="tag">ДИСТ МИКС:</span><input type="range" id="fxDistM" min="0" max="100" value="0" step="1"><span class="tag" id="fxDistMv">0%</span></div>
+    <div class="row"><span class="tag">ДИСТ ГРОМКОСТЬ:</span><input type="range" id="fxDistV" min="0" max="70" value="5" step="1"><span class="tag" id="fxDistVv">5%</span></div>
+  </div>
+</section>
+<!-- ═══ ВКЛАДКА 2: ПУЛЬТ ═══ -->
+<section class="pane" id="pane2">
+  <div class="p_block" >
+	
+	<h2>ТЕСТОВЫЙ СТЕНД WAV — ПОЛНАЯ ОБВЯЗКА</h2>
+      <div class="row" id="wavPanel">
+        <button class="wbtn" id="wavRec">● ЗАПИСЬ</button>
+        <button class="wbtn" id="wavStop">■ СТОП</button>
+        <button class="wbtn" id="wavExport">⬇ ЭКСПОРТ WAV</button>
+        <span class="tag">ВРЕМЯ:</span><span class="badge" id="wavTime">0.0 с</span>
+      </div>
+      <div class="lcd" id="wavLcd">16-WAV: нажмите любой тест — контекст стартует по клику</div>
+		<div class="row" id="wavPanel2">
+        <button class="wbtn" id="wavTone">♪ ТОН C4</button>
+        <button class="wbtn" id="wavScale">♪ ГАММА C-МАЖОР</button>
+		<button id="btnArp">♪ АРПЕДЖИО (C-мажор)</button>
+        <button class="wbtn" id="wavNoise">♪ ШУМ L/S</button>
+        <button class="wbtn" id="wavVoices">♪ ПРОГОН 15 ГОЛОСОВ</button>
+      </div>
+  </div>
+  <div class="p_block" >
+		 <button id="midiBtn">ПОДКЛЮЧИТЬ MIDI</button>
+	<span class="tag">УСТРОЙСТВО:</span><select id="midiSel" style="flex:1;"></select>
+      <h2>MIDI OUT — NC-КАНАЛ И MIDI-ПОРТ (17)</h2>
+     
+      <div class="lcd" id="moutLcd">17-OUT: инициализация…</div>
+	<div class="row">
+		<select id="moutPort" style="min-width:170px;"><option value="">— нет выхода —</option></select>
+        <span class="tag">NC:</span>
+        <button id="moutTx">⟶ NC ПЕРЕДАЧА</button>
+        <button id="moutRx">⟵ NC ПРИЁМ</button>
+        <span class="tag">MIDI:</span>
+        <button id="moutScan">⟳ СКАН MIDI</button>
+        
+     </div>
+	
+	</div>
+</section>
+
+<!-- ═══ ВКЛАДКА 3: СТЕНД ═══ -->
+<section class="pane" id="pane3">
+  
+	 <div class="p_block" >
+	<div>
+	<h2>CHIP-TUNE</h2>
+	<select id="chipVoiceSel" style="min-width:170px;"></select>
+	</div>
+	</div>
+	<div class="p_block" >
+        <div><h2>SOUNDFONT</h2>
+        <input type="file" id="sf2file" accept=".sf2,.sf3" style="flex:1;">
+        <span class="tag">БАНК:</span><select id="bankSel" style="flex:1;"></select>
+        <span class="tag">ПРЕСЕТ:</span><select id="presetSel" style="flex:1;"></select>
+        <span class="tag">ИНСТР.:</span><select id="instSel" style="flex:1;"></select></div>
+    </div>
+	<div class="p_block" >
+
+   <div>
+     <h2>MIDI GM × 128</h2>
+     <span class="tag">ГОЛОС:</span><select id="midiVoiceSel" style="flex:1;"></select></div>
+  </div>
+
+</section>
+
+<!-- ═══ ВКЛАДКА 4: ТЕМЫ ═══ -->
+<section class="pane" id="pane4">
+	<div class="row_bg" id="themeRow">
+		<button class="thbtn" data-th="">ЗЕЛЁНЫЙ</button>
+		<button class="thbtn" data-th="th2">ЖЁЛТЫЙ</button>
+		<button class="thbtn" data-th="th3">ЯНТАРЬ</button>
+		<button class="thbtn" data-th="th4">ОРАНЖЕВЫЙ</button>
+		<button class="thbtn" data-th="th5">КРАСНЫЙ</button>
+		<button class="thbtn" data-th="th6">РОЗОВЫЙ</button>
+		<button class="thbtn" data-th="th7">МАГЕНТА</button>
+		<button class="thbtn" data-th="th8">ФИОЛЕТОВЫЙ</button>
+		<button class="thbtn" data-th="th9">СИНИЙ</button>
+		<button class="thbtn" data-th="th10">ГОЛУБОЙ</button>
+		<button class="thbtn" data-th="th11">ЦИАН</button>
+		<button class="thbtn" data-th="th12">МЯТНЫЙ</button>
+  </div>
+</section>
+
+<!-- ═══ ВКЛАДКА 5: GUI-OFF ═══ -->
+<section class="pane" id="pane5">
+	<!-- ═══ ПУСТОЙ СЕЛЕКТОР ВЫКЛЮЧАЮЩИЙ ВСЕ НЕНУЖНЫЕ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ ═══ -->
+</section>
+
+  <section class="pane" id="pane6">
+    <div class="p_block">
+      <h2>НАМПАД И СТРЕЛКИ</h2>
+      <div class="hrow"><span class="kcap">Num 7 / 8 / 9</span><span class="hdesc">Сустейн 1/8 / 1/4 / 1/2 (как кнопки пульта)</span></div>
+      <div class="hrow"><span class="kcap">Num 4 / 5 / 6</span><span class="hdesc">Туше SOFT / HARD / FIXED (по порядку кнопок на панели)</span></div>
+      <div class="hrow"><span class="kcap">Num + / Num −</span><span class="hdesc">Октава вверх / вниз (с границами диапазона)</span></div>
+      <div class="hrow"><span class="kcap">Num /</span><span class="hdesc">РОЛЛ: 1 ↔ 2 (смена числа клавиатур)</span></div>
+      <div class="hrow"><span class="kcap">Num *</span><span class="hdesc">РЯД: 1 ↔ 2 (смена раскладки)</span></div>
+      <div class="hrow"><span class="kcap">← / →</span><span class="hdesc">Октава вниз / вверх (стрелки)</span></div>
+      <div class="note">NumLock: Num4–Num9 работают только с включённым NumLock. Num +/−, Num / и Num * от NumLock не зависят. При потере фокуса окна (alt-tab) все зажатые ноты глушатся автоматически.</div>
+    </div>
+    <div class="p_block">
+      <h2>НОТНЫЕ РЯДЫ И ПЕРЕКЛЮЧАТЕЛИ</h2>
+      <div class="hrow"><span class="kcap">РЯД 1</span><span class="hdesc">Хроматика C4…F#5: A W S E D F T G Y H U J K O L P ; ' ]</span></div>
+      <div class="hrow"><span class="kcap">РЯД 2 низ</span><span class="hdesc">C4…F5: Z S X D C V G B H N J M , L . ; / '</span></div>
+      <div class="hrow"><span class="kcap">РЯД 2 верх</span><span class="hdesc">C5…F#6: Q 2 W 3 E R 5 T 6 Y 7 U I 9 O 0 P [ ]</span></div>
+      <div class="hrow"><span class="kcap">КЛАВИАТУРА ВКЛ</span><span class="hdesc">При ВЫКЛ ПК-клавиши игнорируются — мышь и MIDI работают свободно</span></div>
+      <div class="hrow"><span class="kcap">Смена РОЛЛ / РЯД</span><span class="hdesc">Все зажатые ноты сбрасываются автоматически</span></div>
+      <div class="note">Диапазон нот движка: 24–78. Ноты вне диапазона пишутся в журнал, звук не запускается.
+Октава 0 (12–23) — модификаторы (v1.4.28): C0 = 🔇 Power Mute (глушит всё играющее, пока зажата),
+D0 = ♯ Chromatic (флажолет +19, громкость 50%, пока зажата). Работают во всех трёх движках.
+Тумблеры «PM» и «CHR» на пульте — включение/отключение; при ВЫКЛ октава 0 снова вне диапазона.</div>
+    </div>
+  </section>
+
+  <section class="pane" id="pane7">
+    <div class="p_block">
+      <canvas id="scope" width="700" height="350"></canvas>
+    </div>
+	<div class="p_block">
+      
+      
+      <div class="row" id="scope2Panel">
+        <button class="wbtn on" id="sc2Wave">~ ВОЛНА</button>
+        <button class="wbtn" id="sc2Spec">ıı СПЕКТР</button>
+        <button class="wbtn" id="sc2XY">⊗ ФИГУРА</button>
+        <button class="wbtn" id="sc2Freeze">❄ СТОП</button>
+      </div>
+    </div>
+	<div class="p_block">
+      <canvas id="scope2" width="700" height="350"></canvas>
+    </div>
+  </section>
+
+  <section class="pane" id="pane8">
+    
+      <div class="p_block" >
+			<div>
+				<div class="lcd" id="lcd2">CHIP — ГОТОВ</div>
+				<div class="lcd" id="lcd">СИСТЕМА: ГОТОВА !!! Включен эксперементальный режим !!!</div>
+			</div>
+			<div>
+				<div class="logbox" id="log"></div>
+				<div class="row" id="adPanel">
+					<button class="wbtn" id="adFreeze">❄ СТОП-ТЕСТ</button>
+					<button class="wbtn" id="adResume">▶ ВОЗОБН.</button>
+				</div>
+				<div class="logbox" id="adLog" ></div>
+			</div>
+			<div>
+				<div class="lcd" id="adLcd">AUDIO: контекст ещё не создан</div>
+				<div class="lcd" id="sc2Lcd">OSC: ожидание контекста</div>
+			</div>
+	</div>
+  </section>
+
+	</div>
+
+  <!-- КЛАВИАТУРЫ -->
+  <div class="panel">
+     <div class="kbSec_ponel">  <span class="rollrow">
+		<div><button id="piKb1">1 КЛАВИАТУРА</button>
+      <button id="piKb2" class="on">2 КЛАВИАТУРЫ</button>
+      <button id="piRoll">СКРОЛЛ: ОТКРЫТ</button></div>
+    </span>
+	<div>
+	<span class="badge" id="noteCnt" title="Счётчик нажатых нот (клавиатура 1). Клик по счётчику — СБРОС.">0
+	</span> </div>
+	<div>
+	<span class="badge" id="voiceCnt">0
+	</span> </div>
+	<div>
+	<span class="badge" id="fpsDisplay">0
+	</span></div>
+	</div>
+	</div>
+    <div id="kbdHdr"></div>
+    <div class="kbSec1">
+      <div class="kwrap" id="wrap1"><div id="keys"></div></div>
+      <div class="strip" id="strip1"><div class="tape-thumb"></div></div>
+    </div>
+    <div class="kbSec2" style="margin-top:12px;">
+		<div class="kbSec_ponel" ></div>
+      <div class="kwrap" id="wrap2"><div id="keys2"></div></div>
+      <div class="strip" id="strip2"><div class="tape-thumb"></div></div>
+    </div>
+  </div>
+    </div>
+  </div>
+
+
+
+<script>
+
+"use strict";
+/* ============================================================
+   ФАЙЛ 01/13: 01_state.js
+   Секция: состояние
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ состояние ============ */
+const state={mode:'chip',chipVoice:'pulse50',sf2:null,presetIdx:0,instIdx:-1,instSpans:null,instSpansKey:'',sampleCache:new Map()};
+let audioCtx=null,master=null;let fxBus=null,fxDry=null,fxDe=null,fxDeIn=null,fxDeOut=null,fxRev=null,fxRevIn=null,fxRevOut=null,fxDist=null,fxDistPre=null,fxDistPost=null,fxDistV=null,fxDistIn=null,fxDistOut=null,fxReady=false;const FXN={de:null,fb:null,deMx:null,revMx:null,dist:null,distMx:null};/* 2A03 ПУЛЬТ: узлы рэка */
+const activeChip=new Map(),activeSF2=new Map(),activeMidi=new Map();
+const $=s=>document.querySelector(s);
+const LOG_MAX=10;const logLines=[];
+function log(msg){
+  const el=$('#log'); if(!el) return;
+  logLines.unshift(msg); if(logLines.length>LOG_MAX) logLines.length=LOG_MAX;
+  el.textContent='';
+  for(const l of logLines){ el.appendChild(document.createTextNode(l)); el.appendChild(document.createElement('hr')); }
+}
+function lcd(msg){$('#lcd').textContent=msg;}
+$('#vol').addEventListener('input',e=>{if(master&&audioCtx)master.gain.setTargetAtTime(Math.max(0,(+e.target.value)/100),audioCtx.currentTime,0.02);});
+function ensureAudio(){
+  if(!audioCtx){
+    /* v1.4.22: явный запрос минимальной задержки вывода; старый webkit-префикс опцию молча игнорирует */
+    const _AC=window.AudioContext||window.webkitAudioContext;
+    try{ audioCtx=new _AC({latencyHint:'interactive'}); }catch(_){ audioCtx=new _AC(); }
+    /* v1.4.22: телеметрия — профиль контекста сразу в журнал */
+    try{ log('AUDIO: ctx создан — sampleRate='+audioCtx.sampleRate+(audioCtx.baseLatency?(' / задержка ~'+Math.round(audioCtx.baseLatency*1000)+' мс'):'')); }catch(_){}
+    audioCtx.addEventListener('statechange',()=>{ try{ log('AUDIO: контекст → '+audioCtx.state); }catch(_){} });
+    master=audioCtx.createGain(); master.gain.value=(+$('#vol').value)/100;
+    /* защита от щелчков: DC-блок -> статичный мягкий клиппер -> мягкий лимитер */
+    const clipCurve=new Float32Array(2048);
+    for(let i=0;i<2048;i++){ const x=(i/1023.5)-1, a=Math.abs(x);
+      clipCurve[i]=Math.sign(x)*(a<0.6?a:0.6+0.35*Math.tanh((a-0.6)/0.35)); }
+    const clip=audioCtx.createWaveShaper(); clip.curve=clipCurve; clip.oversample='4x';
+    const dcb=audioCtx.createBiquadFilter(); dcb.type='highpass'; dcb.frequency.value=20;
+    const limiter=audioCtx.createDynamicsCompressor();
+    limiter.threshold.value=-3; limiter.knee.value=12; limiter.ratio.value=6;
+    limiter.attack.value=0.02; limiter.release.value=0.3;
+    master.connect(dcb); dcb.connect(clip); clip.connect(limiter); limiter.connect(audioCtx.destination);
+    buildFxRack(); /* 2A03 ПУЛЬТ: рэк собирается один раз при создании контекста */
+
+/* ═══ 2A03 ПУЛЬТ: сборка рэка чиповых эффектов (v1.4.24) ═══
+   Все три движка (CHIP / SOUNDFONT / MIDI GM) идут в fxBus — рэк
+   общий. Сухой путь fxDry=1.0 жив всегда — любой движок звучит
+   при полностью выключенном рэке. Эффекты —
+   параллельные посылы: ВЫКЛ обнуляет мокрый путь (setTargetAtTime
+   20 мс), провода не переподключаются на лету — нечему щёлкать.
+   v1.4.27: ДИСТ — кроссфейд-вставка: при ВКЛ сухой приглушается до
+   (1-микс), мокрый поднимается до микс. Суммарный пик не выше чистого:
+   мокрый пик <= сухого при любом грейве (tanh-насыщение + компенсация
+   1/sqrt(pre)), а громкость ограничена 70%. */
+function fxDistCurve(k){const n=512,c=new Float32Array(n);
+  for(let i=0;i<n;i++){const x=i/(n-1)*2-1;c[i]=Math.tanh(x*(k||1))/Math.tanh(k||1);}return c;}
+function buildFxRack(){
+  if(fxReady||!audioCtx)return;
+  fxBus=audioCtx.createGain();
+  fxDry=audioCtx.createGain(); fxDry.gain.value=1;
+  fxBus.connect(fxDry); fxDry.connect(master);
+  /* DELAY: время/обратная связь/микс */
+  fxDeIn=audioCtx.createGain(); fxDeOut=audioCtx.createGain();
+  fxDe=audioCtx.createDelay(1.0); fxDe.delayTime.value=(+$('#fxDeT').value||250)/1000;
+  FXN.fb=audioCtx.createGain(); FXN.fb.gain.value=(+$('#fxDeF').value||30)/100;
+  FXN.deMx=audioCtx.createGain(); FXN.deMx.gain.value=0;
+  fxDeIn.connect(fxDe); fxDe.connect(FXN.fb); FXN.fb.connect(fxDe);
+  fxDe.connect(FXN.deMx); FXN.deMx.connect(fxDeOut); fxDeOut.connect(master);
+  fxBus.connect(fxDeIn);
+  /* REVERB: процедурный импульс 2.2 с, затухающий шум */
+  fxRevIn=audioCtx.createGain(); fxRevOut=audioCtx.createGain();
+  fxRev=audioCtx.createConvolver();
+  const rl=Math.floor(audioCtx.sampleRate*2.2), rb=audioCtx.createBuffer(2,rl,audioCtx.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=rb.getChannelData(ch);
+    for(let i=0;i<rl;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/rl,2.5);}
+  fxRev.buffer=rb;
+  FXN.revMx=audioCtx.createGain(); FXN.revMx.gain.value=0;
+  fxRevIn.connect(fxRev); fxRev.connect(FXN.revMx); FXN.revMx.connect(fxRevOut); fxRevOut.connect(master);
+  fxBus.connect(fxRevIn);
+  /* DIST v1.4.25: фиксированная tanh-кривая + PRE-GAIN. Причина правки:
+     голоса с пиком 0.25 не достают до изгиба tanh — эффект не слышен.
+     PRE-GAIN разгоняет сигнал в кривую, POST-GAIN компенсирует громкость.
+     Правка грейва слайдером — через setTargetAtTime, без щелчков. */
+  fxDistIn=audioCtx.createGain(); fxDistOut=audioCtx.createGain();
+  fxDist=audioCtx.createWaveShaper(); fxDist.curve=fxDistCurve(3);
+  fxDistPre=audioCtx.createGain(); fxDistPost=audioCtx.createGain();
+  const d0=(+$('#fxDistD').value||20)/100;
+  fxDistPre.gain.value=1+d0*15; fxDistPost.gain.value=1/Math.sqrt(1+d0*15);
+  fxDistV=audioCtx.createGain(); fxDistV.gain.value=0.05;
+  FXN.distMx=audioCtx.createGain(); FXN.distMx.gain.value=0;
+  fxDistIn.connect(fxDistPre); fxDistPre.connect(fxDist); fxDist.connect(fxDistPost);
+  fxDistPost.connect(fxDistV); fxDistV.connect(FXN.distMx); FXN.distMx.connect(fxDistOut); fxDistOut.connect(master);
+  fxBus.connect(fxDistIn);
+  FXN.de=fxDe; FXN.dist=fxDist;
+  fxReady=true;
+  lcd('2A03 ПУЛЬТ: рэк готов — общая шина CHIP/SF2/MIDI');
+}
+
+    window.__wavTapOut=audioCtx.createGain(); limiter.connect(window.__wavTapOut); /* 16-WAV: отвод финального сигнала (пост-лимитер) */
+  }
+  if(audioCtx.state==='suspended')audioCtx.resume();
+}
+/* v1.4.22: автоwake — любой жест возвращает suspended-контекст к жизни; touchstart пассивно, чтобы не душить прокрутку */
+['pointerdown','keydown','touchstart'].forEach(ev=>{
+  window.addEventListener(ev,()=>{ if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume(); },{passive:true});
+});
+const freqOf=k=>440*Math.pow(2,(k-69)/12);
+const tc2s=tc=>Math.pow(2,(tc||0)/1200);
+const sgn=v=>v>32767?v-65536:v;
+
+
+/* ============================================================
+   ФАЙЛ 02/13: 02_chip_engine_2a03.js
+   Секция: CHIP-движок 2A03
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ CHIP-движок 2A03 ============ */
+const CPU_NTSC=1789773;
+const NTSC_NOISE=[4,8,16,32,64,96,128,160,202,254,380,508,762,1016,2034,4068];
+const CHIP_VOICES=[
+  {id:'pulse50',name:'□ PULSE 50%',duty:0.5,octave:-1},
+  {id:'pulse25',name:'□ PULSE 25%',duty:0.25,octave:-1},
+  {id:'pulse12',name:'□ PULSE 12,5%',duty:0.125,octave:-1},
+  {id:'saw',name:'◺ ПИЛА',type:'sawtooth',octave:0},
+  {id:'tri',name:'△ ТРЕУГОЛЬНИК',type:'triangle',octave:0},
+  {id:'sine',name:'∿ СИНУС',type:'sine',octave:0},
+  {id:'square',name:'□ КВАДРАТ',type:'square',octave:0,nes:true},
+  {id:'pulseR',name:'ᵓ ПУЛЬС КРУГЛ.',round:true,octave:-1},
+  {id:'nwave',name:'⟋⟋ N-ВОЛНА',nwave:true,octave:0},
+  {id:'noiseL',name:'ШУМ — длинный цикл',noise:'long',octave:0},
+  {id:'noiseS',name:'ШУМ — короткий цикл',noise:'short',octave:0},
+  {id:'pulse6',name:'□ ПУЛЬС 6,25%',duty:0.0625,octave:-1},
+  {id:'triBass',name:'△ ТРЕУГ. БАС',type:'triangle',octave:-1},
+  {id:'sawBass',name:'◺ ПИЛА БАС',type:'sawtooth',octave:-1},
+  {id:'sineBass',name:'∿ СИНУС БАС',type:'sine',octave:-1}
+];
+const chipVoiceById=id=>CHIP_VOICES.find(v=>v.id===id);
+const chipDutyWaves={},chipNoiseCache=new Map();
+const DUTY_PAT={0.0625:[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],0.5:[0,1,1,1,1,0,0,0],0.25:[0,1,1,0,0,0,0,0],0.125:[0,1,0,0,0,0,0,0]};
+
+function dacQ(x){ return Math.round((x+1)*7.5)/7.5-1; }
+
+function dutyBuffer(d,f){ /* duty-паттерн 2A03: 8/16 шагов на период, жёсткие фронты */
+  const k='d'+d+'@'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const pat=DUTY_PAT[d]||DUTY_PAT[0.5];
+  const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++) ch[i]=pat[(i*pat.length/N)|0]?(1-d):(-d);
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn; /* DC-развязка */
+  chipDutyWaves[k]=buf; return buf;
+}
+function noiseBuffer(mode){ /* 15-битный LFSR: 32767 шагов (длинный) или 93 (короткий, бит 6 = feedback) */
+  if(chipNoiseCache.has(mode)) return chipNoiseCache.get(mode);
+  const steps=mode==='short'?93:32767;
+  const buf=audioCtx.createBuffer(1,steps,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  let reg=1;
+  for(let i=0;i<steps;i++){
+    const fb=(reg&1)^((reg>>1)&1);
+    reg=(reg>>1)|(fb<<14);
+    if(mode==='short') reg=(reg&~(1<<6))|(fb<<6);
+    ch[i]=(reg&1)?1:-1;
+  }
+  let mn=0; for(let i=0;i<steps;i++) mn+=ch[i]; mn/=steps;
+  for(let i=0;i<steps;i++) ch[i]-=mn;
+  chipNoiseCache.set(mode,buf); return buf;
+}
+function roundedPulseBuffer(f){ /* пульс со скруглённым фронтом: smoothstep-атака ~12% периода */
+  const k='r'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  const R=Math.max(2,Math.round(N*0.12));
+  for(let i=0;i<N;i++){
+    const p=i/N; let x;
+    if(p<R/N){ const u=i/R; x=-1+2*u*u*(3-2*u); }
+    else if(p<0.5) x=1;
+    else x=-1;
+    ch[i]=x;
+  }
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn;
+  chipDutyWaves[k]=buf; return buf;
+}
+function nWaveBuffer(f){ /* N-волна: зигзаг подъём-спад-подъём, среднее ноль по построению */
+  const k='n'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++){
+    const p=i/N; let x;
+    if(p<1/3) x=-1+6*p;
+    else if(p<2/3) x=1-6*(p-1/3);
+    else x=-1+6*(p-2/3);
+    ch[i]=x;
+  }
+  chipDutyWaves[k]=buf; return buf;
+}
+function triBuffer2A03(f){ /* треугольник 2A03: 32 шага, 4-бит лестница */
+  const k='T'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(32,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++){
+    const s=Math.floor(i*32/N)%32;
+    const lvl=s<=15?s:31-s;
+    ch[i]=(lvl/15)*2-1;
+  }
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn;
+  chipDutyWaves[k]=buf; return buf;
+}
+function vrc6SawBuffer(f){ /* пила VRC6: 7 ступеней на период */
+  const k='S'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(14,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++){
+    const step=Math.min(6,Math.floor(i*7/N));
+    ch[i]=step/6*2-1;
+  }
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn;
+  chipDutyWaves[k]=buf; return buf;
+}
+function sineQBuffer(f){ /* синус через 4-бит DAC (15 уровней) */
+  const k='Si'+f.toFixed(2);
+  if(chipDutyWaves[k]) return chipDutyWaves[k];
+  const N=Math.max(16,Math.round(audioCtx.sampleRate/f));
+  const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
+  const ch=buf.getChannelData(0);
+  for(let i=0;i<N;i++) ch[i]=dacQ(Math.sin(2*Math.PI*i/N));
+  let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
+  for(let i=0;i<N;i++) ch[i]-=mn;
+  chipDutyWaves[k]=buf; return buf;
+}
+
+function chipKill(key){ /* немедленное глушение — при повторном нажатии и при смене режима */
+  const v=activeChip.get(key); if(!v) return;
+  const t=audioCtx.currentTime;
+  const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}
+  v.g.gain.setTargetAtTime(0,t,0.01);
+  v.nodes.forEach(n=>{try{n.stop(t+0.08);}catch(_){}});
+  activeChip.delete(key); hl(key,false);
+}
+/* v1.4.20: реатака — осциллятор живёт в своей фазе, gain мягко доводится до нового пика */
+function chipReattack(key,vel=100){
+  const v=activeChip.get(key); if(!v) return;
+  const t=audioCtx.currentTime;
+  const vc=chipVoiceById(state.chipVoice)||CHIP_VOICES[0];
+  const peak=(vc.nes?0.28:0.25)*Math.pow(vel/127,1.3);
+  const G=v.g.gain;
+  if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}
+  G.linearRampToValueAtTime(peak,t+0.008);
+  G.setTargetAtTime(peak*0.35,t+0.008,0.08);
+}
+/* ═══ v1.4.23 ANTI-CLICK: старт ноты только на живом контексте ═══
+   Пока AudioContext suspended, его currentTime заморожен: конверт атаки,
+   заскедуленный на устаревшее время, после resume() применяется мгновенно —
+   «сжатая» атака звучит щелчком на частоте ноты и громче ноты.
+   Лечение: ядро движка запускается только при state==='running'. */
+function startCtx(cb){
+  if(!audioCtx) ensureAudio();
+  if(audioCtx.state==='running'){ cb(); return; }
+  audioCtx.resume();
+  let done=false;
+  const go=()=>{ if(done) return; done=true; clearTimeout(tid); audioCtx.removeEventListener('statechange',go); cb(); };
+  audioCtx.addEventListener('statechange',go);
+  const tid=setTimeout(go,400); /* страховка: играем в любом случае */
+}
+function chipOn(key,vel=100){ startCtx(()=>chipOnCore(key,vel)); }
+function chipOnCore(key,vel=100){
+  ensureAudio();
+  /* v1.4.20: повторное нажатие звучащей ноты — реатака живого голоса, а не перезапуск */
+  if(activeChip.has(key)){ chipReattack(key,vel); return; }
+  if(activeChip.size>=VOICE_MAX){const k0=activeChip.keys().next().value; chipKill(k0);}
+  const v=chipVoiceById(state.chipVoice)||CHIP_VOICES[0];
+  const t=audioCtx.currentTime;
+  const g=audioCtx.createGain();
+  const peak=(v.nes?0.28:0.25)*Math.pow(vel/127,1.3);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(peak,t+0.005);
+  g.gain.setTargetAtTime(peak*0.35,t+0.005,0.08);
+  const nodes=[]; let rate=null, info='';
+  if(v.noise){
+    /* ИСПРАВЛЕНО: шум растёт вверх по клавиатуре.
+       NTSC_NOISE[0] — таймер 4 (высокий шум), [15] — 4068 (низкий гул).
+       rel: 0 внизу клавиатуры .. 1 вверху; инвертируем: верх -> индекс 0 */
+    const lo=(typeof KB_LO!=='undefined')?KB_LO:21;
+    const hi=(typeof KB_HI!=='undefined')?KB_HI:108;
+    const rel=(key-lo)/(hi-lo);
+    const idx=Math.min(NTSC_NOISE.length-1,Math.max(0,
+      Math.round((1-rel)*(NTSC_NOISE.length-1))));
+    const timer=NTSC_NOISE[idx];
+    const src=audioCtx.createBufferSource();
+    src.buffer=noiseBuffer(v.noise); src.loop=true;
+    const shift=CPU_NTSC/(2*(timer+1)); /* тики LFSR */
+    rate=shift/audioCtx.sampleRate;     /* буфер: 1 тик = 1 сэмпл */
+    /* бенд применяется прямо при старте ноты шума */
+    src.playbackRate.setValueAtTime(rate*Math.pow(2,bendCents/1200),t);
+    src.connect(g); src.start(t); nodes.push(src);
+    info='таймер='+timer+' (сдвиг ~'+shift.toFixed(0)+' Гц)';
+  } else {
+    let freq, osc, note;
+    if(v.duty!==undefined){                 /* пульсы: -1 октава, делитель 16 */
+      note=key+(v.octave||0)*12;
+      const period=Math.round(CPU_NTSC/(16*freqOf(note))-1);
+      if(period<8){ g.disconnect(); log('PULSE: период '+period+' < 8 — канал молчит (как на 2A03).'); return; }
+      freq=CPU_NTSC/(16*(period+1));
+      osc=audioCtx.createBufferSource();
+      osc.buffer=dutyBuffer(v.duty,freq); osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);       /* БАГ ДВОЙНОГО ЗВУКА (2/2): путь один */
+      rate=1;
+      osc.playbackRate.value=Math.pow(2,bendCents/1200); /* ПАТЧ БЕНДА v1.3.1 */
+      info='t='+period+' f='+freq.toFixed(2)+' Гц ('+((v.octave||0)<0?'-1 октава, ':'')+'паттерн 2A03)';
+    } else if(v.type==='sawtooth'){          /* пила VRC6: 7 ступеней, делитель 14 */
+      note=key+(v.octave||0)*12;
+      const period=Math.round(CPU_NTSC/(14*freqOf(note))-1);
+      if(period<8){ g.disconnect(); log('SAW: период '+period+' < 8 — канал молчит.'); return; }
+      freq=CPU_NTSC/(14*(period+1));
+      osc=audioCtx.createBufferSource();
+      osc.buffer=vrc6SawBuffer(freq); osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      rate=1;
+      osc.playbackRate.value=Math.pow(2,bendCents/1200); /* ПАТЧ БЕНДА v1.3.1 */
+      info='t='+period+' f='+freq.toFixed(2)+' Гц (VRC6, 7 ступеней)';
+    } else if(v.nes){                        /* квадрат NES-PIANO: осциллятор + lowpass 4 кГц, без квантования периода */
+      freq=freqOf(key+(v.octave||0)*12);
+      osc=audioCtx.createOscillator();
+      osc.type='square'; osc.frequency.value=freq;
+      const lp=audioCtx.createBiquadFilter();
+      lp.type='lowpass'; lp.frequency.value=4000;
+      osc.connect(lp); lp.connect(g); osc.start(t); nodes.push(osc);
+      osc.detune.value=bendCents; /* ПАТЧ БЕНДА v1.3.1 */
+      info='f='+freq.toFixed(2)+' Гц (схема NES-PIANO, lowpass 4 кГц)';
+    } else if(v.round){                      /* пульс со скруглённым фронтом: -1 октава, таймер 2A03 */
+      note=key+(v.octave||0)*12;
+      const period=Math.round(CPU_NTSC/(16*freqOf(note))-1);
+      if(period<8){ g.disconnect(); log('PULSE-R: период '+period+' < 8 — канал молчит (как на 2A03).'); return; }
+      freq=CPU_NTSC/(16*(period+1));
+      osc=audioCtx.createBufferSource();
+      osc.buffer=roundedPulseBuffer(freq); osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      rate=1;
+      osc.playbackRate.value=Math.pow(2,bendCents/1200); /* ПАТЧ БЕНДА v1.3.1 */
+      info='t='+period+' f='+freq.toFixed(2)+' Гц ('+((v.octave||0)<0?'-1 октава, ':'')+'скруглённый фронт)';
+    } else if(v.nwave){                      /* N-волна: зигзаг, прямой регистр */
+      freq=freqOf(key+(v.octave||0)*12);
+      osc=audioCtx.createBufferSource();
+      osc.buffer=nWaveBuffer(freq); osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      rate=1;
+      osc.playbackRate.value=Math.pow(2,bendCents/1200); /* ПАТЧ БЕНДА v1.3.1 */
+      info='f='+freq.toFixed(2)+' Гц (N-волна, два зубца)';
+    } else {                                 /* треугольник и синус: делитель 32 */
+      note=key+(v.octave||0)*12;
+      const period=Math.round(CPU_NTSC/(32*freqOf(note))-1);
+      if(period<1){ g.disconnect(); log('CH: период '+period+' — вне диапазона чипа.'); return; }
+      freq=CPU_NTSC/(32*(period+1));
+      osc=audioCtx.createBufferSource();
+      osc.buffer=(v.type==='triangle')?triBuffer2A03(freq):sineQBuffer(freq);
+      osc.loop=true;
+      osc.connect(g); osc.start(t); nodes.push(osc);
+      rate=1;
+      osc.playbackRate.value=Math.pow(2,bendCents/1200); /* ПАТЧ БЕНДА v1.3.1 */
+      info='t='+period+' f='+freq.toFixed(2)+' Гц (32 шага, 4-бит)';
+    }
+  }
+  g.connect(fxBus||master); /* 2A03 ПУЛЬТ: голос чипа в общую шину рэка */
+  activeChip.set(key,{g,nodes,rate,
+    bend:c=>{ nodes.forEach(n=>{ try{ if(n.detune) n.detune.value=c; else if(rate!==null) n.playbackRate.value=rate*Math.pow(2,c/1200);}catch(_){} }); }});
+  hl(key,true);
+  log('CHIP: нота '+key+' ['+v.name+'] '+info);
+}
+function chipOff(key){
+  const v=activeChip.get(key); if(!v) return;
+  const t=audioCtx.currentTime;
+  const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}
+  v.g.gain.setTargetAtTime(0,t,0.05);
+  v.nodes.forEach(n=>{try{n.stop(t+0.4);}catch(_){}});
+  activeChip.delete(key); hl(key,false);
+  setTimeout(()=>{ try{ v.g.disconnect(); }catch(_){} },450);
+}
+/* ---------- режимы и выбор голоса ---------- */
+function setMode(m){
+  if(state.mode===m) return;
+  state.mode=m;
+  susClearAll();
+  [...activeChip.keys()].forEach(k=>chipKill(k));
+  [...activeSF2.keys()].forEach(k=>sfOff(k));
+  [...activeMidi.keys()].forEach(k=>midiKill(k));
+  $('#btnChip').classList.toggle('on',m==='chip');
+  $('#btnSf2').classList.toggle('on',m==='sf2');
+  $('#btnMidi').classList.toggle('on',m==='midi');
+  if(m==='chip') lcd('MODE: [CHIP-TUNE] — Чип: [2A03] ['+chipVoiceById(state.chipVoice).name+']');
+  else if(m==='midi') lcd('MODE: [MIDI GM] — Голос: ['+GMN[midiProg]+']');
+  else updateBankLcd();
+  log('Режим: '+(m==='chip'?'CHIP-TUNE (2A03)':(m==='midi'?'MIDI GM':'SoundFont'))+' — голоса заглушены.');
+}
+function setChipVoice(id){
+  state.chipVoice=id;
+  document.querySelectorAll('#wavePanel .wbtn').forEach(x=>x.classList.toggle('on',x.dataset.wave===id));
+  $('#chipVoiceSel').value=id;
+  const v=chipVoiceById(id);
+  lcd('MODE: [CHIP-TUNE] — Чип: [2A03] — Голос: ['+(v?v.name:id)+']');
+  if(state.mode!=='chip') setMode('chip'); else log('Голос чипа: '+(v?v.name:id));
+}
+$('#chipVoiceSel').addEventListener('change',e=>setChipVoice(e.target.value));
+$('#btnChip').addEventListener('click',()=>setMode('chip'));
+$('#btnSf2').addEventListener('click',()=>{ if(!state.sf2){ log('Банк ещё не загружен — сначала загрузите .sf2.'); return; } setMode('sf2'); });
+$('#btnMidi').addEventListener('click',()=>setMode('midi'));
+
+/* ═══ 2A03 ПУЛЬТ: обработчики (v1.4.24) ═══ */
+function fxRamp(node,v){if(node&&audioCtx)node.gain.setTargetAtTime(v,audioCtx.currentTime,0.02);}
+function fxLcd(s){const e=$('#fxLcd');if(e)e.textContent=s;}
+$('#fxDeBtn').addEventListener('click',()=>{if(!fxReady)return;
+  const on=!$('#fxDeBtn').classList.contains('on');
+  $('#fxDeBtn').classList.toggle('on',on);
+  fxRamp(FXN.deMx,on?(+$('#fxDeM').value/100):0);
+  fxLcd('DELAY: '+(on?'ВКЛ':'ВЫКЛ'));});
+$('#fxRevBtn').addEventListener('click',()=>{if(!fxReady)return;
+  const on=!$('#fxRevBtn').classList.contains('on');
+  $('#fxRevBtn').classList.toggle('on',on);
+  fxRamp(FXN.revMx,on?(+$('#fxRevM').value/100):0);
+  fxLcd('РЕВЕРБ: '+(on?'ВКЛ':'ВЫКЛ'));});
+$('#fxDistBtn').addEventListener('click',()=>{if(!fxReady)return;
+  const on=!$('#fxDistBtn').classList.contains('on');
+  $('#fxDistBtn').classList.toggle('on',on);
+  const m=(+$('#fxDistM').value/100)||0;
+  fxRamp(FXN.distMx,on?m:0);
+  /* v1.4.27: кроссфейд как у педали — сухой приглушается до (1-микс) */
+  fxRamp(fxDry,on?(1-m):1);
+  fxLcd('ДИСТ: '+(on?'ВКЛ':'ВЫКЛ'));});
+$('#btnFxOff').addEventListener('click',()=>{if(!fxReady)return;
+  ['fxDeBtn','fxRevBtn','fxDistBtn'].forEach(i=>$('#'+i).classList.remove('on'));
+  fxRamp(FXN.deMx,0);fxRamp(FXN.revMx,0);fxRamp(FXN.distMx,0);
+  fxRamp(fxDry,1); /* v1.4.27: сухой возвращается целиком */
+  fxLcd('РЭК: СУХОЙ СИГНАЛ');});
+$('#fxDeT').addEventListener('input',e=>{const v=+e.target.value;
+  $('#fxDeTv').textContent=v+' мс';
+  if(FXN.de)FXN.de.delayTime.setTargetAtTime(v/1000,audioCtx.currentTime,0.02);});
+$('#fxDeF').addEventListener('input',e=>{const v=+e.target.value;
+  $('#fxDeFv').textContent=v+'%';
+  if(FXN.fb)FXN.fb.gain.setTargetAtTime(v/100,audioCtx.currentTime,0.02);});
+$('#fxDeM').addEventListener('input',e=>{$('#fxDeMv').textContent=e.target.value+'%';
+  if($('#fxDeBtn').classList.contains('on'))fxRamp(FXN.deMx,+e.target.value/100);});
+$('#fxRevM').addEventListener('input',e=>{$('#fxRevMv').textContent=e.target.value+'%';
+  if($('#fxRevBtn').classList.contains('on'))fxRamp(FXN.revMx,+e.target.value/100);});
+$('#fxDistD').addEventListener('input',e=>{const v=+e.target.value;
+  $('#fxDistDv').textContent=v;
+  /* v1.4.25: PRE-GAIN разгоняет сигнал в фиксированную кривую —
+     перестройка curve на лету давала щелчки и слабый эффект */
+  const p=1+v/100*15;
+  if(fxDistPre)fxDistPre.gain.setTargetAtTime(p,audioCtx.currentTime,0.02);
+  if(fxDistPost)fxDistPost.gain.setTargetAtTime(1/Math.sqrt(p),audioCtx.currentTime,0.02);});
+$('#fxDistM').addEventListener('input',e=>{$('#fxDistMv').textContent=e.target.value+'%';
+  if($('#fxDistBtn').classList.contains('on')){
+    fxRamp(FXN.distMx,+e.target.value/100);
+    fxRamp(fxDry,1-(+e.target.value/100)); /* v1.4.27: кроссфейд живой */
+  }});
+$('#fxDistV').addEventListener('input',e=>{$('#fxDistVv').textContent=e.target.value+'%';
+  fxRamp(fxDistV,+e.target.value/100);});
+
+document.querySelectorAll('#wavePanel .wbtn').forEach(b=>{ b.addEventListener('click',()=>setChipVoice(b.dataset.wave)); });
+(function fillChipVoices(){
+  const sel=$('#chipVoiceSel');
+  CHIP_VOICES.forEach(v=>{ const o=document.createElement('option'); o.value=v.id; o.textContent=v.name; sel.appendChild(o); });
+  sel.value=state.chipVoice;
+})();
+/* ============================================================
+   ФАЙЛ 03/13: 03_sf2_parser.js
+   Секция: ПАРСЕР SF2 (живучий: обход RIFF/LIST + RIFX + сигнатурный поиск)
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ ПАРСЕР SF2 (живучий: обход RIFF/LIST + RIFX + сигнатурный поиск) ============ */
+const REC={phdr:38,pbag:4,pmod:4,inst:22,ibag:4,igen:4,shdr:46};
+function parseSF2(buf){
+  const N=buf.byteLength;
+  if(N<64) throw new Error('файл слишком мал ('+N+' байт)');
+  const dv=new DataView(buf), u8=new Uint8Array(buf);
+  const str=(o,n)=>{let t='';for(let i=0;i<n&&o+i<N;i++){const c=u8[o+i];if(c<32||c>126)break;t+=String.fromCharCode(c);}return t;};
+  const head=str(0,4);
+  if(head!=='RIFF'&&head!=='RIFX')
+    throw new Error('это не SoundFont2: сигнатура "'+head+'"');
+  const le=(head!=='RIFX');
+  const u32=o=>(o>=0&&o+4<=N)?dv.getUint32(o,le):0;
+  const u16=o=>(o>=0&&o+2<=N)?dv.getUint16(o,le):0;
+  const s16=o=>(o>=0&&o+2<=N)?dv.getInt16(o,le):0;
+  const found={};
+  /* --- уровень 1: структурный обход с спуском в RIFF/LIST (ЗАЩИЩЕННЫЙ) --- */
+  const walk = (from, to, depth) => {
+    if (depth > 10) return;
+    let p = from;
+    while (p + 8 <= to) {
+      const cid = str(p, 4), cs = u32(p + 4);
+      
+      // ИСПРАВЛЕНИЕ: Жесткая проверка на битый/отрицательный размер или выход за пределы файла
+      if (cs < 0 || cs > (N - p - 8)) { 
+        const rest = Math.max(0, to - (p + 8));
+        if (cid && !found[cid] && cid !== 'LIST' && cid !== 'RIFF' && cid !== 'RIFX') {
+          found[cid] = { start: p + 8, size: rest };
+        }
+        break; // Прерываем чтение поврежденной ветки
+      }
+      
+      if (cid === 'LIST' || cid === 'RIFF' || cid === 'RIFX') {
+        const inner = p + 12, end = Math.min(p + 8 + cs, N);
+        if (cs >= 4) walk(inner, end, depth + 1);
+        p = end; 
+        if (cs % 2) p++;
+      } else {
+        if (!found[cid]) found[cid] = { start: p + 8, size: cs };
+        
+        // ИСПРАВЛЕНИЕ: Предохранитель от нулевого или отрицательного сдвига указателя
+        const step = 8 + cs + (cs % 2);
+        if (step <= 8) { 
+          break; // Защита от бесконечного зацикливания на одном месте
+        }
+        p += step;
+      }
+      if (p <= from) break; // Защита от отката указателя назад
+    }
+  };
+  walk(12, N, 0);
+  /* --- уровень 2: сигнатурный поиск для недостающих критичных чанков --- */
+  const req=['phdr','pbag','pmod','inst','ibag','imap','igen','shdr'];
+  const need=req.filter(id=>!found[id]);
+  if(need.length){
+    for(const id of need){
+      const a=id.charCodeAt(0),b=id.charCodeAt(1),c=id.charCodeAt(2),d=id.charCodeAt(3);
+      let best=-1,bestScore=-1,bestSize=0;
+      const rec=REC[id]||0;
+      for(let i=0;i+12<=N;i++){
+        if(u8[i]!==a||u8[i+1]!==b||u8[i+2]!==c||u8[i+3]!==d) continue;
+        const cs=u32(i+4);
+        if(cs<=0||i+8+cs>N) continue;
+        const even=(cs%rec)===0;
+        const score=(even?1e12:0)+i; /* кратный размеру записи + самая поздняя позиция */
+        if(score>=bestScore){best=i;bestScore=score;bestSize=cs;}
+      }
+      if(best>=0) found[id]={start:best+8,size:bestSize};
+    }
+  }
+  /* --- smpl (данные сэмплов) --- */
+  let sampleStart=0, sampleEnd=N;
+  if(found['smpl']){
+    sampleStart=found['smpl'].start;
+    sampleEnd=Math.min(sampleStart+found['smpl'].size,N);
+  }else{
+    let best=-1,bestSize=0;
+    const a=115,b=109,c=112,d=108; /* 'smpl' */
+    for(let i=0;i+12<=N;i++){
+      if(u8[i]!==a||u8[i+1]!==b||u8[i+2]!==c||u8[i+3]!==d) continue;
+      const cs=u32(i+4);
+      if(cs<=0||i+8+cs>N) continue;
+      if(cs>bestSize){best=i;bestSize=cs;}
+    }
+    if(best>=0){sampleStart=best+8;sampleEnd=best+8+bestSize;}
+  }
+  /* --- версии: предупредить о SF3 --- */
+  if(found['ifil']){
+    const maj=u16(found['ifil'].start);
+    if(maj>=3) log('ПРЕДУПРЕЖДЕНИЕ: банк SF3 (сжатые сэмплы) — звук будет шумом, нужен SF2');
+  }
+  const miss=['phdr','pbag','inst','ibag','igen','shdr'].filter(id=>!found[id]);
+  if(miss.length)
+    throw new Error('в банке нет чанков: '+miss.join(', ')+' | найдены: '+Object.keys(found).join(', '));
+  /* --- разбор записей с защитой границ --- */
+  const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+  const phdrN=Math.floor(found['phdr'].size/38);
+  const pbagN=Math.floor(found['pbag'].size/4);
+  const pgenN=found['pgen']?Math.floor(found['pgen'].size/4):0;
+  const instN=Math.floor(found['inst'].size/22);
+  const ibagN=Math.floor(found['ibag'].size/4);
+  const igenN=Math.floor(found['igen'].size/4);
+  const shdrN=Math.floor(found['shdr'].size/46);
+  if(phdrN<2) throw new Error('phdr пуст ('+phdrN+' записей)');
+  const pbags=[],pgens=[],insts=[],ibags=[],igens=[],shdrs=[],presets=[];
+  for(let i=0;i<pbagN;i++) pbags.push({gi:u16(found['pbag'].start+i*4)});
+  for(let i=0;i<pgenN;i++) pgens.push({op:u16(found['pgen'].start+i*4),amt:u16(found['pgen'].start+i*4+2)});
+  for(let i=0;i<instN;i++){
+    const o=found['inst'].start+i*22;
+    insts.push({name:str(o,20),bag:u16(o+20)});
+  }
+  for(let i=0;i<ibagN;i++) ibags.push({gi:u16(found['ibag'].start+i*4)});
+  for(let i=0;i<igenN;i++) igens.push({op:u16(found['igen'].start+i*4),amt:u16(found['igen'].start+i*4+2)});
+  for(let i=0;i<shdrN;i++){
+    const o=found['shdr'].start+i*46;
+    let sr=u32(o+36); if(sr<8000||sr>96000) sr=44100;
+    shdrs.push({name:str(o,20),start:u32(o+20),end:u32(o+24),
+      startLoop:u32(o+28),endLoop:u32(o+32),sampleRate:sr,
+      origPitch:u8[o+40],pitchCorr:(u8[o+41]>127?u8[o+41]-256:u8[o+41])});
+  }
+  for(let i=0;i<phdrN-1;i++){
+    const o=found['phdr'].start+i*38;
+    presets.push({name:str(o,20),preset:u16(o+20),bank:u16(o+22),
+      bag:u16(o+24),bagEnd:u16(found['phdr'].start+(i+1)*38+24)});
+  }
+  const zones=(bagArr,genArr,b0,b1)=>{
+    b0=clamp(b0|0,0,bagArr.length);
+    b1=clamp(b1|0,b0,bagArr.length);
+    const out=[];
+    for(let b=b0;b<b1;b++){
+      const g0=clamp(bagArr[b].gi|0,0,genArr.length);
+      const g1=clamp(b+1<bagArr.length?bagArr[b+1].gi|0:genArr.length,g0,genArr.length);
+      const gens={};
+      for(let g=g0;g<g1;g++) gens[genArr[g].op]=genArr[g].amt;
+      out.push({gens});
+    }
+    return out;
+  };
+  const sf={dv,le,sampleStart,sampleEnd,presets,pbags,pgens,insts,ibags,igens,shdrs,zones};
+  (sf.presets||[]).forEach((p,i)=>p.spans=buildSpans(sf,i));
+  return sf;
+}
+function buildSpans(sf,pi){
+  const p=sf.presets[pi];
+  const pz=sf.zones(sf.pbags,sf.pgens,p.bag,p.bagEnd);
+  const pg=(pz.find(z=>z.gens[41]===undefined)||{gens:{}}).gens;
+  const spans=[];
+  for(const z of pz){
+    const instIdx=z.gens[41]; if(instIdx===undefined) continue;
+    const ins=sf.insts[instIdx]; if(!ins) continue;
+    const ibEnd=(instIdx+1<sf.insts.length)?sf.insts[instIdx+1].bag:sf.ibags.length;
+    const iz=sf.zones(sf.ibags,sf.igens,ins.bag,ibEnd);
+    const ig=(iz.find(z2=>z2.gens[53]===undefined)||{gens:{}}).gens;
+    for(const z2 of iz){
+      const sIdx=z2.gens[53]; if(sIdx===undefined) continue;
+      const h=sf.shdrs[sIdx]; if(!h) continue;
+      const G=Object.assign({},pg,ig,z2.gens);
+      let lo=0,hi=127;
+      if(G[43]!==undefined){lo=G[43]&0xFF;hi=(G[43]>>8)&0xFF;}
+      if(z.gens[43]!==undefined){lo=Math.max(lo,z.gens[43]&0xFF);hi=Math.min(hi,(z.gens[43]>>8)&0xFF);}
+      let vlo=0,vhi=127;
+      if(G[44]!==undefined){vlo=G[44]&0xFF;vhi=(G[44]>>8)&0xFF;}
+      const root=G[57]!==undefined?G[57]:h.origPitch;
+      spans.push({lo,hi,vlo,vhi,sample:sIdx,
+        root:(root>0&&root<=127)?root:60,
+        coarse:G[51]!==undefined?sgn(G[51]):0,
+        fine:G[52]!==undefined?sgn(G[52]):0,
+        attack:tc2s(G[35]!==undefined?sgn(G[35]):-12000),
+        hold:tc2s(G[36]!==undefined?sgn(G[36]):-12000),
+        decay:tc2s(G[37]!==undefined?sgn(G[37]):-12000),
+        sustain:G[38]!==undefined?sgn(G[38]):0,
+        release:tc2s(G[39]!==undefined?sgn(G[39]):-12000),
+        atten:G[48]!==undefined?sgn(G[48]):0,
+        modes:G[54]||0,corr:h.pitchCorr});
+    }
+  }
+  return spans;
+}
+function presetGlobalGens(sf,pi){
+  const p=sf.presets[pi]; if(!p) return {};
+  const pz=sf.zones(sf.pbags,sf.pgens,p.bag,p.bagEnd);
+  const z=pz.find(z=>z.gens[41]===undefined);
+  return z?z.gens:{};
+}
+function mkSpan(sf,G,sIdx){
+  const h=sf.shdrs[sIdx]; if(!h) return null;
+  let lo=0,hi=127;
+  if(G[43]!==undefined){lo=G[43]&0xFF;hi=(G[43]>>8)&0xFF;}
+  let vlo=0,vhi=127;
+  if(G[44]!==undefined){vlo=G[44]&0xFF;vhi=(G[44]>>8)&0xFF;}
+  const root=G[57]!==undefined?G[57]:h.origPitch;
+  return {lo,hi,vlo,vhi,sample:sIdx,
+    root:(root>0&&root<=127)?root:60,
+    coarse:G[51]!==undefined?sgn(G[51]):0,
+    fine:G[52]!==undefined?sgn(G[52]):0,
+    attack:tc2s(G[35]!==undefined?sgn(G[35]):-12000),
+    hold:tc2s(G[36]!==undefined?sgn(G[36]):-12000),
+    decay:tc2s(G[37]!==undefined?sgn(G[37]):-12000),
+    sustain:G[38]!==undefined?sgn(G[38]):0,
+    release:tc2s(G[39]!==undefined?sgn(G[39]):-12000),
+    atten:G[48]!==undefined?sgn(G[48]):0,
+    modes:G[54]||0,corr:h.pitchCorr};
+}
+function buildSpansInst(sf,instIdx,base){
+  const ins=sf.insts[instIdx]; if(!ins) return [];
+  const ibEnd=(instIdx+1<sf.insts.length)?sf.insts[instIdx+1].bag:sf.ibags.length;
+  const iz=sf.zones(sf.ibags,sf.igens,ins.bag,ibEnd);
+  const out=[];
+  for(const z2 of iz){
+    const sIdx=z2.gens[53]; if(sIdx===undefined) continue;
+    const sp=mkSpan(sf,Object.assign({},base||{},z2.gens),sIdx);
+    if(sp) out.push(sp);
+  }
+  return out;
+}
+/* ============================================================
+   ФАЙЛ 04/13: 04_sf2_playback.js
+   Секция: воспроизведение SF2
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ воспроизведение SF2 ============ */
+function getBuffer(sf,sIdx){
+  if(state.sampleCache.has(sIdx)) return state.sampleCache.get(sIdx);
+  const h=sf.shdrs[sIdx];
+  let len=Math.max(0,h.end-h.start);
+  const avail=Math.floor((sf.sampleEnd-sf.sampleStart)/2);
+  len=Math.min(len,Math.max(0,avail-h.start));
+  if(len<=0){ state.sampleCache.set(sIdx,null); return null; }
+  const ab=audioCtx.createBuffer(1,len,h.sampleRate);
+  const data0=ab.getChannelData(0);
+  for(let i=0;i<len;i++) data0[i]=sf.dv.getInt16(sf.sampleStart+(h.start+i)*2,sf.le)/32768;
+  let entry={buffer:ab,loopStart:null,loopEnd:null};
+  if(h.startLoop<h.endLoop&&h.startLoop>=h.start&&h.endLoop<=h.start+len){
+    entry.loopStart=(h.startLoop-h.start)/h.sampleRate;
+    entry.loopEnd=(h.endLoop-h.start)/h.sampleRate;
+  }
+  state.sampleCache.set(sIdx,entry);
+  return entry;
+}
+const VOICE_MAX=32;
+function sfOn(key,vel=100){ startCtx(()=>sfOnCore(key,vel)); }
+function sfOnCore(key,vel=100){
+  ensureAudio();
+  const sf=state.sf2;
+  if(!sf){ log('Банк не загружен — играет CHIP.'); chipOn(key,vel); return; }
+  /* повторное нажатие зажатой клавиши: старый голос глушим, иначе голоса копятся и звук нарастает */
+  const old=activeSF2.get(key);
+  if(old){
+    const t0=audioCtx.currentTime;
+    try{ const G=old.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t0);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t0);G.setValueAtTime(holdV,t0);} G.setTargetAtTime(0,t0,0.01); old.src.stop(t0+0.1); }catch(_){}
+    activeSF2.delete(key);
+  }
+  /* потолок полифонии: при переполнении крадём самый старый голос */
+  if(activeSF2.size>=VOICE_MAX){ const k0=activeSF2.keys().next().value; sfOff(k0); }
+  const p=sf.presets[state.presetIdx];
+  let spans=null;
+  if(state.instIdx>=0&&sf.insts[state.instIdx]){
+    const kk=state.presetIdx+':'+state.instIdx;
+    if(state.instSpansKey!==kk){ state.instSpans=buildSpansInst(sf,state.instIdx,presetGlobalGens(sf,state.presetIdx)); state.instSpansKey=kk; }
+    spans=state.instSpans;
+    if(!spans.length){ log('Инструмент №'+state.instIdx+' без сэмпловых зон — играет CHIP.'); chipOn(key,vel); return; }
+  } else {
+    if(!p){ log('Пресет не выбран — играет CHIP.'); chipOn(key,vel); return; }
+    spans=p.spans;
+    if(!spans.length){ log('Пресет пуст (0 зон) — играет CHIP.'); chipOn(key,vel); return; }
+  }
+  let span=spans.find(s=>key>=s.lo&&key<=s.hi&&vel>=s.vlo&&vel<=s.vhi);
+  if(!span) span=spans.find(s=>key>=s.lo&&key<=s.hi);
+  if(!span){
+    const los=Math.min(...spans.map(s=>s.lo)), his=Math.max(...spans.map(s=>s.hi));
+    log('Нота '+key+' вне диапазона ['+los+'–'+his+'] — играет CHIP.');
+    chipOn(key,vel); return;
+  }
+  const entry=getBuffer(sf,span.sample);
+  if(!entry){ log('Сэмпл '+span.sample+' пуст — играет CHIP.'); chipOn(key,vel); return; }
+  const src=audioCtx.createBufferSource();
+  src.buffer=entry.buffer;
+  const cents=(key-span.root)*100+span.corr+span.coarse*100+span.fine+bendCents;
+  src.playbackRate.value=Math.pow(2,cents/1200);
+  if(entry.loopStart!==null&&(span.modes===1||span.modes===3)){
+    src.loop=true; src.loopStart=entry.loopStart; src.loopEnd=entry.loopEnd;
+  }
+  const g=audioCtx.createGain(), t=audioCtx.currentTime;
+  const A=Math.max(span.attack,0.002), H=Math.max(span.hold,0);
+  const D=Math.max(span.decay,0.01);
+  const peak=Math.min(0.9,Math.pow(vel/127,1.5)*Math.pow(10,-Math.max(0,span.atten)/200)*0.9);
+  const sus=Math.min(1,Math.max(0.0005,Math.pow(10,-Math.abs(span.sustain)/200)));
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(peak,t+A);
+  g.gain.setValueAtTime(peak,t+A+H);
+  g.gain.exponentialRampToValueAtTime(Math.max(peak*sus,0.0005),t+A+H+D);
+  src.connect(g); g.connect(fxBus||master); src.start(t); /* 2A03 ПУЛЬТ: SF2 в общую шину рэка */
+  activeSF2.set(key,{src,g,rel:Math.max(span.release,0.02),rate:src.playbackRate.value});
+  hl(key,true);
+}
+function sfOff(key){
+  const v=activeSF2.get(key); if(!v) return false;
+  const t=audioCtx.currentTime;
+  const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}
+  v.g.gain.setTargetAtTime(0,t,v.rel/3);
+  v.src.stop(t+v.rel*2);
+  activeSF2.delete(key); hl(key,false);
+  setTimeout(()=>{ try{ v.g.disconnect(); }catch(_){} },Math.round(v.rel*2*1000)+50); /* уборка после хвоста */
+}
+/* ============================================================
+   ФАЙЛ 05/13: 05_sustain.js
+   Секция: сустейн 1/8 · 1/4 · 1/2 (доля + затухание)
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ сустейн 1/8 · 1/4 · 1/2 (доля + затухание) ============ */
+const SUS_FRACTIONS={'1/8':1/8,'1/4':1/4,'1/2':1/2}; /* v1.4.20: сустейн — доля целой ноты */
+function susDims(mode){ /* v1.4.20: gate/tail вычисляются от BPM — всё ограничено 1 целой */
+  const whole=240000/bpm, frac=SUS_FRACTIONS[mode]??SUS_FRACTIONS['1/8'];
+  const gate=whole*frac;
+  return {gate, tail: Math.max(300, whole-gate)}; /* хвост = остаток периода до границы целой */
+} /* v1.4.20: */
+let susMode='';
+const susTimers=new Map(); /* key -> {relT,hlT} */
+const dampKeys=new Set(); /* v1.4.20: ноты в окне рояльного демпфера — повторное нажатие снимает метку */
+function susDecay(key){ /* начало затухания по границе доли */
+  const md=susDims(susMode); /* v1.4.20: хвост = остаток периода */ /* v1.4.20: */
+  if(!audioCtx) return;
+  const t=audioCtx.currentTime, tau=md.tail/8000; /* хвост ~8 тау (v1.4.16: остаток сигнала <0,04% — щелчок за порогом слышимости) */
+  const vC=activeChip.get(key);
+  if(vC){
+    try{const G=vC.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
+    vC.g.gain.setTargetAtTime(0,t,tau);
+    vC.nodes.forEach(n=>{try{n.stop(t+md.tail/1000);}catch(_){}});
+    activeChip.delete(key);
+    setTimeout(()=>{try{vC.g.disconnect();}catch(_){}},md.tail+50);
+  }
+  const vS=activeSF2.get(key);
+  if(vS){
+    try{const G=vS.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
+    vS.g.gain.setTargetAtTime(0,t,tau);
+    try{vS.src.stop(t+md.tail/1000);}catch(_){}
+    activeSF2.delete(key);
+    setTimeout(()=>{try{vS.g.disconnect();}catch(_){}},md.tail+50);
+  }
+  const vM=activeMidi.get(key);
+  if(vM){
+    try{const G=vM.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
+    vM.g.gain.setTargetAtTime(0,t,tau);
+    vM.nodes.forEach(n=>{try{n.stop(t+md.tail/1000);}catch(_){}});
+    activeMidi.delete(key);
+    setTimeout(()=>{try{vM.g.disconnect();}catch(_){}},md.tail+50);
+  }
+  updVoices();
+}
+function susCancel(key){
+  const s=susTimers.get(key);
+  if(s){clearTimeout(s.relT);clearTimeout(s.hlT);susTimers.delete(key);}
+}
+function susClearAll(){
+  for(const [k,s] of susTimers){clearTimeout(s.relT);clearTimeout(s.hlT);hl(k,false);}
+  susTimers.clear();
+}
+let bpm=120; /* ТЕМП: 40–300 BPM; целая нота = 4 доли = 240/BPM секунд */
+const killTimers=new Map(); /* key -> таймер потолка ноты */
+
+function ceilingKill(k){ /* потолок: нота звучит не дольше 1 целой — залипший MIDI не страшен */
+  killTimers.delete(k);
+  if(!activeChip.has(k)&&!activeSF2.has(k)&&!activeMidi.has(k)) return;
+  susDecay(k); susCancel(k); hl(k,false);
+  log('Потолок ноты: нота '+k+' заглушена — прозвучала 1 целую ('+bpm+' BPM).');
+}
+function clearCeiling(k){ const t=killTimers.get(k); if(t){clearTimeout(t);killTimers.delete(k);} }
+function scheduleCeiling(k){ clearCeiling(k); killTimers.set(k,setTimeout(()=>ceilingKill(k),240000/bpm)); }
+
+function susSchedule(key){ /* нота живёт ПОСЛЕ отпускания до границы доли */
+  const now=performance.now();
+  const v=activeChip.get(key)||activeSF2.get(key)||activeMidi.get(key);
+  const st=(v&&v.st)||now;
+  const md=susDims(susMode); /* v1.4.20: доля от текущего BPM */ /* v1.4.20: */
+  const rem=Math.max(0,st+md.gate-now);
+  const relT=setTimeout(()=>{susDecay(key);},rem);
+  const hlT=setTimeout(()=>{hl(key,false);susTimers.delete(key);},rem+md.tail);
+  susTimers.set(key,{relT,hlT});
+  updVoices();
+}
+function hardOff(k){ /* мгновенное глушение без педали */
+  const wasMidi=state.mode==='midi'?midiOff(k):false; const wasSF2=state.mode==='sf2'?sfOff(k):false; if(!wasMidi&&!wasSF2) chipOff(k);
+}
+function setSusMode(mode){
+  susMode = mode;
+  [['susBtn8','1/8'],['susBtn4','1/4'],['susBtn2','1/2']].forEach(([id,m])=>{
+    const b = document.getElementById(id); if(b) b.classList.toggle('on',mode===m);
+  });
+  if(!mode){ susClearAll(); log('Сустейн выключен.'); return; }
+  
+  /* ИСПРАВЛЕНИЕ: Создаем изолированный снимок ключей, чтобы избежать сбоя итератора Map при удалении */
+  const now = performance.now();
+  const keysToUpdate = Array.from(susTimers.keys());
+  
+  for(const k of keysToUpdate){
+    const s = susTimers.get(k);
+    if (!s) continue;
+    
+    // Безопасно очищаем старые таймауты перед перезаписью
+    clearTimeout(s.relT); 
+    clearTimeout(s.hlT);
+    
+    const v = activeChip.get(k) || activeSF2.get(k) || activeMidi.get(k);
+    const st = (v && v.st) || now;
+    const md19=susDims(mode); /* v1.4.20 */
+    const rem = Math.max(0, st + md19.gate - now); /* v1.4.20: */
+    
+    // Пересоздаем объект таймеров заново
+    const newTimers = {
+      relT: setTimeout(() => { susDecay(k); }, rem),
+      hlT: setTimeout(() => { 
+        hl(k, false); 
+        susTimers.delete(k); // Теперь удаление безопасно
+      }, rem + md19.tail) /* v1.4.20 */ /* v1.4.20: */
+    };
+    
+    susTimers.set(k, newTimers);
+  }
+  log('Сустейн: ' + mode + ' — нота поёт после отпускания, затем затухание.');
+}
+/* ============================================================
+   ФАЙЛ 06/13: 06_sensitivity.js
+   Секция: ТУШЕ: режимы чувствительности
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* === ТУШЕ: режимы чувствительности === */
+const SENS_MODES={soft:[40,65],hard:[1,100],fixed:[80,80]};
+let sensMode='hard';
+function applySens(relY){
+  if(sensMode==='fixed') return 80;
+  const [lo,hi]=SENS_MODES[sensMode];
+  const t=Math.min(1,Math.max(0,relY));
+  const curve=(sensMode==='hard')?t*t:Math.pow(t,1.6); /* HARD — крутая кривая, SOFT — мягкая */
+  return Math.round(lo+(hi-lo)*curve);
+}
+function setSensMode(m){
+  sensMode=m;
+  $('#sensSoft').classList.toggle('on',m==='soft');
+  $('#sensHard').classList.toggle('on',m==='hard');
+  $('#sensFixed').classList.toggle('on',m==='fixed');
+  log('ТУШЕ: '+m.toUpperCase()+(m==='soft'?' — мягкий диапазон 40–65%':(m==='hard'?' — полный диапазон 1–100%':' — фиксированные 80%')));
+}
+$('#sensSoft').addEventListener('click',()=>setSensMode('soft'));
+$('#sensHard').addEventListener('click',()=>setSensMode('hard'));
+$('#sensFixed').addEventListener('click',()=>setSensMode('fixed'));
+/* v1.4.28: ОКТ. МОДИФИКАТОРЫ — пустая октава 0 стала функциональной.
+   C0 (MIDI 12) = Power Mute: глушит всё играющее и держит «ладонь на струнах».
+   D0 (MIDI 14) = Chromatic: пока зажата, ноты играются флажолетом +19 (7-й лад), громкость 50%.
+   Перехват стоит до диспетчеризации — покрывает CHIP, SF2 и MIDI GM сразу.
+   Тумблеры pmToggle/chrToggle управляют активностью; ВЫКЛ = октава 0 снова вне диапазона. */
+const PM_KEY=12, CHR_KEY=14;
+let pmHeld=false, chrHeld=false, pmEngaged=true, chrEngaged=true;
+const chrMap=new Map(); /* оригинальная нота -> флажолетовый ключ */
+function pmMuteAll(){
+  for(const t of killTimers.values()) clearTimeout(t);
+  sustained.clear(); susClearAll(); dampKeys.clear(); chrMap.clear();
+  [...activeSF2.keys()].forEach(k=>sfOff(k));
+  [...activeChip.keys()].forEach(k=>chipOff(k));
+  [...activeMidi.keys()].forEach(k=>midiOff(k));
+  updVoices();
+}
+function noteOn(k,v){
+  if(pmEngaged&&k===PM_KEY){ if(!pmHeld){ pmHeld=true; pmMuteAll(); log('PM: C0 — все голоса заглушены'); } return; }
+  if(pmEngaged&&pmHeld){ log('PM: нота '+k+' заглушена'); return; }
+  if(chrEngaged&&k===CHR_KEY){ if(!chrHeld){ chrHeld=true; log('CHR: D0 зажата — флажолеты +19'); } return; }
+  if(chrEngaged&&chrHeld){
+    const k1=k+19, cap=k1>78, k2=cap?78:k1;
+    if(k2<24){ log('CHR: нота '+k+' вне диапазона'); return; }
+    if(noteOwner.has(k)) noteOwner.set(k2, noteOwner.get(k));
+    chrMap.set(k,k2);
+    log('CHR: '+k+'→'+k2+(cap?' (потолок диапазона)':''));
+    k=k2; v=Math.round(v*0.5);
+  }
+  dampKeys.delete(k); /* v1.4.20: живая реатака отменяет отложенный демпфер */
+  susCancel(k); /* повторное нажатие: старый отложенный хвост снимается, голос пересоздаётся */
+  state.mode==='midi'?midiOn(k,v):state.mode==='sf2'?sfOn(k,v):chipOn(k,v);
+  const nv=activeChip.get(k)||activeSF2.get(k)||activeMidi.get(k);
+  if(nv) nv.st=performance.now(); /* метка старта ноты — от неё отсчитывается доля */
+  scheduleCeiling(k); /* предохранитель: максимум 1 целая */
+}
+function noteOff(k){
+  if(pmEngaged&&k===PM_KEY){ if(pmHeld){ pmHeld=false; log('PM: C0 отпущена — играем'); } return; }
+  if(chrEngaged&&k===CHR_KEY){ chrHeld=false; return; }
+  if(chrMap.has(k)){ /* v1.4.28: флажолет снимается по оригинальной ноте, даже если D0 уже отпущена */
+    const k2=chrMap.get(k);
+    if(noteOwner.has(k)&&noteOwner.get(k)!==undefined){ noteOwner.set(k2, noteOwner.get(k)); }
+    noteOwner.delete(k); chrMap.delete(k); k=k2;
+  }
+  clearCeiling(k);
+  if(susMode){ susSchedule(k); return; }
+  hardOff(k);
+}
+$('#susBtn8').addEventListener('click',()=>setSusMode(susMode==='1/8'?'':'1/8'));
+$('#susBtn4').addEventListener('click',()=>setSusMode(susMode==='1/4'?'':'1/4'));
+$('#susBtn2').addEventListener('click',()=>setSusMode(susMode==='1/2'?'':'1/2'));
+
+/* ТЕМП: ползунок 40–300 BPM; при смене предохранители живых голосов пересчитываются */
+$('#bpm').addEventListener('input',e=>{
+  bpm=Math.max(40,Math.min(300,Math.round(+e.target.value||120)));
+  const bv=$('#bpmVal'); if(bv) bv.textContent=bpm+' BPM';
+  const now=performance.now();
+  for(const [k,t] of killTimers){
+    clearTimeout(t);
+    const v=activeChip.get(k)||activeSF2.get(k)||activeMidi.get(k);
+    if(!v){killTimers.delete(k);continue;}
+    const rem=Math.max(300,(v.st||now)+240000/bpm-now); /* v1.4.16: ноты старше нового потолка дозванивают 300 мс, а не казнятся мгновенно */
+    killTimers.set(k,setTimeout(()=>ceilingKill(k),rem));
+  }
+  /* v1.4.20: сустейн-хвосты пересчитываются под новый темп — ноты дозванивают, не обрываются */
+  const now19=performance.now();
+  for(const [k,s19] of susTimers){
+    clearTimeout(s19.relT); clearTimeout(s19.hlT);
+    const v19=activeChip.get(k)||activeSF2.get(k)||activeMidi.get(k);
+    if(!v19){susTimers.delete(k);continue;}
+    const md19=susDims(susMode);
+    const rem=Math.max(0,(v19.st||now19)+md19.gate-now19);
+    susTimers.set(k,{relT:setTimeout(()=>susDecay(k),rem),hlT:setTimeout(()=>{hl(k,false);susTimers.delete(k);},rem+md19.tail)});
+  }
+  log('ТЕМП: '+bpm+' BPM — целая нота '+(240/bpm).toFixed(2)+' с.'); /* v1.4.20: */
+});
+/* ============================================================
+   ФАЙЛ 07/13: 07_sf2_loader.js
+   Секция: загрузка SF2
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ загрузка SF2 ============ */
+$('#sf2file').addEventListener('change',async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const sf=parseSF2(await f.arrayBuffer());
+    state.sf2=sf; state.presetIdx=0; state.instIdx=-1; state.instSpans=null; state.instSpansKey='';
+    state.sampleCache.clear();
+    const banks=[...new Set(sf.presets.map(p=>p.bank))].sort((a,b)=>a-b);
+    const bsel=$('#bankSel'); bsel.innerHTML=''; bsel.disabled=false;
+    banks.forEach(b=>{
+      const o=document.createElement('option');
+      o.value=b; o.textContent='Банк '+b+(banks.length>1?(' ('+sf.presets.filter(q=>q.bank===b).length+' пресетов)'):'');
+      bsel.appendChild(o);
+    });
+    const isel=$('#instSel'); isel.innerHTML='<option value="-1">— авто (из пресета) —</option>'; isel.disabled=false;
+    for(let i=0;i<sf.insts.length-1;i++){
+      const o=document.createElement('option');
+      o.value=i; o.textContent=i+': '+(sf.insts[i].name||'инструмент');
+      isel.appendChild(o);
+    }
+    const firstP=fillPresetSel(banks.length?banks[0]:0);
+    state.presetIdx=firstP>=0?firstP:-1;
+    if(firstP>=0) $('#presetSel').value=String(firstP);
+    lcd('MODE: [SoundFont]\nБанк: ['+f.name+'] — Пресетов: ['+sf.presets.length+']\nПресет: [—] — Инструмент: [— авто —]\nВыберите банк, пресет или инструмент — и играйте.');
+    log('Загружен банк: '+f.name+' ('+(f.size/1048576).toFixed(1)+' МБ) — пресетов: '+sf.presets.length+'; '+(sf.le?'RIFF':'RIFX'));
+  }catch(err){ log('Ошибка SF2: '+err.message); lcd('SF2 ERROR: '+err.message); }
+  finally{ $('#sf2file').value=''; }
+});
+function fillPresetSel(bank){
+  const sel=$('#presetSel'); sel.innerHTML=''; sel.disabled=false;
+  let first=-1;
+  state.sf2.presets.forEach((pr,i)=>{
+    if(pr.bank!==bank) return;
+    if(first<0) first=i;
+    const o=document.createElement('option');
+    o.value=i; o.textContent=pr.preset+': '+(pr.name||'(без имени)');
+    sel.appendChild(o);
+  });
+  if(first<0){
+    const o=document.createElement('option'); o.value=''; o.textContent='(в банке нет пресетов)';
+    sel.appendChild(o); sel.disabled=true;
+  }
+  return first;
+}
+function updateBankLcd(){
+  const sf=state.sf2; if(!sf) return;
+  const p=sf.presets[state.presetIdx];
+  const ins=state.instIdx>=0?('№'+state.instIdx+' «'+((sf.insts[state.instIdx]||{}).name||'инструмент')+'»'):'авто';
+  lcd('MODE: [SoundFont]\nБанк: ['+$('#bankSel').value+'] — Пресетов: ['+sf.presets.length+']\nПресет: ['+(p?(p.name||'(без имени)'):'—')+'] — Инструмент: ['+ins+']');
+}
+$('#bankSel').addEventListener('change',e=>{
+  if(!state.sf2) return;
+  const first=fillPresetSel(+e.target.value);
+  if(first>=0){ state.presetIdx=first; $('#presetSel').value=String(first); } else state.presetIdx=-1;
+  state.instSpansKey='';
+  updateBankLcd();
+  log('Банк переключён на '+e.target.value+' — пресеты пересобраны.');
+});
+$('#presetSel').addEventListener('change',e=>{
+  if(!state.sf2) return;
+  const v=+e.target.value;
+  state.presetIdx=Number.isFinite(v)&&e.target.value!==''?v:-1;
+  state.instSpansKey='';
+  updateBankLcd();
+  const p=state.sf2.presets[state.presetIdx];
+  if(p&&!p.spans.length) log('Пресет «'+(p.name||'(без имени)')+'» пуст (0 зон) — выберите другой.');
+});
+$('#instSel').addEventListener('change',e=>{
+  if(!state.sf2) return;
+  state.instIdx=+e.target.value; state.instSpansKey='';
+  updateBankLcd();
+  log(state.instIdx>=0
+    ?('Инструмент: выбран №'+state.instIdx+' — разрез клавиатуры теперь из инструмента, зоны сэмплов не тронуты.')
+    :'Инструмент: авто — выбор инструмента из пресета.');
+});
+/* ============================================================
+   ФАЙЛ 08/13: 08_keyboard_mouse.js
+   Секция: клавиатура (мышь)
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ клавиатура (мышь) ============ */
+const KB_LO=24, KB_HI=108; /* C1..C8 — полная октавность (режим 2) */
+
+let kbMode=2; /* 2 — две клавиатуры C1..C8; 1 — одна клавиатура, вид v1.0.25 */
+const keyEls1=new Map(), keyEls2=new Map();
+const isBlackM=m=>[1,3,6,8,10].includes(m);
+const NOTE_L=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+/* граница октавы Пполный ролл: 24..78 (до C8) в обоих режимах */
+const PC_MIN=()=>24;
+const PC_MAX=()=>108;
+function buildKeys(){
+  const roles=[[document.getElementById('keys'),keyEls1],[document.getElementById('keys2'),keyEls2]];
+  for(const [box,els] of roles){
+    if(!box) continue;
+    els.clear(); box.innerHTML='';
+    
+    // Принудительно ставим блоку относительное позиционирование для абсолютных координат клавиш
+    box.style.position = 'relative';
+    
+    let wCount = 0;
+    // Шаг 1: Считаем, сколько белых клавиш попадет в наш диапазон, чтобы задать точную ширину контейнера
+    for (let k = KB_LO; k <= KB_HI; k++) {
+      if (!isBlackM(k % 12)) wCount++;
+    }
+    // Белая клавиша = 58px. Задаем динамическую ширину контейнера под диапазон 24-78
+    box.style.width = (wCount * 58) + 'px'; 
+    box.style.height = '164px';
+
+    let wIdx = 0;
+    // Шаг 2: Отрисовка БЕЛЫХ клавиш с четким позиционированием по горизонтали
+    for(let k = KB_LO; k <= KB_HI; k++){
+      const m = k % 12;
+      if(!isBlackM(m)){
+        const d = document.createElement('div');
+        d.className = 'wk'; 
+        d.dataset.key = k;
+        // ИСПРАВЛЕНИЕ: Каждой белой клавише задаем жесткую позицию слева
+        d.style.position = 'absolute';
+        d.style.left = (wIdx * 58) + 'px';
+        d.style.top = '0px';
+        
+        d.innerHTML = '<span class="lbl">' + NOTE_L[m] + (Math.floor(k / 12) - 1) + '</span>';
+        box.appendChild(d); 
+        els.set(k, d);
+        wIdx++; // Смещаем индекс для следующей белой клавиши
+      }
+    }
+
+    wIdx = 0;
+    // Шаг 3: Отрисовка ЧЁРНЫХ клавиш поверх белых
+    for(let k = KB_LO; k <= KB_HI; k++){
+      const m = k % 12;
+      if(isBlackM(m)){
+        const d = document.createElement('div');
+        d.className = 'bk'; 
+        d.dataset.key = k;
+        // Единый размер: белые 58x152, чёрные 36x94 — центровка на границе белых
+        d.style.position = 'absolute';
+        d.style.width = '36px'; 
+        d.style.height = '94px';
+        // Позиционируем черную клавишу строго между двумя белыми
+        d.style.left = (wIdx * 58 - 18) + 'px';
+        d.style.top = '0px';
+        
+        box.appendChild(d); 
+        els.set(k, d);
+      } else {
+        wIdx++; // Чёрная клавиша ориентируется на индекс предыдущей белой
+      }
+    }
+  }
+  centerOnBase();
+}
+function hl(k,on){
+  const e1=keyEls1.get(k), e2=keyEls2.get(k);
+  if(e1) e1.classList.toggle('act',on);
+  if(e2) e2.classList.toggle('act',on);
+  updVoices();
+}
+/* pointer-механика: усыновление владельца, ТУШЕ-кривая, снятие на up/cancel — навешивается один раз */
+function attachKb(box){
+  if(!box) return;
+  box.addEventListener('pointerdown',e=>{
+    const el=e.target.closest('.wk,.bk'); if(!el) return;
+    const r=el.getBoundingClientRect();
+    const relY=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));
+    const vel=applySens(relY);
+    ensureAudio(); noteOwner.set(+el.dataset.key,'@ext'); noteOn(+el.dataset.key,vel);
+    if(box.id==='keys'||box.id==='keys2') bumpNoteCnt(); /* v1.4.21: счётчик — обе клавиатуры */
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  const up=e=>{
+    const el=e.target.closest('.wk,.bk'); if(!el) return;
+    const _k=+el.dataset.key; if(noteOwner.get(_k)==='@ext'){ noteOwner.delete(_k); noteOff(_k); }
+  };
+  box.addEventListener('pointerup',up);
+  box.addEventListener('pointercancel',up);
+}
+/* ═══ СЧЁТЧИК НАЖАТЫХ НОТ (обе клавиатуры, v1.4.16 → расширено v1.4.21) ═══ */
+const noteCntEl=document.getElementById('noteCnt');
+let noteCnt=0;
+function bumpNoteCnt(){ noteCnt++; if(noteCntEl) noteCntEl.textContent=String(noteCnt); }
+if(noteCntEl){
+  noteCntEl.style.cursor='pointer';
+  noteCntEl.addEventListener('click',()=>{
+    noteCnt=0; noteCntEl.textContent='0';
+    if(typeof lcd==='function') lcd('СЧЁТЧИК НОТ: СБРОС');
+  });
+}
+attachKb(document.getElementById('keys'));
+attachKb(document.getElementById('keys2'));
+/* ленты скролла: независимые — каждая ведёт только свою клавиатуру */
+const tapeSyncs=[];
+function tapeSetup(strip,wrap){
+  if(!strip||!wrap) return;
+  const thumb=strip.querySelector('.tape-thumb');
+  if(!thumb) return;
+  const sync=()=>{
+    const maxS=wrap.scrollWidth-wrap.clientWidth;
+    const vis=maxS>0?wrap.clientWidth/wrap.scrollWidth:1;
+    const w=Math.max(24,Math.round(strip.clientWidth*vis));
+    thumb.style.width=w+'px';
+    thumb.style.left=(maxS>0?(wrap.scrollLeft/maxS)*(strip.clientWidth-w):0)+'px';
+  };
+  tapeSyncs.push(sync);
+  let drag=false,dragX=0,dragL=0;
+  thumb.addEventListener('pointerdown',e=>{
+    drag=true; dragX=e.clientX; dragL=wrap.scrollLeft;
+    try{thumb.setPointerCapture(e.pointerId);}catch(_){}
+    e.preventDefault();
+  });
+  thumb.addEventListener('pointermove',e=>{
+    if(!drag) return;
+    const maxS=wrap.scrollWidth-wrap.clientWidth; if(maxS<=0) return;
+    const track=Math.max(1,strip.clientWidth-thumb.offsetWidth);
+    wrap.scrollLeft=Math.min(maxS,Math.max(0,dragL+(e.clientX-dragX)*(maxS/track)));
+  });
+  const end=()=>{ drag=false; };
+  thumb.addEventListener('pointerup',end);
+  thumb.addEventListener('pointercancel',end);
+  strip.addEventListener('pointerdown',e=>{
+    if(e.target===thumb) return;
+    const r=strip.getBoundingClientRect();
+    const maxS=wrap.scrollWidth-wrap.clientWidth; if(maxS<=0) return;
+    const x=e.clientX-r.left;
+    wrap.scrollLeft=Math.min(maxS,Math.max(0,(x-thumb.offsetWidth/2)*(maxS/Math.max(1,strip.clientWidth-thumb.offsetWidth))));
+    sync();
+  });
+  wrap.addEventListener('scroll',sync);
+  wrap.addEventListener('wheel',e=>{
+    if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){
+      wrap.scrollLeft+=e.deltaY;
+      if(wrap.scrollWidth>wrap.clientWidth) e.preventDefault();
+    }
+  },{passive:false});
+  window.addEventListener('resize',sync);
+  sync();
+}
+tapeSetup(document.getElementById('strip1'),document.getElementById('wrap1'));
+tapeSetup(document.getElementById('strip2'),document.getElementById('wrap2'));
+
+
+/* ===== ОКТАВНЫЙ ПУЛЬТ v1.0.37: кнопки дёргают ту же механику pcBase, что и
+   стрелки; зажим PC_MIN/PC_MAX; обработчики стрелок не тронуты ===== */
+function octBtn(d){
+  pcBase=Math.min(PC_MAX(),Math.max(PC_MIN(),pcBase+d*12));
+  lcd('PC-клавиатура: октава от ноты '+pcBase);
+}
+$('#octDn').addEventListener('click',()=>octBtn(-1));
+$('#octUp').addEventListener('click',()=>octBtn(1));
+function centerOnBase(){
+  for(const w of [document.getElementById('wrap1'),document.getElementById('wrap2')]){
+    if(!w) continue;
+    const box=w.firstElementChild;
+    const c=box?box.querySelector('[data-key="'+pcBase+'"]'):null;
+    if(c) w.scrollLeft=Math.max(0,c.offsetLeft-(w.clientWidth-c.offsetWidth)/2);
+  }
+  for(const f of tapeSyncs) f();
+}
+function setKbMode(n){
+  if(n===kbMode) return;
+  kbMode=n;
+  document.getElementById('kb2').classList.toggle('on',n===2);
+  document.getElementById('kb1').classList.toggle('on',n===1);
+  for(const [note,own] of [...noteOwner]){
+    if(own==='@ext'){ noteOwner.delete(note); noteOff(note); }
+  }
+  for(const [,nn] of heldKeys){ susCancel(nn); hardOff(nn); }
+  heldKeys.clear(); noteOwner.clear();
+  pcBase=Math.min(PC_MAX(),Math.max(PC_MIN(),pcBase));
+  document.body.classList.toggle('kb-single',kbMode===1);
+  const h=document.getElementById('kbdHdr');
+  if(h) h.textContent=kbMode===2?'КЛАВИАТУРА I — C1..C8 (мышь и ПК):':'КЛАВИАТУРА — C1..C8 (мышь и ПК):';
+  buildKeys();
+  log(kbMode===2?'Клавиатуры: 2 — обе роли C1..C8, единый размер 58×152.':'Клавиатуры: 1 — одна клавиатура C1..C8, ваш размер 58px, высота 152, лента скролла.');
+  lcd('КЛАВИАТУРЫ: '+(kbMode===2?'2 — C1..C8':'1 — C1..C8'));
+}
+/* ============================================================
+   ФИКС РОЛЛ-ЛОК (v1.3.1): в оригинале кнопка #rollLock звала
+   rollLockApply(), которой не существовало. Функция объявлена здесь —
+   хостинг делает её видимой для всех блоков инициализации.
+   ============================================================ */
+let rollLocked=false;
+function rollLockApply(){
+  const b=document.getElementById('rollLock'); if(!b) return;
+  b.classList.toggle('on',rollLocked);
+  lcd(rollLocked?'РОЛЛ-ЛОК: ВКЛ — ленты заблокированы':'РОЛЛ-ЛОК: ВЫКЛ');
+  log('РОЛЛ-ЛОК: '+(rollLocked?'включён — бегунки и колесо мыши заблокированы':'выключен'));
+}
+/* блокировка лент на фазе capture: перехват до обработчиков бегунков и колеса */
+document.addEventListener('pointerdown',e=>{
+  if(!rollLocked||!e.target||!e.target.closest) return;
+  if(e.target.closest('.strip')) e.stopPropagation();
+},true);
+document.addEventListener('wheel',e=>{
+  if(!rollLocked||!e.target||!e.target.closest) return;
+  if(e.target.closest('#wrap1,#wrap2')) e.stopPropagation();
+},{capture:true,passive:true});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById('kbToggle');
+  const btnLay2 = document.getElementById('lay2');
+  const btnLay1 = document.getElementById('lay1');
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      kbOn = !kbOn;
+      toggleBtn.classList.toggle('on', kbOn);
+      toggleBtn.textContent = 'КЛАВИАТУРА: ' + (kbOn ? 'ВКЛ' : 'ВЫКЛ');
+      if (!kbOn) {
+        for (const [code, n] of heldKeys) { susCancel(n); hl(n, false); hardOff(n); }
+        heldKeys.clear(); noteOwner.clear();
+        log('Клавиатура ПК выключена — мышь и MIDI работают.');
+      } else log('Клавиатура ПК включена.');
+    });
+  }
+
+  if (btnLay2) btnLay2.addEventListener('click', () => setLayout(true));
+  if (btnLay1) btnLay1.addEventListener('click', () => setLayout(false));
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btnKb2 = document.getElementById('kb2');
+  const btnKb1 = document.getElementById('kb1');
+  const btnOctDn = document.getElementById('octDn');
+  const btnOctUp = document.getElementById('octUp');
+  const btnRollLock = document.getElementById('rollLock');
+
+  if (btnKb2) btnKb2.addEventListener('click', () => setKbMode(2));
+  if (btnKb1) btnKb1.addEventListener('click', () => setKbMode(1));
+  if (btnOctDn) btnOctDn.addEventListener('click', () => octBtn(-1));
+  if (btnOctUp) btnOctUp.addEventListener('click', () => octBtn(1));
+  if (btnRollLock) btnRollLock.addEventListener('click', () => { rollLocked = !rollLocked; rollLockApply(); });
+});
+/* ============================================================
+   ФАЙЛ 09/13: 09_keyboard_pc.js
+   Секция: клавиатура ПК
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ клавиатура ПК ============ */
+/* раскладки ПК: 2 ряда — сплошной зигзаг C3..B5, 1 ряд — хроматика C4..F#5 */
+const LO2=['KeyZ','KeyS','KeyX','KeyD','KeyC','KeyV','KeyG','KeyB','KeyH','KeyN','KeyJ','KeyM','Comma','KeyL','Period','Semicolon','Slash','Quote'];
+const HI2=['KeyQ','Digit2','KeyW','Digit3','KeyE','KeyR','Digit5','KeyT','Digit6','KeyY','Digit7','KeyU','KeyI','Digit9','KeyO','Digit0','KeyP','BracketLeft','BracketRight'];
+const ONE=['KeyA','KeyW','KeyS','KeyE','KeyD','KeyF','KeyT','KeyG','KeyY','KeyH','KeyU','KeyJ','KeyK','KeyO','KeyL','KeyP','Semicolon','Quote','BracketRight'];
+let pcBase=60, layout2=true;
+
+const heldKeys=new Map(); // код клавиши -> номер ноты на момент нажатия
+const noteOwner=new Map(); // нота -> владелец (код клавиши или '@ext' для мыши/MIDI)
+
+function codeToNote(e){
+  const c=e.code;
+  if(!layout2){ const i=ONE.indexOf(c); return i>=0?pcBase+i:-1; }
+  const l=LO2.indexOf(c);
+  if(l>=0) return pcBase+l;
+  const h=HI2.indexOf(c);
+  if(h>=0) return pcBase+12+h;
+  return -1;
+}
+
+let kbOn = true;
+
+// Переносим всю привязку к UI-элементам в блок ожидания загрузки DOM
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById('kbToggle');
+  const btnLay2 = document.getElementById('lay2');
+  const btnLay1 = document.getElementById('lay1');
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      kbOn = !kbOn;
+      // Используем сохраненную ссылку на элемент, чтобы избежать повторного поиска
+      toggleBtn.classList.toggle('on', kbOn);
+      toggleBtn.textContent = 'КЛАВИАТУРА: ' + (kbOn ? 'ВКЛ' : 'ВЫКЛ');
+      
+      if (!kbOn) {
+        for (const [code, n] of heldKeys) { 
+          if (typeof susCancel === 'function') susCancel(n); 
+          if (typeof hl === 'function') hl(n, false); 
+          if (typeof hardOff === 'function') hardOff(n); 
+        }
+        heldKeys.clear(); 
+        noteOwner.clear();
+        log('Клавиатура ПК выключена — мышь и MIDI работают.');
+      } else {
+        log('Клавиатура ПК включена.');
+      }
+    });
+  } else {
+    console.warn("Предупреждение Движка: Элемент 'kbToggle' не найден в DOM. Переведено в авто-режим.");
+  }
+
+  if (btnLay2) btnLay2.addEventListener('click', () => setLayout(true));
+  if (btnLay1) btnLay1.addEventListener('click', () => setLayout(false));
+});
+
+// Безопасное переключение раскладок
+function setLayout(m) {
+  layout2 = m;
+  const btnLay2 = document.getElementById('lay2');
+  const btnLay1 = document.getElementById('lay1');
+  
+  if (btnLay2) btnLay2.classList.toggle('on', !!m);
+  if (btnLay1) btnLay1.classList.toggle('on', !m);
+  
+  for (const [, n] of heldKeys) { 
+    if (typeof susCancel === 'function') susCancel(n); 
+    if (typeof hardOff === 'function') hardOff(n); 
+  }
+  heldKeys.clear(); 
+  noteOwner.clear();
+  log(m ? "Раскладка: 2 ряда — нижний C4…F5, верхний C5…F#6." : "Раскладка: 1 ряд — хроматика C4…F#5.");
+}
+function setLayout(m){
+  layout2=m;
+  document.getElementById('lay2').classList.toggle('on',!!m);
+  document.getElementById('lay1').classList.toggle('on',!m);
+  for(const [,n] of heldKeys){ susCancel(n); hardOff(n); }
+  heldKeys.clear(); noteOwner.clear();
+  log(m?"Раскладка: 2 ряда — нижний C4…F5 (/=E5), верхний C5…F#6 (Q=C5, I=C6).":"Раскладка: 1 ряд — хроматика C4…F#5.");
+}
+document.addEventListener("DOMContentLoaded", () => {
+  
+  // 1. Безопасная привязка переключателя клавиатуры
+  const toggleBtn = document.getElementById('kbToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      kbOn = !kbOn;
+      toggleBtn.classList.toggle('on', kbOn);
+      toggleBtn.textContent = 'КЛАВИАТУРА: ' + (kbOn ? 'ВКЛ' : 'ВЫКЛ');
+      if (!kbOn) {
+        for (const [code, n] of heldKeys) { 
+          if (typeof susCancel === 'function') susCancel(n); 
+          if (typeof hl === 'function') hl(n, false); 
+          if (typeof hardOff === 'function') hardOff(n); 
+        }
+        heldKeys.clear(); noteOwner.clear();
+        log('Клавиатура ПК выключена — мышь и MIDI работают.');
+      } else log('Клавиатура ПК включена.');
+    });
+  }
+
+  // 2. ИСПРАВЛЕНИЕ БАГА: Безопасная привязка раскладки 2 ряда
+  const btnLay2 = document.getElementById('lay2');
+  if (btnLay2) {
+    btnLay2.addEventListener('click', () => setLayout(true));
+  }
+
+  // 3. ИСПРАВЛЕНИЕ БАГА: Безопасная привязка раскладки 1 ряд
+  const btnLay1 = document.getElementById('lay1');
+  if (btnLay1) {
+    btnLay1.addEventListener('click', () => setLayout(false));
+  }
+
+});
+
+// Сама функция переключения раскладок (вынесена наружу, чтобы быть доступной везде)
+function setLayout(m) {
+  layout2 = m;
+  const btnLay2 = document.getElementById('lay2');
+  const btnLay1 = document.getElementById('lay1');
+  
+  if (btnLay2) btnLay2.classList.toggle('on', !!m);
+  if (btnLay1) btnLay1.classList.toggle('on', !m);
+  
+  for (const [, n] of heldKeys) { 
+    if (typeof susCancel === 'function') susCancel(n); 
+    if (typeof hardOff === 'function') hardOff(n); 
+  }
+  heldKeys.clear(); 
+  noteOwner.clear();
+  log(m ? "Раскладка: 2 ряда — нижний C4…F5, верхний C5…F#6." : "Раскладка: 1 ряд — хроматика C4…F#5.");
+}
+// Безопасный и принудительный обработчик нажатия клавиш ПК
+document.addEventListener('keydown', e => {
+  // Игнорируем авто-повторы при зажатии клавиши
+  if (e.repeat) return;
+  
+  // Управление октавами через стрелки
+  if (e.key === 'ArrowLeft') { 
+    pcBase = Math.max(PC_MIN(), pcBase - 12);
+    if (typeof lcd === 'function') lcd('PC-клавиатура: октава от ноты ' + pcBase); 
+    if (typeof centerOnBase === 'function') centerOnBase();
+    return; 
+  }
+  if (e.key === 'ArrowRight') { 
+    pcBase = Math.min(PC_MAX(), pcBase + 12);
+    if (typeof lcd === 'function') lcd('PC-клавиатура: октава от ноты ' + pcBase); 
+    if (typeof centerOnBase === 'function') centerOnBase();
+    return; 
+  }
+  
+  // Управление сустейном через Numpad
+  if (e.code === 'Numpad7') { setSusMode('1/8'); e.preventDefault(); return; }
+  if (e.code === 'Numpad8') { setSusMode('1/4'); e.preventDefault(); return; }
+  if (e.code === 'Numpad9') { setSusMode('1/2'); e.preventDefault(); return; }
+  // Управление туше через Numpad (Num4/5/6 — по порядку кнопок на панели)
+  if (e.code === 'Numpad4') { setSensMode('soft'); e.preventDefault(); return; }
+  if (e.code === 'Numpad5') { setSensMode('hard'); e.preventDefault(); return; }
+  if (e.code === 'Numpad6') { setSensMode('fixed'); e.preventDefault(); return; }
+  // Октавы через Numpad +/-
+  if (e.code === 'NumpadAdd') { octBtn(1); e.preventDefault(); return; }
+  if (e.code === 'NumpadSubtract') { octBtn(-1); e.preventDefault(); return; }
+  // Num / — смена режима РОЛЛ 1 <-> 2
+  if (e.code === 'NumpadDivide') { setKbMode(kbMode===1?2:1); e.preventDefault(); return; }
+  // Num * — смена раскладки РЯД 1 <-> 2
+  if (e.code === 'NumpadMultiply') { setLayout(!layout2); e.preventDefault(); return; }
+  if(e.key==='ArrowLeft'){ pcBase=Math.max(PC_MIN(),pcBase-12);
+  lcd('PC-клавиатура: октава от ноты '+pcBase); return; }
+  
+  // Проверка глобального включения клавиатуры (принудительно страхуем от багов UI)
+  if (typeof kbOn !== 'undefined' && !kbOn) return;
+  if (heldKeys.has(e.code)) return;
+  
+  const n = codeToNote(e);
+  // Проверяем, что нота попадает в разрешенный спецификацией диапазон 24-78
+  if (n >= PC_MIN() && n <= PC_MAX()) { 
+    heldKeys.set(e.code, n); 
+    ensureAudio(); // Активируем аудио-контекст
+    noteOwner.set(n, e.code); 
+    noteOn(n, 100); // Запускаем звук
+    bumpNoteCnt(); // счётчик нажатых нот (клавиатура 1)
+  } else if (n >= 0) {
+    log('Нота ПК ' + n + ' вне диапазона спецификации (24-78)');
+  }
+});
+
+/* v1.4.28: тумблеры модификаторов — ВЫКЛ снимает удержание безопасно */
+const _pmBtn=document.getElementById('pmToggle'), _chrBtn=document.getElementById('chrToggle');
+if(_pmBtn) _pmBtn.addEventListener('click',()=>{
+  pmEngaged=!pmEngaged;
+  if(!pmEngaged&&pmHeld){ pmHeld=false; log('PM: модификатор выключен'); }
+  _pmBtn.classList.toggle('on',pmEngaged);
+  _pmBtn.textContent='🔇 PM: '+(pmEngaged?'ВКЛ':'ВЫКЛ');
+  log('PM: '+(pmEngaged?'включен':'выключен'));
+});
+if(_chrBtn) _chrBtn.addEventListener('click',()=>{
+  chrEngaged=!chrEngaged;
+  if(!chrEngaged&&chrHeld){ chrHeld=false; log('CHR: модификатор выключен'); }
+  _chrBtn.classList.toggle('on',chrEngaged);
+  _chrBtn.textContent='♯ CHR: '+(chrEngaged?'ВКЛ':'ВЫКЛ');
+  log('CHR: '+(chrEngaged?'включен':'выключен'));
+});
+document.addEventListener('keyup', e => {
+  if (!heldKeys.has(e.code)) return;
+  const n = heldKeys.get(e.code);
+  heldKeys.delete(e.code);
+  if (noteOwner.get(n) === e.code) { 
+    noteOwner.delete(n); 
+    noteOff(n); 
+  }
+});
+
+window.addEventListener('blur',()=>{
+  for(const m of [keyEls1,keyEls2]) for(const k of m.values()) k.classList.remove('act');
+  for(const [,n] of heldKeys){ susCancel(n); hardOff(n); }
+  heldKeys.clear(); noteOwner.clear();
+});
+/* ============================================================
+   ФАЙЛ 10/13: 10_midi_keyboard.js
+   Секция: MIDI-клавиатура
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ MIDI-клавиатура ============ */
+let midiAccess=null;
+let sustainOn=false;
+const sustained=new Set();
+let bendCents=0;
+function updVoices(){
+  const el=$('#voiceCnt');
+  if(el) el.textContent=activeChip.size+activeSF2.size+activeMidi.size;
+}
+function panicAll(){
+  sustainOn=false; sustained.clear(); susClearAll(); noteOwner.clear();
+  for(const t of killTimers.values()) clearTimeout(t); killTimers.clear();
+  [...activeSF2.keys()].forEach(k=>sfOff(k));
+  [...activeChip.keys()].forEach(k=>chipOff(k));
+  [...activeMidi.keys()].forEach(k=>midiOff(k));
+  updVoices();
+  log('PANIC: все голоса заглушены.');
+  lcd('PANIC — все голоса заглушены. Модель: ['+(state.sf2?'SoundFont':'CHIP')+']');
+}
+function applyBend(){
+  // 1. Бенд для SoundFont сэмплов
+  activeSF2.forEach(v=>{ if(v.rate) v.src.playbackRate.value=v.rate*Math.pow(2,bendCents/1200); });
+  
+  // 2. Бенд для CHIP-осцилляторов
+  activeChip.forEach(v=>{ if(v.bend) v.bend(bendCents); });
+  
+  // ИСПРАВЛЕНИЕ: 3. Динамический бенд для всех гармоник MIDI GM инструментов
+  activeMidi.forEach(v => {
+    if (v.nodes && v.f && v.ratios) {
+      v.nodes.forEach((osc, idx) => {
+        // Проверяем, что это осциллятор (у него есть параметр frequency)
+        if (osc.frequency) {
+          const baseRatio = v.ratios[idx] || 1;
+          const targetFreq = v.f * baseRatio * Math.pow(2, bendCents / 1200);
+          osc.frequency.setValueAtTime(targetFreq, audioCtx.currentTime);
+        }
+      });
+    }
+  });
+}
+function initMIDI(){
+  if(!navigator.requestMIDIAccess){
+    log('Web MIDI API не поддерживается этим браузером (Chrome, Edge, Opera — да; Firefox — нет).');
+    lcd('MIDI: браузер не поддерживает Web MIDI API');
+    return;
+  }
+  navigator.requestMIDIAccess({sysex:false}).then(acc=>{
+    midiAccess=acc;
+    fillMidiSel(acc);
+    acc.onstatechange=()=>{ fillMidiSel(acc); };
+    log('MIDI доступ получен — устройства подключаются автоматически (в том числе «горячее» включение).');
+  }).catch(err=>log('MIDI: доступ не получен — '+err.message));
+}
+function fillMidiSel(acc){
+  const sel=$('#midiSel'); const cur=sel.value;
+  sel.innerHTML='<option value="all">Все устройства</option>';
+  acc.inputs.forEach(inp=>{
+    const o=document.createElement('option');
+    o.value=inp.id; o.textContent=inp.name||('MIDI-вход '+(inp.id||''));
+    sel.appendChild(o);
+  });
+  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+  acc.inputs.forEach(inp=>{ inp.onmidimessage=onMIDI; });
+}
+function onMIDI(ev){
+  const sel=$('#midiSel');
+  if(sel.value!=='all'&&sel.value!==ev.target.id) return;
+  const data=ev.data; if(!data||data.length<2) return;
+  const st=data[0]&0xF0, d1=data[1], d2=data.length>2?data[2]:0;
+  if(st===0x90&&d2>0){
+    ensureAudio();
+    sustained.delete(d1); dampKeys.delete(d1); /* v1.4.20: повторное нажатие снимает демпферную метку */
+    noteOwner.set(d1,'@ext');
+    noteOn(d1,applySens(d2/127));
+    bumpNoteCnt(); /* счётчик: MIDI note-on (фильтры движка) */
+  } else if(st===0x80||(st===0x90&&d2===0)){
+    if(sustainOn){ clearCeiling(d1); sustained.add(d1); } /* v1.4.16: педаль — легитимный владелец ноты, потолок под ней не тикает */
+    else if(noteOwner.get(d1)==='@ext'){ noteOwner.delete(d1); noteOff(d1); }
+  } else if(st===0xB0){
+    if(d1===64){
+      const was=sustainOn;
+      sustainOn=d2>=64;
+      if(was&&!sustainOn){
+        /* v1.4.20: рояльный демпфер — перед штатным release каждая нота под педалью
+           спадает ~220 мс (тау 73 мс), затем susDecay/hardOff подхватывает уже ослабленный уровень */
+        const dampArr=[...sustained];
+        dampArr.forEach(k=>{
+          const v=activeChip.get(k)||activeSF2.get(k)||activeMidi.get(k);
+          if(v&&v.g&&v.g.gain){
+            try{const t=audioCtx.currentTime;
+                v.g.gain.cancelScheduledValues(t);
+                v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
+                v.g.gain.setTargetAtTime(0,t,0.073);}catch(_){}
+          }
+          dampKeys.add(k);
+        });
+        setTimeout(()=>{dampArr.forEach(k=>{if(!dampKeys.delete(k))return; if(sustainOn){sustained.add(k);scheduleCeiling(k);}else{noteOff(k);}});},220);
+        sustained.clear();
+        log('Сустейн: педаль отпущена — рояльный демпфер, хвосты угасают плавно.');
+      }
+    } else if(d1===120||d1===123){
+      panicAll();
+    }
+  } else if(st===0xE0&&data.length>=3){
+    bendCents=Math.round((((d2&0x7F)<<7|(d1&0x7F))-8192)/8192*200);
+    applyBend();
+  }
+}
+$('#midiBtn').addEventListener('click',initMIDI);
+$('#panicBtn').addEventListener('click',panicAll);
+/* ============================================================
+   ФАЙЛ 11/13: 11_midi_gm128.js
+   Секция: MIDI GM × 128 — синтез по рецептам (v1.1.1 «GLOBAL MIDI»)
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+/* ============ MIDI GM × 128 — синтез по рецептам (v1.1.1 «GLOBAL MIDI») ============ */
+const GMN=["Acoustic Grand Piano", "Bright Acoustic Piano", "Electric Grand Piano", "Honky-tonk Piano", "Electric Piano 1", "Electric Piano 2", "Harpsichord", "Clavinet", "Celesta", "Glockenspiel", "Music Box", "Vibraphone", "Marimba", "Xylophone", "Tubular Bells", "Dulcimer", "Drawbar Organ", "Percussive Organ", "Rock Organ", "Church Organ", "Reed Organ", "Accordion", "Harmonica", "Tango Accordion", "Acoustic Guitar (nylon)", "Acoustic Guitar (steel)", "Electric Guitar (jazz)", "Electric Guitar (clean)", "Electric Guitar (muted)", "Overdriven Guitar", "Distortion Guitar", "Guitar Harmonics", "Acoustic Bass", "Electric Bass (finger)", "Electric Bass (pick)", "Fretless Bass", "Slap Bass 1", "Slap Bass 2", "Synth Bass 1", "Synth Bass 2", "Violin", "Viola", "Cello", "Contrabass", "Tremolo Strings", "Pizzicato Strings", "Orchestral Harp", "Timpani", "String Ensemble 1", "String Ensemble 2", "Synth Strings 1", "Synth Strings 2", "Choir Aahs", "Voice Oohs", "Synth Voice", "Orchestra Hit", "Trumpet", "Trombone", "Tuba", "Muted Trumpet", "French Horn", "Brass Section", "Synth Brass 1", "Synth Brass 2", "Soprano Sax", "Alto Sax", "Tenor Sax", "Baritone Sax", "Oboe", "English Horn", "Bassoon", "Clarinet", "Piccolo", "Flute", "Recorder", "Pan Flute", "Blown Bottle", "Shakuhachi", "Whistle", "Ocarina", "Square Lead", "Saw Lead", "Calliope Lead", "Chiff Lead", "Charang", "Voice Lead", "Fifth Saw Lead", "Bass & Lead", "New Age Pad", "Warm Pad", "Polysynth Pad", "Choir Pad", "Bowed Pad", "Metallic Pad", "Halo Pad", "Sweep Pad", "Rain", "Soundtrack", "Crystal", "Atmosphere", "Brightness", "Goblins", "Echoes", "Sci-Fi", "Sitar", "Banjo", "Shamisen", "Koto", "Kalimba", "Bagpipe", "Fiddle", "Shanai", "Tinkle Bell", "Agogo", "Steel Drums", "Woodblock", "Taiko Drum", "Melodic Tom", "Synth Drum", "Reverse Cymbal", "Guitar Fret Noise", "Breath Noise", "Seashore", "Bird Tweet", "Telephone Ring", "Helicopter", "Applause", "Gunshot"];
+const FAMS_RNG=[[0, "Piano"], [8, "Chromatic Percussion"], [16, "Organ"], [24, "Guitar"], [32, "Bass"], [40, "Strings"], [48, "Ensemble"], [56, "Brass"], [64, "Reed"], [72, "Pipe"], [80, "Synth Lead"], [88, "Synth Pad"], [96, "Synth Effects"], [104, "Ethnic"], [112, "Percussive"], [120, "Sound Effects"]];
+const R={"0":{"w":"triangle","p":[[1,1],[2,0.6],[3,0.28],[4,0.12],[5,0.06],[6,0.03]],"a":0.004,"d":1.0,"s":0,"r":0.165,"cut":7500,"br":1},"1":{"w":"triangle","p":[[1,1],[2,0.6],[3,0.28],[4,0.12],[5,0.06],[6,0.03]],"a":0.004,"d":0.9,"s":0,"r":0.165,"cut":9000,"br":1},"2":{"w":"triangle","p":[[1,1],[2,0.6],[3,0.28],[4,0.12],[5,0.06],[6,0.03]],"a":0.006,"d":1.0,"s":0,"r":0.165,"cut":6500,"br":1},"3":{"w":"triangle","p":[[1,1],[2,0.6],[3,0.28],[4,0.12],[5,0.06],[6,0.03]],"a":0.004,"d":1.0,"s":0,"r":0.165,"cut":5500,"br":1,"lvl":0.85},"4":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12]],"a":0.004,"d":1.0,"s":0,"r":0.165,"cut":5200,"br":1},"5":{"w":"triangle","p":[[1,1],[2,0.5],[3,0.2],[6,0.12]],"a":0.004,"d":1.0,"s":0,"r":0.165,"cut":5600,"br":1},"6":{"w":"triangle","p":[[1,1],[2,0.6],[3,0.28],[4,0.12],[5,0.06],[6,0.03]],"a":0.004,"d":0.6,"s":0,"r":0.165,"cut":7000,"br":1},"7":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.004,"d":0.7,"s":0,"r":0.165,"cut":5200,"br":1},"8":{"w":"sine","p":[[1,1],[2.76,0.32],[5.4,0.15]],"a":0.002,"d":0.9,"s":0,"r":0.1375,"cut":9000,"br":1},"9":{"w":"sine","p":[[1,1],[4,0.3]],"a":0.002,"d":1.1,"s":0,"r":0.1375,"cut":9500,"br":1},"10":{"w":"sine","p":[[1,1],[2.76,0.32],[5.4,0.15]],"a":0.002,"d":0.9,"s":0,"r":0.1375,"cut":9000,"br":1},"11":{"w":"sine","p":[[1,1],[2.76,0.32],[5.4,0.15]],"a":0.002,"d":0.9,"s":0,"r":0.1375,"cut":9000,"br":1},"12":{"w":"sine","p":[[1,1],[2.76,0.32],[5.4,0.15]],"a":0.002,"d":0.9,"s":0,"r":0.1375,"cut":9000,"br":1},"13":{"w":"sine","p":[[1,1],[2.76,0.32],[5.4,0.15]],"a":0.002,"d":0.9,"s":0,"r":0.1375,"cut":9000,"br":1},"14":{"w":"sine","p":[[1,1],[2.76,0.32],[5.4,0.15]],"a":0.002,"d":1.6,"s":0,"r":0.22,"cut":9000,"br":1},"15":{"w":"sine","p":[[1,1],[2.76,0.32],[5.4,0.15]],"a":0.002,"d":0.9,"s":0,"r":0.1375,"cut":9000,"br":1},"16":{"w":"sine","p":[[1,1],[2,0.5],[3,0.33],[4,0.25],[6,0.16],[8,0.1]],"a":0.02,"d":0.12,"s":1,"r":0.165,"cut":8000},"17":{"w":"sine","p":[[1,1],[2,0.5],[3,0.33],[4,0.25],[6,0.16],[8,0.1]],"a":0.02,"d":0.12,"s":1,"r":0.165,"cut":8000},"18":{"w":"sine","p":[[1,1],[2,0.5],[3,0.33],[4,0.25],[6,0.16],[8,0.1]],"a":0.02,"d":0.12,"s":1,"r":0.165,"cut":8000},"19":{"w":"sine","p":[[1,1],[2,0.55],[3,0.4],[4,0.3],[6,0.22],[8,0.16]],"a":0.02,"d":0.12,"s":1,"r":0.165,"cut":7000},"20":{"w":"sine","p":[[1,1],[2,0.5],[3,0.33],[4,0.25],[6,0.16],[8,0.1]],"a":0.02,"d":0.12,"s":1,"r":0.165,"cut":8000},"21":{"w":"sine","p":[[1,1],[2,0.5],[3,0.33],[4,0.25],[6,0.16],[8,0.1]],"a":0.02,"d":0.12,"s":1,"r":0.165,"cut":8000},"22":{"w":"sine","p":[[1,1],[2,0.5],[3,0.33],[4,0.25],[6,0.16],[8,0.1]],"a":0.02,"d":0.12,"s":1,"r":0.165,"cut":8000},"23":{"w":"sine","p":[[1,1],[2,0.5],[3,0.33],[4,0.25],[6,0.16],[8,0.1]],"a":0.02,"d":0.12,"s":1,"r":0.165,"cut":8000},"24":{"w":"triangle","p":[[1,1],[2,0.45],[3,0.2],[4,0.08]],"a":0.003,"d":0.9,"s":0,"r":0.154,"cut":6500,"br":1},"25":{"w":"triangle","p":[[1,1],[2,0.45],[3,0.2],[4,0.08]],"a":0.003,"d":0.9,"s":0,"r":0.154,"cut":6500,"br":1},"26":{"w":"triangle","p":[[1,1],[2,0.45],[3,0.2],[4,0.08]],"a":0.003,"d":0.9,"s":0,"r":0.154,"cut":6500,"br":1},"27":{"w":"triangle","p":[[1,1],[2,0.45],[3,0.2],[4,0.08]],"a":0.003,"d":0.9,"s":0,"r":0.154,"cut":6500,"br":1},"28":{"w":"triangle","p":[[1,1],[2,0.45],[3,0.2],[4,0.08]],"a":0.003,"d":0.9,"s":0,"r":0.154,"cut":6500,"br":1},"29":{"w":"triangle","p":[[1,1],[2,0.45],[3,0.2],[4,0.08]],"a":0.003,"d":0.9,"s":0,"r":0.154,"cut":6500,"br":1},"30":{"w":"square","p":[[1,1],[2,0.6]],"a":0.003,"d":0.8,"s":0,"r":0.154,"cut":3000,"br":1,"noise":0.3},"31":{"w":"triangle","p":[[1,1],[2,0.45],[3,0.2],[4,0.08]],"a":0.003,"d":0.9,"s":0,"r":0.154,"cut":6500,"br":1},"32":{"w":"triangle","p":[[1,1],[2,0.5],[3,0.18],[4,0.06]],"a":0.004,"d":0.7,"s":0.25,"r":0.154,"cut":3200,"br":0.6},"33":{"w":"triangle","p":[[1,1],[2,0.5],[3,0.18],[4,0.06]],"a":0.004,"d":0.7,"s":0.25,"r":0.154,"cut":3200,"br":0.6},"34":{"w":"triangle","p":[[1,1],[2,0.5],[3,0.18],[4,0.06]],"a":0.004,"d":0.7,"s":0.25,"r":0.154,"cut":3200,"br":0.6},"35":{"w":"triangle","p":[[1,1],[2,0.5],[3,0.18],[4,0.06]],"a":0.004,"d":0.7,"s":0.25,"r":0.154,"cut":3200,"br":0.6},"36":{"w":"square","p":[[1,1],[2,0.5],[3,0.18],[4,0.06]],"a":0.003,"d":0.3,"s":0.1,"r":0.154,"cut":2400,"br":0.6},"37":{"w":"square","p":[[1,1],[2,0.5],[3,0.18],[4,0.06]],"a":0.004,"d":0.35,"s":0.1,"r":0.154,"cut":2600,"br":0.6},"38":{"w":"triangle","p":[[1,1],[2,0.5],[3,0.18],[4,0.06]],"a":0.004,"d":0.7,"s":0.25,"r":0.154,"cut":3200,"br":0.6},"39":{"w":"triangle","p":[[1,1],[2,0.5],[3,0.18],[4,0.06]],"a":0.004,"d":0.7,"s":0.25,"r":0.154,"cut":3200,"br":0.6},"40":{"w":"sawtooth","p":[[1,1],[2,0.4]],"a":0.09,"d":0.2,"s":0.8,"r":0.1925,"cut":4200,"br":0.6,"det":7},"41":{"w":"sawtooth","p":[[1,1],[2,0.4]],"a":0.09,"d":0.2,"s":0.8,"r":0.1925,"cut":4200,"br":0.6,"det":7},"42":{"w":"sawtooth","p":[[1,1],[2,0.4]],"a":0.09,"d":0.2,"s":0.8,"r":0.1925,"cut":4200,"br":0.6,"det":7},"43":{"w":"sawtooth","p":[[1,1],[2,0.4]],"a":0.09,"d":0.2,"s":0.8,"r":0.1925,"cut":4200,"br":0.6,"det":7},"44":{"w":"sawtooth","p":[[1,1],[2,0.4]],"a":0.09,"d":0.2,"s":0.8,"r":0.1925,"cut":4200,"br":0.6,"det":7},"45":{"w":"sawtooth","p":[[1,1],[2,0.4]],"a":0.09,"d":0.15,"s":0.8,"r":0.11,"cut":4200,"br":0.6,"det":7},"46":{"w":"sawtooth","p":[[1,1],[2,0.4]],"a":0.09,"d":0.2,"s":0.8,"r":0.1925,"cut":4200,"br":0.6,"det":7},"47":{"w":"sawtooth","p":[[1,1]],"a":0.09,"d":1.2,"s":0.15,"r":0.22,"cut":3000,"br":0.6,"det":7,"noise":0.6,"lvl":0.9},"48":{"w":"sawtooth","p":[[1,1],[2,0.35],[3,0.2]],"a":0.06,"d":0.18,"s":0.75,"r":0.176,"cut":5000,"det":9,"br":0.7},"49":{"w":"sawtooth","p":[[1,1],[2,0.35],[3,0.2]],"a":0.06,"d":0.18,"s":0.75,"r":0.176,"cut":5000,"det":9,"br":0.7},"50":{"w":"sawtooth","p":[[1,1],[2,0.35],[3,0.2]],"a":0.06,"d":0.18,"s":0.75,"r":0.176,"cut":5000,"det":9,"br":0.7},"51":{"w":"sawtooth","p":[[1,1],[2,0.35],[3,0.2]],"a":0.06,"d":0.18,"s":0.75,"r":0.176,"cut":5000,"det":9,"br":0.7},"52":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.22]],"a":0.35,"d":0.18,"s":0.9,"r":0.33,"cut":3800,"det":14,"br":0.7},"53":{"w":"sawtooth","p":[[1,1],[2,0.35],[3,0.2]],"a":0.06,"d":0.18,"s":0.75,"r":0.176,"cut":5000,"det":9,"br":0.7},"54":{"w":"sawtooth","p":[[1,1],[2,0.35],[3,0.2]],"a":0.06,"d":0.18,"s":0.75,"r":0.176,"cut":5000,"det":9,"br":0.7},"55":{"w":"sawtooth","p":[[1,1],[2,0.35],[3,0.2]],"a":0.06,"d":0.18,"s":0.75,"r":0.176,"cut":5000,"det":9,"br":0.7},"56":{"w":"sawtooth","p":[[1,1],[2,0.5],[3,0.25]],"a":0.03,"d":0.15,"s":0.6,"r":0.154,"cut":3800,"br":0.8},"57":{"w":"sawtooth","p":[[1,1],[2,0.5],[3,0.25]],"a":0.035,"d":0.15,"s":0.7,"r":0.154,"cut":3800,"br":0.8},"58":{"w":"sawtooth","p":[[1,1],[2,0.5],[3,0.25]],"a":0.035,"d":0.15,"s":0.7,"r":0.154,"cut":3800,"br":0.8},"59":{"w":"sawtooth","p":[[1,1],[2,0.5],[3,0.25]],"a":0.035,"d":0.15,"s":0.7,"r":0.154,"cut":3800,"br":0.8},"60":{"w":"sawtooth","p":[[1,1],[2,0.5],[3,0.25]],"a":0.035,"d":0.15,"s":0.7,"r":0.154,"cut":3800,"br":0.8},"61":{"w":"sawtooth","p":[[1,1],[2,0.5],[3,0.25]],"a":0.05,"d":0.15,"s":0.75,"r":0.154,"cut":3800,"br":0.8},"62":{"w":"sawtooth","p":[[1,1],[2,0.5],[3,0.25]],"a":0.035,"d":0.15,"s":0.7,"r":0.154,"cut":3800,"br":0.8},"63":{"w":"sawtooth","p":[[1,1],[2,0.5],[3,0.25]],"a":0.035,"d":0.15,"s":0.7,"r":0.154,"cut":3800,"br":0.8},"64":{"w":"sawtooth","p":[[1,1],[2,0.45],[3,0.22],[4,0.1]],"a":0.02,"d":0.12,"s":0.75,"r":0.143,"cut":4400,"br":0.8},"65":{"w":"sawtooth","p":[[1,1],[2,0.45],[3,0.22],[4,0.1]],"a":0.02,"d":0.12,"s":0.75,"r":0.143,"cut":4400,"br":0.8},"66":{"w":"sawtooth","p":[[1,1],[2,0.45],[3,0.22],[4,0.1]],"a":0.02,"d":0.12,"s":0.75,"r":0.143,"cut":4400,"br":0.8},"67":{"w":"sawtooth","p":[[1,1],[2,0.45],[3,0.22],[4,0.1]],"a":0.02,"d":0.12,"s":0.75,"r":0.143,"cut":4400,"br":0.8},"68":{"w":"sawtooth","p":[[1,1],[2,0.45],[3,0.22],[4,0.1]],"a":0.02,"d":0.12,"s":0.75,"r":0.143,"cut":4400,"br":0.8},"69":{"w":"sawtooth","p":[[1,1],[2,0.45],[3,0.22],[4,0.1]],"a":0.02,"d":0.12,"s":0.75,"r":0.143,"cut":4400,"br":0.8},"70":{"w":"sawtooth","p":[[1,1],[2,0.45],[3,0.22],[4,0.1]],"a":0.02,"d":0.12,"s":0.75,"r":0.143,"cut":4400,"br":0.8},"71":{"w":"sawtooth","p":[[1,1],[2,0.45],[3,0.22],[4,0.1]],"a":0.02,"d":0.12,"s":0.75,"r":0.143,"cut":4400,"br":0.8},"72":{"w":"sine","p":[[1,1],[2,0.4],[3,0.18],[4,0.08]],"a":0.03,"d":0.1,"s":1,"r":0.165,"cut":7000},"73":{"w":"sine","p":[[1,1],[2,0.15],[3,0.05]],"a":0.03,"d":0.1,"s":0.9,"r":0.165,"cut":6500},"74":{"w":"sine","p":[[1,1],[2,0.4],[3,0.18],[4,0.08]],"a":0.03,"d":0.1,"s":1,"r":0.165,"cut":7000},"75":{"w":"sine","p":[[1,1],[2,0.4],[3,0.18],[4,0.08]],"a":0.03,"d":0.1,"s":1,"r":0.165,"cut":7000},"76":{"w":"sine","p":[[1,1],[2,0.4],[3,0.18],[4,0.08]],"a":0.03,"d":0.1,"s":1,"r":0.165,"cut":7000},"77":{"w":"sine","p":[[1,1],[2,0.4],[3,0.18],[4,0.08]],"a":0.03,"d":0.1,"s":1,"r":0.165,"cut":7000},"78":{"w":"sine","p":[[1,1],[2,0.4],[3,0.18],[4,0.08]],"a":0.03,"d":0.1,"s":1,"r":0.165,"cut":7000},"79":{"w":"sine","p":[[1,1],[2,0.4],[3,0.18],[4,0.08]],"a":0.03,"d":0.1,"s":1,"r":0.165,"cut":7000},"80":{"w":"square","p":[[1,1],[2,0.5]],"a":0.01,"d":0.1,"s":0.7,"r":0.1375,"cut":5200,"br":1},"81":{"w":"square","p":[[1,1],[2,0.5]],"a":0.01,"d":0.1,"s":0.7,"r":0.1375,"cut":5200,"br":1},"82":{"w":"square","p":[[1,1],[2,0.45],[3,0.3]],"a":0.01,"d":0.1,"s":0.75,"r":0.1375,"cut":5200,"br":1},"83":{"w":"square","p":[[1,1],[2,0.5]],"a":0.01,"d":0.1,"s":0.7,"r":0.1375,"cut":5200,"br":1},"84":{"w":"square","p":[[1,1],[2,0.5]],"a":0.01,"d":0.1,"s":0.7,"r":0.1375,"cut":5200,"br":1},"85":{"w":"square","p":[[1,1],[2,0.5]],"a":0.01,"d":0.1,"s":0.7,"r":0.1375,"cut":5200,"br":1},"86":{"w":"square","p":[[1,1],[2,0.5]],"a":0.01,"d":0.1,"s":0.7,"r":0.1375,"cut":5200,"br":1},"87":{"w":"square","p":[[1,1],[2,0.5]],"a":0.01,"d":0.1,"s":0.7,"r":0.1375,"cut":5200,"br":1},"88":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.18]],"a":0.28,"d":0.3,"s":0.9,"r":0.3025,"cut":3600,"det":12,"br":0.5},"89":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.18]],"a":0.28,"d":0.3,"s":0.9,"r":0.3025,"cut":3600,"det":12,"br":0.5},"90":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.18]],"a":0.28,"d":0.3,"s":0.9,"r":0.3025,"cut":3600,"det":12,"br":0.5},"91":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.18]],"a":0.4,"d":0.3,"s":0.92,"r":0.385,"cut":3200,"det":16,"br":0.5},"92":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.18]],"a":0.28,"d":0.3,"s":0.9,"r":0.3025,"cut":3600,"det":12,"br":0.5},"93":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.18]],"a":0.28,"d":0.3,"s":0.9,"r":0.3025,"cut":3600,"det":12,"br":0.5},"94":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.18]],"a":0.28,"d":0.3,"s":0.9,"r":0.3025,"cut":3600,"det":12,"br":0.5},"95":{"w":"sawtooth","p":[[1,1],[2,0.4],[3,0.18]],"a":0.28,"d":0.3,"s":0.9,"r":0.3025,"cut":3600,"det":12,"br":0.5},"96":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.05,"d":0.25,"s":0.6,"r":0.1925,"cut":4200,"br":0.8},"97":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.05,"d":0.25,"s":0.6,"r":0.1925,"cut":4200,"br":0.8},"98":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.05,"d":0.25,"s":0.6,"r":0.1925,"cut":4200,"br":0.8},"99":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.05,"d":0.25,"s":0.6,"r":0.1925,"cut":4200,"br":0.8},"100":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.05,"d":0.25,"s":0.6,"r":0.1925,"cut":4200,"br":0.8},"101":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.05,"d":0.25,"s":0.6,"r":0.1925,"cut":4200,"br":0.8},"102":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.05,"d":0.25,"s":0.6,"r":0.1925,"cut":4200,"br":0.8},"103":{"w":"square","p":[[1,1],[2,0.7],[3,0.4]],"a":0.05,"d":0.25,"s":0.6,"r":0.1925,"cut":4200,"br":0.8},"104":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12],[4.2,0.08]],"a":0.003,"d":1.1,"s":0,"r":0.165,"cut":6000,"br":1},"105":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12],[4.2,0.08]],"a":0.003,"d":1.1,"s":0,"r":0.165,"cut":6000,"br":1},"106":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12],[4.2,0.08]],"a":0.003,"d":1.1,"s":0,"r":0.165,"cut":6000,"br":1},"107":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12],[4.2,0.08]],"a":0.003,"d":1.1,"s":0,"r":0.165,"cut":6000,"br":1},"108":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12],[4.2,0.08]],"a":0.003,"d":1.1,"s":0,"r":0.165,"cut":6000,"br":1},"109":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12],[4.2,0.08]],"a":0.003,"d":1.1,"s":0.85,"r":0.165,"cut":6000,"br":1,"noise":0.25,"det":10},"110":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12],[4.2,0.08]],"a":0.003,"d":1.1,"s":0,"r":0.165,"cut":6000,"br":1},"111":{"w":"triangle","p":[[1,1],[2,0.35],[3,0.12],[4.2,0.08]],"a":0.003,"d":1.1,"s":0,"r":0.165,"cut":6000,"br":1},"112":{"w":"sine","p":[[1,1]],"a":0.002,"d":0.7,"s":0,"r":0.1375,"cut":5000,"noise":0.5,"br":0.9},"113":{"w":"sine","p":[[1,1]],"a":0.002,"d":0.7,"s":0,"r":0.1375,"cut":5000,"noise":0.5,"br":0.9},"114":{"w":"sine","p":[[1,1],[2.8,0.3]],"a":0.002,"d":0.8,"s":0,"r":0.1375,"cut":5000,"noise":0.5,"br":0.9},"115":{"w":"sine","p":[[1,1]],"a":0.002,"d":0.7,"s":0,"r":0.1375,"cut":5000,"noise":0.5,"br":0.9},"116":{"w":"sine","p":[[1,1],[2,0.3]],"a":0.002,"d":0.5,"s":0,"r":0.1375,"cut":2600,"noise":1,"br":0.9,"lvl":1.1},"117":{"w":"sine","p":[[1,1]],"a":0.002,"d":0.7,"s":0,"r":0.1375,"cut":5000,"noise":0.5,"br":0.9},"118":{"w":"square","p":[[1,1],[2,0.5]],"a":0.002,"d":0.4,"s":0,"r":0.1375,"cut":5000,"noise":0.4,"br":0.9},"119":{"w":"sine","p":[[1,1]],"a":0.4,"d":0.3,"s":0.7,"r":0.33,"cut":6000,"noise":1,"br":0.9},"120":{"w":"sine","p":[[1,1],[2,0.5]],"a":0.005,"d":0.8,"s":0,"r":0.1375,"cut":5000},"121":{"w":"sine","p":[[1,1],[2,0.5]],"a":0.005,"d":0.8,"s":0,"r":0.1375,"cut":5000},"122":{"w":"sine","p":[[1,1],[2,0.5]],"a":0.005,"d":0.8,"s":0,"r":0.1375,"cut":5000},"123":{"w":"sine","p":[[1,1],[2,0.5]],"a":0.005,"d":0.8,"s":0,"r":0.1375,"cut":5000},"124":{"w":"sine","p":[[1,1],[2,0.5]],"a":0.005,"d":0.8,"s":0,"r":0.1375,"cut":5000},"125":{"w":"sine","p":[[1,1],[2,0.5]],"a":0.005,"d":0.8,"s":0,"r":0.1375,"cut":5000},"126":{"w":"sine","p":[[1,1],[2,0.5]],"a":0.005,"d":0.8,"s":0,"r":0.1375,"cut":5000},"127":{"w":"sine","p":[[1,1],[2,0.5]],"a":0.002,"d":0.12,"s":0,"r":0.033,"cut":3000,"noise":1,"lvl":1.2}};
+let midiProg=0;
+const midiGet=p=>R[String(p)]||R['0'];
+/* v1.4.20: реатака GM-голоса — ramp к новому пику с атакой пресета, бенд продолжает тянуть тот же голос */
+function midiReattack(k,vel=100){
+  const v=activeMidi.get(k); if(!v) return;
+  const t=audioCtx.currentTime;
+  const rec=midiGet(midiProg);
+  const A=rec.a||0.01, D=Math.max(rec.d||0.3,0.01), S=(rec.s==null?0.5:rec.s);
+  const vv=Math.max(0.06,Math.min(1,(vel||100)/127));
+  const peak=0.24*(0.35+0.65*vv)*(rec.lvl||1);
+  const G=v.g.gain;
+  try{if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
+  G.linearRampToValueAtTime(peak,t+A);
+  G.setTargetAtTime(Math.max(peak*S,0.0001),t+A,D);
+}
+function midiOn(k,vel=100){ startCtx(()=>midiOnCore(k,vel)); }
+function midiOnCore(k,vel=100){
+  ensureAudio();
+  /* v1.4.20: повторное нажатие звучащей ноты — реатака без пересоздания гармоник */
+  if(activeMidi.has(k)){ midiReattack(k,vel); return; }
+  
+  /* ИСПРАВЛЕНИЕ: Безопасный лимит полифонии (замена VOICE_MAX на жесткое число, если константа недоступна) */
+  const limit = (typeof VOICE_MAX !== 'undefined') ? VOICE_MAX : 32;
+  if(activeMidi.size >= limit){ const k0=activeMidi.keys().next().value; midiKill(k0); }
+  
+  const rec=midiGet(midiProg);
+  const t=audioCtx.currentTime;
+  const f=freqOf(k);
+  const v=Math.max(0.06,Math.min(1,(vel||100)/127));
+  const A=rec.a||0.01, D=Math.max(rec.d||0.3,0.01), S=(rec.s==null?0.5:rec.s), Rr=rec.r||0.2;
+  const peak=0.24*(0.35+0.65*v)*(rec.lvl||1);
+  const g=audioCtx.createGain();
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(peak,t+A);
+  g.gain.setTargetAtTime(Math.max(peak*S,0.0001),t+A,D);
+  const lp=rec.cut?audioCtx.createBiquadFilter():null;
+  if(lp){ lp.type='lowpass'; lp.frequency.value=rec.cut*(rec.br?0.55+0.45*v:1); }
+  const nodes=[];
+  
+  for(const pr of rec.p){
+    const osc=audioCtx.createOscillator();
+    osc.type=rec.w||'sine';
+    
+    /* ИСПРАВЛЕНИЕ: Учитываем текущий Pitch Bend (bendCents) прямо в момент взятия ноты */
+    const currentBend = (typeof bendCents !== 'undefined') ? bendCents : 0;
+    osc.frequency.value = f * pr[0] * Math.pow(2, currentBend / 1200);
+    
+    if(rec.det) osc.detune.value=((pr[0]%2)?1:-1)*rec.det;
+    const og=audioCtx.createGain(); og.gain.value=pr[1];
+    osc.connect(og); og.connect(lp||g); osc.start(t); nodes.push(osc);
+  }
+  if(rec.noise){
+    const ns=audioCtx.createBufferSource(); ns.buffer=noiseBuffer('long'); ns.loop=true;
+    const ng=audioCtx.createGain(); ng.gain.value=rec.noise;
+    ns.connect(ng); ng.connect(lp||g); ns.start(t); nodes.push(ns);
+  }
+  if(lp) lp.connect(g);
+  g.connect(fxBus||master); /* 2A03 ПУЛЬТ: MIDI GM в общую шину рэка */
+  
+  /* ИСПРАВЛЕНИЕ: Сохраняем базовую частоту f и коэффициенты гармоник pr[0] для динамического Pitch Bend */
+  activeMidi.set(k,{g,nodes,Rr,f,ratios: rec.p.map(pr=>pr[0]),st:performance.now()});
+  hl(k,true); updVoices();
+  if(S===0){ /* перкуссивные и щипковые затухают сами */
+    const end=t+A+D*6+Rr*2;
+    nodes.forEach(n=>{try{n.stop(end);}catch(_){}});
+  }
+}
+function midiOff(k){
+  const v=activeMidi.get(k); if(!v) return;
+  const t=audioCtx.currentTime, Rr=v.Rr;
+  try{const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
+  /* v1.4.20: останов осцилляторов = 8 тау release — остаток за порогом слышимости */
+  const tauOff=Math.max(Rr/3,0.01);
+  v.g.gain.setTargetAtTime(0,t,tauOff);
+  const endOff=t+tauOff*8;
+  v.nodes.forEach(n=>{try{n.stop(endOff);}catch(_){}});
+  activeMidi.delete(k); hl(k,false);
+  setTimeout(()=>{try{v.g.disconnect();}catch(_){}},(endOff-t)*1000+80);
+  updVoices();
+}
+function midiKill(k){
+  const v=activeMidi.get(k); if(!v) return;
+  const t=audioCtx.currentTime;
+  try{const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
+  v.g.gain.setTargetAtTime(0,t,0.010); /* v1.4.16: тау 8→10 мс */
+  v.nodes.forEach(n=>{try{n.stop(t+0.08);}catch(_){}}); /* v1.4.16: стоп на ровно 8 тау */
+  activeMidi.delete(k); hl(k,false);
+  setTimeout(()=>{try{v.g.disconnect();}catch(_){}},110); /* v1.4.16: с запасом после стопа */
+  updVoices();
+}
+function buildMidiSel(){
+  const sel=document.getElementById('midiVoiceSel'); if(!sel) return;
+  sel.innerHTML='';
+  FAMS_RNG.forEach((fr,i)=>{
+    const og=document.createElement('optgroup'); og.label=fr[1];
+    const nxt=FAMS_RNG[i+1]?FAMS_RNG[i+1][0]:128;
+    for(let p=fr[0];p<nxt;p++){
+      const o=document.createElement('option'); o.value=String(p);
+      o.textContent=(p+1)+'. '+GMN[p];
+      og.appendChild(o);
+    }
+    sel.appendChild(og);
+  });
+  sel.value='0';
+}
+$('#midiVoiceSel').addEventListener('change',e=>{
+  midiProg=+e.target.value||0;
+  lcd('MODE: [MIDI GM] — Голос: ['+GMN[midiProg]+']');
+  if(state.mode!=='midi') setMode('midi'); else log('Голос MIDI: '+GMN[midiProg]);
+});
+/* ============================================================
+   ФАЙЛ 12/13: 12_start.js (ИСПРАВЛЕННЫЙ)
+   Секция: старт/инициализация
+   ============================================================ */
+
+// Безопасный вызов инициализации MIDI (если функция объявлена глобально)
+if (typeof buildMidiSel === 'function') {
+  buildMidiSel();
+} else {
+  // Заглушка, так как в файле 10 функция называется fillMidiSel и вызывается при коннекте
+  log('MIDI-селектор переведен в режим авто-ожидания');
+}
+
+// Отрисовка клавиатуры теперь гарантированно выполнится
+buildKeys();
+
+document.addEventListener('click', () => ensureAudio(), { once: true });
+
+log('BUILD v1.2.5 «Finale»');
+log('Загружен основной код Движка');
+log('Загружен Чип RP 2A03 E - Темастер');
+log('Загружен Контроллер Midi x 128');
+log('Загружен SF2 Парсер');
+log('Загружен SF2 Контроллер');
+log('Загружен SF2 Микропроцессор');
+log('Опрос модулей прошел успешно');
+log('Приятной игры ;-)');
+/* ============================================================
+   ФАЙЛ 13/13: 13_touch_fps.js
+   Секция: touch-детект + FPS-метр
+   Часть монолитного скрипта SF2 ENGINE v1.2.5 «Finale»
+   ============================================================ */
+
+function hasTouch() {
+  return 'ontouchstart' in document.documentElement ||
+         navigator.maxTouchPoints > 0 ||
+         navigator.msMaxTouchPoints > 0;
+}
+
+if (hasTouch()) {
+  // ИСПРАВЛЕНИЕ: Кроссбраузерное удаление правил с :hover с поддержкой cssRules
+  try {
+    for (let si = document.styleSheets.length - 1; si >= 0; si--) {
+      const styleSheet = document.styleSheets[si];
+      // Проверяем современный cssRules, откатываемся на rules для старых систем
+      const rules = styleSheet.cssRules || styleSheet.rules;
+      if (!rules) continue;
+      
+      for (let ri = rules.length - 1; ri >= 0; ri--) {
+        if (!rules[ri].selectorText) continue;
+        if (rules[ri].selectorText.match(':hover')) {
+          styleSheet.deleteRule(ri);
+        }
+      }
+    }
+    log('Touch-оптимизация: эффекты :hover успешно удалены для сенсорного экрана.');
+  } catch (ex) {
+    // Защита от CORS ограничений, если стили загружены со стороннего домена
+  }
+}
+
+// FPS метр :
+let frameCount = 0;
+let lastTime = performance.now();
+
+function updateFPS() {
+  const now = performance.now();
+  frameCount++;
+  if (now - lastTime >= 1000) {
+    document.getElementById('fpsDisplay').textContent = frameCount;
+    frameCount = 0;
+    lastTime = now;
+  }
+  requestAnimationFrame(updateFPS);
+}
+
+updateFPS();
+
+/* ============================================================
+   ФАЙЛ 13b: 13b_chip_extra.js
+   Секция: надстройки — анализатор-отвод, осциллограф движка,
+   LCD2-сводка, питч-бенд, арпеджио. Движок не тронут.
+   ============================================================ */
+let analyser13=null;
+const _ensureAudio=ensureAudio;
+ensureAudio=function(){
+  _ensureAudio();
+  if(audioCtx&&!analyser13){
+    analyser13=audioCtx.createAnalyser();
+    analyser13.fftSize=2048;
+    analyser13.smoothingTimeConstant=0.5;
+    master.connect(analyser13);
+    log('13b: анализатор подключён к мастеру');
+  }
+};
+
+/* ---------- питч-бенд ---------- */
+$('#bend').addEventListener('input',e=>{
+  bendCents=parseInt(e.target.value,10);
+  $('#bendLbl').textContent=bendCents+' ц';
+  applyBend();
+});
+
+/* ---------- арпеджио-демо ---------- */
+$('#btnArp').addEventListener('click',()=>{
+  const seq=[60,64,67,72,67,64,60,55];
+  let i=0;
+  const iv=setInterval(()=>{
+    if(i>=seq.length){ clearInterval(iv); return; }
+    const n=seq[i++];
+    noteOn(n,100);
+    setTimeout(()=>noteOff(n),180);
+  },200);
+});
+
+/* ---------- осциллограф движка ---------- */
+(function scopeLoop(){
+  const cv=document.getElementById('scope');
+  if(!cv) return;
+  const ctx=cv.getContext('2d');
+  function draw(){
+    requestAnimationFrame(draw);
+    ctx.fillStyle='#050d08'; ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.strokeStyle='#174a17';
+    for(let x=0;x<cv.width;x+=30){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,cv.height); ctx.stroke(); }
+    for(let y=0;y<cv.height;y+=14){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cv.width,y); ctx.stroke(); }
+    ctx.strokeStyle='#2d6a2d'; ctx.beginPath(); ctx.moveTo(0,cv.height/2); ctx.lineTo(cv.width,cv.height/2); ctx.stroke();
+    if(!analyser13) return;
+    const buf=new Uint8Array(analyser13.fftSize);
+    analyser13.getByteTimeDomainData(buf);
+    ctx.strokeStyle='#9bbc0f'; ctx.lineWidth=2; ctx.beginPath();
+    const step=buf.length/cv.width;
+    for(let i=0;i<cv.width;i++){
+      const v=buf[(i*step)|0]/128-1;
+      const yy=cv.height/2+v*cv.height*0.45;
+      if(i===0) ctx.moveTo(i,yy); else ctx.lineTo(i,yy);
+    }
+    ctx.stroke(); ctx.lineWidth=1;
+  }
+  draw();
+})();
+
+/* ---------- LCD2: сводка чип-канала (опрос, движок не трогает) ---------- */
+(function lcd2Loop(){
+  const el=document.getElementById('lcd2');
+  if(!el) return;
+  const NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const noteName=n=>NN[n%12]+(Math.floor(n/12)-1);
+  let last='';
+  function paint(){
+    requestAnimationFrame(paint);
+    const t=Date.now(); if(t-lcd2Loop._t<150) return; lcd2Loop._t=t;
+    const v=chipVoiceById(state.chipVoice);
+    const active=activeChip.size;
+    let lastNote='';
+    if(active>0){
+      let mx=0; activeChip.forEach((_,k)=>{ if(k>mx) mx=k; });
+      lastNote=' НОТА:['+noteName(mx)+']';
+    }
+    const line='ГОЛОС:['+(v?v.name:'?')+'] ОКТ:['+(pcBase>=60?'+':'')+(pcBase-60)+' от C4]'+
+      ' БЕНД:'+(bendCents>0?'+':'')+bendCents+' ц ГЛАСА:'+active+lastNote;
+    if(line!==last){ el.textContent=line; last=line; }
+  }
+  paint();
+})();
+
+/* ============================================================
+   ФАЙЛ 14: 14_audio_context_probe.js
+   Секция: независимый контроль аудио-тракта (аудио-щуп)
+   Движок не трогает: оборачивает прототипы Web Audio (счётчики)
+   и только ЧИТАЕТ audioCtx / analyser13 / activeChip / activeSF2 / activeMidi.
+   ============================================================ */
+(function(){
+'use strict';
+const stat={created:{},live:new Set(),bufN:0,bufBytes:0,ctxHooked:false,
+            dcWarn:false,silentWarn:false};
+function wrapCtor(Ctor,name,label){
+  if(!Ctor||!Ctor.prototype||!Ctor.prototype[name]||Ctor.prototype[name].__ad) return;
+  const orig=Ctor.prototype[name];
+  Ctor.prototype[name]=function(){
+    const n=orig.apply(this,arguments);
+    if(n){
+      stat.created[label]=(stat.created[label]||0)+1;
+      if(typeof n.start==='function'){
+        stat.live.add(n);
+        if(typeof n.addEventListener==='function')
+          n.addEventListener('ended',function(){ stat.live.delete(n); });
+      }
+    }
+    return n;
+  };
+  Ctor.prototype[name].__ad=true;
+}
+[['createBufferSource','BufferSource'],['createOscillator','Oscillator'],
+ ['createGain','Gain'],['createBiquadFilter','BiquadFilter'],
+ ['createWaveShaper','WaveShaper'],['createDynamicsCompressor','Compressor'],
+ ['createDelay','Delay'],['createStereoPanner','StereoPanner']
+].forEach(p=>wrapCtor(window.AudioContext,p[0],p[1]));
+if(window.AudioContext&&!window.AudioContext.prototype.createBuffer.__ad){
+  const orig=window.AudioContext.prototype.createBuffer;
+  window.AudioContext.prototype.createBuffer=function(ch,len,sr){
+    const b=orig.apply(this,arguments);
+    stat.bufN++; stat.bufBytes+=ch*len*4;
+    return b;
+  };
+  window.AudioContext.prototype.createBuffer.__ad=true;
+}
+const logEl=document.getElementById('adLog');
+function adLog(m){
+  if(!logEl) return;
+  const d=new Date();
+  const t=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
+  const row=document.createElement('div'); row.textContent='['+t+'] '+m;
+  logEl.insertBefore(row,logEl.firstChild);
+  while(logEl.children.length>8) logEl.removeChild(logEl.lastChild);
+}
+function db(v){ return v<=0.00001?'-∞':(20*Math.log10(v)).toFixed(1); }
+document.getElementById('adFreeze').addEventListener('click',function(){
+  if(!audioCtx){ adLog('контекст ещё не создан'); return; }
+  audioCtx.suspend().then(()=>adLog('❄ КОНТЕКСТ ПРИОСТАНОВЛЕН'));
+});
+document.getElementById('adResume').addEventListener('click',function(){
+  if(!audioCtx) return;
+  audioCtx.resume().then(()=>adLog('▶ контекст возобновлён'));
+});
+const lcd=document.getElementById('adLcd');
+let last='', lastT=0;
+let timeBuf=null, freqBuf=null;
+const NOTE=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+function loop(ts){
+  requestAnimationFrame(loop);
+  if(ts-lastT<200) return; lastT=ts;
+  if(!audioCtx){ put('AUDIO: контекст ещё не создан'); return; }
+  if(!stat.ctxHooked){
+    stat.ctxHooked=true;
+    adLog('контекст: '+audioCtx.sampleRate+' Гц, латентность '+((audioCtx.baseLatency||0)*1000).toFixed(1)+' мс');
+    audioCtx.addEventListener('statechange',function(){ adLog('состояние контекста: '+audioCtx.state); });
+  }
+  let line='AUDIO '+audioCtx.state.toUpperCase()+' '+Math.round(audioCtx.sampleRate/100)/10+'кГц';
+  if(analyser13){
+    if(!timeBuf||timeBuf.length!==analyser13.fftSize){
+      timeBuf=new Float32Array(analyser13.fftSize);
+      freqBuf=new Uint8Array(analyser13.frequencyBinCount);
+    }
+    analyser13.getFloatTimeDomainData(timeBuf);
+    analyser13.getByteFrequencyData(freqBuf);
+    let peak=0,sum=0,mean=0,clip=0;
+    for(let i=0;i<timeBuf.length;i++){
+      const x=timeBuf[i], a=x<0?-x:x;
+      if(a>peak) peak=a;
+      if(a>=0.999) clip++;
+      sum+=x*x; mean+=x;
+    }
+    mean/=timeBuf.length;
+    const rms=Math.sqrt(sum/timeBuf.length);
+    const dc=Math.abs(mean)*100;
+    let top=-1,tv=0;
+    for(let i=0;i<freqBuf.length;i++) if(freqBuf[i]>tv){ tv=freqBuf[i]; top=i; }
+    line+=' | пик '+db(peak)+'дБ RMS '+db(rms)+'дБ | DC '+dc.toFixed(1)+'%'+
+      ' | клип '+clip+' | пик спектра '+
+      (tv>60?NOTE[((Math.round(69+12*Math.log2(top*audioCtx.sampleRate/2/freqBuf.length/440))%12)+12)%12]+' '+Math.round(top*audioCtx.sampleRate/2/freqBuf.length)+' Гц':'—');
+    const silent=!(activeChip.size+activeSF2.size+activeMidi.size);
+    if(silent&&rms>0.004&&!stat.silentWarn){ stat.silentWarn=true; adLog('⚠ ФОН при тишине: RMS '+db(rms)+' дБ — источник в тракте'); }
+    if(!silent) stat.silentWarn=false;
+    if(dc>1.5&&!stat.dcWarn){ stat.dcWarn=true; adLog('⚠ DC-смещение '+dc.toFixed(1)+'% — буфер без нормализации среднего'); }
+    if(dc<0.5) stat.dcWarn=false;
+  }
+  const L=[];
+  for(const k in stat.created) L.push(k[0]+' '+stat.created[k]);
+  line+=' | созд:'+(L.length?L.join(' '):'0');
+  const liveCnt={};
+  stat.live.forEach(n=>{ const l=n.constructor.name||'?'; liveCnt[l]=(liveCnt[l]||0)+1; });
+  const LL=[]; for(const k in liveCnt) LL.push(k[0]+' '+liveCnt[k]);
+  line+=' | жив:'+(LL.length?LL.join(' '):'0');
+  line+=' | буф: '+stat.bufN+' ('+(stat.bufBytes/1024).toFixed(0)+' КБ)';
+  put(line);
+}
+function put(s){ if(s!==last&&lcd){ lcd.textContent=s; last=s; } }
+requestAnimationFrame(loop);
+})();
+
+/* ============================================================
+   ФАЙЛ 15: 15_oscilloscope.js
+   Секция: диагностический осциллограф (волна/спектр/фигура/стоп-кадр)
+   Движок не трогает: читает analyser13 и audioCtx.
+   ============================================================ */
+(function(){
+'use strict';
+const cv=document.getElementById('scope2');
+const lcd=document.getElementById('sc2Lcd');
+if(!cv) return;
+const ctx=cv.getContext('2d');
+let mode='wave', frozen=false, snap=null, lastT=0;
+let timeBuf=null, freqBuf=null;
+const NOTE=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+function setMode(m){
+  mode=m; if(m!=='wave') frozen=false;
+  ['sc2Wave','sc2Spec','sc2XY'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('on',['wave','spec','xy'][i]===mode);
+  });
+}
+document.getElementById('sc2Wave').addEventListener('click',()=>setMode('wave'));
+document.getElementById('sc2Spec').addEventListener('click',()=>setMode('spec'));
+document.getElementById('sc2XY').addEventListener('click',()=>setMode('xy'));
+document.getElementById('sc2Freeze').addEventListener('click',()=>{
+  if(frozen){ frozen=false; snap=null; }
+  else if(timeBuf){ snap=timeBuf.slice(); frozen=true; }
+});
+function grid(){
+  ctx.fillStyle='#050d08'; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.strokeStyle='#174a17'; ctx.lineWidth=1;
+  for(let x=0;x<cv.width;x+=30){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,cv.height); ctx.stroke(); }
+  for(let y=0;y<cv.height;y+=18){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cv.width,y); ctx.stroke(); }
+  ctx.strokeStyle='#2d6a2d';
+  ctx.beginPath(); ctx.moveTo(0,cv.height/2); ctx.lineTo(cv.width,cv.height/2); ctx.stroke();
+}
+function fetch13(){
+  if(!analyser13||!audioCtx) return null;
+  if(!timeBuf||timeBuf.length!==analyser13.fftSize){
+    timeBuf=new Float32Array(analyser13.fftSize);
+    freqBuf=new Uint8Array(analyser13.frequencyBinCount);
+  }
+  analyser13.getFloatTimeDomainData(timeBuf);
+  analyser13.getByteFrequencyData(freqBuf);
+  return audioCtx;
+}
+function findTrigger(buf){
+  for(let i=1;i<buf.length/2;i++){
+    if(buf[i-1]<0&&buf[i]>=0) return i;
+  }
+  return 0;
+}
+function freqOfPeak(ac){
+  let top=-1,tv=0;
+  for(let i=2;i<freqBuf.length;i++) if(freqBuf[i]>tv){ tv=freqBuf[i]; top=i; }
+  if(tv<60||top<1) return null;
+  const a=freqBuf[top-1], b=freqBuf[top], c=freqBuf[top+1]||0;
+  const d=(a-c)/(2*(a-2*b+c))||0;
+  const f=(top+d)*ac.sampleRate/2/freqBuf.length;
+  const n=69+12*Math.log2(f/440);
+  return f.toFixed(1)+' Гц ~ '+NOTE[((Math.round(n)%12)+12)%12]+(Math.floor(Math.round(n)/12)-1);
+}
+function drawWave(buf){
+  grid();
+  const start=findTrigger(buf);
+  const span=Math.min(buf.length-start,Math.floor(buf.length/2));
+  ctx.strokeStyle='#9bbc0f'; ctx.lineWidth=2; ctx.beginPath();
+  for(let i=0;i<cv.width;i++){
+    const v=buf[start+Math.floor(i*span/cv.width)]||0;
+    const yy=cv.height/2+v*cv.height*0.45;
+    if(i===0) ctx.moveTo(i,yy); else ctx.lineTo(i,yy);
+  }
+  ctx.stroke(); ctx.lineWidth=1;
+}
+let acSf=44100;
+function drawSpec(){
+  grid();
+  const bw=cv.width/freqBuf.length;
+  ctx.fillStyle='#9bbc0f';
+  for(let i=2;i<freqBuf.length;i++){
+    const h=(freqBuf[i]/255)*cv.height;
+    if(h>1) ctx.fillRect(i*bw,cv.height-h,bw,h);
+  }
+  ctx.strokeStyle='#2d6a2d';
+  for(let f=1000;f<acSf/2;f+=1000){
+    const xx=f/(acSf/2)*cv.width;
+    ctx.beginPath(); ctx.moveTo(xx,0); ctx.lineTo(xx,cv.height); ctx.stroke();
+  }
+}
+function drawXY(buf){
+  grid();
+  ctx.strokeStyle='#9bbc0f'; ctx.beginPath();
+  const off=Math.floor(buf.length/4), n=Math.min(cv.width,800);
+  for(let i=0;i<n;i++){
+    const a=buf[Math.floor(i*buf.length/n/2)]||0;
+    const b=buf[(Math.floor(i*buf.length/n/2)+off)%buf.length]||0;
+    const xx=cv.width/2+a*cv.width*0.42;
+    const yy=cv.height/2+b*cv.height*0.42;
+    if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+  }
+  ctx.stroke();
+}
+function loop(ts){
+  requestAnimationFrame(loop);
+  if(frozen&&snap){ drawWave(snap); return; }
+  const ac=fetch13();
+  if(!ac){ if(mode==='wave') grid(); return; }
+  acSf=ac.sampleRate;
+  if(ts-lastT<33) return; lastT=ts;
+  if(mode==='wave') drawWave(timeBuf);
+  else if(mode==='spec') drawSpec();
+  else drawXY(timeBuf);
+  const pk=freqOfPeak(ac);
+  const info='OSC '+mode.toUpperCase()+(pk?' | '+pk:'');
+  if(info!==loop._l){ lcd.textContent=info; loop._l=info; }
+}
+requestAnimationFrame(loop);
+})();
+
+/* ============================================================
+   ФАЙЛ 16-WAV: wav_stand.js
+   Секция: тестовый стенд записи WAV — полная обвязка движка
+   Отвод: пост-лимитер (ровно то, что слышно) -> ScriptProcessor
+   -> PCM Float32 -> 16-bit WAV. Мастер-цепь движка не затронута.
+   ============================================================ */
+const WAV_MAX_SEC=90;
+let wavProc=null,wavSink=null,wavChunks=[],wavN=0,wavRec=false,wavT0=0,wavTimer=null,wavSeqTimer=null;
+function wavLcd(m){const el=document.getElementById('wavLcd'); if(el) el.textContent=m;}
+function wavEnsureTap(){
+  ensureAudio();
+  if(!window.__wavTapOut){ log('16-WAV: отвод не создан — патч ensureAudio не сработал.'); return false; }
+  if(!wavProc){
+    wavProc=audioCtx.createScriptProcessor(4096,1,1);
+    wavSink=audioCtx.createGain(); wavSink.gain.value=0;
+    window.__wavTapOut.connect(wavProc); wavProc.connect(wavSink); wavSink.connect(audioCtx.destination); wavProc.disconnect();
+    wavProc.onaudioprocess=e=>{
+      if(!wavRec) return;
+      const d=e.inputBuffer.getChannelData(0);
+      wavChunks.push(new Float32Array(d)); wavN+=d.length;
+      if(wavN>=WAV_MAX_SEC*audioCtx.sampleRate) wavRecStop('лимит '+WAV_MAX_SEC+' с — авто-стоп');
+    };
+    log('16-WAV: отвод подключён ('+audioCtx.sampleRate+' Гц, моно, лимит '+WAV_MAX_SEC+' с).');
+  }
+  return true;
+}
+function wavRecStart(){
+  if(wavRec){ log('16-WAV: запись уже идёт.'); return; }
+  if(!wavEnsureTap()) return;
+  try{window.__wavTapOut.connect(wavProc);}catch(_){}
+  wavChunks=[]; wavN=0; wavRec=true; wavT0=performance.now();
+  wavLcd('16-WAV: ЗАПИСЬ ИДЁТ — звук пост-лимитер, моно, '+audioCtx.sampleRate+' Гц');
+  log('16-WAV: запись начата.');
+  const b=document.getElementById('wavRec'); if(b) b.classList.add('on');
+  wavTimer=setInterval(()=>{
+    const s=(performance.now()-wavT0)/1000;
+    const el=document.getElementById('wavTime'); if(el) el.textContent=s.toFixed(1)+' с';
+  },100);
+}
+function wavRecStop(reason){
+  if(!wavRec) return;
+  wavRec=false; if(wavTimer){clearInterval(wavTimer); wavTimer=null;}
+  try{wavProc.disconnect();}catch(_){}
+  const b=document.getElementById('wavRec'); if(b) b.classList.remove('on');
+  const dur=wavN/audioCtx.sampleRate;
+  wavLcd('16-WAV: записано '+dur.toFixed(1)+' с'+(reason?', '+reason:'')+' — готово к экспорту');
+  log('16-WAV: запись остановлена — '+dur.toFixed(2)+' с'+(reason?', '+reason:'')+'.');
+}
+function wavRecExport(){
+  if(wavRec){ log('16-WAV: сначала СТОП, потом экспорт.'); return; }
+  if(!wavN){ log('16-WAV: нечего экспортировать — нет записи.'); return; }
+  const sr=audioCtx.sampleRate, n=wavN;
+  const buf=new ArrayBuffer(44+n*2), dv=new DataView(buf);
+  const ws=(o,s)=>{for(let i=0;i<s.length;i++)dv.setUint8(o+i,s.charCodeAt(i));};
+  ws(0,'RIFF'); dv.setUint32(4,36+n*2,true); ws(8,'WAVE'); ws(12,'fmt ');
+  dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+  dv.setUint32(24,sr,true); dv.setUint32(28,sr*2,true); dv.setUint16(32,2,true);
+  dv.setUint16(34,16,true); ws(36,'data'); dv.setUint32(40,n*2,true);
+  let o=44;
+  for(const ch of wavChunks){
+    for(let i=0;i<ch.length;i++){
+      let s=Math.max(-1,Math.min(1,ch[i]));
+      dv.setInt16(o, s<0?s*32768:s*32767, true); o+=2;
+    }
+  }
+  const d=new Date(), p=x=>(''+x).padStart(2,'0');
+  const name='diowkrad_test_'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+'.wav';
+  const blob=new Blob([buf],{type:'audio/wav'}), url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  wavLcd('16-WAV: экспорт готов — '+name);
+  log('16-WAV: экспорт '+n+' сэмплов → '+(blob.size/1024|0)+' КБ, '+sr+' Гц, 16 бит, '+name);
+}
+function wavSeqRun(mode){
+  if(!wavEnsureTap()) return;
+  if(wavSeqTimer){ clearTimeout(wavSeqTimer); wavSeqTimer=null; panicAll(); }
+  const saved=state.chipVoice, seq=[];
+  if(mode==='tone') seq.push([saved,60,1.0]);
+  else if(mode==='scale') [60,62,64,65,67,69,71,72].forEach(k=>seq.push([saved,k,0.3]));
+  else if(mode==='noise'){ seq.push(['noiseL',60,0.8]); seq.push(['noiseS',60,0.8]); }
+  else if(mode==='voices') CHIP_VOICES.forEach(v=>seq.push([v.id,60,0.35]));
+  let i=0;
+  const step=()=>{
+    if(i>=seq.length){
+      state.chipVoice=saved; wavSeqTimer=null;
+      wavLcd('16-WAV: тест завершён — голос восстановлен: '+(chipVoiceById(saved)||{}).name);
+      log('16-WAV: тест "'+mode+'" завершён.'); return;
+    }
+    const [vid,key,dur]=seq[i++];
+    state.chipVoice=vid;
+    chipOn(key,100);
+    const vn=chipVoiceById(vid)||{}; wavLcd('16-WAV: тест → '+vn.name+' / нота '+key+' / '+dur+' с');
+    wavSeqTimer=setTimeout(()=>{ chipKill(key); wavSeqTimer=setTimeout(step,80); }, dur*1000);
+  };
+  log('16-WAV: запущен тест "'+mode+'" ('+seq.length+' шагов).');
+  step();
+}
+(function wavWire(){
+  const w=(id,fn)=>{const b=document.getElementById(id); if(b) b.addEventListener('click',fn);};
+  w('wavRec',wavRecStart); w('wavStop',()=>wavRecStop()); w('wavExport',wavRecExport);
+  w('wavTone',()=>wavSeqRun('tone')); w('wavScale',()=>wavSeqRun('scale'));
+  w('wavNoise',()=>wavSeqRun('noise')); w('wavVoices',()=>wavSeqRun('voices'));
+})();
+
+/* ================= МОДУЛЬ 17: MIDI OUT v1.3.1 =================
+   NC-канал (BroadcastChannel 'diowkrad-nc'): связка двух вкладок одного файла.
+   ЗАЩИТА ОТ ПЕТЛИ: канал — ЛИБО передача, ЛИБО приём (не оба);
+   сообщения подписаны ID вкладки, эхо отбрасывается по источнику.
+   MIDI-порт: выход не может занять порт, назначенный MIDI-входу (#midiSel),
+   при смене входа конфликтный выход отключается сам. */
+(function(){
+  var TAB_ID='w'+Math.random().toString(36).slice(2,9);
+  var ch=null, modeNC='';
+  var midiAcc=null, midiOut=null, midiOutId='', sentN=0;
+
+  function mLcd(t){ var e=document.querySelector('#moutLcd'); if(e) e.textContent=t; }
+  function mLog(t){ if(typeof log==='function') log('[17-OUT] '+t); }
+
+  function ncUnlight(sel){ var b=document.querySelector(sel); if(b) b.classList.remove('on'); }
+  function ncStop(){
+    try{ if(ch) ch.close(); }catch(e){}
+    ch=null; modeNC='';
+    ncUnlight('#moutTx'); ncUnlight('#moutRx');
+    mLcd('17-OUT: NC выключен');
+  }
+  function ncStart(m){
+    ncStop();
+    ch=new BroadcastChannel('diowkrad-nc');
+    if(m==='rx'){
+      ch.onmessage=function(ev){
+        var d=ev.data||{};
+        if(d.src===TAB_ID) return;
+        try{
+          if(d.t==='on' && typeof noteOn==='function') noteOn(d.k|0,(d.v==null?100:d.v)|0);
+          else if(d.t==='off' && typeof noteOff==='function') noteOff(d.k|0);
+          else if(d.t==='bend'){
+            var s=document.querySelector('#bend');
+            if(s){ s.value=d.c; s.dispatchEvent(new Event('input')); }
+          }
+        }catch(e){}
+      };
+      mLcd('17-OUT: NC ПРИЁМ · жду ноты · id='+TAB_ID);
+      mLog('NC: ПРИЁМ (id='+TAB_ID+')');
+    } else {
+      mLcd('17-OUT: NC ПЕРЕДАЧА · ноты уходят наружу · id='+TAB_ID);
+      mLog('NC: ПЕРЕДАЧА (id='+TAB_ID+')');
+    }
+    modeNC=m;
+    var b=document.querySelector(m==='tx'?'#moutTx':'#moutRx'); if(b) b.classList.add('on');
+  }
+  var txB=document.querySelector('#moutTx'), rxB=document.querySelector('#moutRx');
+  if(txB) txB.addEventListener('click',function(){ if(modeNC==='tx') ncStop(); else ncStart('tx'); });
+  if(rxB) rxB.addEventListener('click',function(){ if(modeNC==='rx') ncStop(); else ncStart('rx'); });
+
+  function ncSend(o){ if(modeNC==='tx' && ch){ try{ o.src=TAB_ID; ch.postMessage(o); }catch(e){} } }
+
+  function inputOccupied(pid){
+    if(!midiAcc || pid==null) return false;
+    var sel=document.querySelector('#midiSel');
+    if(sel && sel.value && sel.value!=='all' && sel.value===pid) return true;
+    if(sel && sel.value==='all'){
+      var found=false;
+      midiAcc.inputs.forEach(function(_v,id){ if(id===pid) found=true; });
+      if(found) return true;
+    }
+    return false;
+  }
+  function scanMidi(){
+    if(!navigator.requestMIDIAccess){ mLcd('17-OUT: Web MIDI в этом браузере недоступен'); return; }
+    navigator.requestMIDIAccess({sysex:false}).then(function(acc){
+      midiAcc=acc;
+      var sel=document.querySelector('#moutPort');
+      if(sel){
+        sel.innerHTML='';
+        var none=document.createElement('option');
+        none.value=''; none.textContent='— нет выхода —';
+        sel.appendChild(none);
+        var n=0;
+        acc.outputs.forEach(function(o){
+          var opt=document.createElement('option');
+          opt.value=o.id;
+          opt.textContent=o.name+(inputOccupied(o.id)?'  ⛔ (занят входом)':'');
+          sel.appendChild(opt); n++;
+        });
+        midiOut=null; midiOutId='';
+        mLcd(n?'17-OUT: найдено выходов: '+n+' · выберите порт':'17-OUT: MIDI-выходов не найдено');
+        mLog('скан MIDI OUT: '+n+' устройств');
+      }
+      acc.onstatechange=function(){ scanMidi(); };
+    }).catch(function(e){ mLcd('17-OUT: ошибка MIDI: '+e); });
+  }
+  var scanB=document.querySelector('#moutScan');
+  if(scanB) scanB.addEventListener('click', scanMidi);
+  var portSel=document.querySelector('#moutPort');
+  if(portSel) portSel.addEventListener('change', function(){
+    var id=portSel.value;
+    if(!id){ midiOut=null; midiOutId=''; mLcd('17-OUT: выход отключён'); return; }
+    if(!midiAcc){ scanMidi(); return; }
+    if(inputOccupied(id)){
+      portSel.value=''; midiOut=null; midiOutId='';
+      mLcd('ОТКАЗ: этот порт занят MIDI-входом — петля');
+      mLog('отказ: порт занят входом — защита от петли');
+      return;
+    }
+    midiOut=midiAcc.outputs.get(id)||null;
+    midiOutId=id;
+    mLcd(midiOut?('17-OUT: выход → '+midiOut.name+' · отправлено: 0'):'17-OUT: порт не найден');
+    if(midiOut) mLog('MIDI OUT подключен: '+midiOut.name);
+  });
+  var inSel=document.querySelector('#midiSel');
+  if(inSel) inSel.addEventListener('change', function(){
+    if(midiOutId && inputOccupied(midiOutId)){
+      mLog('конфликт: вход занял порт выхода — MIDI OUT отключён');
+      midiOut=null; midiOutId='';
+      if(portSel) portSel.value='';
+      mLcd('17-OUT: конфликт петли — выход отключён');
+    }
+  });
+
+  function sendMIDI(msg){
+    if(!midiOut) return;
+    try{ midiOut.send(msg); sentN++; mLcd('17-OUT: OUT → '+midiOut.name+' · отправлено: '+sentN); }catch(e){}
+  }
+
+  if(typeof noteOn==='function'){
+    var _noteOn=noteOn;
+    window.noteOn=function(k,v){
+      var r=_noteOn(k,v);
+      ncSend({t:'on', k:k, v:v});
+      sendMIDI([0x90,(k&127),(v==null?100:(v&127))]);
+      return r;
+    };
+  }
+  if(typeof noteOff==='function'){
+    var _noteOff=noteOff;
+    window.noteOff=function(k){
+      var r=_noteOff(k);
+      ncSend({t:'off', k:k});
+      sendMIDI([0x80,(k&127),0]);
+      return r;
+    };
+  }
+  var bendEl=document.querySelector('#bend');
+  if(bendEl) bendEl.addEventListener('input', function(){
+    var c=+bendEl.value||0;
+    ncSend({t:'bend', c:c});
+    if(midiOut){
+      var cc=Math.max(-200,Math.min(200,c));
+      var pb=8192+Math.round(cc/200*8191);
+      if(pb<0) pb=0; if(pb>16383) pb=16383;
+      sendMIDI([0xE0,(pb&127),((pb>>7)&127)]);
+    }
+  });
+  if(typeof setSusMode==='function'){
+    var _ssm=setSusMode;
+    window.setSusMode=function(m){
+      var r=_ssm(m);
+      var on=document.querySelector('#susBtn8.on')||document.querySelector('#susBtn4.on')||document.querySelector('#susBtn2.on');
+      sendMIDI([0xB0,64,on?127:0]);
+      return r;
+    };
+  }
+  var panicB=document.querySelector('#panicBtn');
+  if(panicB) panicB.addEventListener('click', function(){
+    if(midiOut){ try{ midiOut.send([0xB0,123,0]); }catch(e){} }
+  });
+
+  mLcd('17-OUT: модуль инициализирован · NC выключен · MIDI не выбран');
+  mLog('17-OUT: модуль инициализирован (id='+TAB_ID+')');
+})();
+
+</script>
+
+<script> 
+	/* ТЕМЫ: перекраска классом на <html>, запоминание выбора */
+(function(){
+  const row=document.getElementById('themeRow');
+  if(!row) return;
+  const NAMES={th2:'ЖЁЛТАЯ',th3:'ЯНТАРНАЯ',th4:'ОРАНЖЕВАЯ',th5:'КРАСНАЯ',
+    th6:'РОЗОВАЯ',th7:'МАГЕНТА',th8:'ФИОЛЕТОВАЯ',th9:'СИНЯЯ',
+    th10:'ГОЛУБАЯ',th11:'ЦИАНОВАЯ',th12:'МЯТНАЯ'};
+  function apply(th){
+    [...document.documentElement.classList]
+      .filter(c=>/^th\d+$/.test(c))
+      .forEach(c=>document.documentElement.classList.remove(c));
+    if(th) document.documentElement.classList.add(th);
+    row.querySelectorAll('.thbtn').forEach(b=>b.classList.toggle('on',b.dataset.th===th));
+    try{localStorage.setItem('diowkrad_theme',th||'');}catch(e){}
+    if(typeof lcd==='function') lcd('ТЕМА: '+(NAMES[th]||'ЗЕЛЁНАЯ'));
+  }
+  row.addEventListener('click',e=>{
+    const b=e.target.closest('.thbtn'); if(b) apply(b.dataset.th);
+  });
+  let saved=''; try{saved=localStorage.getItem('diowkrad_theme')||'';}catch(e){}
+  apply(saved);
+})();
+</script>
+<script>
+/* ХОСТ: подсветка ПИАНО РОЛЛА + кнопки 1/2 КЛАВИАТУРЫ. Ставится ПОСЛЕ двигла. */
+(function(){
+  const kb1=document.getElementById('piKb1'),
+        kb2=document.getElementById('piKb2'),
+        roll=document.getElementById('piRoll');
+  function syncPiano(){
+    const single=document.body.classList.contains('kb-single');
+    kb1&&kb1.classList.toggle('on',single);
+    kb2&&kb2.classList.toggle('on',!single);
+    if(roll){
+      const rl=document.getElementById('rollLock');
+      const locked=rl?rl.classList.contains('on'):false;
+      roll.textContent='СКРОЛЛ: '+(locked?'ЗАКРЫТ':'ОТКРЫТ');
+      roll.classList.toggle('on',locked);
+    }
+  }
+  if(kb1) kb1.addEventListener('click',()=>{ if(typeof setKbMode==='function') setKbMode(1); syncPiano(); });
+  if(kb2) kb2.addEventListener('click',()=>{ if(typeof setKbMode==='function') setKbMode(2); syncPiano(); });
+  if(roll) roll.addEventListener('click',()=>{ const rl=document.getElementById('rollLock'); rl&&rl.click(); });
+  if(typeof setKbMode==='function'){ const _skm=setKbMode; window.setKbMode=function(m){ _skm(m); syncPiano(); }; }
+  if(typeof rollLockApply==='function'){ const _rla=rollLockApply; window.rollLockApply=function(){ _rla(); syncPiano(); }; }
+  syncPiano();
+})();
+</script>
+<script>
+/* ═══ ЧИТ-КОД: режим разработчика (v1.4.16) — прячет МОНИТОРЫ (tb8). Пароль: alisatyan ═══ */
+(function(){
+  const SEQ='alisatyan';
+  const lbl8=document.querySelector('label[for="tb8"]');
+  let buf='';
+  function hide(){ if(lbl8) lbl8.style.display='none'; }
+  function show(){ if(lbl8) lbl8.style.display='flex'; }
+  hide();
+  document.addEventListener('keydown',e=>{
+    if(e.repeat) return;
+    const t=e.target;
+    if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+    if(!e.key||e.key.length!==1) return;
+    buf=(buf+e.key.toLowerCase()).slice(-SEQ.length);
+    if(buf!==SEQ) return;
+    buf='';
+    if(lbl8&&lbl8.style.display!=='none'){
+      show();
+      alert('СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВКЛЮЧЕН !!!');
+    } else {
+      hide();
+      const tb8=document.getElementById('tb8');
+      if(tb8&&tb8.checked){ const tb1=document.getElementById('tb1'); if(tb1) tb1.checked=true; }
+      alert('СИСТЕМА: РЕЖИМ РАЗРАБОТЧИКА ВЫКЛЮЧЕН');
+    }
+  });
+})();
+</script>
+</body>
+</html>
