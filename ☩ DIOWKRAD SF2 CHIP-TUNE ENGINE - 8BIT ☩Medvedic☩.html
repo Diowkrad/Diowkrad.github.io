@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.21 «Medvedic Upgrade»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.23 «Medvedic Upgrade»</title>
 <style>
 :root{
   --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
@@ -477,7 +477,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.21 «Medvedic Upgrade»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.23 «Medvedic Upgrade»</h1>
 	</header>
 
 
@@ -744,7 +744,7 @@ input[name="tb"]{display:none;}
       <button id="piRoll">СКРОЛЛ: ОТКРЫТ</button>
     </span>
 	<span class="tag">Нот нажато:</span>
-	<span class="badge" id="noteCnt" title="Счётчик нажатых нот (обе клавиатуры). Клик по счётчику — СБРОС.">0
+	<span class="badge" id="noteCnt" title="Счётчик нажатых нот (клавиатура 1). Клик по счётчику — СБРОС.">0
 	</span> 
 	<span class="tag">Нот звучит:</span>
 	<span class="badge" id="voiceCnt">0
@@ -795,7 +795,12 @@ function lcd(msg){$('#lcd').textContent=msg;}
 $('#vol').addEventListener('input',e=>{if(master&&audioCtx)master.gain.setTargetAtTime(Math.max(0,(+e.target.value)/100),audioCtx.currentTime,0.02);});
 function ensureAudio(){
   if(!audioCtx){
-    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    /* v1.4.22: явный запрос минимальной задержки вывода; старый webkit-префикс опцию молча игнорирует */
+    const _AC=window.AudioContext||window.webkitAudioContext;
+    try{ audioCtx=new _AC({latencyHint:'interactive'}); }catch(_){ audioCtx=new _AC(); }
+    /* v1.4.22: телеметрия — профиль контекста сразу в журнал */
+    try{ log('AUDIO: ctx создан — sampleRate='+audioCtx.sampleRate+(audioCtx.baseLatency?(' / задержка ~'+Math.round(audioCtx.baseLatency*1000)+' мс'):'')); }catch(_){}
+    audioCtx.addEventListener('statechange',()=>{ try{ log('AUDIO: контекст → '+audioCtx.state); }catch(_){} });
     master=audioCtx.createGain(); master.gain.value=(+$('#vol').value)/100;
     /* защита от щелчков: DC-блок -> статичный мягкий клиппер -> мягкий лимитер */
     const clipCurve=new Float32Array(2048);
@@ -811,6 +816,10 @@ function ensureAudio(){
   }
   if(audioCtx.state==='suspended')audioCtx.resume();
 }
+/* v1.4.22: автоwake — любой жест возвращает suspended-контекст к жизни; touchstart пассивно, чтобы не душить прокрутку */
+['pointerdown','keydown','touchstart'].forEach(ev=>{
+  window.addEventListener(ev,()=>{ if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume(); },{passive:true});
+});
 const freqOf=k=>440*Math.pow(2,(k-69)/12);
 const tc2s=tc=>Math.pow(2,(tc||0)/1200);
 const sgn=v=>v>32767?v-65536:v;
@@ -969,7 +978,22 @@ function chipReattack(key,vel=100){
   G.linearRampToValueAtTime(peak,t+0.008);
   G.setTargetAtTime(peak*0.35,t+0.008,0.08);
 }
-function chipOn(key,vel=100){
+/* ═══ v1.4.23 ANTI-CLICK: старт ноты только на живом контексте ═══
+   Пока AudioContext suspended, его currentTime заморожен: конверт атаки,
+   заскедуленный на устаревшее время, после resume() применяется мгновенно —
+   «сжатая» атака звучит щелчком на частоте ноты и громче ноты.
+   Лечение: ядро движка запускается только при state==='running'. */
+function startCtx(cb){
+  if(!audioCtx) ensureAudio();
+  if(audioCtx.state==='running'){ cb(); return; }
+  audioCtx.resume();
+  let done=false;
+  const go=()=>{ if(done) return; done=true; clearTimeout(tid); audioCtx.removeEventListener('statechange',go); cb(); };
+  audioCtx.addEventListener('statechange',go);
+  const tid=setTimeout(go,400); /* страховка: играем в любом случае */
+}
+function chipOn(key,vel=100){ startCtx(()=>chipOnCore(key,vel)); }
+function chipOnCore(key,vel=100){
   ensureAudio();
   /* v1.4.20: повторное нажатие звучащей ноты — реатака живого голоса, а не перезапуск */
   if(activeChip.has(key)){ chipReattack(key,vel); return; }
@@ -1361,7 +1385,8 @@ function getBuffer(sf,sIdx){
   return entry;
 }
 const VOICE_MAX=32;
-function sfOn(key,vel=100){
+function sfOn(key,vel=100){ startCtx(()=>sfOnCore(key,vel)); }
+function sfOnCore(key,vel=100){
   ensureAudio();
   const sf=state.sf2;
   if(!sf){ log('Банк не загружен — играет CHIP.'); chipOn(key,vel); return; }
@@ -1793,7 +1818,7 @@ function attachKb(box){
   box.addEventListener('pointerup',up);
   box.addEventListener('pointercancel',up);
 }
-/* ═══ СЧЁТЧИК НАЖАТЫХ НОТ (обе клавиатуры) — v1.4.16/21 ═══ */
+/* ═══ СЧЁТЧИК НАЖАТЫХ НОТ (обе клавиатуры, v1.4.16 → расширено v1.4.21) ═══ */
 const noteCntEl=document.getElementById('noteCnt');
 let noteCnt=0;
 function bumpNoteCnt(){ noteCnt++; if(noteCntEl) noteCntEl.textContent=String(noteCnt); }
@@ -2136,7 +2161,7 @@ document.addEventListener('keydown', e => {
     ensureAudio(); // Активируем аудио-контекст
     noteOwner.set(n, e.code); 
     noteOn(n, 100); // Запускаем звук
-    bumpNoteCnt(); // счётчик нажатых нот
+    bumpNoteCnt(); // счётчик нажатых нот (клавиатура 1)
   } else if (n >= 0) {
     log('Нота ПК ' + n + ' вне диапазона спецификации (24-78)');
   }
@@ -2298,7 +2323,8 @@ function midiReattack(k,vel=100){
   G.linearRampToValueAtTime(peak,t+A);
   G.setTargetAtTime(Math.max(peak*S,0.0001),t+A,D);
 }
-function midiOn(k,vel=100){
+function midiOn(k,vel=100){ startCtx(()=>midiOnCore(k,vel)); }
+function midiOnCore(k,vel=100){
   ensureAudio();
   /* v1.4.20: повторное нажатие звучащей ноты — реатака без пересоздания гармоник */
   if(activeMidi.has(k)){ midiReattack(k,vel); return; }
