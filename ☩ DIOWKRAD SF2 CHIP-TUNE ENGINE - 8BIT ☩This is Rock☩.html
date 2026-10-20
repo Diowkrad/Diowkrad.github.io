@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.30 «This is Rock»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.31 «ДАБЛ+ВИБ»</title>
 <style>
 :root{
 	--bg: #010;
@@ -534,7 +534,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.30 «This is Rock»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.31 «ДАБЛ+ВИБ»</h1>
 	</header>
 
 
@@ -627,12 +627,14 @@ input[name="tb"]{display:none;}
 
 <section class="pane" id="pane9">
   <div class="p_block">
-    <div class="row"><span class="tag">2A03 ПУЛЬТ — РЭК ЧИПОВЫХ ЭФФЕКТОВ</span></div>
+    <div class="row"><span class="tag">МИКШЕР - ЭФФЕКТОВ</span></div>
     <div class="lcd" id="fxLcd">РЭК: СУХОЙ СИГНАЛ</div>
     <div>
       <button class="wbtn" id="fxDeBtn">⧉ DELAY: ВЫКЛ</button>
       <button class="wbtn" id="fxRevBtn">≋ РЕВЕРБ: ВЫКЛ</button>
       <button class="wbtn" id="fxDistBtn">⚡ ДИСТ: ВЫКЛ</button>
+      <button class="wbtn" id="fxDblBtn">◉ ДАБЛ: ВЫКЛ</button>
+      <button class="wbtn" id="fxVbrBtn">∿ ВИБРАТО: ВЫКЛ</button>
       <button class="wbtn" id="btnFxOff">■ ВСЁ ВЫКЛ</button>
       <button class="wbtn" id="presetRock">🎸 ЧИП-РОК</button>
       <button class="wbtn" id="presetMetal">Ъ ЧИП-МЕТЛ</button>
@@ -704,6 +706,39 @@ input[name="tb"]{display:none;}
 		<span class="tag">ДИСТ ГРОМКОСТЬ:</span>
 		<input type="range" id="fxDistV" min="0" max="70" value="5" step="1">
 		<span class="tag" id="fxDistVv">5%</span>
+	</div></div></div>
+	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}">Выход: ДАБЛ-ТРЕК</span>
+   <div> <div class="row">
+		<div> 
+		<span class="tag">ДТ ЗАДЕРЖКА:</span>
+		<input type="range" id="fxDblT" min="10" max="60" value="25" step="1"><span class="tag" id="fxDblTv">25 мс</span>
+	</div></div>
+    <div class="row">
+		<div> 
+		<span class="tag">ДТ МИКС:</span>
+		<input type="range" id="fxDblM" min="0" max="100" value="0" step="1">
+		<span class="tag" id="fxDblMv">0%</span>
+	</div></div></div>
+	
+	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}">Выход:ВИБРАТО</span>
+	
+   <div> <div class="row">
+		<div> 
+		<span class="tag">ВИБ СКОРОСТЬ:</span>
+		<input type="range" id="fxVbrR" min="0.5" max="8" value="5" step="0.1">
+		<span class="tag" id="fxVbrRv">5.0 Гц</span>
+	</div></div>
+    <div class="row">
+		<div> 
+		<span class="tag">ВИБ ГЛУБИНА:</span>
+		<input type="range" id="fxVbrD" min="0" max="5" value="1.5" step="0.1">
+		<span class="tag" id="fxVbrDv">1.5 мс</span>
+	</div></div>
+    <div class="row">
+		<div> 
+		<span class="tag">ВИБ МИКС:</span>
+		<input type="range" id="fxVbrM" min="0" max="100" value="0" step="1">
+		<span class="tag" id="fxVbrMv">0%</span>
 	</div></div></div></div>
 </section>
 <!-- ═══ ВКЛАДКА 2: ПУЛЬТ ═══ -->
@@ -906,7 +941,7 @@ D0 = ♯ Chromatic (флажолет +19, громкость 50%, пока за�
 
 /* ============ состояние ============ */
 const state={mode:'chip',chipVoice:'pulse50',sf2:null,presetIdx:0,instIdx:-1,instSpans:null,instSpansKey:'',sampleCache:new Map()};
-let audioCtx=null,master=null;let fxBus=null,fxDry=null,fxDe=null,fxDeIn=null,fxDeOut=null,fxRev=null,fxRevIn=null,fxRevOut=null,fxDist=null,fxDistPre=null,fxDistPost=null,fxDistV=null,fxDistIn=null,fxDistOut=null,fxReady=false;const FXN={de:null,fb:null,deMx:null,revMx:null,dist:null,distMx:null};/* 2A03 ПУЛЬТ: узлы рэка */
+let audioCtx=null,master=null;let fxBus=null,fxDry=null,fxDe=null,fxDeIn=null,fxDeOut=null,fxRev=null,fxRevIn=null,fxRevOut=null,fxDist=null,fxDistPre=null,fxDistPost=null,fxDistV=null,fxDistIn=null,fxDistOut=null,fxReady=false;let fxDbl=null,fxDblIn=null,fxDblOut=null,fxVbr=null,fxVbrIn=null,fxVbrOut=null,fxVbrLfo=null,fxVbrLfoG=null;const FXN={de:null,fb:null,deMx:null,revMx:null,dist:null,distMx:null,dblMx:null,vbrMx:null};/* 2A03 ПУЛЬТ: узлы рэка */
 const activeChip=new Map(),activeSF2=new Map(),activeMidi=new Map();
 const $=s=>document.querySelector(s);
 const LOG_MAX=10;const logLines=[];
@@ -988,6 +1023,26 @@ function buildFxRack(){
   fxDistIn.connect(fxDistPre); fxDistPre.connect(fxDist); fxDist.connect(fxDistPost);
   fxDistPost.connect(fxDistV); fxDistV.connect(FXN.distMx); FXN.distMx.connect(fxDistOut); fxDistOut.connect(master);
   fxBus.connect(fxDistIn);
+  /* v1.4.31 ДАБЛ: ADT-посыл — копия сигнала с малой задержкой (10-60 мс).
+     Мокрый гейн = микс*0.5: сумма сухого и копии не выше 1.5 сухого.
+     Пик голоса 0.28 => потолок 0.42, лимитер 0.708 не тревожится. */
+  fxDblIn=audioCtx.createGain(); fxDblOut=audioCtx.createGain();
+  fxDbl=audioCtx.createDelay(0.2); fxDbl.delayTime.value=(+$('#fxDblT').value||25)/1000;
+  FXN.dblMx=audioCtx.createGain(); FXN.dblMx.gain.value=0;
+  fxDblIn.connect(fxDbl); fxDbl.connect(FXN.dblMx); FXN.dblMx.connect(fxDblOut); fxDblOut.connect(master);
+  fxBus.connect(fxDblIn);
+  /* v1.4.31 ВИБРАТО: кроссфейд-вставка с модулируемой линией задержки.
+     LFO качает delayTime: база 6 мс, глубина до 5 мс — линия не в ноль.
+     Сухой делит fxDry с дистом: (1-дистМикс)*(1-вибМикс) — суммарный пик не выше сухого. */
+  fxVbrIn=audioCtx.createGain(); fxVbrOut=audioCtx.createGain();
+  fxVbr=audioCtx.createDelay(0.1); fxVbr.delayTime.value=0.006;
+  fxVbrLfo=audioCtx.createOscillator(); fxVbrLfo.type='sine';
+  fxVbrLfo.frequency.value=(+$('#fxVbrR').value||5);
+  fxVbrLfoG=audioCtx.createGain(); fxVbrLfoG.gain.value=(+$('#fxVbrD').value||1.5)/1000;
+  fxVbrLfo.connect(fxVbrLfoG); fxVbrLfoG.connect(fxVbr.delayTime); fxVbrLfo.start();
+  FXN.vbrMx=audioCtx.createGain(); FXN.vbrMx.gain.value=0;
+  fxVbrIn.connect(fxVbr); fxVbr.connect(FXN.vbrMx); FXN.vbrMx.connect(fxVbrOut); fxVbrOut.connect(master);
+  fxBus.connect(fxVbrIn);
   FXN.de=fxDe; FXN.dist=fxDist;
   fxReady=true;
   lcd('2A03 ПУЛЬТ: рэк готов — общая шина CHIP/SF2/MIDI');
@@ -1317,6 +1372,11 @@ $('#btnMidi').addEventListener('click',()=>setMode('midi'));
 
 /* ═══ 2A03 ПУЛЬТ: обработчики (v1.4.24) ═══ */
 function fxRamp(node,v){if(node&&audioCtx)node.gain.setTargetAtTime(v,audioCtx.currentTime,0.02);}
+/* v1.4.31: суммарный сухой — дист и вибрато делят одну дорожку fxDry */
+function fxDryCalc(){let d=0,v=0;const db=$('#fxDistBtn'),vb=$('#fxVbrBtn');
+  if(db&&db.classList.contains('on'))d=(+$('#fxDistM').value||0)/100;
+  if(vb&&vb.classList.contains('on'))v=(+$('#fxVbrM').value||0)/100;
+  return (1-d)*(1-v);}
 function fxLcd(s){const e=$('#fxLcd');if(e)e.textContent=s;}
 $('#fxDeBtn').addEventListener('click',()=>{if(!fxReady)return;
   const on=!$('#fxDeBtn').classList.contains('on');
@@ -1334,44 +1394,53 @@ $('#fxDistBtn').addEventListener('click',()=>{if(!fxReady)return;
   const m=(+$('#fxDistM').value/100)||0;
   fxRamp(FXN.distMx,on?m:0);
   /* v1.4.27: кроссфейд как у педали — сухой приглушается до (1-микс) */
-  fxRamp(fxDry,on?(1-m):1);
+  fxRamp(fxDry,fxDryCalc()); /* v1.4.31: кроссфейд живой */
   fxLcd('ДИСТ: '+(on?'ВКЛ':'ВЫКЛ'));});
 $('#btnFxOff').addEventListener('click',()=>{if(!fxReady)return;
-  ['fxDeBtn','fxRevBtn','fxDistBtn'].forEach(i=>$('#'+i).classList.remove('on'));
+  ['fxDeBtn','fxRevBtn','fxDistBtn','fxDblBtn','fxVbrBtn','presetRock','presetMetal','presetClean'].forEach(i=>$('#'+i).classList.remove('on'));
+  fxRamp(FXN.dblMx,0);fxRamp(FXN.vbrMx,0);
   fxRamp(FXN.deMx,0);fxRamp(FXN.revMx,0);fxRamp(FXN.distMx,0);
   fxRamp(fxDry,1); /* v1.4.27: сухой возвращается целиком */
-  ['presetRock','presetMetal','presetClean'].forEach(i=>{const e=$('#'+i);if(e)e.classList.remove('on');}); /* v1.4.30: пресеты гаснут */
   fxLcd('РЭК: СУХОЙ СИГНАЛ');});
-/* ═══ ПРЕСЕТЫ РЭКА (v1.4.30) ═══ */
-function presetGlow(id){['presetRock','presetMetal','presetClean'].forEach(i=>{const e=$('#'+i);if(e)e.classList.toggle('on',i===id);});}
-function presetApply(kind){if(!fxReady)return;
-  const P=kind==='rock'?{deT:150,deF:25,deM:30,revM:20,gr:85,diM:100,diV:40}
-        :kind==='metal'?{deT:120,deF:40,deM:25,revM:12,gr:100,diM:100,diV:55}
-        :{deT:250,deF:30,deM:0,revM:0,gr:20,diM:0,diV:5};
-  const on=kind!=='clean';
-  $('#fxDeT').value=P.deT;$('#fxDeTv').textContent=P.deT+' мс';
-  $('#fxDeF').value=P.deF;$('#fxDeFv').textContent=P.deF+'%';
-  $('#fxDeM').value=P.deM;$('#fxDeMv').textContent=P.deM+'%';
-  $('#fxRevM').value=P.revM;$('#fxRevMv').textContent=P.revM+'%';
-  $('#fxDistD').value=P.gr;$('#fxDistDv').textContent=P.gr;
-  $('#fxDistM').value=P.diM;$('#fxDistMv').textContent=P.diM+'%';
-  $('#fxDistV').value=P.diV;$('#fxDistVv').textContent=P.diV+'%';
-  const p=1+P.gr/100*15;
-  if(FXN.de)FXN.de.delayTime.setTargetAtTime(P.deT/1000,audioCtx.currentTime,0.02);
-  if(FXN.fb)FXN.fb.gain.setTargetAtTime(P.deF/100,audioCtx.currentTime,0.02);
-  fxRamp(FXN.deMx,on?P.deM/100:0);
-  fxRamp(FXN.revMx,on?P.revM/100:0);
-  fxRamp(FXN.distMx,on?P.diM/100:0);
-  fxRamp(fxDry,on?(1-P.diM/100):1);
-  if(fxDistPre)fxDistPre.gain.setTargetAtTime(p,audioCtx.currentTime,0.02);
-  if(fxDistPost)fxDistPost.gain.setTargetAtTime(1/Math.sqrt(p),audioCtx.currentTime,0.02);
-  fxRamp(fxDistV,P.diV/100);
-  fxLcd(kind==='rock'?'РЭК: ЧИП-РОК':kind==='metal'?'РЭК: ЧИП-МЕТЛ':'РЭК: СУХОЙ СИГНАЛ');
-  presetGlow(kind==='rock'?'presetRock':kind==='metal'?'presetMetal':'presetClean');
-  log(kind==='rock'?'ПРЕСЕТ: ЧИП-РОК применён':kind==='metal'?'ПРЕСЕТ: ЧИП-МЕТЛ применён':'ПРЕСЕТ: ЧИСТЫЙ — сухой сигнал');}
-$('#presetRock').addEventListener('click',()=>presetApply('rock'));
-$('#presetMetal').addEventListener('click',()=>presetApply('metal'));
-$('#presetClean').addEventListener('click',()=>presetApply('clean'));
+
+/* ═══ v1.4.31 ПРЕСЕТЫ: ЧИП-РОК / ЧИП-МЕТЛ / ЧИСТЫЙ ═══ */
+function fxSet(id,v,txt){const el=$('#'+id);if(el)el.value=v;const lb=$('#'+id+'v');if(lb)lb.textContent=txt;}
+function presetFlash(which){['presetRock','presetMetal','presetClean'].forEach(i=>$('#'+i).classList.toggle('on',i===which));}
+function fxApply(name){
+  if(!fxReady)return;
+  if(name==='rock'){
+    fxSet('fxDistD',85,'85');fxSet('fxDistM',100,'100%');fxSet('fxDistV',40,'40%');
+    fxSet('fxDeT',150,'150 мс');fxSet('fxDeF',25,'25%');fxSet('fxDeM',30,'30%');
+    fxSet('fxRevM',20,'20%');
+  } else if(name==='metal'){
+    fxSet('fxDistD',100,'100');fxSet('fxDistM',100,'100%');fxSet('fxDistV',55,'55%');
+    fxSet('fxDeT',120,'120 мс');fxSet('fxDeF',40,'40%');fxSet('fxDeM',25,'25%');
+    fxSet('fxRevM',12,'12%');
+  } else {
+    fxSet('fxDistD',20,'20');fxSet('fxDistM',0,'0%');fxSet('fxDistV',5,'5%');
+    fxSet('fxDeT',250,'250 мс');fxSet('fxDeF',30,'30%');fxSet('fxDeM',0,'0%');
+    fxSet('fxRevM',0,'0%');fxSet('fxDblM',0,'0%');fxSet('fxVbrM',0,'0%');
+  }
+  ['fxDeBtn','fxRevBtn','fxDistBtn'].forEach(i=>$('#'+i).classList.toggle('on',name!=='clean'));
+  fxRamp(FXN.deMx,(+$('#fxDeM').value)/100);
+  fxRamp(FXN.revMx,(+$('#fxRevM').value)/100);
+  fxRamp(FXN.distMx,(+$('#fxDistM').value)/100);
+  fxRamp(fxDistV,(+$('#fxDistV').value)/100);
+  const dp=1+(+$('#fxDistD').value)/100*15;
+  fxRamp(fxDistPre,dp);fxRamp(fxDistPost,1/Math.sqrt(dp));
+  if(FXN.de)FXN.de.delayTime.setTargetAtTime((+$('#fxDeT').value)/1000,audioCtx.currentTime,0.02);
+  if(FXN.fb)FXN.fb.gain.setTargetAtTime((+$('#fxDeF').value)/100,audioCtx.currentTime,0.02);
+  /* пресеты гасят дабл и вибрато; ЧИСТЫЙ сбрасывает их миксы в 0 */
+  fxRamp(FXN.dblMx,0);fxRamp(FXN.vbrMx,0);
+  $('#fxDblBtn').classList.remove('on');$('#fxVbrBtn').classList.remove('on');
+  fxRamp(fxDry,fxDryCalc());
+  presetFlash(name==='rock'?'presetRock':(name==='metal'?'presetMetal':'presetClean'));
+  fxLcd(name==='rock'?'ПРЕСЕТ: ЧИП-РОК':(name==='metal'?'ПРЕСЕТ: ЧИП-МЕТЛ':'ПРЕСЕТ: ЧИСТЫЙ'));
+  log('ПРЕСЕТ: '+(name==='rock'?'ЧИП-РОК применён':(name==='metal'?'ЧИП-МЕТЛ применён':'ЧИСТЫЙ — сухой сигнал')));
+}
+$('#presetRock').addEventListener('click',()=>fxApply('rock'));
+$('#presetMetal').addEventListener('click',()=>fxApply('metal'));
+$('#presetClean').addEventListener('click',()=>fxApply('clean'));
 $('#fxDeT').addEventListener('input',e=>{const v=+e.target.value;
   $('#fxDeTv').textContent=v+' мс';
   if(FXN.de)FXN.de.delayTime.setTargetAtTime(v/1000,audioCtx.currentTime,0.02);});
@@ -1392,10 +1461,38 @@ $('#fxDistD').addEventListener('input',e=>{const v=+e.target.value;
 $('#fxDistM').addEventListener('input',e=>{$('#fxDistMv').textContent=e.target.value+'%';
   if($('#fxDistBtn').classList.contains('on')){
     fxRamp(FXN.distMx,+e.target.value/100);
-    fxRamp(fxDry,1-(+e.target.value/100)); /* v1.4.27: кроссфейд живой */
+    fxRamp(fxDry,fxDryCalc()); /* v1.4.31: кроссфейд живой */
   }});
 $('#fxDistV').addEventListener('input',e=>{$('#fxDistVv').textContent=e.target.value+'%';
   fxRamp(fxDistV,+e.target.value/100);});
+
+/* ═══ v1.4.31 ДАБЛ ТРЕК и ВИБРАТО: кнопки и слайдеры ═══ */
+$('#fxDblBtn').addEventListener('click',()=>{if(!fxReady)return;
+  const on=!$('#fxDblBtn').classList.contains('on');
+  $('#fxDblBtn').classList.toggle('on',on);
+  fxRamp(FXN.dblMx,on?(+$('#fxDblM').value/100)*0.5:0);
+  fxLcd('ДАБЛ: '+(on?'ВКЛ':'ВЫКЛ'));});
+$('#fxDblT').addEventListener('input',e=>{const v=+e.target.value;
+  $('#fxDblTv').textContent=v+' мс';
+  if(fxDbl)fxDbl.delayTime.setTargetAtTime(v/1000,audioCtx.currentTime,0.02);});
+$('#fxDblM').addEventListener('input',e=>{$('#fxDblMv').textContent=e.target.value+'%';
+  if($('#fxDblBtn').classList.contains('on'))fxRamp(FXN.dblMx,(+e.target.value/100)*0.5);});
+$('#fxVbrBtn').addEventListener('click',()=>{if(!fxReady)return;
+  const on=!$('#fxVbrBtn').classList.contains('on');
+  $('#fxVbrBtn').classList.toggle('on',on);
+  const m=(+$('#fxVbrM').value/100)||0;
+  fxRamp(FXN.vbrMx,on?m:0);
+  fxRamp(fxDry,fxDryCalc()); /* v1.4.31: кроссфейд живой */
+  fxLcd('ВИБРАТО: '+(on?'ВКЛ':'ВЫКЛ'));});
+$('#fxVbrR').addEventListener('input',e=>{$('#fxVbrRv').textContent=(+e.target.value).toFixed(1)+' Гц';
+  if(fxVbrLfo)fxVbrLfo.frequency.setTargetAtTime(+e.target.value,audioCtx.currentTime,0.02);});
+$('#fxVbrD').addEventListener('input',e=>{$('#fxVbrDv').textContent=(+e.target.value).toFixed(1)+' мс';
+  if(fxVbrLfoG)fxVbrLfoG.gain.setTargetAtTime(+e.target.value/1000,audioCtx.currentTime,0.02);});
+$('#fxVbrM').addEventListener('input',e=>{$('#fxVbrMv').textContent=e.target.value+'%';
+  if($('#fxVbrBtn').classList.contains('on')){
+    fxRamp(FXN.vbrMx,+e.target.value/100);
+    fxRamp(fxDry,fxDryCalc()); /* v1.4.31: кроссфейд живой */
+  }});
 
 document.querySelectorAll('#wavePanel .wbtn').forEach(b=>{ b.addEventListener('click',()=>setChipVoice(b.dataset.wave)); });
 (function fillChipVoices(){
