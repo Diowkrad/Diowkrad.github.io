@@ -3,13 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.28 «This is Rock»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.30 «This is Rock»</title>
 <style>
 :root{
-  --bg:#0b0f0b; --panel:#111a11; --panel2:#0e150e;
-  --line:#1d3a1d; --line2:#174a17;
-  --ink:#8bac0f; --ink2:#5a7a0a;
-  --hot:#9bbc0f; --font:'Courier New',Courier,monospace;
+	--bg: #010;
+    --panel: #020;
+    --panel2: #0d1b0b;
+    --line: #244a0e;
+    --line2: #2f6610;
+    --ink: #90bc0f;
+    --ink2: #e2f77e;
+    --hot: #9bbc0f;
+    --font: 'Courier New', Courier, monospace;
 }
 
 html.th2{filter:hue-rotate(-18deg)}   /* ЖЁЛТЫЙ */
@@ -59,7 +64,8 @@ h2{font-size:.75rem; letter-spacing:.1em; color:var(--ink2);
 .lcd{background:#071207; border:1px solid var(--line2); border-radius:4px; color:var(--hot);
   font-family:var(--font); font-size:.78rem; padding:8px 10px; letter-spacing:.05em;
   white-space:pre-wrap; text-shadow:0 0 6px rgba(155,188,15,.55); min-height:34px;}
-button{    font-family: var(--font);
+button{
+    font-family: var(--font);
     font-size: .72rem;
     letter-spacing: .04em;
     background: var(--panel2);
@@ -68,8 +74,8 @@ button{    font-family: var(--font);
     border-radius: 8px;
     padding: 7px 10px;
     cursor: pointer;
-    box-shadow: 2px 2px 6px rgb(139 172 15 / 30%);
-    text-shadow: 3px 3px 6px rgb(0 138 20);}
+    box-shadow: 0px 0px 5px 0px rgb(139 172 15 / 30%);
+    text-shadow: 1px 1px 3px rgb(0 138 20);}
 button:hover{background:#16240f; color:var(--hot);}
 button.on{background:#244a0e; color:#e2f77e; border-color:var(--ink2); box-shadow:0 0 8px rgba(139,172,15,.4);}
 button:active{transform:translateY(1px);}
@@ -250,11 +256,17 @@ body.kb-single .kbSec2{display:none;}
     min-width: 0;overflow: auto;
 }
 /* "голые" дивы внутри блока = строки (авто-ряды) */
-.p_block>div{
+.p_block>div {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    align-items: center;    
+    align-items: center;
+    flex-direction: row;
+    background: #020;
+    padding: 5px 10px;
+    justify-content: center;
+    box-shadow: inset 0px 0px 7px 5px #030, 0px 0px 2px 4px #16240f;
+    align-content: center;
 }
 
 .p_block button{
@@ -522,7 +534,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.28 «This is Rock»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.30 «This is Rock»</h1>
 	</header>
 
 
@@ -622,6 +634,9 @@ input[name="tb"]{display:none;}
       <button class="wbtn" id="fxRevBtn">≋ РЕВЕРБ: ВЫКЛ</button>
       <button class="wbtn" id="fxDistBtn">⚡ ДИСТ: ВЫКЛ</button>
       <button class="wbtn" id="btnFxOff">■ ВСЁ ВЫКЛ</button>
+      <button class="wbtn" id="presetRock">🎸 ЧИП-РОК</button>
+      <button class="wbtn" id="presetMetal">Ъ ЧИП-МЕТЛ</button>
+      <button class="wbtn" id="presetClean">○ ЧИСТЫЙ</button>
     </div></div>
 	<div class="p_block" id="bend_sing">
 	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}" >Вход:</span>
@@ -1325,7 +1340,38 @@ $('#btnFxOff').addEventListener('click',()=>{if(!fxReady)return;
   ['fxDeBtn','fxRevBtn','fxDistBtn'].forEach(i=>$('#'+i).classList.remove('on'));
   fxRamp(FXN.deMx,0);fxRamp(FXN.revMx,0);fxRamp(FXN.distMx,0);
   fxRamp(fxDry,1); /* v1.4.27: сухой возвращается целиком */
+  ['presetRock','presetMetal','presetClean'].forEach(i=>{const e=$('#'+i);if(e)e.classList.remove('on');}); /* v1.4.30: пресеты гаснут */
   fxLcd('РЭК: СУХОЙ СИГНАЛ');});
+/* ═══ ПРЕСЕТЫ РЭКА (v1.4.30) ═══ */
+function presetGlow(id){['presetRock','presetMetal','presetClean'].forEach(i=>{const e=$('#'+i);if(e)e.classList.toggle('on',i===id);});}
+function presetApply(kind){if(!fxReady)return;
+  const P=kind==='rock'?{deT:150,deF:25,deM:30,revM:20,gr:85,diM:100,diV:40}
+        :kind==='metal'?{deT:120,deF:40,deM:25,revM:12,gr:100,diM:100,diV:55}
+        :{deT:250,deF:30,deM:0,revM:0,gr:20,diM:0,diV:5};
+  const on=kind!=='clean';
+  $('#fxDeT').value=P.deT;$('#fxDeTv').textContent=P.deT+' мс';
+  $('#fxDeF').value=P.deF;$('#fxDeFv').textContent=P.deF+'%';
+  $('#fxDeM').value=P.deM;$('#fxDeMv').textContent=P.deM+'%';
+  $('#fxRevM').value=P.revM;$('#fxRevMv').textContent=P.revM+'%';
+  $('#fxDistD').value=P.gr;$('#fxDistDv').textContent=P.gr;
+  $('#fxDistM').value=P.diM;$('#fxDistMv').textContent=P.diM+'%';
+  $('#fxDistV').value=P.diV;$('#fxDistVv').textContent=P.diV+'%';
+  const p=1+P.gr/100*15;
+  if(FXN.de)FXN.de.delayTime.setTargetAtTime(P.deT/1000,audioCtx.currentTime,0.02);
+  if(FXN.fb)FXN.fb.gain.setTargetAtTime(P.deF/100,audioCtx.currentTime,0.02);
+  fxRamp(FXN.deMx,on?P.deM/100:0);
+  fxRamp(FXN.revMx,on?P.revM/100:0);
+  fxRamp(FXN.distMx,on?P.diM/100:0);
+  fxRamp(fxDry,on?(1-P.diM/100):1);
+  if(fxDistPre)fxDistPre.gain.setTargetAtTime(p,audioCtx.currentTime,0.02);
+  if(fxDistPost)fxDistPost.gain.setTargetAtTime(1/Math.sqrt(p),audioCtx.currentTime,0.02);
+  fxRamp(fxDistV,P.diV/100);
+  fxLcd(kind==='rock'?'РЭК: ЧИП-РОК':kind==='metal'?'РЭК: ЧИП-МЕТЛ':'РЭК: СУХОЙ СИГНАЛ');
+  presetGlow(kind==='rock'?'presetRock':kind==='metal'?'presetMetal':'presetClean');
+  log(kind==='rock'?'ПРЕСЕТ: ЧИП-РОК применён':kind==='metal'?'ПРЕСЕТ: ЧИП-МЕТЛ применён':'ПРЕСЕТ: ЧИСТЫЙ — сухой сигнал');}
+$('#presetRock').addEventListener('click',()=>presetApply('rock'));
+$('#presetMetal').addEventListener('click',()=>presetApply('metal'));
+$('#presetClean').addEventListener('click',()=>presetApply('clean'));
 $('#fxDeT').addEventListener('input',e=>{const v=+e.target.value;
   $('#fxDeTv').textContent=v+' мс';
   if(FXN.de)FXN.de.delayTime.setTargetAtTime(v/1000,audioCtx.currentTime,0.02);});
