@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.36 «This is Rock»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.37 «This is Rock»</title>
 <style>
 :root{
 	--bg: #010;
@@ -462,28 +462,43 @@ input[name="tb"]{display:none;}
 
 
 #tb7:checked~#pane7{
-	display: flex;
+	    display: flex;
     background: var(--panel2);
     border: 1px solid var(--line);
     border-radius: 6px;
     padding: 10px;
     justify-content: space-between;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: nowrap;
-    align-items: flex-end;
+    align-items: stretch;
 }
 
-#tb7:checked~#pane7 .row{
-	display: flex;
-    gap: 2px;
-    margin: 5px;
-    align-content: center;
+#tb7:checked~#pane7>.p_block{
+	    display: flex;
     flex-direction: row;
-    justify-content: center;
-    align-items: stretch;
-    flex-wrap: wrap;
-} 
+}
+#tb7:checked~#pane7>.p_block canvas{
+	display: flex;
+    flex-direction: row;
+    width: 100%;
+}
 
+#tb7:checked~#pane7>#scope2Panel{
+	display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+#tb7:checked~#pane7>div button{
+	display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    margin: 0 5px;
+    padding: 8px 12px;
+}
 #tb7:checked~#pane7>.p_block button{
 	width: 100%;
 }
@@ -537,7 +552,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.36 «This is Rock»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.37 «This is Rock»</h1>
 	</header>
 
 
@@ -632,18 +647,26 @@ input[name="tb"]{display:none;}
 <section class="pane" id="pane9">
   <div class="p_block">
     <div class="row"><span class="tag">МИКШЕР - ЭФФЕКТОВ</span></div>
-    <div class="lcd" id="fxLcd">РЭК: СУХОЙ СИГНАЛ</div>
-    <div>
-      <button class="wbtn" id="fxDeBtn">⧉ DELAY: ВЫКЛ</button>
-      <button class="wbtn" id="fxRevBtn">≋ РЕВЕРБ: ВЫКЛ</button>
-      <button class="wbtn" id="fxDistBtn">⚡ ДИСТ: ВЫКЛ</button>
-      <button class="wbtn" id="fxDblBtn">◉ ДАБЛ: ВЫКЛ</button>
-      <button class="wbtn" id="fxVbrBtn">∿ ВИБРАТО: ВЫКЛ</button>
-      <button class="wbtn" id="btnFxOff">■ ВСЁ ВЫКЛ</button>
-      <button class="wbtn" id="presetRock">🎸 ЧИП-РОК</button>
-      <button class="wbtn" id="presetMetal">Ъ ЧИП-МЕТЛ</button>
-      <button class="wbtn" id="presetClean">○ ЧИСТЫЙ</button>
-    </div></div>
+		<div class="lcd" id="fxLcd">МИКШЕР - РЕЖИМЫ</div>
+			<div>
+				<div> 
+					<button class="wbtn" id="fxDeBtn">⧉ DELAY: ВЫКЛ</button>
+					<button class="wbtn" id="fxRevBtn">≋ РЕВЕРБ: ВЫКЛ</button>
+					<button class="wbtn" id="fxDistBtn">⚡ ДИСТ: ВЫКЛ</button>
+					<button class="wbtn" id="fxDblBtn">◉ ДАБЛ: ВЫКЛ</button>
+					<button class="wbtn" id="fxVbrBtn">∿ ВИБРАТО: ВЫКЛ</button>
+					<button class="wbtn" id="btnFxOff">■ ВСЁ ВЫКЛ</button>
+				</div>
+			</div>
+			<div class="lcd" id="fxLcd">МИКШЕР - ПРИСЕТЫ</div>
+			<div>
+				<div> 
+					<button class="wbtn" id="presetRock">🎸 ЧИП-РОК</button>
+					<button class="wbtn" id="presetMetal">Ъ ЧИП-МЕТЛ</button>
+					<button class="wbtn" id="presetClean">○ ЧИСТЫЙ</button>
+				</div>
+			</div>
+	</div>
 	<div class="p_block" id="bend_sing">
 	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}" >Вход:</span>
 	<div>
@@ -872,22 +895,21 @@ D0 = ♯ Chromatic (флажолет +19, громкость 50%, пока за�
   </section>
 
   <section class="pane" id="pane7">
-    <div class="p_block">
-      <canvas id="scope" width="700" height="350"></canvas>
-    </div>
-	<div class="p_block">
-      
-      
-      <div class="row" id="scope2Panel">
+	<div id="scope2Panel">
         <button class="wbtn on" id="sc2Wave">~ ВОЛНА</button>
         <button class="wbtn" id="sc2Spec">ıı СПЕКТР</button>
         <button class="wbtn" id="sc2XY">⊗ ФИГУРА</button>
         <button class="wbtn" id="sc2Freeze">❄ СТОП</button>
-      </div>
-    </div>
-	<div class="p_block">
+   </div>
+   <div class="p_block">
+   
+	<div>
       <canvas id="scope2" width="700" height="350"></canvas>
     </div>
+	 <div>
+      <canvas id="scope" width="700" height="350"></canvas>
+    </div>
+	</div>
   </section>
 
   <section class="pane" id="pane8">
@@ -1965,6 +1987,7 @@ function buildFxRack(){
   fxBus.connect(fxVbrIn);
   FXN.de=fxDe; FXN.dist=fxDist;
   fxReady=true;
+  sessFxReapply();
   lcd('2A03 ПУЛЬТ: рэк готов — общая шина CHIP/SF2/MIDI');
 }
 
@@ -3774,6 +3797,70 @@ buildKeys();
 
 document.addEventListener('click', () => ensureAudio(), { once: true });
 
+/* ═══ v1.4.37 СЕССИЯ СОХРАНЕНИЯ: localStorage, восстановление на старте ═══ */
+const SESS_KEY='diowkrad_session';
+const SESS_SL=['vol','bend','bpm','fxDeT','fxDeF','fxDeM','fxRevM','fxDistD','fxDistM','fxDistV','fxDblT','fxDblM','fxVbrR','fxVbrD','fxVbrM'];
+const SESS_TG=['fxDeBtn','fxRevBtn','fxDistBtn','fxDblBtn','fxVbrBtn'];
+let sessRestored=false;
+function sessSave(){
+  try{
+    const o={v:1,sl:{},tg:{}};
+    const md={btnChip:'chip',btnYm:'ym',btnSf2:'sf2',btnMidi:'midi'};
+    for(const k in md){const e=document.getElementById(k);if(e&&e.classList.contains('on'))o.mode=md[k];}
+    o.chipV=state.chipVoice;
+    const cs=document.getElementById('chipVoiceSel');if(cs)o.chipVS=cs.value;
+    const yv=document.getElementById('ymVoiceSel');if(yv)o.ymV=yv.value;
+    const mv=document.getElementById('midiVoiceSel');if(mv)o.midiV=mv.value;
+    for(const id of SESS_SL){const e=document.getElementById(id);if(e)o.sl[id]=e.value;}
+    for(const id of SESS_TG){const e=document.getElementById(id);if(e)o.tg[id]=e.classList.contains('on')?1:0;}
+    const pr={presetRock:'rock',presetMetal:'metal',presetClean:'clean'};
+    for(const k in pr){const e=document.getElementById(k);if(e&&e.classList.contains('on'))o.preset=pr[k];}
+    o.sus=susMode||'';o.sens=sensMode||'hard';o.roll=kbMode;o.lay=layout2?1:0;
+    o.lock=rollLocked?1:0;o.oct=pcBase;o.kb=kbOn?1:0;
+    o.pm=pmEngaged?1:0;o.chr=chrEngaged?1:0;
+    localStorage.setItem(SESS_KEY,JSON.stringify(o));
+  }catch(e){}
+}
+function sessRestore(){
+  let o=null;
+  try{o=JSON.parse(localStorage.getItem(SESS_KEY)||'null');}catch(e){o=null;}
+  if(!o||o.v!==1){lcd('СЕССИЯ: сохранённых настроек нет');return;}
+  try{
+    if(o.mode&&o.mode!=='sf2')setMode(o.mode);
+    if(typeof o.chipVS!=='undefined'){const cs=document.getElementById('chipVoiceSel');if(cs){cs.value=o.chipVS;if(typeof setChipVoice==='function')setChipVoice(o.chipVS);}}
+    if(typeof o.ymV!=='undefined'){const yv=document.getElementById('ymVoiceSel');if(yv){yv.value=o.ymV;try{yv.dispatchEvent(new Event('change'));}catch(x){}}}
+    if(typeof o.midiV!=='undefined'){const mv=document.getElementById('midiVoiceSel');if(mv){mv.value=o.midiV;try{mv.dispatchEvent(new Event('change'));}catch(x){}}}
+    const pr={rock:'presetRock',metal:'presetMetal',clean:'presetClean'};
+    if(o.preset&&pr[o.preset]&&typeof presetFlash==='function')presetFlash(pr[o.preset]);
+    for(const id of SESS_TG){const e=document.getElementById(id);if(e)e.classList.toggle('on',!!o.tg[id]);}
+    if(typeof fxLcd==='function')fxLcd((o.tg&&Object.values(o.tg).some(function(x){return x;}))?'РЭК: ВОССТАНОВЛЕН ИЗ СЕССИИ':'РЭК: СУХОЙ СИГНАЛ');
+    if(typeof o.sus!=='undefined')setSusMode(o.sus||'');
+    if(o.sens)setSensMode(o.sens);
+    if(typeof o.roll!=='undefined')setKbMode(o.roll);
+    if(typeof o.lay!=='undefined')setLayout(!!o.lay);
+    if(typeof o.lock!=='undefined'&&!!o.lock!==rollLocked){rollLocked=!!o.lock;if(typeof rollLockApply==='function')rollLockApply();}
+    if(typeof o.oct!=='undefined'){pcBase=Math.max(PC_MIN(),Math.min(PC_MAX(),o.oct));octBtn(0);}
+    if(typeof o.pm!=='undefined')pmEngaged=!!o.pm;
+    if(typeof o.chr!=='undefined')chrEngaged=!!o.chr;
+    const p1=document.getElementById('pmToggle'),c1=document.getElementById('chrToggle');
+    if(p1)p1.classList.toggle('on',pmEngaged);
+    if(c1)c1.classList.toggle('on',chrEngaged);
+    for(const id in o.sl||{}){const e=document.getElementById(id);if(e){e.value=o.sl[id];try{e.dispatchEvent(new Event('input'));}catch(x){}}}
+    sessRestored=true;
+    lcd('СЕССИЯ: настройки восстановлены');
+    document.addEventListener('DOMContentLoaded',function(){
+      if(o.kb===0){kbOn=false;const b=document.getElementById('kbToggle');if(b){b.classList.remove('on');b.textContent='КЛАВИАТУРА: ВЫКЛ';}}
+    });
+    if(typeof log==='function')log('СЕССИЯ: восстановлено (v1.4.37)');
+  }catch(e){if(typeof log==='function')log('СЕССИЯ: ошибка восстановления');}
+}
+function sessFxReapply(){
+  if(!sessRestored)return;
+  for(const id of SESS_SL){const e=document.getElementById(id);if(e){try{e.dispatchEvent(new Event('input'));}catch(x){}}}
+}
+window.addEventListener('beforeunload',sessSave);
+setInterval(sessSave,2000);
+/* ═══ конец модуля СЕССИЯ ═══ */
 log('BUILD v1.2.5 «Finale»');
 log('Загружен основной код Движка');
 log('Загружен Чип RP 2A03 E - Темастер');
@@ -3785,6 +3872,7 @@ log('Опрос модулей прошел успешно');
 log('Приятной игры ;-)');
 ymInit();
 licSealCheck();
+sessRestore();
 /* ============================================================
    ФАЙЛ 13/13: 13_touch_fps.js
    Секция: touch-детект + FPS-метр
