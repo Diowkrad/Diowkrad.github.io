@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.31 «This is Rock»</title>
+<title>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.36 «This is Rock»</title>
 <style>
 :root{
 	--bg: #010;
@@ -426,6 +426,9 @@ input[name="tb"]{display:none;}
     flex-wrap: nowrap;
 }
 
+#tb3:checked~#pane3 .p_block{flex:1;}
+
+
 #tb5:checked~#pane5{ display:none; }
 #kbdHdr{ display:none;}
 
@@ -534,7 +537,7 @@ input[name="tb"]{display:none;}
 <div id="app">
   <!-- ШАПКА -->
 	<header class="panel">
-		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.31 «This is Rock»</h1>
+		<h1>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.4.36 «This is Rock»</h1>
 	</header>
 
 
@@ -552,7 +555,8 @@ input[name="tb"]{display:none;}
 
 	<nav class="tabbar">
 		<span class="tag">РЕЖИМ: Движка</span>
-		<button id="btnChip" class="on">CHIP-TUNE</button>
+		<button id="btnChip" class="on">CHIP-TUNE 8 bit</button>
+		<button id="btnYm">CHIP-TUNE 16 bit</button>
 		<button id="btnSf2">SOUNDFONT</button>
 		<button id="btnMidi">MIDI GM</button>
 	</nav>
@@ -785,23 +789,37 @@ input[name="tb"]{display:none;}
   
 	 <div class="p_block" >
 	<div>
-	<h2>CHIP-TUNE</h2>
-	<select id="chipVoiceSel" style="min-width:170px;"></select>
+		<h2>CHIP-TUNE 8 bit</h2>
+		<select id="chipVoiceSel" style="flex:1;"></select>
+	</div>
+	<div>
+		<h2>CHIP-TUNE 16 bit</h2>
+		
+		<select id="ymVoiceSel" style="flex:1;"></select>
+	</div>
+	<div>
+		<h2>MIDI GM × 128</h2>
+		
+		<select id="midiVoiceSel" style="flex:1;"></select>
 	</div>
 	</div>
 	<div class="p_block" >
-        <div><h2>SOUNDFONT</h2>
-        <input type="file" id="sf2file" accept=".sf2,.sf3" style="flex:1;">
-        <span class="tag">БАНК:</span><select id="bankSel" style="flex:1;"></select>
-        <span class="tag">ПРЕСЕТ:</span><select id="presetSel" style="flex:1;"></select>
-        <span class="tag">ИНСТР.:</span><select id="instSel" style="flex:1;"></select></div>
+       
+			
+			<div>
+					<h2>SOUNDFONT</h2>
+					<input type="file" id="sf2file" accept=".sf2,.sf3" style="flex:1;"></div>
+			<div>
+					<span class="tag">БАНК:</span>
+					<select id="bankSel" style="flex:1;"></select>
+					<span class="tag">ПРЕСЕТ:</span>
+					<select id="presetSel" style="flex:1;"></select>
+					<span class="tag">ИНСТР.:</span>
+					<select id="instSel" style="flex:1;"></select>
+			</div>
+		
     </div>
-	<div class="p_block" >
-
-   <div>
-     <h2>MIDI GM × 128</h2>
-     <span class="tag">ГОЛОС:</span><select id="midiVoiceSel" style="flex:1;"></select></div>
-  </div>
+	
 
 </section>
 
@@ -931,8 +949,910 @@ D0 = ♯ Chromatic (флажолет +19, громкость 50%, пока за�
 
 
 <script>
+'use strict';
+/**
+ * js2413.js - YM2413 (OPLL) FM Sound Chip Emulator
+ *
+ * A JavaScript emulator of the YAMAHA YM2413 (OPLL) FM synthesis sound chip.
+ * Provides register-level access compatible with the real hardware, so code
+ * written against real YM2413 register maps can drive this emulator directly.
+ *
+ * @version 1.0.0
+ * @license MIT
+ * @author UO Soft
+ * @email uosoft@uosoft.net
+ *
+ * MIT License
+ *
+ * Copyright (c) UO Soft (uosoft@uosoft.net)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * =============================================================================
+ *
+ * Features:
+ * ✓ 9-channel, 2-operator FM synthesis
+ * ✓ Register-compatible access via set_register(addr, value)
+ * ✓ 15 built-in ROM voices (@1-@15) + 1 user-definable voice (@0)
+ * ✓ Rhythm mode (BD/SD/HH/TOM/CYM) via register 0x0E
+ * ✓ Floating-point waveform model: sine table + dB-domain envelope generator
+ *
+ * Register map:
+ *   0x00-0x07 : user voice (@0)
+ *   0x0E      : rhythm mode (R/BD/SD/TOM/CYM/HH)
+ *   0x10-0x18 : F-Number low 8 bits (ch0-8)
+ *   0x20-0x28 : SUS / KEY / BLOCK / F-Number high bit
+ *   0x30-0x38 : voice number (high nibble) / volume (low nibble, 0 = loudest)
+ *
+ * Usage:
+ *
+ *   const chip = new YM2413(44100);
+ *   chip.set_register(0x30, 0x30); // channel 0: voice 3 (piano), max volume
+ *   chip.set_register(0x10, 0x9c); // F-Number low 8 bits
+ *   chip.set_register(0x20, 0x11); // Block/F-Number high bit + key on
+ *   const sample = chip.calc();    // generate one sample (-1.0 to 1.0)
+ *
+ * =============================================================================
+ */
+
+/**
+ * Shared lookup tables and constants used by the envelope/waveform generators.
+ * @private
+ */
+const YM2413_CONST = (() => {
+  const SIN_LEN = 1024;
+  const SIN_MASK = SIN_LEN - 1;
+  // 波形テーブル [0]=正弦波 [1]=半波整流 (DC/DMビット用)
+  const sinTables = [new Float64Array(SIN_LEN), new Float64Array(SIN_LEN)];
+  for (let i = 0; i < SIN_LEN; i++) {
+    const s = Math.sin((2 * Math.PI * (i + 0.5)) / SIN_LEN);
+    sinTables[0][i] = s;
+    sinTables[1][i] = s > 0 ? s : 0;
+  }
+  // dB→リニア変換テーブル (0.25dB刻み, 96dB以上は無音)
+  const db2lin = new Float64Array(1024);
+  for (let i = 0; i < db2lin.length; i++) {
+    const db = i * 0.25;
+    db2lin[i] = db >= 96 ? 0 : Math.pow(10, -db / 20);
+  }
+  // MULTI (周波数逓倍) テーブル
+  const MULT = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 12, 12, 15, 15];
+  // KSL基本テーブル (6dB/oct時の減衰量[dB], F-Number上位4bitで引く)
+  const KSL_BASE = [0, 18, 24, 27.75, 30, 32.25, 33.75, 35.25,
+                    36, 37.5, 38.25, 39, 39.75, 40.5, 41.25, 42];
+  // KSLビット→スケール (0 / 3dB/oct / 1.5dB/oct / 6dB/oct)
+  const KSL_SCALE = [0, 0.5, 0.25, 1];
+  const NATIVE_RATE = 3579545 / 72; // 実チップのサンプルレート ≒49716Hz
+  return { SIN_LEN, SIN_MASK, sinTables, db2lin, MULT, KSL_BASE, KSL_SCALE, NATIVE_RATE };
+})();
+
+/**
+ * Envelope generator states.
+ * @private
+ */
+const YM2413_EG = { DAMP: 0, ATTACK: 1, DECAY: 2, SUSTAIN: 3, RELEASE: 4, FINISH: 5 };
+
+/**
+ * Compute the decay/release speed [dB/sample] for a given rate.
+ * @private
+ * @param {number} R - Rate value (0-15)
+ * @param {number} adj - Key-scale rate adjustment
+ * @param {number} sampleRate - Output sample rate [Hz]
+ * @returns {number} Decay speed in dB per sample
+ */
+function YM2413_egRate(R, adj, sampleRate) {
+  if (R <= 0) return 0;
+  const r = Math.min(63, R * 4 + adj);
+  const dphase = ((r & 3) + 4) * Math.pow(2, (r >> 2) - 1);
+  return (48 * dphase / 4194304) * (YM2413_CONST.NATIVE_RATE / sampleRate);
+}
+
+/**
+ * Compute the per-sample multiplicative attack coefficient for a given rate.
+ * @private
+ * @param {number} R - Attack rate value (0-15)
+ * @param {number} adj - Key-scale rate adjustment
+ * @param {number} sampleRate - Output sample rate [Hz]
+ * @returns {number} Multiplicative coefficient (0 = instant, 1 = no progress / AR0)
+ */
+function YM2413_attackCoef(R, adj, sampleRate) {
+  if (R <= 0) return 1;
+  const r = Math.min(63, R * 4 + adj);
+  if (r >= 60) return 0;
+  const dphase = 3 * ((r & 3) + 4) * Math.pow(2, (r >> 2) + 1);
+  const seconds = 4194304 / dphase / YM2413_CONST.NATIVE_RATE;
+  return Math.pow(0.4 / 48, 1 / (seconds * sampleRate));
+}
+
+/**
+ * A single FM operator (oscillator + envelope generator).
+ * Used as the modulator/carrier pair inside YM2413Channel, and directly as
+ * the rhythm-mode voices (BD/HH/SD/TOM/CYM) inside YM2413.
+ */
+class YM2413Slot {
+  /**
+   * @param {YM2413} chip - The owning chip instance (for sampleRate access)
+   */
+  constructor(chip) {
+    this.chip = chip;
+    // 音色パラメータ
+    this.am = 0;       // AM(トレモロ)有効
+    this.vib = 0;      // ビブラート有効
+    this.egHold = 0;   // EGタイプ (1=持続音, 0=減衰音)
+    this.ksr = 0;      // キースケールレート
+    this.ml = 1;       // MULTIインデックス
+    this.kslBits = 0;  // キースケールレベル
+    this.wave = 0;     // 波形 (0=正弦波, 1=半波)
+    this.tlDb = 0;     // モジュレータ:TL / キャリア:音量 [dB]
+    this.fbFactor = 0; // フィードバック係数 (モジュレータのみ)
+    this.arR = 0;
+    this.drR = 0;
+    this.slDb = 0;
+    this.rrR = 0;
+    // 動作状態
+    this.phase = 0;    // 位相 (テーブル単位)
+    this.dphase = 0;
+    this.kslDb = 0;
+    this.rateAdj = 0;
+    this.arCoef = 1;
+    this.drRate = 0;
+    this.srRate = 0;   // 減衰音のサステイン中レート
+    this.relRate = 0;
+    this.out1 = 0;     // 直前の出力 (フィードバック用)
+    this.out2 = 0;
+    this.egState = YM2413_EG.FINISH;
+    this.egAtt = 48;   // エンベロープ減衰量 [dB] (0=最大音量)
+  }
+
+  /**
+   * Reset phase and envelope state to silence.
+   */
+  reset() {
+    this.phase = 0;
+    this.out1 = 0;
+    this.out2 = 0;
+    this.egState = YM2413_EG.FINISH;
+    this.egAtt = 48;
+  }
+
+  /**
+   * Recompute phase increment, key-scale level, and envelope rates from
+   * the channel's F-Number/Block.
+   * @param {number} fnum - F-Number (0-511)
+   * @param {number} block - Octave block (0-7)
+   */
+  updateFreq(fnum, block) {
+    const C = YM2413_CONST;
+    const freq = fnum * Math.pow(2, block - 1) * C.NATIVE_RATE / 262144;
+    this.dphase = freq * C.MULT[this.ml] * C.SIN_LEN / this.chip.sampleRate;
+    const kslAtt = Math.max(0, C.KSL_BASE[(fnum >> 5) & 15] - 6 * (7 - block));
+    this.kslDb = kslAtt * C.KSL_SCALE[this.kslBits];
+    const kb = (block << 1) | ((fnum >> 8) & 1);
+    this.rateAdj = this.ksr ? kb : kb >> 2;
+    this.arCoef = YM2413_attackCoef(this.arR, this.rateAdj, this.chip.sampleRate);
+    this.drRate = YM2413_egRate(this.drR, this.rateAdj, this.chip.sampleRate);
+    this.srRate = this.egHold ? 0 : YM2413_egRate(this.rrR, this.rateAdj, this.chip.sampleRate);
+  }
+
+  /**
+   * Begin the attack phase from silence.
+   * @private
+   */
+  startAttack() {
+    this.phase = 0; // キーオンで位相リセット
+    this.egAtt = 48;
+    this.egState = YM2413_EG.ATTACK;
+  }
+
+  /**
+   * Key on. If already sounding, first passes through a brief DAMP
+   * (fast fade-out) before re-attacking, matching real chip behavior.
+   */
+  keyOn() {
+    if (this.egState === YM2413_EG.FINISH) this.startAttack();
+    else this.egState = YM2413_EG.DAMP;
+  }
+
+  /**
+   * Key off, entering the release phase.
+   * @param {boolean} sus - Whether the channel's SUS bit is set
+   *   (fixed rate 5) as opposed to the voice's own RR (or fixed rate 7
+   *   for non-sustaining voices)
+   */
+  keyOff(sus) {
+    if (this.egState === YM2413_EG.FINISH) return;
+    // SUSビット時はレート5固定 / 持続音はRR / 減衰音はレート7固定
+    const R = sus ? 5 : (this.egHold ? this.rrR : 7);
+    this.relRate = YM2413_egRate(Math.max(R, 1), this.rateAdj, this.chip.sampleRate);
+    this.egState = YM2413_EG.RELEASE;
+  }
+
+  /**
+   * Advance the envelope state machine and phase accumulator by one
+   * sample. Does not produce output; see sampleAt() / calc().
+   * @param {number} pmMul - Vibrato multiplier applied to the phase increment
+   */
+  advance(pmMul) {
+    const E = YM2413_EG;
+    switch (this.egState) {
+      case E.DAMP:
+        this.egAtt += this.chip.dampRate;
+        if (this.egAtt >= 48) this.startAttack();
+        break;
+      case E.ATTACK:
+        if (this.arCoef === 0) { this.egAtt = 0; this.egState = E.DECAY; }
+        else {
+          this.egAtt *= this.arCoef;
+          if (this.egAtt <= 0.4) { this.egAtt = 0; this.egState = E.DECAY; }
+        }
+        break;
+      case E.DECAY:
+        this.egAtt += this.drRate;
+        if (this.egAtt >= this.slDb) { this.egAtt = this.slDb; this.egState = E.SUSTAIN; }
+        break;
+      case E.SUSTAIN:
+        if (!this.egHold) {
+          this.egAtt += this.srRate;
+          if (this.egAtt >= 48) { this.egAtt = 48; this.egState = E.FINISH; }
+        }
+        break;
+      case E.RELEASE:
+        this.egAtt += this.relRate;
+        if (this.egAtt >= 48) { this.egAtt = 48; this.egState = E.FINISH; }
+        break;
+    }
+    this.phase += this.vib ? this.dphase * pmMul : this.dphase;
+    if (this.phase >= 1073741824) this.phase -= 1073741824;
+  }
+
+  /**
+   * Sample the waveform table at an explicit phase index with the current
+   * envelope applied, without advancing the phase. Used by rhythm-mode
+   * voices (HH/SD/CYM) whose audible phase is chosen from a noise
+   * generator rather than their own running phase.
+   * @param {number} idx - Waveform table index (table units)
+   * @param {number} amDb - Tremolo (AM) attenuation [dB] for this sample
+   * @returns {number} Output sample (-1.0 to 1.0 range before mixing)
+   */
+  sampleAt(idx, amDb) {
+    const C = YM2413_CONST;
+    if (this.egState === YM2413_EG.FINISH) {
+      this.out2 = this.out1;
+      this.out1 = 0;
+      return 0;
+    }
+    const att = this.egAtt + this.tlDb + this.kslDb + (this.am ? amDb : 0);
+    const out = C.sinTables[this.wave][idx & C.SIN_MASK] * C.db2lin[Math.min(1023, (att * 4) | 0)];
+    this.out2 = this.out1;
+    this.out1 = out;
+    return out;
+  }
+
+  /**
+   * Advance and produce one sample of output using this slot's own phase.
+   * @param {number} pmUnits - Phase modulation input from another slot (table units)
+   * @param {number} amDb - Tremolo (AM) attenuation [dB] for this sample
+   * @param {number} pmMul - Vibrato multiplier applied to the phase increment
+   * @returns {number} Output sample
+   */
+  calc(pmUnits, amDb, pmMul) {
+    this.advance(pmMul);
+    if (this.egState === YM2413_EG.FINISH) {
+      this.out2 = this.out1;
+      this.out1 = 0;
+      return 0;
+    }
+    const idx = (this.phase + pmUnits) | 0;
+    return this.sampleAt(idx, amDb);
+  }
+}
+
+/**
+ * Unpack an 8-byte voice patch into a modulator/carrier slot pair.
+ * Shared by YM2413Channel.applyPatch() (regular voices) and YM2413's
+ * rhythm-mode initialization (fixed BD/HH+SD/TOM+CYM patches).
+ * @param {YM2413Slot} m - Modulator slot to populate
+ * @param {YM2413Slot} c - Carrier slot to populate
+ * @param {Array<number>|Uint8Array} b - 8-byte patch data
+ */
+function YM2413_applyPatchBytes(m, c, b) {
+  m.am = (b[0] >> 7) & 1; m.vib = (b[0] >> 6) & 1;
+  m.egHold = (b[0] >> 5) & 1; m.ksr = (b[0] >> 4) & 1; m.ml = b[0] & 15;
+  c.am = (b[1] >> 7) & 1; c.vib = (b[1] >> 6) & 1;
+  c.egHold = (b[1] >> 5) & 1; c.ksr = (b[1] >> 4) & 1; c.ml = b[1] & 15;
+  m.kslBits = (b[2] >> 6) & 3;
+  m.tlDb = (b[2] & 63) * 0.75;
+  c.kslBits = (b[3] >> 6) & 3;
+  c.wave = (b[3] >> 4) & 1;
+  m.wave = (b[3] >> 3) & 1;
+  const fb = b[3] & 7;
+  m.fbFactor = fb === 0 ? 0 : Math.pow(2, fb - 6);
+  m.arR = (b[4] >> 4) & 15; m.drR = b[4] & 15;
+  c.arR = (b[5] >> 4) & 15; c.drR = b[5] & 15;
+  m.slDb = ((b[6] >> 4) & 15) * 3; m.rrR = b[6] & 15;
+  c.slDb = ((b[7] >> 4) & 15) * 3; c.rrR = b[7] & 15;
+}
+
+/**
+ * One of the chip's 9 regular 2-operator FM channels.
+ * Normally accessed via YM2413.channels[i]; not intended to be constructed
+ * directly by user code.
+ */
+class YM2413Channel {
+  /**
+   * @param {YM2413} chip - The owning chip instance
+   * @param {number} index - Channel index (0-8)
+   */
+  constructor(chip, index) {
+    this.chip = chip;
+    this.index = index;
+    this.mod = new YM2413Slot(chip);
+    this.car = new YM2413Slot(chip);
+    this.fnum = 0;
+    this.block = 0;
+    this.key = 0;
+    this.sus = 0;
+    this.inst = 0;
+    this.vol = 0; // 4bit減衰量 (0が最大音量)
+  }
+
+  /**
+   * Reset the channel (registers and slots) to its initial state.
+   */
+  reset() {
+    this.fnum = 0;
+    this.block = 0;
+    this.key = 0;
+    this.sus = 0;
+    this.inst = 0;
+    this.vol = 0;
+    this.mod.reset();
+    this.car.reset();
+    this.applyPatch();
+  }
+
+  /**
+   * Unpack the current voice's 8-byte patch (built-in ROM voice, or the
+   * user voice at register 0x00-0x07 when inst===0) into mod/car.
+   */
+  applyPatch() {
+    const b = this.inst === 0
+      ? this.chip.registers.subarray(0, 8)
+      : YM2413.VOICES[this.inst];
+    YM2413_applyPatchBytes(this.mod, this.car, b);
+    this.car.tlDb = this.vol * 3;
+    this.updateFreq();
+  }
+
+  /**
+   * Set the channel volume.
+   * @param {number} v - Volume register value (0-15, 0 = loudest)
+   */
+  setVol(v) {
+    this.vol = v;
+    this.car.tlDb = v * 3;
+  }
+
+  /**
+   * Propagate the channel's F-Number/Block to both slots.
+   */
+  updateFreq() {
+    this.mod.updateFreq(this.fnum, this.block);
+    this.car.updateFreq(this.fnum, this.block);
+  }
+
+  /**
+   * Key on both slots.
+   */
+  keyOn() {
+    this.mod.keyOn();
+    this.car.keyOn();
+  }
+
+  /**
+   * Key off. Only the carrier releases; the modulator keeps running,
+   * matching real hardware behavior.
+   */
+  keyOff() {
+    this.car.keyOff(this.sus);
+  }
+
+  /**
+   * Produce one sample of this channel's FM output.
+   * @param {number} amDb - Tremolo (AM) attenuation [dB] for this sample
+   * @param {number} pmMul - Vibrato multiplier for this sample
+   * @returns {number} Output sample
+   */
+  calc(amDb, pmMul) {
+    const C = YM2413_CONST;
+    const m = this.mod;
+    const fbUnits = m.fbFactor ? (m.out1 + m.out2) * 0.5 * m.fbFactor * C.SIN_LEN : 0;
+    const modOut = m.calc(fbUnits, amDb, pmMul);
+    // モジュレータ→キャリアの変調は最大8π (振幅1で4周期分)
+    return this.car.calc(modOut * 4 * C.SIN_LEN, amDb, pmMul);
+  }
+}
+
+/**
+ * YM2413 (OPLL) FM sound chip emulator.
+ *
+ * @example
+ *   const chip = new YM2413(44100);
+ *   chip.set_register(0x30, 0x30);
+ *   chip.set_register(0x10, 0x9c);
+ *   chip.set_register(0x20, 0x11);
+ *   const sample = chip.calc();
+ */
+class YM2413 {
+  /**
+   * @param {number} [sampleRate=44100] - Output sample rate [Hz]
+   */
+  constructor(sampleRate = 44100) {
+    this.sampleRate = sampleRate;
+    this.registers = new Uint8Array(0x40);
+    // キーオン時のダンプ速度 (レート12相当)
+    this.dampRate = (48 * 8192 / 4194304) * (YM2413_CONST.NATIVE_RATE / sampleRate);
+    this.amPhase = 0;
+    this.pmPhase = 0;
+    this.channels = [];
+    for (let i = 0; i < 9; i++) this.channels.push(new YM2413Channel(this, i));
+    // リズムモード専用スロット (ch6=BD, ch7=HH/SD, ch8=TOM/CYM)
+    this.rhythmMode = 0;
+    this.noise = 1; // 23bit相当のノイズ発生器の状態
+    this.rhythm = {
+      bdMod: new YM2413Slot(this), bdCar: new YM2413Slot(this),
+      hh: new YM2413Slot(this), sd: new YM2413Slot(this),
+      tom: new YM2413Slot(this), cym: new YM2413Slot(this),
+    };
+    this._rhythmKeys = { bd: 0, hh: 0, sd: 0, tom: 0, cym: 0 };
+    this.reset();
+  }
+
+  /**
+   * Reset all registers, channels, and rhythm-mode state.
+   */
+  reset() {
+    this.registers.fill(0);
+    this.amPhase = 0;
+    this.pmPhase = 0;
+    this.rhythmMode = 0;
+    this.noise = 1;
+    this._rhythmKeys = { bd: 0, hh: 0, sd: 0, tom: 0, cym: 0 };
+    for (const ch of this.channels) ch.reset();
+    const R = this.rhythm;
+    for (const key of Object.keys(R)) R[key].reset();
+    YM2413_applyPatchBytes(R.bdMod, R.bdCar, YM2413.RHYTHM_VOICES[0]);
+    YM2413_applyPatchBytes(R.hh, R.sd, YM2413.RHYTHM_VOICES[1]);
+    YM2413_applyPatchBytes(R.tom, R.cym, YM2413.RHYTHM_VOICES[2]);
+  }
+
+  /**
+   * Write a value to a chip register and apply its effect immediately.
+   * This is the primary hardware-compatible entry point; see the file
+   * header for the full register map.
+   * @param {number} addr - Register address (masked to 6 bits)
+   * @param {number} value - Value to write (masked to 8 bits)
+   */
+  set_register(addr, value) {
+    addr &= 0x3f;
+    value &= 0xff;
+    this.registers[addr] = value;
+
+    if (addr <= 0x07) {
+      // ユーザー音色: @0を使用中のチャンネルへ即時反映
+      for (const ch of this.channels) {
+        if (ch.inst === 0) ch.applyPatch();
+      }
+    } else if (addr === 0x0e) {
+      this._setRhythm(value);
+    } else if (addr >= 0x10 && addr <= 0x18) {
+      const idx = addr - 0x10;
+      const ch = this.channels[idx];
+      ch.fnum = (ch.fnum & 0x100) | value;
+      ch.updateFreq();
+      if (idx >= 6) this._syncRhythmFreq(idx);
+    } else if (addr >= 0x20 && addr <= 0x28) {
+      const idx = addr - 0x20;
+      const ch = this.channels[idx];
+      ch.fnum = (ch.fnum & 0xff) | ((value & 1) << 8);
+      ch.block = (value >> 1) & 7;
+      ch.sus = (value >> 5) & 1;
+      ch.updateFreq();
+      if (idx >= 6) this._syncRhythmFreq(idx);
+      // リズムモード中は ch6-8 の通常キーオン/オフは無効
+      // (BD/HH/SD/TOM/CYMのキーはレジスタ0x0Eのみが制御する)
+      if (!(this.rhythmMode && idx >= 6)) {
+        const key = (value >> 4) & 1;
+        if (key && !ch.key) ch.keyOn();
+        else if (!key && ch.key) ch.keyOff();
+        ch.key = key;
+      }
+    } else if (addr >= 0x30 && addr <= 0x38) {
+      const idx = addr - 0x30;
+      if (this.rhythmMode && idx >= 6) {
+        this._setRhythmVolume(idx, value);
+      } else {
+        const ch = this.channels[idx];
+        const inst = (value >> 4) & 15;
+        ch.vol = value & 15;
+        if (inst !== ch.inst) {
+          ch.inst = inst;
+          ch.applyPatch();
+        } else {
+          ch.setVol(ch.vol);
+        }
+      }
+    }
+  }
+
+  /**
+   * Alias for set_register() using camelCase naming.
+   * @param {number} addr - Register address
+   * @param {number} value - Value to write
+   */
+  setRegister(addr, value) {
+    this.set_register(addr, value);
+  }
+
+  /**
+   * Read back the raw value most recently written to a register.
+   * @param {number} addr - Register address
+   * @returns {number} The stored register value
+   */
+  getRegister(addr) {
+    return this.registers[addr & 0x3f];
+  }
+
+  /**
+   * Handle a write to register 0x0E: rhythm mode on/off and the
+   * BD/SD/HH/TOM/CYM key bits.
+   * @private
+   * @param {number} value - The byte written to register 0x0E
+   */
+  _setRhythm(value) {
+    this.rhythmMode = (value >> 5) & 1;
+    const keys = this.rhythmMode ? value : 0; // リズムモードOFF時は全キーオフ扱い
+    const R = this.rhythm;
+    this._setRhythmKey('bd', (keys >> 4) & 1, R.bdMod, R.bdCar);
+    this._setRhythmKey('hh', keys & 1, R.hh);
+    this._setRhythmKey('sd', (keys >> 3) & 1, R.sd);
+    this._setRhythmKey('tom', (keys >> 2) & 1, R.tom);
+    this._setRhythmKey('cym', (keys >> 1) & 1, R.cym);
+  }
+
+  /**
+   * Apply a key on/off edge for one rhythm voice.
+   * @private
+   * @param {string} name - Rhythm voice name ('bd'/'hh'/'sd'/'tom'/'cym')
+   * @param {number} on - 1 if the key bit is set, 0 otherwise
+   * @param {YM2413Slot} slotA - Primary slot for this voice
+   * @param {YM2413Slot} [slotB] - Secondary slot (BD only, its carrier)
+   */
+  _setRhythmKey(name, on, slotA, slotB) {
+    const prev = this._rhythmKeys[name];
+    if (on && !prev) {
+      slotA.keyOn();
+      if (slotB) slotB.keyOn();
+    } else if (!on && prev) {
+      slotA.keyOff(false);
+      if (slotB) slotB.keyOff(false);
+    }
+    this._rhythmKeys[name] = on;
+  }
+
+  /**
+   * Propagate a channel 6/7/8 F-Number/Block change to the rhythm slots
+   * that share its pitch registers.
+   * @private
+   * @param {number} idx - Channel index (6, 7, or 8)
+   */
+  _syncRhythmFreq(idx) {
+    const R = this.rhythm;
+    if (idx === 6) {
+      const ch = this.channels[6];
+      R.bdMod.updateFreq(ch.fnum, ch.block);
+      R.bdCar.updateFreq(ch.fnum, ch.block);
+    } else if (idx === 7) {
+      const ch = this.channels[7];
+      R.hh.updateFreq(ch.fnum, ch.block);
+      R.sd.updateFreq(ch.fnum, ch.block);
+    } else if (idx === 8) {
+      const ch = this.channels[8];
+      R.tom.updateFreq(ch.fnum, ch.block);
+      R.cym.updateFreq(ch.fnum, ch.block);
+    }
+  }
+
+  /**
+   * Handle a write to register 0x36/0x37/0x38 while rhythm mode is
+   * active (rhythm-voice volume instead of the normal instrument/volume
+   * encoding).
+   * @private
+   * @param {number} idx - Channel index (6, 7, or 8)
+   * @param {number} value - The byte written to the register
+   */
+  _setRhythmVolume(idx, value) {
+    const R = this.rhythm;
+    if (idx === 6) {
+      R.bdCar.tlDb = (value & 15) * 3;
+    } else if (idx === 7) {
+      R.hh.tlDb = ((value >> 4) & 15) * 3;
+      R.sd.tlDb = (value & 15) * 3;
+    } else if (idx === 8) {
+      R.tom.tlDb = ((value >> 4) & 15) * 3;
+      R.cym.tlDb = (value & 15) * 3;
+    }
+  }
+
+  /**
+   * Advance the rhythm-mode noise generator by one sample (real-chip-style
+   * XOR feedback shift register).
+   * @private
+   */
+  _updateNoise() {
+    if (this.noise & 1) this.noise ^= 0x800200;
+    this.noise = (this.noise >>> 1) || 1;
+  }
+
+  /**
+   * Synthesize one sample of the combined rhythm voices (BD/HH/SD/TOM/CYM).
+   * @private
+   * @param {number} pmMul - Vibrato multiplier for this sample
+   * @returns {number} Combined rhythm output for this sample
+   */
+  _calcRhythm(pmMul) {
+    const C = YM2413_CONST;
+    const R = this.rhythm;
+    this._updateNoise();
+
+    // BD: 通常の2オペレータFM楽器と同じ経路 (固定音色, ch6のF-Number/Blockを使用)
+    const fbUnits = R.bdMod.fbFactor
+      ? (R.bdMod.out1 + R.bdMod.out2) * 0.5 * R.bdMod.fbFactor * C.SIN_LEN : 0;
+    const modOut = R.bdMod.calc(fbUnits, 0, pmMul);
+    const bd = R.bdCar.calc(modOut * 4 * C.SIN_LEN, 0, pmMul);
+
+    // TOM: 変調なしの単純なトーン (ch8のF-Number/Blockを使用)
+    const tom = R.tom.calc(0, 0, pmMul);
+
+    // HH/SD/CYM: ノイズ発生器とHH/CYM自身の位相ビットを組み合わせて生成
+    R.hh.advance(pmMul);
+    R.sd.advance(pmMul);
+    R.cym.advance(pmMul);
+    const pgHH = (R.hh.phase | 0) & C.SIN_MASK;
+    const pgCym = (R.cym.phase | 0) & C.SIN_MASK;
+    const hBit2 = (pgHH >> 2) & 1, hBit7 = (pgHH >> 7) & 1, hBit3 = (pgHH >> 3) & 1;
+    const cBit3 = (pgCym >> 3) & 1, cBit5 = (pgCym >> 5) & 1;
+    const shortNoise = (hBit2 ^ hBit7) | (hBit3 ^ cBit5) | (cBit3 ^ cBit5);
+    const nBit = this.noise & 1;
+
+    const hhIdx = shortNoise ? (nBit ? 0x2d0 : 0x234) : (nBit ? 0x34 : 0xd0);
+    const hh = R.hh.sampleAt(hhIdx, 0);
+
+    const sdBit8 = ((R.sd.phase | 0) >> 8) & 1;
+    const sdIdx = sdBit8 ? (nBit ? 0x300 : 0x200) : (nBit ? 0x0 : 0x100);
+    const sd = R.sd.sampleAt(sdIdx, 0);
+
+    const cymIdx = shortNoise ? 0x300 : 0x100;
+    const cym = R.cym.sampleAt(cymIdx, 0);
+
+    return bd + hh + sd + tom + cym;
+  }
+
+  /**
+   * Generate one output sample.
+   * @returns {number} Sample value clamped to the range [-1.0, 1.0]
+   */
+  calc() {
+    this.amPhase += 3.7 / this.sampleRate;   // トレモロ 3.7Hz
+    if (this.amPhase >= 1) this.amPhase -= 1;
+    this.pmPhase += 6.4 / this.sampleRate;   // ビブラート 6.4Hz
+    if (this.pmPhase >= 1) this.pmPhase -= 1;
+    const amDb = (1 - Math.cos(2 * Math.PI * this.amPhase)) * 2.4; // 0〜4.8dB
+    const pmMul = Math.pow(2, (13.75 * Math.sin(2 * Math.PI * this.pmPhase)) / 1200);
+
+    let sum = 0;
+    // リズムモード中は ch6-8 が打楽器専用になるため通常合成から除外する
+    const melodyChannels = this.rhythmMode ? 6 : 9;
+    for (let i = 0; i < melodyChannels; i++) sum += this.channels[i].calc(amDb, pmMul);
+    if (this.rhythmMode) sum += this._calcRhythm(pmMul);
+    const out = sum * 0.35;
+    return out > 1 ? 1 : (out < -1 ? -1 : out);
+  }
+
+  /**
+   * Fill a buffer with consecutive output samples.
+   * @param {Float32Array|Array<number>} buffer - Buffer to fill in place
+   * @returns {Float32Array|Array<number>} The same buffer, for convenience
+   */
+  generate(buffer) {
+    for (let i = 0; i < buffer.length; i++) buffer[i] = this.calc();
+    return buffer;
+  }
+}
+
+// 内蔵ROM音色データ (@1-@15, 実チップのダンプに基づく)
+// [0]:mod AM/VIB/EG/KSR/MULTI [1]:car 同 [2]:mod KSL/TL
+// [3]:car KSL/波形/FB [4]:mod AR/DR [5]:car AR/DR [6]:mod SL/RR [7]:car SL/RR
+/** @type {Array<Array<number>|null>} 8-byte patch data for voices @0 (null) through @15 */
+YM2413.VOICES = [
+  null, // @0 ユーザー音色 (レジスタ0x00-0x07)
+  [0x71, 0x61, 0x1e, 0x17, 0xd0, 0x78, 0x00, 0x17], // @1  ヴァイオリン
+  [0x13, 0x41, 0x1a, 0x0d, 0xd8, 0xf7, 0x23, 0x13], // @2  ギター
+  [0x13, 0x01, 0x99, 0x00, 0xf2, 0xd4, 0x21, 0x23], // @3  ピアノ
+  [0x11, 0x61, 0x0e, 0x07, 0x8d, 0x64, 0x70, 0x27], // @4  フルート
+  [0x32, 0x21, 0x1e, 0x06, 0xe1, 0x76, 0x01, 0x28], // @5  クラリネット
+  [0x31, 0x22, 0x16, 0x05, 0xe0, 0x71, 0x00, 0x18], // @6  オーボエ
+  [0x21, 0x61, 0x1d, 0x07, 0x82, 0x81, 0x11, 0x07], // @7  トランペット
+  [0x33, 0x21, 0x2d, 0x13, 0xb0, 0x70, 0x00, 0x07], // @8  オルガン
+  [0x61, 0x61, 0x1b, 0x06, 0x64, 0x65, 0x10, 0x17], // @9  ホルン
+  [0x41, 0x61, 0x0b, 0x18, 0x85, 0xf0, 0x81, 0x07], // @10 シンセサイザー
+  [0x13, 0x01, 0x83, 0x11, 0xfa, 0xe4, 0x10, 0x04], // @11 ハープシコード
+  [0x17, 0xc1, 0x24, 0x07, 0xf8, 0xf8, 0x22, 0x12], // @12 ビブラフォン
+  [0x61, 0x50, 0x0c, 0x05, 0xd2, 0xf5, 0x40, 0x42], // @13 シンセベース
+  [0x01, 0x01, 0x55, 0x03, 0xe9, 0x90, 0x03, 0x02], // @14 アコースティックベース
+  [0x41, 0x41, 0x89, 0x03, 0xf1, 0xe4, 0xc0, 0x13], // @15 エレキギター
+];
+
+/** @type {Array<string>} Display names for YM2413.VOICES, same indexing */
+YM2413.VOICE_NAMES = [
+  'ユーザー音色', 'ヴァイオリン', 'ギター', 'ピアノ', 'フルート',
+  'クラリネット', 'オーボエ', 'トランペット', 'オルガン', 'ホルン',
+  'シンセサイザー', 'ハープシコード', 'ビブラフォン', 'シンセベース',
+  'アコースティックベース', 'エレキギター',
+];
+
+// リズム専用固定音色 (BD / HH+SD / TOM+CYM) — 実チップのダンプに基づく
+// applyPatchBytes(mod, car, ...) と同じ8バイト形式
+/** @type {Array<Array<number>>} Fixed 8-byte patches: [BD, HH+SD, TOM+CYM] */
+YM2413.RHYTHM_VOICES = [
+  [0x01, 0x01, 0x18, 0x0f, 0xdf, 0xf8, 0x6a, 0x6d], // BD  (mod+car とも通常のFM合成)
+  [0x01, 0x01, 0x00, 0x00, 0xc8, 0xd8, 0xa7, 0x48], // HH(mod) / SD(car)
+  [0x05, 0x01, 0x00, 0x00, 0xf8, 0xaa, 0x59, 0x55], // TOM(mod) / CYM(car)
+];
+
+/** @type {Array<string>} Rhythm voice names in key-bit order (0x0E bits 4-0) */
+YM2413.RHYTHM_NAMES = ['BD', 'HH', 'SD', 'TOM', 'CYM'];
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { YM2413, YM2413Channel, YM2413Slot };
+}
+
+</script>
+<script>
 
 "use strict";
+const LIC_SEAL=(()=>{const A=[3,23,104,110,107,105,122,114,21,10,22,22,115,122,243,122,15,21,122,9,53,60,46,122,38,122,23,19,14,122,22,51],B=[57,63,52,41,63,122,38,122,61,51,46,50,47,56,116,57,53,55,117,47,53,41,53,60,46,117,48,41,104,110,107,105],K=90,EXP=0x7c8c520;let s="";for(let i=0;i<A.length+B.length;i++)s+=String.fromCharCode((i<32?A[i]:B[i-32])^K);let h=5381>>>0;for(let i=0;i<s.length;i++)h=(((h<<5)+h)+s.charCodeAt(i))>>>0;return{text:s,ok:h===EXP};})();
+function licSealCheck(){try{log("ЛИЦЕНЗИЯ: "+(LIC_SEAL.ok?LIC_SEAL.text:"ПОВРЕЖДЕНА — контрольная сумма не сошлась"));}catch(_){}}
+/* ============================================================
+   YM2413 FM ENGINE — мост (load-safe v2).
+   Верхний уровень: только объявления. Вся проводка DOM — в ymInit(),
+   вызов из init-блока. Эмулятор: js2413.js (MIT, UO Soft).
+   ============================================================ */
+const YMV=[null,'Скрипка','Гитара','Пианино','Флейта','Кларнет','Гобой','Труба','Орган','Валторна','Синтезатор','Клавесин','Вибрафон','Синт-бас','Акуст. бас','Эл. гитара'];
+const activeYm=new Map();
+const ymFree=[0,1,2,3,4,5,6,7,8];
+let ymChip=null,ymNode=null,ymGainNode=null;
+const YMS={voice:2,started:false};
+function ymAudio(){
+  if(ymChip) return true;
+  if(!audioCtx){ try{ ensureAudio(); }catch(_){} }
+  if(!audioCtx){ log('YM2413: аудиоконтекст ещё не запущен — нажмите клавишу ещё раз.'); return false; }
+  try{
+    ymChip=new YM2413(audioCtx.sampleRate);
+    ymNode=audioCtx.createScriptProcessor(2048,0,1);
+    ymNode.onaudioprocess=function(e){
+      if(!ymChip) return;
+      const out=e.outputBuffer.getChannelData(0);
+      for(let i=0;i<out.length;i++) out[i]=ymChip.calc();
+    };
+    ymGainNode=audioCtx.createGain(); ymGainNode.gain.value=1.25;
+    ymNode.connect(ymGainNode); ymGainNode.connect(fxBus);
+    YMS.started=true;
+    log('YM2413: аудио-конвейер запущен (9 каналов, банк 15 голосов).');
+    return true;
+  }catch(err){ log('YM2413: ошибка запуска аудио — '+(err&&err.message?err.message:err)); ymChip=null; return false; }
+}
+function ymFnumOf(midi){
+  const freq=440*Math.pow(2,(midi-69+bendCents/100)/12);
+  let block=Math.floor(midi/12)-1; if(block<0)block=0; if(block>7)block=7;
+  let fnum=Math.round(freq*Math.pow(2,19-block)/(3579545/72));
+  while(fnum>511&&block<7){block++; fnum>>=1;}
+  if(fnum>511)fnum=511; if(fnum<1)fnum=1;
+  return {fnum,block};
+}
+function ymWriteOn(ch,midi){
+  const p=ymFnumOf(midi);
+  ymChip.set_register(0x10+ch,p.fnum&0xFF);
+  ymChip.set_register(0x20+ch,((p.block<<1)|(p.fnum>>8))|0x10);
+  return p;
+}
+function ymOn(k,v){
+  if(state.mode!=='ym') return false;
+  if(!ymAudio()) return false;
+  if(activeYm.has(k)){ ymReattack(k,v); return true; }
+  let ch;
+  if(ymFree.length) ch=ymFree.shift();
+  else{
+    let oldK=null,oldT=Infinity;
+    activeYm.forEach(function(r,key){ if(r.st<oldT){oldT=r.st;oldK=key;} });
+    if(oldK===null) return false;
+    ch=activeYm.get(oldK).ch; ymOff(oldK);
+    log('YM2413: 9 каналов занято — нота '+oldK+' вытеснена.');
+  }
+  const vel=(typeof v==='number')?v:100;
+  const lvl=15-Math.min(15,Math.round(vel/127*15));
+  const voice=Math.min(15,Math.max(1,YMS.voice));
+  ymChip.set_register(0x30+ch,(voice<<4)|lvl);
+  const p=ymWriteOn(ch,k);
+  activeYm.set(k,{ch,midi:k,fnum:p.fnum,block:p.block,vel:vel,st:performance.now()});
+  hl(k,true);
+  updVoices();
+  return true;
+}
+function ymOff(k){
+  const r=activeYm.get(k); if(!r) return false;
+  if(ymChip) ymChip.set_register(0x20+r.ch,(r.block<<1)|(r.fnum>>8));
+  activeYm.delete(k); ymFree.push(r.ch);
+  hl(k,false); updVoices();
+  return true;
+}
+function ymReattack(k,v){
+  const r=activeYm.get(k); if(!r||!ymChip) return false;
+  const vel=(typeof v==='number')?v:r.vel;
+  const lvl=15-Math.min(15,Math.round(vel/127*15));
+  ymChip.set_register(0x30+r.ch,(Math.min(15,Math.max(1,YMS.voice))<<4)|lvl);
+  ymChip.set_register(0x20+r.ch,((r.block<<1)|(r.fnum>>8))&0xEF);
+  ymWriteOn(r.ch,k);
+  r.st=performance.now(); r.vel=vel;
+  return true;
+}
+function ymKill(){
+  [...activeYm.keys()].forEach(k=>ymOff(k));
+}
+function ymApplyBend(){
+  if(!ymChip) return;
+  activeYm.forEach(function(r,k){
+    const p=ymFnumOf(r.midi!==undefined?r.midi:k);
+    r.fnum=p.fnum; r.block=p.block;
+    ymChip.set_register(0x10+r.ch,p.fnum&0xFF);
+    ymChip.set_register(0x20+r.ch,((p.block<<1)|(p.fnum>>8))|0x10);
+  });
+}
+function ymInit(){
+  const btn=document.getElementById('btnYm');
+  if(btn) btn.addEventListener('click',function(){ setMode('ym'); });
+  const sel=document.getElementById('ymVoiceSel');
+  if(sel){
+    for(let i=1;i<YMV.length;i++){
+      const o=document.createElement('option');
+      o.value=String(i); o.textContent='@'+i+' '+YMV[i];
+      if(i===YMS.voice) o.selected=true;
+      sel.appendChild(o);
+    }
+    sel.addEventListener('change',function(){
+      YMS.voice=parseInt(sel.value,10)||2;
+      if(state.mode==='ym') lcd('MODE: [YM2413 FM] — Голос: ['+YMV[YMS.voice]+' @'+YMS.voice+']');
+      log('YM2413: голос @'+YMS.voice+' — '+YMV[YMS.voice]);
+    });
+  } else log('YM2413: селектор голосов не найден.');
+}
+
 /* ============================================================
    ФАЙЛ 01/13: 01_state.js
    Секция: состояние
@@ -1349,13 +2269,16 @@ function setMode(m){
   [...activeChip.keys()].forEach(k=>chipKill(k));
   [...activeSF2.keys()].forEach(k=>sfOff(k));
   [...activeMidi.keys()].forEach(k=>midiKill(k));
+  [...activeYm.keys()].forEach(k=>ymKill(k));
   $('#btnChip').classList.toggle('on',m==='chip');
   $('#btnSf2').classList.toggle('on',m==='sf2');
   $('#btnMidi').classList.toggle('on',m==='midi');
+  $('#btnYm').classList.toggle('on',m==='ym');
   if(m==='chip') lcd('MODE: [CHIP-TUNE] — Чип: [2A03] ['+chipVoiceById(state.chipVoice).name+']');
   else if(m==='midi') lcd('MODE: [MIDI GM] — Голос: ['+GMN[midiProg]+']');
+  else if(m==='ym') lcd('MODE: [YM2413 FM] — Голос: ['+YMV[YMS.voice]+' @'+YMS.voice+']');
   else updateBankLcd();
-  log('Режим: '+(m==='chip'?'CHIP-TUNE (2A03)':(m==='midi'?'MIDI GM':'SoundFont'))+' — голоса заглушены.');
+  log('Режим: '+(m==='chip'?'CHIP-TUNE (2A03)':(m==='midi'?'MIDI GM':(m==='ym'?'YM2413 FM':'SoundFont')))+' — голоса заглушены.');
 }
 function setChipVoice(id){
   state.chipVoice=id;
@@ -1854,6 +2777,7 @@ function susDecay(key){ /* начало затухания по границе �
     activeMidi.delete(key);
     setTimeout(()=>{try{vM.g.disconnect();}catch(_){}},md.tail+50);
   }
+  if(activeYm.has(key)) ymOff(key);
   updVoices();
 }
 function susCancel(key){
@@ -1869,7 +2793,7 @@ const killTimers=new Map(); /* key -> таймер потолка ноты */
 
 function ceilingKill(k){ /* потолок: нота звучит не дольше 1 целой — залипший MIDI не страшен */
   killTimers.delete(k);
-  if(!activeChip.has(k)&&!activeSF2.has(k)&&!activeMidi.has(k)) return;
+  if(!activeChip.has(k)&&!activeSF2.has(k)&&!activeMidi.has(k)&&!activeYm.has(k)) return;
   susDecay(k); susCancel(k); hl(k,false);
   log('Потолок ноты: нота '+k+' заглушена — прозвучала 1 целую ('+bpm+' BPM).');
 }
@@ -1878,7 +2802,7 @@ function scheduleCeiling(k){ clearCeiling(k); killTimers.set(k,setTimeout(()=>ce
 
 function susSchedule(key){ /* нота живёт ПОСЛЕ отпускания до границы доли */
   const now=performance.now();
-  const v=activeChip.get(key)||activeSF2.get(key)||activeMidi.get(key);
+  const v=activeChip.get(key)||activeSF2.get(key)||activeMidi.get(key)||activeYm.get(key);
   const st=(v&&v.st)||now;
   const md=susDims(susMode); /* v1.4.20: доля от текущего BPM */ /* v1.4.20: */
   const rem=Math.max(0,st+md.gate-now);
@@ -1888,7 +2812,7 @@ function susSchedule(key){ /* нота живёт ПОСЛЕ отпускани�
   updVoices();
 }
 function hardOff(k){ /* мгновенное глушение без педали */
-  const wasMidi=state.mode==='midi'?midiOff(k):false; const wasSF2=state.mode==='sf2'?sfOff(k):false; if(!wasMidi&&!wasSF2) chipOff(k);
+  const wasMidi=state.mode==='midi'?midiOff(k):false; const wasSF2=state.mode==='sf2'?sfOff(k):false; const wasYm=state.mode==='ym'?ymOff(k):false; if(!wasMidi&&!wasSF2&&!wasYm) chipOff(k);
 }
 function setSusMode(mode){
   susMode = mode;
@@ -1967,6 +2891,7 @@ function pmMuteAll(){
   [...activeSF2.keys()].forEach(k=>sfOff(k));
   [...activeChip.keys()].forEach(k=>chipOff(k));
   [...activeMidi.keys()].forEach(k=>midiOff(k));
+  [...activeYm.keys()].forEach(k=>ymOff(k));
   updVoices();
 }
 function noteOn(k,v){
@@ -1983,8 +2908,8 @@ function noteOn(k,v){
   }
   dampKeys.delete(k); /* v1.4.20: живая реатака отменяет отложенный демпфер */
   susCancel(k); /* повторное нажатие: старый отложенный хвост снимается, голос пересоздаётся */
-  state.mode==='midi'?midiOn(k,v):state.mode==='sf2'?sfOn(k,v):chipOn(k,v);
-  const nv=activeChip.get(k)||activeSF2.get(k)||activeMidi.get(k);
+  state.mode==='ym'?ymOn(k,v):state.mode==='midi'?midiOn(k,v):state.mode==='sf2'?sfOn(k,v):chipOn(k,v);
+  const nv=activeChip.get(k)||activeSF2.get(k)||activeMidi.get(k)||activeYm.get(k);
   if(nv) nv.st=performance.now(); /* метка старта ноты — от неё отсчитывается доля */
   scheduleCeiling(k); /* предохранитель: максимум 1 целая */
 }
@@ -2606,7 +3531,7 @@ const sustained=new Set();
 let bendCents=0;
 function updVoices(){
   const el=$('#voiceCnt');
-  if(el) el.textContent=activeChip.size+activeSF2.size+activeMidi.size;
+  if(el) el.textContent=activeChip.size+activeSF2.size+activeMidi.size+activeYm.size;
 }
 function panicAll(){
   sustainOn=false; sustained.clear(); susClearAll(); noteOwner.clear();
@@ -2614,6 +3539,7 @@ function panicAll(){
   [...activeSF2.keys()].forEach(k=>sfOff(k));
   [...activeChip.keys()].forEach(k=>chipOff(k));
   [...activeMidi.keys()].forEach(k=>midiOff(k));
+  [...activeYm.keys()].forEach(k=>ymOff(k));
   updVoices();
   log('PANIC: все голоса заглушены.');
   lcd('PANIC — все голоса заглушены. Модель: ['+(state.sf2?'SoundFont':'CHIP')+']');
@@ -2638,6 +3564,7 @@ function applyBend(){
       });
     }
   });
+  ymApplyBend();
 }
 function initMIDI(){
   if(!navigator.requestMIDIAccess){
@@ -2856,6 +3783,8 @@ log('Загружен SF2 Контроллер');
 log('Загружен SF2 Микропроцессор');
 log('Опрос модулей прошел успешно');
 log('Приятной игры ;-)');
+ymInit();
+licSealCheck();
 /* ============================================================
    ФАЙЛ 13/13: 13_touch_fps.js
    Секция: touch-детект + FPS-метр
@@ -3090,7 +4019,7 @@ function loop(ts){
     line+=' | пик '+db(peak)+'дБ RMS '+db(rms)+'дБ | DC '+dc.toFixed(1)+'%'+
       ' | клип '+clip+' | пик спектра '+
       (tv>60?NOTE[((Math.round(69+12*Math.log2(top*audioCtx.sampleRate/2/freqBuf.length/440))%12)+12)%12]+' '+Math.round(top*audioCtx.sampleRate/2/freqBuf.length)+' Гц':'—');
-    const silent=!(activeChip.size+activeSF2.size+activeMidi.size);
+    const silent=!(activeChip.size+activeSF2.size+activeMidi.size+activeYm.size);
     if(silent&&rms>0.004&&!stat.silentWarn){ stat.silentWarn=true; adLog('⚠ ФОН при тишине: RMS '+db(rms)+' дБ — источник в тракте'); }
     if(!silent) stat.silentWarn=false;
     if(dc>1.5&&!stat.dcWarn){ stat.dcWarn=true; adLog('⚠ DC-смещение '+dc.toFixed(1)+'% — буфер без нормализации среднего'); }
