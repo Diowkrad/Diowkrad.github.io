@@ -255,6 +255,45 @@ body.kb-single .kbSec2{display:none;}
     box-shadow: inset 0 0 24px rgba(0,0,0,.5);
     min-width: 0;overflow: auto;
 }
+
+.p_block::-webkit-scrollbar {
+  width: 12px;   /* для вертикального скролла */
+  height: 12px;  /* для горизонтального скролла */
+}
+html::-webkit-scrollbar {
+  width: 12px;   /* для вертикального скролла */
+  height: 12px;  /* для горизонтального скролла */
+}
+
+html::-webkit-scrollbar-track {
+    border-radius: 1px;
+    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #031 2px, #000000 2px, #000000 4px), repeating-radial-gradient(circle at 50% 50%, #29ff00 1px, #008951 1px, #027729 1px, #0a1a12 6px);
+    background-size: 5px 4px, 12px 12px;}
+
+html::-webkit-scrollbar-thumb {
+    background-color: #2d6a2d;
+    border-radius: 4px;
+    border: 1px solid var(--ink2);}
+
+.p_block::-webkit-scrollbar-thumb {
+    background-color: #2d6a2d;
+    border-radius: 4px;
+    border: 1px solid var(--ink2);}
+	
+.p_block::-webkit-scrollbar-track {
+    
+    border-radius: 1px;
+    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #031 2px, #000000 2px, #000000 4px), repeating-radial-gradient(circle at 50% 50%, #29ff00 1px, #008951 1px, #027729 1px, #0a1a12 6px);
+    background-size: 5px 4px, 12px 12px;}
+
+#tb9:checked~#pane9 .g_block{
+	display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
 /* "голые" дивы внутри блока = строки (авто-ряды) */
 .p_block>div {
     display: flex;
@@ -376,8 +415,8 @@ input[name="tb"]{display:none;}
 }
 
 #bend_sing{
-	    display: flex;
-    flex-direction: column;
+	display: flex;
+    flex-direction: row;
     gap: 8px;
     background: var(--panel);
     border: 1px solid var(--line);
@@ -386,6 +425,10 @@ input[name="tb"]{display:none;}
     box-shadow: inset 0 0 24px rgba(0, 0, 0, .5);
     min-width: 0;
     align-items: flex-start;
+    align-content: center;
+    flex-wrap: nowrap;
+    justify-content: flex-start; 
+	overflow-x: auto;
 }
 
 #tb1:checked~#pane1>.p_block>div{
@@ -540,6 +583,7 @@ input[name="tb"]{display:none;}
     align-items: stretch;
 } 
 
+
 /* ТАЧ-ФИКС: касание по нотам и клавиатурам — не прокрутка страницы */
 #keys,#keys2{ touch-action:none; }
 .kwrap{ touch-action:none; }
@@ -621,7 +665,7 @@ input[name="tb"]{display:none;}
 		</div>
 	</div>
 	<div class="p_block" >
-		
+	
 			<div><button id="octDn">ОКТАВА: −</button><button id="octUp">ОКТАВА: +</button></div>
 			<div>
 		
@@ -675,11 +719,9 @@ input[name="tb"]{display:none;}
 			</div>
 	</div>
 	<div class="p_block" id="bend_sing">
-	
+	<div class="g_block">
 	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}" >Вход:</span>
-	<div>
-		<!-- ═══ !! Маркер вставки !!  ═══ -->
-		<div class="row">
+		<div>
 			<div>
 				<span class="tag">ГРОМКОСТЬ:</span>
 				<input type="range" id="vol" min="0" max="100" value="70">
@@ -701,6 +743,8 @@ input[name="tb"]{display:none;}
 			</div>
 		</div>
 	 </div> 
+	 
+	<div class="g_block">
 	  <span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}" >Выход: DELAY/REVERB</span>
    <div>
    <div> 
@@ -729,7 +773,8 @@ input[name="tb"]{display:none;}
 		<span class="tag">РЕВЕРБ МИКС:</span>
 		<input type="range" id="fxRevM" min="0" max="100" value="0" step="1">
 		<span class="tag" id="fxRevMv">0%</span>
-	</div></div></div></div>
+	</div></div></div></div></div>
+	<div class="g_block">
 	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}">Выход: DISTORSHIN</span>
    <div> <div class="row">
 		<div> 
@@ -747,7 +792,8 @@ input[name="tb"]{display:none;}
 		<span class="tag">ДИСТ ГРОМКОСТЬ:</span>
 		<input type="range" id="fxDistV" min="0" max="70" value="5" step="1">
 		<span class="tag" id="fxDistVv">5%</span>
-	</div></div></div>
+	</div></div></div></div>
+	<div class="g_block">
 	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}">Выход: ДАБЛ-ТРЕК</span>
    <div> <div class="row">
 		<div> 
@@ -759,8 +805,8 @@ input[name="tb"]{display:none;}
 		<span class="tag">ДТ МИКС:</span>
 		<input type="range" id="fxDblM" min="0" max="100" value="0" step="1">
 		<span class="tag" id="fxDblMv">0%</span>
-	</div></div></div>
-	
+	</div></div></div></div>
+	<div class="g_block">
 	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}">Выход:ВИБРАТО</span>
 	
 	<div> 
@@ -785,7 +831,8 @@ input[name="tb"]{display:none;}
 				<span class="tag" id="fxVbrMv">0%</span>
 			</div>
 		</div>
-	</div>
+	</div></div>
+	<div class="g_block">
 	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}">Выход:ФЕЙЗЕР</span>
 	<div>
 		<div class="row">
@@ -809,7 +856,8 @@ input[name="tb"]{display:none;}
 				<span class="tag" id="fxPhMv">0%</span>
 			</div>
 		</div>
-	</div>
+	</div></div>
+	<div class="g_block">
 	<span class="tag" Style="font-size: 16px; border: 3px solid var(--line2); padding: 4px;}">Выход: ГЕЙТ</span>
 		<div>
 			<div class="row">
@@ -821,21 +869,8 @@ input[name="tb"]{display:none;}
 			</div>
 		</div>
 	</div>
-	
-	
+	</div>
 
-	
-   
-   
-	
-	
-	
-	
-	
-	
-	
-	
-	
   
 </section>
 
