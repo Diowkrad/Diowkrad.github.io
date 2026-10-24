@@ -1036,16 +1036,6 @@
 							<button id="octUp">ОКТАВА: +</button>
 						</div>
 						<div>
-							<button id="susBtn8">Sus: 1/8</button>
-							<button id="susBtn4">Sus: 1/4</button>
-							<button id="susBtn2">Sus: 1/2</button>
-						</div>
-						<div>
-							<button id="sensSoft">SOFT</button>
-							<button id="sensHard" class="on">HARD</button>
-							<button id="sensFixed">FIXED</button>
-						</div>
-						<div>
 							<button id="kb1">РОЛЛ: 1</button>
 							<button id="kb2" class="on">РОЛЛ:2</button>
 							<button id="lay1">РЯД: 1</button>
@@ -1090,26 +1080,36 @@
 					</div>
 					<div class="p_block" id="bend_sing">
 						<div class="g_block">
-							<span class="tag" style="font-size:16px; border:3px solid var(--line2); padding:4px;" >Вход:</span>
+							<span class="tag" style="font-size:16px; border:3px solid var(--line2); padding:4px;">Выход:</span>
 							<div>
-								<div>
-									<span class="tag">ГРОМКОСТЬ:</span>
-									<input type="range" id="vol" min="0" max="100" value="70">
-									<span class="tag" id="bendVolTag">70</span>
-								</div>
-							</div>
-							<div class="row">
-								<div>
-									<span class="tag" style="min-width:0;">ПИТЧ-БЕНД:</span>
-									<input type="range" id="bend" min="-400" max="400" value="0">
-									<span class="tag" id="bendLbl">0 ц</span>
-								</div>
-							</div>
-							<div class="row">
-								<div>
-									<span class="tag">ТЕМП:</span>
-									<input type="range" id="bpm" min="40" max="300" value="120">
-									<span class="tag" id="bpmVal">120 BPM</span>
+								<div class="row">
+									<div>
+										<div><span class="tag">СУСТЕЙН:</span></div>
+										<button id="susBtn8">1/8</button>
+										<button id="susBtn4">1/4</button>
+										<button id="susBtn2">1/2</button>
+									</div>
+									<div>
+										<div><span class="tag">ТУШЕ:</span></div>
+										<button id="sensSoft">SOFT</button>
+										<button id="sensHard" class="on">HARD</button>
+										<button id="sensFixed">FIXED</button>
+									</div>
+									<div>
+										<span class="tag">ТЕМП:</span>
+										<input type="range" id="bpm" min="40" max="300" value="120">
+										<span class="tag" id="bpmVal">120 BPM</span>
+									</div>
+									<div>
+										<span class="tag" style="min-width:0;">ПИТЧ-БЕНД:</span>
+										<input type="range" id="bend" min="-400" max="400" value="0">
+										<span class="tag" id="bendLbl">0 ц</span>
+									</div>
+									<div>
+										<span class="tag">ГРОМКОСТЬ:</span>
+										<input type="range" id="vol" min="0" max="100" value="70">
+										<span class="tag" id="bendVolTag">70</span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -1263,8 +1263,11 @@
 							<span class="tag" style="font-size:16px; border:3px solid var(--line2); padding:4px;">Выход: КРАШЕР</span>
 							<div>
 								<div class="row">
-									<button class="wbtn" id="crushBitsBtn">ГЛУБИНА: 8 БИТ</button>
-									<button class="wbtn" id="crushModeBtn">МАТЧИНГ: RMS</button>
+									<div>
+										<div><span class="tag">РЕЖИМ:</span></div>
+										<button class="wbtn" id="crushBitsBtn">ГЛУБИНА: 8 БИТ</button>
+										<button class="wbtn" id="crushModeBtn">МАТЧИНГ: RMS</button>
+									</div>
 									<div>
 										<span class="tag">ЧАСТОТА:</span>
 										<input type="range" id="crushDecR" min="2" max="48" value="48" step="1">
