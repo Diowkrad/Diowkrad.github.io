@@ -2668,7 +2668,7 @@ const chipVoiceById=id=>CHIP_VOICES.find(v=>v.id===id);
 const chipDutyWaves={},chipNoiseCache=new Map();
 /* R4: банк волн чипа — буферы по ключу «вид:нота», по образцу sampleCache SF2 */
 const chipWaveBank=new Map();
-const CHIP_TAIL_MS=0.021, CHIP_TAIL_LABEL='21 мс'; /* R8: 18→21 мс — не кратно сетке 2 мс, вне фазы квантования; запас на инпут-лаг API */
+const CHIP_TAIL_MS=0.011, CHIP_TAIL_LABEL='21 мс'; /* R8: 18→21 мс — не кратно сетке 11 мс, вне фазы квантования; запас на инпут-лаг API */
 /* ═══ v1.7.0 ЕДИНЫЙ КОНВЕРТ БАНКА (adsrConfig) ═══
    Единственный источник таймингов: атака/decay/сустейн/релиз.
    Release связан с остановом голоса; громкость остаётся на пульте. */
@@ -5431,5 +5431,6 @@ const YM2413_WORKLET_SRC="'use strict';\n/**\n * js2413.js - YM2413 (OPLL) FM So
   });
 })();
 </script>
+
 	</body>
 </html>
