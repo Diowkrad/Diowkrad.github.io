@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-<!-- Хеш = a65968c299a3e524 -->
+<!-- Хеш = 0 -->
 <!-- ☩ R17 «АСКОП»: сторожа разрыва и провала в обоих трактах, телеметрия с контекстом, кроссфейд матчинга 5 мс, бенды и фейзер на рампах ☩ -->
 <!-- ☩ R19 «ЧЕСТНОСТЬ»: имена и словарь R — только реальные рецепты (43), честный фолбэк p&~7 ☩ -->
 <!-- ☩ R20 «СТОЛБЕЦ»: настоящий опрос модулей вместо заглушки — ОК/предупреждение/ошибка и честный итог ☩ -->
@@ -10,6 +10,7 @@
 <!-- ☩ R23a «ПРОВОДКА»: прямые кнопки волн вернулись в строй — слушатели на #pane2 .wbtn[data-wave] через setChipVoice ☩ -->
 <!-- ☩ R24 «СЛИЯНИЕ»: глифы басов легли на живые кнопки — СИНУС унаследовал 〽︎, ТРЕУГОЛЬНИК и ПИЛА совпали с разметкой, басы живут в словаре и селекторе ☩ -->
 <!-- ☩ R25 «БАС-ЦИКЛЕРЫ»: ПИЛА/ТРЕУГОЛЬНИК/СИНУС — циклеры ×2 норм↔БАС, один источник правды setChipVoice, data-wave-проводка погашена ☩ -->
+<!-- ☩ R0 «СЕМПЛЕР» вехи v1.7.x: GM-голоса — банк волновых таблиц как у 8-bit движка, один осциллятор на ноту вместо роя гармоник, ФПС длинных сессий жив ☩ -->
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2611,7 +2612,7 @@ function ymInit(){
 /* ============================================================
    ФАЙЛ 01/13: 01_state.js
    Секция: состояние
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ состояние ============ */
@@ -2803,7 +2804,7 @@ const sgn=v=>v>32767?v-65536:v;
 /* ============================================================
    ФАЙЛ 02/13: 02_chip_engine_2a03.js
    Секция: CHIP-движок 2A03
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ CHIP-движок 2A03 ============ */
@@ -2856,6 +2857,45 @@ function bankGet(kind,note,freq,builder){
   let buf=chipWaveBank.get(bk);
   if(!buf){ buf=builder(freq); chipWaveBank.set(bk,buf); log('БАНК ЧИПА: новый '+bk+' — '+chipWaveBank.size+' волн в банке'); }
   return buf;
+}
+/* R0 «СЕМПЛЕР»: GM-голоса — волновые таблицы как у 8-bit движка.
+   Стек гармоник программы запекается в PeriodicWave один раз: нота = один осциллятор
+   вместо роя осцилляторов и гейнов — ФПС длинных сессий жив, деградации окон меньше.
+   Бенд живёт в osc.frequency — обработчик vR17 АСКОП не тронут.
+   Нецелые партиалы таблице не врать: такие программы честно остаются на легаси-пути (Р19). */
+const midiWaveBank=new Map();
+function midiFourier(w,k){ /* синусный ряд WebAudio: коэффициент k-й гармоники базовой волны */
+  if(w==='square')   return (k%2)? 4/(Math.PI*k) : 0;
+  if(w==='triangle') return (k%2)? 8/(Math.PI*Math.PI*k*k)*Math.pow(-1,(k-1)/2) : 0;
+  if(w==='sawtooth') return 2/(Math.PI*k);
+  return (k===1)? 1 : 0; /* sine */
+}
+function midiWave(prog){ /* таблица GM-программы: один раз на программу, дальше из банка */
+  if(midiWaveBank.has(prog)) return midiWaveBank.get(prog);
+  const rec=midiGet(prog);
+  const parts=(rec.p||[]);
+  if(!parts.length || parts.some(pr=>Math.abs(pr[0]-Math.round(pr[0]))>1e-9)){
+    midiWaveBank.set(prog,null); return null; /* легаси: пусть играют честные осцилляторы */
+  }
+  const N=1024;
+  const build=pick=>{ /* один стол: синусные коэффициенты партиалов (pick — фильтр чётности для det) */
+    const real=new Float32Array(N), imag=new Float32Array(N);
+    for(const [r,a] of parts){
+      if(pick&&!pick(r)) continue;
+      const w=rec.w||'sine';
+      for(let k=1;k*r<N;k++){
+        const c=midiFourier(w,k)*a;
+        if(c) imag[k*r]+=c;
+      }
+    }
+    return audioCtx.createPeriodicWave(real,imag,{disableNormalization:true}); /* громкость как в легаси */
+  };
+  const entry=rec.det
+    ? {parts:[{w:build(r=>r%2!==0),det:rec.det},{w:build(r=>r%2===0),det:-rec.det}],ratios:parts.map(()=>1)}
+    : {parts:[{w:build(null),det:0}],ratios:parts.map(()=>1)};
+  midiWaveBank.set(prog,entry);
+  log('БАНК СЕМПЛОВ: GM '+prog+' — таблица в банке ('+midiWaveBank.size+')');
+  return entry;
 }
 const DUTY_PAT={0.0625:[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],0.5:[0,1,1,1,1,0,0,0],0.25:[0,1,1,0,0,0,0,0],0.125:[0,1,0,0,0,0,0,0]};
 
@@ -3471,7 +3511,7 @@ syncChipCyclers();
 /* ============================================================
    ФАЙЛ 03/13: 03_sf2_parser.js
    Секция: ПАРСЕР SF2 (живучий: обход RIFF/LIST + RIFX + сигнатурный поиск)
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ ПАРСЕР SF2 (живучий: обход RIFF/LIST + RIFX + сигнатурный поиск) ============ */
@@ -3691,7 +3731,7 @@ function buildSpansInst(sf,instIdx,base){
 /* ============================================================
    ФАЙЛ 04/13: 04_sf2_playback.js
    Секция: воспроизведение SF2
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ воспроизведение SF2 ============ */
@@ -3781,7 +3821,7 @@ function sfOff(key){
 /* ============================================================
    ФАЙЛ 05/13: 05_sustain.js
    Секция: сустейн 1/8 · 1/4 · 1/2 (доля + затухание)
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ сустейн 1/8 · 1/4 · 1/2 (доля + затухание) ============ */
@@ -3902,7 +3942,7 @@ function setSusMode(mode){
 /* ============================================================
    ФАЙЛ 06/13: 06_sensitivity.js
    Секция: ТУШЕ: режимы чувствительности
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* === ТУШЕ: режимы чувствительности === */
@@ -4005,7 +4045,7 @@ $('#bpm').addEventListener('input',e=>{
 /* ============================================================
    ФАЙЛ 07/13: 07_sf2_loader.js
    Секция: загрузка SF2
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ загрузка SF2 ============ */
@@ -4086,7 +4126,7 @@ $('#instSel').addEventListener('change',e=>{
 /* ============================================================
    ФАЙЛ 08/13: 08_keyboard_mouse.js
    Секция: клавиатура (мышь)
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ клавиатура (мышь) ============ */
@@ -4347,7 +4387,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ============================================================
    ФАЙЛ 09/13: 09_keyboard_pc.js
    Секция: клавиатура ПК
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ клавиатура ПК ============ */
@@ -4492,7 +4532,7 @@ window.addEventListener('blur',()=>{
 /* ============================================================
    ФАЙЛ 10/13: 10_midi_keyboard.js
    Секция: MIDI-клавиатура
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ MIDI-клавиатура ============ */
@@ -4725,7 +4765,7 @@ $('#panicBtn').addEventListener('click',panicAll);
 /* ============================================================
    ФАЙЛ 11/13: 11_midi_gm128.js
    Секция: MIDI GM × 128 — синтез по рецептам (v1.1.1 «GLOBAL MIDI»)
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 /* ============ MIDI GM × 128 — синтез по рецептам (v1.1.1 «GLOBAL MIDI») ============ */
@@ -4770,17 +4810,28 @@ function midiOnCore(k,vel=100){
   if(lp){ lp.type='lowpass'; lp.frequency.value=rec.cut*(rec.br?0.55+0.45*v:1); }
   const nodes=[];
   
-  for(const pr of rec.p){
-    const osc=audioCtx.createOscillator();
-    osc.type=rec.w||'sine';
-    
-    /* ИСПРАВЛЕНИЕ: Учитываем текущий Pitch Bend (bendCents) прямо в момент взятия ноты */
-    const currentBend = (typeof bendCents !== 'undefined') ? bendCents : 0;
-    osc.frequency.value = f * pr[0] * Math.pow(2, currentBend / 1200);
-    
-    if(rec.det) osc.detune.value=((pr[0]%2)?1:-1)*rec.det;
-    const og=audioCtx.createGain(); og.gain.value=pr[1];
-    osc.connect(og); og.connect(lp||g); osc.start(t); nodes.push(osc);
+  const mw=midiWave(midiProg);
+  if(mw){
+    /* R0 «СЕМПЛЕР»: таблица программы из банка — один осциллятор (det: пара столов, биения как в легаси) */
+    for(const sp of mw.parts){
+      const osc=audioCtx.createOscillator();
+      osc.setPeriodicWave(sp.w);
+      const currentBend = (typeof bendCents !== 'undefined') ? bendCents : 0;
+      osc.frequency.value = f * Math.pow(2, currentBend / 1200);
+      if(sp.det) osc.detune.value=sp.det;
+      osc.connect(lp||g); osc.start(t); nodes.push(osc);
+    }
+  } else {
+    /* легаси-путь (Р19): нецелые партиалы — честный рой осцилляторов */
+    for(const pr of rec.p){
+      const osc=audioCtx.createOscillator();
+      osc.type=rec.w||'sine';
+      const currentBend = (typeof bendCents !== 'undefined') ? bendCents : 0;
+      osc.frequency.value = f * pr[0] * Math.pow(2, currentBend / 1200);
+      if(rec.det) osc.detune.value=((pr[0]%2)?1:-1)*rec.det;
+      const og=audioCtx.createGain(); og.gain.value=pr[1];
+      osc.connect(og); og.connect(lp||g); osc.start(t); nodes.push(osc);
+    }
   }
   if(rec.noise){
     const ns=audioCtx.createBufferSource(); ns.buffer=noiseBuffer('long'); ns.loop=true;
@@ -4791,7 +4842,7 @@ function midiOnCore(k,vel=100){
   haloRoute(g,k); /* 2A03 ПУЛЬТ: MIDI GM в общую шину рэка */
   
   /* ИСПРАВЛЕНИЕ: Сохраняем базовую частоту f и коэффициенты гармоник pr[0] для динамического Pitch Bend */
-  activeMidi.set(k,{g,nodes,Rr,f,ratios: rec.p.map(pr=>pr[0]),st:performance.now()});
+  activeMidi.set(k,{g,nodes,Rr,f,ratios:(mw?mw.ratios:rec.p.map(pr=>pr[0])),st:performance.now()}); /* R0: СЕМПЛЕР — фундаменталы таблиц */
   hl(k,true); updVoices();
   if(S===0){ /* перкуссивные и щипковые затухают сами */
     const end=t+A+D*6+Rr*2;
@@ -4928,7 +4979,7 @@ function sessFxReapply(){
 window.addEventListener('beforeunload',sessSave);
 setInterval(sessSave,2000);
 /* ═══ конец модуля СЕССИЯ ═══ */
-log('BUILD v1.7.0 «Ultimate» R25');
+log('BUILD v1.7.0 «Ultimate» R0');
 (function(){
   var nOK=0,nW=0,nE=0;
   var rep=function(st,m){
@@ -4980,7 +5031,7 @@ sessRestore();
 /* ============================================================
    ФАЙЛ 13/13: 13_touch_fps.js
    Секция: touch-детект + FPS-метр
-   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R25
+   Часть монолитного скрипта SF2 ENGINE v1.7.0 «Ultimate» R0
    ============================================================ */
 
 function hasTouch() {
