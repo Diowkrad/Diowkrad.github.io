@@ -952,29 +952,32 @@
 				overflow:auto;
 			}
 			#midTracksBody .mtrow{
-				display:flex;
-				flex-wrap:wrap;
+				display:grid;
+				grid-template-columns:minmax(150px,1fr) minmax(150px,max-content) auto;
 				align-items:center;
-				gap:6px;
+				gap:8px;
 				background:#020;
 				border:1px solid var(--line);
 				border-radius:4px;
 				padding:6px 8px;
 			}
 			#midTracksBody .mtrow .mtName{
-				min-width:150px;
-				flex:1 1 140px;
+				overflow:hidden;
+				text-overflow:ellipsis;
+				white-space:nowrap;
 				color:var(--ink2);
 				font-size:.72rem;
 				letter-spacing:.04em;
 			}
 			#midTracksBody .mtrow select{
-				flex:1 1 140px;
-				min-width:120px;
+				width:100%;
+				min-width:0;
+				max-width:260px;
 			}
 			#midTracksBody .mtrow .mtActs button{
 				padding:4px 8px;
 				font-size:.7rem;
+				white-space:nowrap;
 			}
 			/* панель МОНИТОРЫ: раскладка */
 			#tb8:checked~#pane8{
@@ -2712,6 +2715,9 @@ function ymInit(){
 
 /* ============ состояние ============ */
 const state={mode:'chip',chipVoice:'pulse50',sf2:null,presetIdx:0,instIdx:-1,instSpans:null,instSpansKey:'',sampleCache:new Map()};
+var __mpBus=null; /* R38-fix(9): глобально для haloRoute (движковый block). Раньше
+   объявлялось `let` внутри block2 плеера и было невидимо для haloRoute в block1 →
+   ReferenceError «__mpBus is not defined at haloRoute», голос терялся молча. */
 let audioCtx=null,master=null;let fxBus=null,fxDry=null,fxDe=null,fxDeIn=null,fxDeOut=null,fxRev=null,fxRevIn=null,fxRevOut=null,fxDist=null,fxDistPre=null,fxDistPost=null,fxDistV=null,fxDistIn=null,fxDistOut=null,fxReady=false;let fxDbl=null,fxDblIn=null,fxDblOut=null,fxVbr=null,fxVbrIn=null,fxVbrOut=null,fxVbrLfo=null,fxVbrLfoG=null,fxPhIn=null,fxPhOut=null,fxPhA=null,fxPhLfo=null,fxPhLfoG=null,fxGate=null,fxGateByp=null,fxBusG=null;let crushOn=false,crushBits=8,crushDecHz=48000, /* v1.6.6: дефолт 8 бит — эффект слышен сразу */ /* v1.6.5: частота крашера, Гц */crushMode='rms',crushNode=null,crushBuilt=false,crushPath='—',crushIn=null,crushDry=null,crushWet=null; /* v1.6.0: ⌗ КРАШЕР */const FXN={de:null,fb:null,deMx:null,revMx:null,dist:null,distMx:null,dblMx:null,vbrMx:null,phMx:null,gateMx:null};/* 2A03 ПУЛЬТ: узлы рэка */
 const activeChip=new Map(),activeSF2=new Map(),activeMidi=new Map();
 const $=s=>document.querySelector(s);
@@ -3073,6 +3079,7 @@ function noiseBuffer(mode){ /* 15-битный LFSR: 32767 шагов (длин�
     if(mode==='short') reg=(reg&~(1<<6))|(fb<<6);
     ch[i]=(reg&1)?1:-1;
   }
+  ch[0]=0;
   let mn=0; for(let i=0;i<steps;i++) mn+=ch[i]; mn/=steps;
   for(let i=0;i<steps;i++) ch[i]-=mn;
   chipNoiseCache.set(mode,buf); return buf;
@@ -3091,6 +3098,7 @@ function roundedPulseBuffer(f){ /* пульс со скруглённым фро
     else x=-1;
     ch[i]=x;
   }
+  ch[0]=0;
   let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
   for(let i=0;i<N;i++) ch[i]-=mn;
   chipDutyWaves[k]=buf; return buf;
@@ -3121,6 +3129,7 @@ function triBuffer2A03(f){ /* треугольник 2A03: 32 шага, 4-бит
     const lvl=s<=15?s:31-s;
     ch[i]=(lvl/15)*2-1;
   }
+  ch[0]=0;
   let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
   for(let i=0;i<N;i++) ch[i]-=mn;
   chipDutyWaves[k]=buf; return buf;
@@ -3135,6 +3144,7 @@ function vrc6SawBuffer(f){ /* пила VRC6: 7 ступеней на перио�
     const step=Math.min(6,Math.floor(i*7/N));
     ch[i]=step/6*2-1;
   }
+  ch[0]=0;
   let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
   for(let i=0;i<N;i++) ch[i]-=mn;
   chipDutyWaves[k]=buf; return buf;
@@ -3146,6 +3156,7 @@ function sineQBuffer(f){ /* синус через 4-бит DAC (15 уровне�
   const buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate);
   const ch=buf.getChannelData(0);
   for(let i=0;i<N;i++) ch[i]=dacQ(Math.sin(2*Math.PI*i/N));
+  ch[0]=0;
   let mn=0; for(let i=0;i<N;i++) mn+=ch[i]; mn/=N;
   for(let i=0;i<N;i++) ch[i]-=mn;
   chipDutyWaves[k]=buf; return buf;
@@ -3207,7 +3218,13 @@ function chipOnCore(key,vel=100){
   /* R34: старт с малым запасом к аудио-времени (как в midiOnCore) — чтобы
      setValueAtTime(0) ложился до первого семпла и атака не «склёвывала»
      ненулевой гейн (стартовый щелчок на плотном секвенсере). */
-  const t=audioCtx.currentTime+0.005;
+  /* R38-fix(16): старт на границе аудио-блока. WebAudio рендерит блоками 128
+     сэмплов; t=currentTime+0.005 попадает внутрь блока, и первый сэмпл звучит с
+     уже ненулевым гейном (дельта-выброс на старте, виден на сценографе при
+     полифонии). Округление вверх к границе блока + полблока даёт: первый сэмпл
+     голоса = ровно 0 гейна. */
+  const __blk=128/audioCtx.sampleRate;
+  const t=Math.ceil(audioCtx.currentTime/__blk)*__blk + __blk*0.5;
   const g=audioCtx.createGain();
   const peak=(v.nes?0.28:0.25)*Math.pow(vel/127,1.3);
   g.gain.setValueAtTime(0,t);
@@ -5024,15 +5041,29 @@ let __haloSeq=0;
    который давал прежний 1/(cos+sin), и делает громкость независимой от режима. */
 function haloRoute(node,key){
   try{
+    /* R38: голоса MIDI-плеера уходят в mpBus (свой каскад «кубик→кламп»),
+       а не в общий fxBus/master — так суммарная полифония плеера ограничивается
+       ДО попадания в лимитер синтезатора, треск в динамиках уходит. Живые
+       голоса синтезатора при этом идут старым путём (fxBus). */
+    if(window.__mpActive){
+      try{ if(!__mpBus) mpEnsureBus(); }catch(_){}
+      if(__mpBus && master){ node.connect(__mpBus); return; }
+      /* mpBus не построен — НЕ роняем голос: безопасно подключаем к fxBus/master */
+      try{ node.connect(fxBus||master); }catch(_){}
+      /* R38-fix(3): диагностика маршрута — при подозрении на немоту пишем первый случай */
+      if(!window.__haloWarned){ window.__haloWarned=true; try{ if(typeof log==='function') log('HALO: __mpActive, но нет mpBus/master — голос в fxBus/master'); }catch(_){} }
+      return;
+    }
     const w=window.__haloWidth/100;
-    if(!audioCtx){node.connect(fxBus||master);return;}
+    const dest=fxBus||master;
+    if(!audioCtx||!dest){ try{node.connect(dest);}catch(_){ } return; }
     /* R27 «БАЛАНС»: единая калибровка голосов под общий пик ~0.25 (как у CHIP).
        Без неё SF2 (пик до 0.9) громче CHIP/MIDI (0.24-0.28) в разы и клипает раньше.
        Мультипликатор зависит от движка, для которого создан голос. */
     const CAL={chip:1.0,sf2:0.31,midi:1.0,ym:1.0};
     const cal=CAL[state.mode]!==undefined?CAL[state.mode]:1.0;
     const g=audioCtx.createGain(); g.gain.value=cal;
-    if(w<=0||!audioCtx.createStereoPanner){node.connect(g);g.connect(fxBus||master);return;}
+    if(w<=0||!audioCtx.createStereoPanner){node.connect(g);g.connect(dest);return;}
     const seq=(__haloSeq++)%2?1:-1;
     const oct=(key/12)%3;
     /* мягкий: база 0.18..0.38 (сгружено к центру) · жёсткий: 0.55..0.85 (полный разброс) */
@@ -5040,8 +5071,11 @@ function haloRoute(node,key){
     const p=Math.max(-0.999,Math.min(0.999,seq*Math.min(1,w*base)));
     const pan=audioCtx.createStereoPanner();
     pan.pan.value=p;
-    node.connect(g);g.connect(pan);pan.connect(fxBus||master);
-  }catch(_){node.connect(fxBus||master);}
+    node.connect(g);g.connect(pan);pan.connect(dest);
+  }catch(_){
+    const safe=((window.__mpActive&&__mpBus)?__mpBus:(fxBus||master));
+    try{ node.connect(safe); }catch(__){ /* нет шины — голос тих, но плеер не падает */ }
+  }
 }
 function hqTick(){
   const now=performance.now();
@@ -5183,7 +5217,9 @@ function midiOnCore(k,vel=100){
      onTime = currentTime + 0.01). Гарантирует, что setValueAtTime(0) ложится
      ДО первого семпла осциллятора — иначе атака «склёвывала» ненулевое
      значение гейна (стартовый щелчок на плотном секвенсере). */
-  const t=audioCtx.currentTime+0.005;
+  /* R38-fix(16): старт на границе аудио-блока (см. chipOnCore) */
+  const __blk=128/audioCtx.sampleRate;
+  const t=Math.ceil(audioCtx.currentTime/__blk)*__blk + __blk*0.5;
   const g=audioCtx.createGain();
   g.gain.setValueAtTime(0,t);
   g.gain.linearRampToValueAtTime(peak,t+A);
@@ -5192,7 +5228,13 @@ function midiOnCore(k,vel=100){
   if(lp){ lp.type='lowpass'; lp.frequency.value=rec.cut*(rec.br?0.55+0.45*v:1); }
   const nodes=[];
   
-  const mw=midiWave(midiProg);
+  /* R38-fix(3): ГЛАВНЫЙ кандидат «MIDI молчит» — если midiWave вернул null
+     (пустой рецепт rec.p) или бросил исключение (createPeriodicWave сбой на
+     некоторых браузерах), ниже НЕТ осциллятора — голос пропадает молча.
+     Оборачиваем в try и при null/ошибке даём ЖИВОЙ рой-фолбэк из гармоник
+     rec.p (как было до R32), чтобы нота гарантированно звучала. */
+  let mw=null;
+  try{ mw=midiWave(midiProg); }catch(_){ mw=null; }
   if(mw){
     /* R0 «СЕМПЛЕР»: таблица программы из банка — один осциллятор (det: пара столов, биения как в легаси) */
     for(const sp of mw.parts){
@@ -5208,6 +5250,24 @@ function midiOnCore(k,vel=100){
          осцилляторов (тренд к тормозам и фоновому ровному гулу). */
       try{ osc.onended = ()=>{ try{ osc.disconnect(dest); }catch(_){ } }; }catch(_){}
     }
+  } else {
+    /* R38-fix(3): РОЙ-ФОЛБЭК — таблица не построилась (пустой rec.p или сбой
+       PeriodicWave). Играем базовыми осцилляторами из рецепта: часть фундаментала
+       + мягкая гармоника, чтобы нота слышалась, а не пропадала молча. */
+    try{
+      const wType=(rec.w==='square')?'square':(rec.w==='sawtooth')?'sawtooth':(rec.w==='triangle')?'triangle':'sine';
+      const baseOsc=audioCtx.createOscillator();
+      baseOsc.type=wType; baseOsc.frequency.value=f;
+      baseOsc.connect(lp||g); baseOsc.start(t); nodes.push(baseOsc);
+      if(rec.p && rec.p.length){
+        for(const pr of rec.p.slice(0,3)){
+          const o=audioCtx.createOscillator();
+          o.type=wType; o.frequency.value=f*pr[0];
+          const og=audioCtx.createGain(); og.gain.value=(pr[1]||0.5)*0.5;
+          o.connect(og); og.connect(lp||g); o.start(t); nodes.push(o);
+        }
+      }
+    }catch(_){}
   }
   if(rec.noise){
     const ns=audioCtx.createBufferSource(); ns.buffer=noiseBuffer('long'); ns.loop=true;
@@ -5229,10 +5289,13 @@ function midiOff(k){
   const v=activeMidi.get(k); if(!v) return;
   const t=audioCtx.currentTime, Rr=v.Rr;
   try{const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
-  /* v1.4.20: останов осцилляторов = 8 тау release — остаток за порогом слышимости */
-  const tauOff=Math.max(Rr/3,0.01);
-  v.g.gain.setTargetAtTime(0,t,tauOff);
-  const endOff=t+tauOff*8;
+  /* R38-fix(17) ДЕЛЬТА НА СТОПЕ: экспонента setTargetAtTime не даёт ровный ноль,
+     stop на остатке (~3e-4) давал микро-импульс на стопе. linearRamp до точного
+     0, stop ПОСЛЕ конца рампы (как chipOff/midiKill). */
+  const F=Math.max(Rr||0.02,0.015);
+  v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
+  v.g.gain.linearRampToValueAtTime(0,t+F);
+  const endOff=t+F+0.02;
   v.nodes.forEach(n=>{try{n.stop(endOff);}catch(_){}});
   activeMidi.delete(k); hl(k,false);
   setTimeout(()=>{try{v.g.disconnect();}catch(_){}},(endOff-t)*1000+80);
@@ -6243,7 +6306,11 @@ function mpEngineOn(eng, voice, k, vel){
       midiProg = +voice||0;
       midiOnCore(k, vel);
     }
-  }catch(_){}
+  }catch(err){
+    /* R38-fix(8): НЕ глотаем молча — иначе движок умирает без следа и «журнал
+       пуст, нота не звучит». Выводим ошибку, чтобы локализовать. */
+    try{ mlog('DBG: движок '+eng+' упал на ноте '+k+': '+(err&&err.stack?err.stack:(err&&err.message?err.message:err))); }catch(_){}
+  }
 }
 function mpEngineOff(eng, k){
   try{
@@ -6277,7 +6344,16 @@ const LA = 0.15; /* R31: 120→150 мс lookahead — меньше плотно�
    сверху и выжимаем самый старый голос, когда лимит исчерпан. */
 const MP_MAXVOICES = 24;
 function mpScheduleOn(e){
-  if(!audioCtx){ ensureAudio(); }
+  if(!audioCtx) ensureAudio();
+  /* R38-fix: РЕЗЮМЕ КОНТЕКСТА. Живые ноты идут через noteOn→chipOn→startCtx,
+     который делает audioCtx.resume(). Плеер же зовёт *Core напрямую (обход
+     startCtx в R31), поэтому контекст, созданный в состоянии suspended
+     (браузер требует жест, а «ИГРАТЬ ВСЕ» — это клик, но resume не вызывался),
+     оставался замороженным: голоса стартовали в остановленное время и звука
+     не было (логи и счётчик при этом работали). Резюмируем здесь принудительно. */
+  try{
+    if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  }catch(_){}
   const hk = e.eng+':'+e.note;
   /* R31: если этот ключ был украден steal-oldest'ом, снимаем метку «украдено» —
      новый голос живёт как обычно. */
@@ -6308,6 +6384,11 @@ function mpScheduleOn(e){
   mpEngineOn(e.eng, e.voice, e.note, e.vel||100);
   /* R35: счётчик нажатых нот живёт и при воспроизведении MIDI */
   try{ if(typeof bumpNoteCnt==='function') bumpNoteCnt(); }catch(_){}
+  /* R38-fix(7) ДИАГНОСТИКА: первая нота пишется в лог даже при __mpActive —
+     чтобы понять, доходит ли планирование до движков (симптом «журнал пуст»). */
+  if(!window.__mpDbgN){ window.__mpDbgN=true;
+    try{ mlog('DBG: первая on ['+e.eng+'] нота '+e.note+' ctx='+(audioCtx?audioCtx.state:'null')+' mpBus='+(__mpBus?'да':'нет')+' fxBus='+(fxBus?'да':'нет')); }catch(_){}
+  }
   /* R35: ПОТОЛОК НОТЫ = 1 ЦЕЛАЯ (правило движка). Если note-off не пришёл
      (легато/залипший MIDI), принудительно глушим голос через 240000/bpm мс.
      Ставим таймер ТОЛЬКО на первом нажатии, чтобы повторные on/reattack
@@ -6329,8 +6410,10 @@ function mpScheduleOn(e){
 }
 function mpScheduleOff(e){
   const hk = e.eng+':'+e.note;
-  /* R31: этот голос был украден и уже заглушен — повторный note-off игнорируем */
-  if(MPL.stolen.has(hk)){ MPL.stolen.delete(hk); MPL.live.delete(e.key); return; }
+  /* R38-fix(11) ЗАЛИПАНИЕ: раньше при stolen был return без mpEngineOff —
+     пересозданный голос после steal висел до потолка. Теперь глушим тем же
+     декрементом; движки безопасны (нет голоса — ничего не делают). */
+  MPL.stolen.delete(hk);
   /* R35: снимаем таймер потолка — note-off пришёл вовремя */
   if(MPL.ceiling.has(e.key)){ clearTimeout(MPL.ceiling.get(e.key)); MPL.ceiling.delete(e.key); }
   const n = (MPL.noteHold.get(hk)||0)-1;
@@ -6340,6 +6423,7 @@ function mpScheduleOff(e){
 }
 function mpTick(){
   if(!MPL.playing) return;
+
   /* R30: учёт скорости. События лежат в реальных секундах; пройденное время
      масштабируем на MPL.speed — ускорение/замедление без перестройки очереди. */
   const nowSec = (performance.now()-MPL.t0wall)/1000 * MPL.speed + MPL.startAt;
@@ -6406,6 +6490,10 @@ function mpPlayTrack(idx){
   if(!MPL.file){ mpLcd('MIDI: сначала загрузите файл.'); return; }
   if(!audioCtx) ensureAudio();
   if(MPL.playing) mpStopNow();
+  /* R38-fix: до старта таймера принудительно поднимаем контекст в running.
+     Используем startCtx движка (резюмит + ждёт), чтобы первый голос не стартовал
+     в замороженное аудио-время (иначе звука нет, хотя логи идут). */
+  try{ startCtx(function(){}); }catch(_){}
   window.__mpActive=true; /* R30: глушим нотный лог/подсветку на время игры */
   mpSetSpdHidden(true); /* R34: прячем кнопки скорости на время игры */
   MPL.soloIdx = idx;
@@ -6424,6 +6512,8 @@ function mpPlayAll(){
   if(!MPL.file){ mpLcd('MIDI: сначала загрузите файл.'); return; }
   if(!audioCtx) ensureAudio();
   if(MPL.playing) mpStopNow();
+  /* R38-fix: принудительный resume до старта таймера — см. mpPlayTrack */
+  try{ startCtx(function(){}); }catch(_){}
   window.__mpActive=true; /* R30: глушим нотный лог/подсветку на время игры */
   mpSetSpdHidden(true); /* R34: прячем кнопки скорости на время игры */
   MPL.evQueue = buildEvQueue();
@@ -6440,6 +6530,25 @@ function mpPlayAll(){
 
 /* ---------- загрузка файла ---------- */
 let midFileName='';
+/* R37: ПОЛНЫЙ СБРОС ПЛЕЕРА перед новой загрузкой. При замене файла стопуем
+   всё, что могло остаться от предыдущей песни: таймер mpTick, живой секвенсер,
+   таймеры потолка, рефкаунт, метки кражи, голоса и positions. Раньше эти поля
+   (evQueue/live/stolen/ceiling/evPtr/soloIdx) от первой песни висели, когда
+   MPL.file уже новый — стрелки старого файла продолжали слать note-off в
+   несуществующие голоса нового → код падал при замене файла. */
+function mpResetPlayer(){
+  try{ if(MPL.timer){ clearInterval(MPL.timer); MPL.timer=null; } }catch(_){}
+  MPL.playing=false;
+  MPL.soloIdx=-1;
+  MPL.evQueue=[]; MPL.evPtr=0; MPL.maxSec=0; MPL.startAt=0;
+  /* снять все таймеры потолка и очистить динамические карты */
+  try{ MPL.ceiling.forEach(t=>{ try{ clearTimeout(t); }catch(_){ } }); }catch(_){}
+  MPL.ceiling.clear();
+  MPL.live.clear(); MPL.stolen.clear(); MPL.noteHold.clear();
+  window.__mpActive=false;
+  /* глушим любые живые голоса синтезатора (дозавон PL.voice, chip/midi/ym/sf2) */
+  try{ panicAll(); }catch(_){}
+}
 function mpLoadFromInput(file){
   if(!file) return;
   if(!file.name.toLowerCase().match(/\.midi?$/)){ mpLcd('MIDI: нужен файл .mid/.midi'); return; }
@@ -6447,13 +6556,15 @@ function mpLoadFromInput(file){
   rd.onload = ()=>{
     try{
       const smf = parseSMF(rd.result);
+      /* сброс состояния плеера ДО установки нового файла */
+      mpResetPlayer();
       MPL.file = smf;
       midFileName = file.name;
       /* пересчёт max времени */
       let mx=0; for(const tr of smf.tracks){ for(const e of tr.events){ if(e.sec>mx) mx=e.sec; } }
       MPL.maxSec = mx;
-      if(MPL.playing) mpStopNow();
       buildTrackList();
+      mpSetSpdHidden(false); /* кнопки скорости снова видны до старта */
       mpLcd('MIDI: «'+file.name+'» — '+smf.tracks.length+' дорожек, '+smf.div+' PPQ.');
       mlog('MIDI: загружен «'+file.name+'» — '+smf.tracks.length+' дорожек (канал 10 отсечён).');
       const bp = $id('midBpm'); if(bp) bp.textContent = '120';
@@ -6463,6 +6574,39 @@ function mpLoadFromInput(file){
     }
   };
   rd.readAsArrayBuffer(file);
+}
+
+/* ═══ R38 «АНТИ-ЩЕЛЧОК для MIDI-плеера»:мягкое насыщение суммарного сигнала ═══
+   chip/GM дают до 24 отдельных осцилляторов, стартующих в микроокне — их сумма
+   в один сэмпл имеет резкие скачки (щелчки на атаке/сбросе), чего нет у YM
+   (FM-суммирование в ворклете сглажено). Все голоса плеера идут в __mpBus,
+   где пологый «кубик→кламп» (широкая линейная зона, насыщение только верхов)
+   срезает суммарные пики ДО попадания в fxBus/master. Живой синтезатор не
+   задет. */
+function mpEnsureBus(){
+  /* R38-fix(6) «ЕДИНЫЙ МАРШРУТ»: голоса плеера идут в ТОТ ЖЕ путь, что рабочий
+     YM (fxBus). __mpBus — субмикс-гейн всех голосов плеера перед fxBus.
+     Весь треск уже срезает общий master-clip синтезатора; отдельный лимитер
+     плееру не нужен. */
+  if(__mpBus) return true;
+  if(!audioCtx || !fxBus){
+    try{ if(!audioCtx || !master) ensureAudio(); }catch(_){}
+  }
+  if(!audioCtx || !fxBus) return false;
+  try{
+    __mpBus=audioCtx.createGain(); __mpBus.gain.value=0.55;
+    /* R38-fix(14) ДИАГНОСТИКА клиппера: WaveShaper с oversample 4x на сумме
+       резких квадратных фронтов может давать паразитный звон при полифонии
+       (треск при 2+ нотах, не зависящий от громкости - НЕ перегруз, т.к. при
+       N=2 и √N-нормировке fix13 сумма всего ~0.4). Убираем WaveShaper совсем
+       для проверки: __mpBus -> компрессор -> fxBus. */
+    const __mpLim=audioCtx.createDynamicsCompressor();
+    __mpLim.threshold.value=-14; __mpLim.knee.value=8;
+    __mpLim.ratio.value=4; __mpLim.attack.value=0.003; __mpLim.release.value=0.12;
+    __mpLim.makeupGain.value=2.2;
+    __mpBus.connect(__mpLim); __mpLim.connect(fxBus);
+    return true;
+  }catch(_){ return false; }
 }
 
 /* ---------- проводка ---------- */
