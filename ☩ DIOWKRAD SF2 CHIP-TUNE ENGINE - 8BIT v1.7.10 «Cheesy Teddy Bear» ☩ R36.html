@@ -4125,7 +4125,7 @@ function sfOnCore(key,vel=100){
   const old=activeSF2.get(key);
   if(old){
     const t0=audioCtx.currentTime;
-    try{ const G=old.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t0);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t0);G.setValueAtTime(holdV,t0);} G.setTargetAtTime(0,t0,0.01); old.src.stop(t0+0.1); }catch(_){}
+    try{ const G=old.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t0);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t0);G.setValueAtTime(holdV,t0);} const F0=0.05; G.linearRampToValueAtTime(0,t0+F0); old.src.stop(t0+F0+0.02); }catch(_){}
     activeSF2.delete(key);
   }
   /* потолок полифонии: при переполнении крадём самый старый голос */
@@ -4175,8 +4175,10 @@ function sfOff(key){
   const v=activeSF2.get(key); if(!v) return false;
   const t=audioCtx.currentTime;
   const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}
-  v.g.gain.setTargetAtTime(0,t,v.rel/3);
-  v.src.stop(t+v.rel*2);
+  const F2=Math.max(v.rel||0.02,0.015);
+  v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
+  v.g.gain.linearRampToValueAtTime(0,t+F2);
+  v.src.stop(t+F2+0.02);
   activeSF2.delete(key); hl(key,false);
   setTimeout(()=>{ try{ v.g.disconnect(); }catch(_){} },Math.round(v.rel*2*1000)+50); /* уборка после хвоста */
 }
@@ -4203,24 +4205,30 @@ function susDecay(key){ /* начало затухания по границе �
   const vC=activeChip.get(key);
   if(vC){
     try{const G=vC.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
-    vC.g.gain.setTargetAtTime(0,t,tau);
-    vC.nodes.forEach(n=>{try{n.stop(t+md.tail/1000);}catch(_){}});
+    const FC=Math.max(tau||0.01,0.015);
+    vC.g.gain.setValueAtTime(vC.g.gain.value||0.0001,t);
+    vC.g.gain.linearRampToValueAtTime(0,t+FC);
+    vC.nodes.forEach(n=>{try{n.stop(t+FC+0.02);}catch(_){}});
     activeChip.delete(key);
     setTimeout(()=>{try{vC.g.disconnect();}catch(_){}},md.tail+50);
   }
   const vS=activeSF2.get(key);
   if(vS){
     try{const G=vS.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
-    vS.g.gain.setTargetAtTime(0,t,tau);
-    try{vS.src.stop(t+md.tail/1000);}catch(_){}
+    const FS=Math.max(tau||0.01,0.015);
+    vS.g.gain.setValueAtTime(vS.g.gain.value||0.0001,t);
+    vS.g.gain.linearRampToValueAtTime(0,t+FS);
+    try{vS.src.stop(t+FS+0.02);}catch(_){}
     activeSF2.delete(key);
     setTimeout(()=>{try{vS.g.disconnect();}catch(_){}},md.tail+50);
   }
   const vM=activeMidi.get(key);
   if(vM){
     try{const G=vM.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
-    vM.g.gain.setTargetAtTime(0,t,tau);
-    vM.nodes.forEach(n=>{try{n.stop(t+md.tail/1000);}catch(_){}});
+    const FM=Math.max(tau||0.01,0.015);
+    vM.g.gain.setValueAtTime(vM.g.gain.value||0.0001,t);
+    vM.g.gain.linearRampToValueAtTime(0,t+FM);
+    vM.nodes.forEach(n=>{try{n.stop(t+FM+0.02);}catch(_){}});
     activeMidi.delete(key);
     setTimeout(()=>{try{vM.g.disconnect();}catch(_){}},md.tail+50);
   }
@@ -5152,7 +5160,9 @@ function midiDrain(){ /* R5: вызывается из updateFPS — раз за
             try{const t=audioCtx.currentTime;
                 v.g.gain.cancelScheduledValues(t);
                 v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
-                v.g.gain.setTargetAtTime(0,t,0.073);}catch(_){}
+                const FW=0.08;
+                v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
+                v.g.gain.linearRampToValueAtTime(0,t+FW);}catch(_){}
           }
           dampKeys.add(k);
         });
