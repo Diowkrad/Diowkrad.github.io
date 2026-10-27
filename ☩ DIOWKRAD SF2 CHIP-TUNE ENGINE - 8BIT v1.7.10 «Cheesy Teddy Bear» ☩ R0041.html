@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-<!-- 2431c14c9580f7f9 -->
+<!-- Хеш = 0 требуется верефикация и проверка файла. -->
 <!-- ☩ R17 «АСКОП»: сторожа разрыва и провала в обоих трактах, телеметрия с контекстом, кроссфейд матчинга 5 мс, бенды и фейзер на рампах ☩ -->
 <!-- ☩ R19 «ЧЕСТНОСТЬ»: имена и словарь R — только реальные рецепты (43), честный фолбэк p&~7 ☩ -->
 <!-- ☩ R20 «СТОЛБЕЦ»: настоящий опрос модулей вместо заглушки — ОК/предупреждение/ошибка и честный итог ☩ -->
@@ -3383,23 +3383,7 @@ function sineQBuffer(f){ /* синус через 4-бит DAC (15 уровне�
   chipDutyWaves[k]=buf; return buf;
 }
 
-function chipKill(key){ if(chipCore){ chipNewOff(key); return; } /* немедленное глушение — при повторном нажатии и при смене режима */
-  const v=activeChip.get(key); if(!v) return;
-  const t=audioCtx.currentTime;
-  const G=v.g.gain;
-  /* R34: явный линейный fadout к 0, stop строго ПОСЛЕ конца рампа.
-     Раньше stop(t+0.08) мог прийти на ещё недодошедший к нулю сигнал (резкий
-     обрыв = щелчок). Теперь: cancelAndHold → linearRamp до 0 за RELEASE,
-     stop в t+RELEASE+0.005 — сигнал уже в нуле, среза нет. */
-  const F = adsrConfig.release || 0.02;
-  if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}
-  G.setValueAtTime(G.value||0.0001,t);
-  G.linearRampToValueAtTime(0,t+F+0.005);
-  v.nodes.forEach(n=>{try{n.stop(t+F+0.01);}catch(_){}});
-  activeChip.delete(key); hl(key,false);
-  chipTails.set(key,{g:v.g,nodes:v.nodes}); /* R4: короткий хвост — регистрируем */
-  setTimeout(()=>{ chipTails.delete(key); },Math.round((F+0.02)*1000)+40);
-}
+function chipKill(key){ chipOff(key); }
 /* v1.4.20: реатака — осциллятор живёт в своей фазе, gain мягко доводится до нового пика */
 function chipReattack(key,vel=100){
   const v=activeChip.get(key); if(!v) return;
@@ -3432,7 +3416,7 @@ function startCtx(cb){
 /* ==== НОВЫЙ ПУТЬ ЧИП (архитектура YM): нота = регистр в ворклет, фикс-каналы ==== */
 const CHIP_VOICE_ENUM={'pulse50':0,'pulse25':1,'pulse12':2,'pulse6':3,'saw':4,'tri':5,'sine':6,'square':7,'pulseR':8,'nwave':9,'noiseL':10,'noiseS':11,'triBass':12,'sawBass':13,'sineBass':14};
 const chipNoteChan=new Map();
-const chipChanFree=[];
+const chipChanFree=Array.from({length:16},(_,i)=>i);
 const chipChanNote=new Array(16).fill(null);
 const chipChanSt=new Array(16).fill(0);
 function chipAudioReady(){
@@ -3441,19 +3425,20 @@ function chipAudioReady(){
     chip2413EnsureWorklet();
     if(chip2413State==='ready'){
       try{
-        chipNode=new AudioWorkletNode(audioCtx,'chip2413-proc',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[1]});
+        chipNode=new AudioWorkletNode(audioCtx,'chip2413-proc',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1]});
         try{ const _z=audioCtx.createBuffer(1,128,audioCtx.sampleRate),_zs=audioCtx.createBufferSource();_zs.buffer=_z;_zs.loop=true;_zs.connect(chipNode);_zs.start(); }catch(_){}
         chipCore=CHIP2413_BRIDGE(chipNode);
+        try{ chipNode.port.onmessage=function(ev){ const d=(ev&&ev.data)||{}; if(d.beat){ chipAlive=true; } }; }catch(_){}
         chipGain=audioCtx.createGain(); chipGain.gain.value=1.0;
         try{
-          if(audioCtx.createStereoPanner){ chipPan=audioCtx.createStereoPanner(); chipPan.pan.value=Math.max(-0.999,Math.min(0.999,(window.__haloWidth||0)/100*0.5)); chipGain.connect(chipPan); chipPan.connect(fxBus); }
-          else chipGain.connect(fxBus);
-        }catch(_){ chipGain.connect(fxBus); }
+          if(audioCtx.createStereoPanner){ chipPan=audioCtx.createStereoPanner(); chipPan.pan.value=Math.max(-0.999,Math.min(0.999,(window.__haloWidth||0)/100*0.5)); chipGain.connect(chipPan); } else { chipPan=null; }
+          chipReroute();
+        }catch(_){ chipPan=null; chipReroute(); }
         log('CHIP2413: аудио-конвейер запущен (16 каналов, сэмпл-точный).');
       }catch(e){ log('CHIP2413: не удалось создать узел — фолбэк старый чип. '+(e&&e.message?e.message:e)); chipCore=null; return false; }
     }
   }
-  return !!chipCore;
+  if(chipAlive) return !!chipCore; return false; /* пока ворклет не подтвердил тик — используем старый путь */
 }
 function chipVoiceEnum(id){ const e=CHIP_VOICE_ENUM[id]; return (e===undefined)?0:e; }
 function chipNewOn(key,vel){
@@ -3462,11 +3447,11 @@ function chipNewOn(key,vel){
     let ch=chipNoteChan.get(key);
     if(ch===undefined){
       ch = chipChanFree.length ? chipChanFree.shift() : null;
-      if(ch===null){
+if(ch===null){
         let old=null,oldT=Infinity;
         for(let i=0;i<16;i++){ if(chipChanNote[i]!==null && (chipChanSt[i]||0)<oldT){ oldT=chipChanSt[i]; old=i; } }
         ch = (old===null)? 0 : old;
-        if(old!==null){ chipCore.set_register(0x20,1<<old); chipChanNote[old]=null; }
+        if(old!==null){ chipCore.set_register(0x20,1<<old); const ok=chipChanNote[old]; chipChanNote[old]=null; if(ok!==null&&chipNoteChan.get(ok)===old){ chipNoteChan.delete(ok); hl(ok,false); } }
       }
     }
     chipCore.set_register(0x10+ch, chipVoiceEnum(state.chipVoice));
@@ -3487,7 +3472,7 @@ function chipNewOff(key){
 }
 function chipNewKill(key){ if(chipCore) chipNewOff(key); }
 
-function chipOn(key,vel=100){ startCtx(function(){ if( !chipNewOn(key,vel) ) chipOnCore(key,vel); }); }
+function chipOn(key,vel=100){ startCtx(function(){ chipOnCore(key,vel); }); }
 function chipOnCore(key,vel=100){
   ensureAudio();
   /* v1.4.20: повторное нажатие звучащей ноты — реатака живого голоса, а не перезапуск */
@@ -3606,24 +3591,20 @@ function chipOnCore(key,vel=100){
   hl(key,true);
   if(!window.__mpActive) log('CHIP: нота '+key+' ['+v.name+'] '+info);
 }
-function chipOff(key){ if(chipCore){ chipNewOff(key); return; }
-  const v=activeChip.get(key); if(!v) return;
-  const t=audioCtx.currentTime;
-  const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}
-  G.linearRampToValueAtTime(0,t+adsrConfig.release); /* R8: линейный релиз из adsrConfig */
-  v.nodes.forEach(n=>{try{n.stop(t+adsrConfig.release+CHIP_TAIL_MS);}catch(_){}}); /* R8: останов производен от конфига */
-  activeChip.delete(key); hl(key,false);
-  chipTails.set(key,{g:v.g,nodes:v.nodes}); /* R4/R8: хвост = release+тейл — реприз знает про него */
-  setTimeout(()=>{ chipTails.delete(key); try{ v.g.disconnect(); }catch(_){} },adsrConfig.release*1000+60);
+function chipOff(key){
+  if(activeChip.has(key)){ /* старый голос */
+    try{ const v=activeChip.get(key); const t=audioCtx.currentTime; const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const h=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(h,t);} G.linearRampToValueAtTime(0,t+adsrConfig.release); v.nodes.forEach(nd=>{try{nd.stop(t+adsrConfig.release+CHIP_TAIL_MS);}catch(_){}}); activeChip.delete(key); hl(key,false); chipTails.set(key,{g:v.g,nodes:v.nodes}); setTimeout(()=>{ chipTails.delete(key); try{ v.g.disconnect(); }catch(_){} },adsrConfig.release*1000+60); }catch(_){}
+  }
+if(chipNoteChan.has(key)){ chipNewOff(key); }
 }
 /* ---------- режимы и выбор голоса ---------- */
 function setMode(m){
   if(state.mode===m) return;
   state.mode=m;
   susClearAll();
-  [...activeChip.keys()].forEach(k=>chipKill(k));
+[...new Set([...activeChip.keys(),...chipNoteChan.keys()])].forEach(k=>chipKill(k));
   [...activeSF2.keys()].forEach(k=>sfOff(k));
-  [...activeMidi.keys()].forEach(k=>midiKill(k));
+  [...new Set([...activeMidi.keys(),...gmNoteChan.keys()])].forEach(k=>midiKill(k));
   [...activeYm.keys()].forEach(k=>ymKill(k));
   $('#btnChip').classList.toggle('on',m==='chip');
   $('#btnSf2').classList.toggle('on',m==='sf2');
@@ -4627,8 +4608,8 @@ function pmMuteAll(){
   for(const t of killTimers.values()) clearTimeout(t.t); killTimers.clear();
   sustained.clear(); susClearAll(); dampKeys.clear(); chrMap.clear();
   [...activeSF2.keys()].forEach(k=>sfOff(k));
-  [...activeChip.keys()].forEach(k=>chipOff(k));
-  [...activeMidi.keys()].forEach(k=>midiOff(k));
+  [...new Set([...activeChip.keys(),...chipNoteChan.keys()])].forEach(k=>chipOff(k));
+  [...new Set([...activeMidi.keys(),...gmNoteChan.keys()])].forEach(k=>midiOff(k));
   [...activeYm.keys()].forEach(k=>ymOff(k));
   chipTails.forEach((tn,k)=>chipTailKill(k,'телефонный мьют')); /* R5: мьют не оставляет звенящих хвостов */
   updVoices();
@@ -5201,8 +5182,8 @@ function panicAll(){
   sustainOn=false; sustained.clear(); susClearAll(); noteOwner.clear(); extHold.clear(); /* R9 */
   for(const t of killTimers.values()) clearTimeout(t.t); killTimers.clear();
   [...activeSF2.keys()].forEach(k=>sfOff(k));
-  [...activeChip.keys()].forEach(k=>chipOff(k));
-  [...activeMidi.keys()].forEach(k=>midiOff(k));
+  [...new Set([...activeChip.keys(),...chipNoteChan.keys()])].forEach(k=>chipOff(k));
+  [...new Set([...activeMidi.keys(),...gmNoteChan.keys()])].forEach(k=>midiOff(k));
   [...activeYm.keys()].forEach(k=>ymOff(k));
   chipTails.forEach((tn,k)=>chipTailKill(k,'panic')); /* R5: паника не оставляет звенящих хвостов */
   updVoices();
@@ -5365,6 +5346,28 @@ function haloRoute(node,key){
     try{ node.connect(safe); }catch(__){ /* нет шины — голос тих, но плеер не падает */ }
   }
 }
+
+function chipReroute(){
+  try{
+    if(!chipGain) return;
+    const out=(chipPan&&audioCtx)?chipPan:chipGain;
+    if(!out) return;
+    try{ out.disconnect(); }catch(_){}
+    if(window.__mpActive){ if(!__mpBus && !mpEnsureBus()) throw 0; if(__mpBus){ out.connect(__mpBus); return; } }
+    const dest=fxBus||master; if(dest) out.connect(dest);
+  }catch(_){ try{ const o=(chipPan||chipGain); const d=(window.__mpActive&&__mpBus)||fxBus||master; if(o&&d) o.connect(d); }catch(__){ } }
+}
+function gmReroute(){
+  try{
+    if(!gmGain) return;
+    const out=(gmPan&&audioCtx)?gmPan:gmGain;
+    if(!out) return;
+    try{ out.disconnect(); }catch(_){}
+    if(window.__mpActive){ if(!__mpBus && !mpEnsureBus()) throw 0; if(__mpBus){ out.connect(__mpBus); return; } }
+    const dest=fxBus||master; if(dest) out.connect(dest);
+  }catch(_){ try{ const o=(gmPan||gmGain); const d=(window.__mpActive&&__mpBus)||fxBus||master; if(o&&d) o.connect(d); }catch(__){ } }
+}
+function mpRerouteAll(){ try{ chipReroute(); }catch(_){} try{ gmReroute(); }catch(_){} }
 function hqTick(){
   const now=performance.now();
   if(now-hqLast<100)return; hqLast=now;
@@ -5489,7 +5492,7 @@ function midiReattack(k,vel=100){
   G.setTargetAtTime(Math.max(peak*S,0.0001), t+aT, D);
 }
 /* ==== GM (MIDI) НА АРХИТЕКТУРЕ YM (worklet) ==== */
-const GM2413_WORKLET_SRC="'use strict';\n/* GM (MIDI) эмулятор на архитектуре YM2413: нота = сообщение, фикс-каналы,\n   аддитивная волна из рецепта (тембр как midiWave) + ADSR внутри. */\nconst GM2N=1024;\nfunction gm2Fourier(w,k){\n  if(w==='square')   return (k%2)? 4/(Math.PI*k) : 0;\n  if(w==='triangle') return (k%2)? 8/(Math.PI*Math.PI*k*k)*Math.pow(-1,(k-1)/2) : 0;\n  if(w==='sawtooth') return 2/(Math.PI*k);\n  return (k===1)? 1 : 0; /* sine */\n}\nconst GM2WAVE=new Map();\nfunction gm2Wave(rec){\n  const key=String((rec.w||'sine'))+':'+JSON.stringify(rec.p);\n  const hit=GM2WAVE.get(key); if(hit) return hit;\n  let parts=rec.p||[]; if(!parts.length) parts=[[1,1]];\n  const N=GM2N, buf=new Float32Array(N);\n  const w=rec.w||'sine';\n  const hasNonInt=parts.some(pr=>Math.abs(pr[0]-Math.round(pr[0]))>1e-9);\n  if(hasNonInt){\n    for(let i=0;i<N;i++){\n      let s=0;\n      for(const [r,a] of parts){ let k=1; while(r*k<N){ s+=gm2Fourier(w,k)*a*Math.sin(2*Math.PI*r*k*i/N); k++; } }\n      buf[i]=s;\n    }\n  } else {\n    for(const [ri,a] of parts){\n      const r=Math.round(ri);\n      for(let k=1;k*r<N;k++){ buf[r*k-1]+=gm2Fourier(w,k)*a; }\n    }\n    // повернуть? Нет: buf[n] = выборочная амплитуда для гармоники n+1,\n    // но нам нужна ВРЕМЕННАЯ выборка. Построим временной ряд из гармоник.\n    const tmp=new Float32Array(N);\n    for(let n=0;n<N;n++){\n      let s=0;\n      for(let h=1;h<N;h++){ const c=buf[h-1]; if(c) s+=c*Math.sin(2*Math.PI*h*n/N); }\n      tmp[n]=s;\n    }\n    buf.set(tmp);\n  }\n  let peak=0.0001; for(let i=0;i<N;i++){ const a=buf[i]<0?-buf[i]:buf[i]; if(a>peak)peak=a; }\n  if(peak>1.0){ const inv=1/peak; for(let i=0;i<N;i++) buf[i]*=inv; }\n  GM2WAVE.set(key,buf); return buf;\n}\nclass GM2Chan {\n  constructor(){ this.reset(); }\n  reset(){\n    this.state='F'; this.note=-1; this.vel=100;\n    this.rec=null; this.wav=null; this.phase=0;\n    this.f0=440;\n    this.g=0; this.peak=0.24; this.sustain=0.5;\n    this.aS=0.01; this.dS=0.3; this.rS=0.2;\n    this.noise=0; this.noiseTick=0; this.lfsr=1; this.noiseMix=0;\n    this.lpA=1; this.lpf=0;\n  }\n  setRec(rec){\n    this.rec=rec;\n    this.aS=rec.a||0.01; this.dS=Math.max(rec.d||0.3,0.01); this.sustain=(rec.s==null?0.5:rec.s); this.rS=rec.r||0.2;\n    this.noiseMix=rec.noise||0;\n    this.wav=gm2Wave(rec);\n  }\n  keyOn(note,vel,rec){\n    this.note=note; this.vel=vel||100;\n    if(rec){ this.setRec(rec); } else if(!this.wav){ this.setRec(this.rec||{w:'sine',p:[[1,1]]}); }\n    const v=Math.max(0.06,Math.min(1,(this.vel||100)/127));\n    this.peak=0.24*(0.35+0.65*v)*(this.rec.lvl||1);\n    this.phase=0; this.lpf=0; this.noiseTick=0; this.lfsr=1;\n    const cut=this.rec.cut? this.rec.cut : 30000;\n    const br=this.rec.br===undefined? 1: this.rec.br;\n    const eff=cut*(br?(0.55+0.45*v):1);\n    this.lpA= (eff>29900)? 0 : (2*Math.PI*eff/48000); if(this.lpA>1)this.lpA=1; this.noise=this.noiseMix;\n    const base=440*Math.pow(2,(note-69)/12);\n    this.f0=base*(this.rec.det? Math.pow(2,this.rec.det/1200):1);\n    this.state='A'; this.g=0; this.gTarget=this.peak;\n    this.gStep=this.peak/Math.max(1,this.aS*48000);\n  }\n  keyOff(){ if(this.state==='F')return; this.state='R'; this.gTarget=0; const cur=this.g||0.0001; this.gStep=cur/Math.max(1,this.rS*48000); }\n  calc(){\n    if(this.state==='F') return 0;\n    if(this.state==='A'){ this.g+=this.gStep; if(this.g>=this.gTarget){ this.g=this.gTarget; const susL=this.gTarget*this.sustain; this.gTarget=susL; this.state='D'; this.gStep=(this.g-susL)/Math.max(1,this.dS*48000); } }\n    else if(this.state==='D'){ this.g-=this.gStep; if(this.g<=this.gTarget){ this.g=this.gTarget; this.state='S'; this.gStep=0; } }\n    else if(this.state==='S'){}\n    else if(this.state==='R'){ this.g-=this.gStep; if(this.g<=0){ this.g=0; this.state='F'; return 0; } }\n    let w;\n    if(this.noise>0){\n      if(this.noiseTick<=0){ this.noiseTick=4; const fb=(this.lfsr&1)^((this.lfsr>>1)&1); this.lfsr=(this.lfsr>>1)|(fb<<14); w=(this.lfsr&1)?1:-1; } else { --this.noiseTick; w=(this.lfsr&1)?1:-1; }\n    } else {\n      const idx=this.phase|0; w=this.wav[idx%this.wav.length];\n    }\n    // phase advance: целое число сэмплов не подходит для октав; используем фракционную через step\n    const step=(this.f0/48000)*GM2N;\n    this.phase+=step; while(this.phase>=GM2N)this.phase-=GM2N;\n    if(this.lpA>0 && this.lpA<1){ this.lpf+=this.lpA*(w-this.lpf); w=this.lpf; } else { this.lpf=w; }\n    let out=w*this.g;\n    return out;\n  }\n}\nclass GM2413_ {\n  constructor(){ this.channels=[]; for(let i=0;i<32;i++) this.channels.push(new GM2Chan()); }\n  msg(m){\n    if(m.type==='noteOn'){\n      const ch=this.free(); if(ch<0){ for(let i=0;i<32;i++) this.channels[i].keyOff(); return; }\n      this.channels[ch].keyOn(m.note,m.vel,m.rec);\n    } else if(m.type==='noteOff'){\n      for(let i=0;i<32;i++){ const c=this.channels[i]; if(c.note===m.note && c.state!=='F') c.keyOff(); }\n    } else if(m.type==='panic'){ for(let i=0;i<32;i++)this.channels[i].keyOff(); }\n  }\n  free(){ for(let i=0;i<32;i++) if(this.channels[i].state==='F') return i; return -1; }\n  calc(){ let s=0; for(let i=0;i<32;i++) s+=this.channels[i].calc(); return s*0.5; }\n}\nclass GM2413Proc_ extends AudioWorkletProcessor {\n  constructor(){ super(); this.core=new GM2413_(); this.port.onmessage=(e)=>{ const d=e.data||{}; if(d.type) this.core.msg(d); }; }\n  process(inputs,outputs){ const out=outputs[0]&&outputs[0][0]; if(!out)return true;\n    for(let i=0;i<out.length;i++){ let s=this.core.calc(); if(!isFinite(s))s=0; if(s>1)s=1;else if(s<-1)s=-1; out[i]=s; } return true; }\n}\nregisterProcessor('gm2413-proc', GM2413Proc_);";
+const GM2413_WORKLET_SRC="'use strict';\n/* GM (MIDI) эмулятор на архитектуре YM2413: нота = сообщение, фикс-каналы,\n   аддитивная волна из рецепта (тембр как midiWave) + ADSR внутри. */\nconst GM2N=1024;\nfunction gm2Fourier(w,k){\n  if(w==='square')   return (k%2)? 4/(Math.PI*k) : 0;\n  if(w==='triangle') return (k%2)? 8/(Math.PI*Math.PI*k*k)*Math.pow(-1,(k-1)/2) : 0;\n  if(w==='sawtooth') return 2/(Math.PI*k);\n  return (k===1)? 1 : 0; /* sine */\n}\nconst GM2WAVE=new Map();\nfunction gm2Wave(rec){\n  const key=String((rec.w||'sine'))+':'+JSON.stringify(rec.p);\n  const hit=GM2WAVE.get(key); if(hit) return hit;\n  let parts=rec.p||[]; if(!parts.length) parts=[[1,1]];\n  const N=GM2N, buf=new Float32Array(N);\n  const w=rec.w||'sine';\n  const hasNonInt=parts.some(pr=>Math.abs(pr[0]-Math.round(pr[0]))>1e-9);\n  if(hasNonInt){\n    for(let i=0;i<N;i++){\n      let s=0;\n      for(const [r,a] of parts){ let k=1; while(r*k<N){ s+=gm2Fourier(w,k)*a*Math.sin(2*Math.PI*r*k*i/N); k++; } }\n      buf[i]=s;\n    }\n  } else {\n    for(const [ri,a] of parts){\n      const r=Math.round(ri);\n      for(let k=1;k*r<N;k++){ buf[r*k-1]+=gm2Fourier(w,k)*a; }\n    }\n    // повернуть? Нет: buf[n] = выборочная амплитуда для гармоники n+1,\n    // но нам нужна ВРЕМЕННАЯ выборка. Построим временной ряд из гармоник.\n    const tmp=new Float32Array(N);\n    for(let n=0;n<N;n++){\n      let s=0;\n      for(let h=1;h<N;h++){ const c=buf[h-1]; if(c) s+=c*Math.sin(2*Math.PI*h*n/N); }\n      tmp[n]=s;\n    }\n    buf.set(tmp);\n  }\n  let peak=0.0001; for(let i=0;i<N;i++){ const a=buf[i]<0?-buf[i]:buf[i]; if(a>peak)peak=a; }\n  if(peak>1.0){ const inv=1/peak; for(let i=0;i<N;i++) buf[i]*=inv; }\n  GM2WAVE.set(key,buf); return buf;\n}\nclass GM2Chan {\n  constructor(){ this.reset(); }\n  reset(){\n    this.state='F'; this.note=-1; this.vel=100;\n    this.rec=null; this.wav=null; this.phase=0;\n    this.f0=440;\n    this.g=0; this.peak=0.24; this.sustain=0.5;\n    this.aS=0.01; this.dS=0.3; this.rS=0.2;\n    this.noise=0; this.noiseTick=0; this.lfsr=1; this.noiseMix=0;\n    this.lpA=1; this.lpf=0;\n  }\n  setRec(rec){\n    this.rec=rec;\n    this.aS=rec.a||0.01; this.dS=Math.max(rec.d||0.3,0.01); this.sustain=(rec.s==null?0.5:rec.s); this.rS=rec.r||0.2;\n    this.noiseMix=rec.noise||0;\n    this.wav=gm2Wave(rec);\n  }\n  keyOn(note,vel,rec){\n    this.note=note; this.vel=vel||100;\n    if(rec){ this.setRec(rec); } else if(!this.wav){ this.setRec(this.rec||{w:'sine',p:[[1,1]]}); }\n    const v=Math.max(0.06,Math.min(1,(this.vel||100)/127));\n    this.peak=0.24*(0.35+0.65*v)*(this.rec.lvl||1);\n    this.phase=0; this.lpf=0; this.noiseTick=0; this.lfsr=1;\n    const cut=this.rec.cut? this.rec.cut : 30000;\n    const br=this.rec.br===undefined? 1: this.rec.br;\n    const eff=cut*(br?(0.55+0.45*v):1);\n    this.lpA= (eff>29900)? 0 : (2*Math.PI*eff/48000); if(this.lpA>1)this.lpA=1; this.noise=this.noiseMix;\n    const base=440*Math.pow(2,(note-69)/12);\n    this.f0=base*(this.rec.det? Math.pow(2,this.rec.det/1200):1);\n    this.state='A'; this.g=0; this.gTarget=this.peak;\n    this.gStep=this.peak/Math.max(1,this.aS*48000);\n  }\n  keyOff(){ if(this.state==='F')return; this.state='R'; this.gTarget=0; const cur=this.g||0.0001; this.gStep=cur/Math.max(1,this.rS*48000); }\n  calc(){\n    if(this.state==='F') return 0;\n    if(this.state==='A'){ this.g+=this.gStep; if(this.g>=this.gTarget){ this.g=this.gTarget; const susL=this.gTarget*this.sustain; this.gTarget=susL; this.state='D'; this.gStep=(this.g-susL)/Math.max(1,this.dS*48000); } }\n    else if(this.state==='D'){ this.g-=this.gStep; if(this.g<=this.gTarget){ this.g=this.gTarget; this.state='S'; this.gStep=0; } }\n    else if(this.state==='S'){}\n    else if(this.state==='R'){ this.g-=this.gStep; if(this.g<=0){ this.g=0; this.state='F'; return 0; } }\n    let w;\n    if(this.noise>0){\n      if(this.noiseTick<=0){ this.noiseTick=4; const fb=(this.lfsr&1)^((this.lfsr>>1)&1); this.lfsr=(this.lfsr>>1)|(fb<<14); w=(this.lfsr&1)?1:-1; } else { --this.noiseTick; w=(this.lfsr&1)?1:-1; }\n    } else {\n      const idx=this.phase|0; w=this.wav[idx%this.wav.length];\n    }\n    // phase advance: целое число сэмплов не подходит для октав; используем фракционную через step\n    const step=(this.f0/48000)*GM2N;\n    this.phase+=step; while(this.phase>=GM2N)this.phase-=GM2N;\n    if(this.lpA>0 && this.lpA<1){ this.lpf+=this.lpA*(w-this.lpf); w=this.lpf; } else { this.lpf=w; }\n    let out=w*this.g;\n    return out;\n  }\n}\nclass GM2413_ {\n  constructor(){ this.channels=[]; for(let i=0;i<32;i++) this.channels.push(new GM2Chan()); }\n  msg(m){\n    if(m.type==='noteOn'){\n      const ch=this.free(); if(ch<0){ for(let i=0;i<32;i++) this.channels[i].keyOff(); return; }\n      this.channels[ch].keyOn(m.note,m.vel,m.rec);\n    } else if(m.type==='noteOff'){\n      for(let i=0;i<32;i++){ const c=this.channels[i]; if(c.note===m.note && c.state!=='F') c.keyOff(); }\n    } else if(m.type==='panic'){ for(let i=0;i<32;i++)this.channels[i].keyOff(); }\n  }\n  free(){ for(let i=0;i<32;i++) if(this.channels[i].state==='F') return i; return -1; }\n  calc(){ let s=0; for(let i=0;i<32;i++) s+=this.channels[i].calc(); return s*0.5; }\n}\nclass GM2413Proc_ extends AudioWorkletProcessor {\n  constructor(){ super(); this.__beats=0; this.core=new GM2413_(); this.port.onmessage=(e)=>{ const d=e.data||{}; if(d.type) this.core.msg(d); }; }\n  process(inputs,outputs){ const out=outputs[0]&&outputs[0][0]; if(!out)return true; this.__beats+=(out&&out.length)||0; if(this.__beats>9600){ this.__beats=0; try{ this.port.postMessage({beat:1}); }catch(_){} }\n    for(let i=0;i<out.length;i++){ let s=this.core.calc(); if(!isFinite(s))s=0; if(s>1)s=1;else if(s<-1)s=-1; out[i]=s; } return true; }\n}\nregisterProcessor('gm2413-proc', GM2413Proc_);";
 
 
 /* ==== GM (MIDI) на архитектуре YM: bridge + init + новый путь ==== */
@@ -5515,19 +5518,20 @@ function gmAudioReady(){
     gm2413EnsureWorklet();
     if(gm2413State==='ready'){
       try{
-        gmNode=new AudioWorkletNode(audioCtx,'gm2413-proc',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[1]});
+        gmNode=new AudioWorkletNode(audioCtx,'gm2413-proc',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1]});
         try{ const _z=audioCtx.createBuffer(1,128,audioCtx.sampleRate),_zs=audioCtx.createBufferSource();_zs.buffer=_z;_zs.loop=true;_zs.connect(gmNode);_zs.start(); }catch(_){}
         gmCore=GM2413_BRIDGE(gmNode);
+        try{ gmNode.port.onmessage=function(ev){ const d=(ev&&ev.data)||{}; if(d.beat){ gmAlive=true; } }; }catch(_){}
         gmGain=audioCtx.createGain(); gmGain.gain.value=1.0;
         try{
-          if(audioCtx.createStereoPanner){ gmPan=audioCtx.createStereoPanner(); gmPan.pan.value=Math.max(-0.999,Math.min(0.999,(window.__haloWidth||0)/100*0.5)); gmGain.connect(gmPan); gmPan.connect(fxBus); }
-          else gmGain.connect(fxBus);
-        }catch(_){ gmGain.connect(fxBus); }
+          if(audioCtx.createStereoPanner){ gmPan=audioCtx.createStereoPanner(); gmPan.pan.value=Math.max(-0.999,Math.min(0.999,(window.__haloWidth||0)/100*0.5)); gmGain.connect(gmPan); } else { gmPan=null; }
+          gmReroute();
+        }catch(_){ gmPan=null; gmReroute(); }
         log('GM2413: аудио-конвейер запущен (32 канала, сэмпл-точный).');
       }catch(e){ log('GM2413: не удалось создать узел — фолбэк старый. '+(e&&e.message?e.message:e)); gmCore=null; return false; }
     }
   }
-  return !!gmCore;
+  if(gmAlive) return !!gmCore; return false; /* пока ворклет не подтвердил — старый путь */
 }
 function midiNewOn(k,vel){
   if(!gmAudioReady()) return false;
@@ -5548,7 +5552,7 @@ function midiNewOff(k){
 }
 function midiNewKill(k){ if(gmCore) midiNewOff(k); }
 
-function midiOn(k,vel=100){ startCtx(function(){ if( !midiNewOn(k,vel) ) midiOnCore(k,vel); }); }
+function midiOn(k,vel=100){ startCtx(function(){ midiOnCore(k,vel); }); }
 function midiOnCore(k,vel=100){
   ensureAudio();
   /* v1.4.20: повторное нажатие звучащей ноты — реатака без пересоздания гармоник */
@@ -5635,37 +5639,13 @@ function midiOnCore(k,vel=100){
     nodes.forEach(n=>{try{n.stop(end);}catch(_){}});
   }
 }
-function midiOff(k){ if(gmCore && !activeMidi.has(k)){ midiNewOff(k); return; }
-  const v=activeMidi.get(k); if(!v) return;
-  const t=audioCtx.currentTime, Rr=v.Rr;
-  try{const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);}}catch(_){}
-  /* R38-fix(17) ДЕЛЬТА НА СТОПЕ: экспонента setTargetAtTime не даёт ровный ноль,
-     stop на остатке (~3e-4) давал микро-импульс на стопе. linearRamp до точного
-     0, stop ПОСЛЕ конца рампы (как chipOff/midiKill). */
-  const F=Math.max(Rr||0.02,0.015);
-  v.g.gain.setValueAtTime(v.g.gain.value||0.0001,t);
-  v.g.gain.linearRampToValueAtTime(0,t+F);
-  const endOff=t+F+0.02;
-  v.nodes.forEach(n=>{try{n.stop(endOff);}catch(_){}});
-  activeMidi.delete(k); hl(k,false);
-  setTimeout(()=>{try{v.g.disconnect();}catch(_){}},(endOff-t)*1000+80);
-  updVoices();
+function midiOff(k){
+  if(activeMidi.has(k)){ /* старый голос */
+    try{ const v=activeMidi.get(k); const t=audioCtx.currentTime, Rr=v.Rr; const G=v.g.gain; if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const h=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(h,t);} const F=Math.max(Rr||0.02,0.015); G.setValueAtTime(G.value||0.0001,t); G.linearRampToValueAtTime(0,t+F); const eo=t+F+0.02; v.nodes.forEach(nd=>{try{nd.stop(eo);}catch(_){}}); activeMidi.delete(k); hl(k,false); setTimeout(()=>{try{v.g.disconnect();}catch(_){}},(eo-t)*1000+60); updVoices(); }catch(_){}
+  }
+if(gmNoteChan.has(k)){ midiNewOff(k); }
 }
-function midiKill(k){ if(gmCore && !activeMidi.has(k)){ midiNewOff(k); return; }
-  const v=activeMidi.get(k); if(!v) return;
-  const t=audioCtx.currentTime;
-  const G=v.g.gain;
-  /* R34: linearRamp fadout к нулю, stop строго ПОСЛЕ конца рампа (как chipKill) —
-     убирает щелчок от stop на ещё звучащем сигнале при steal/панике. */
-  const F = Math.max(v.Rr||0.02, 0.015);
-  try{ if(G.cancelAndHoldAtTime){G.cancelAndHoldAtTime(t);}else{const holdV=G.value||0.0001;G.cancelScheduledValues(t);G.setValueAtTime(holdV,t);} }catch(_){}
-  G.setValueAtTime(G.value||0.0001,t);
-  G.linearRampToValueAtTime(0,t+F+0.005);
-  v.nodes.forEach(n=>{try{n.stop(t+F+0.01);}catch(_){}});
-  activeMidi.delete(k); hl(k,false);
-  setTimeout(()=>{try{v.g.disconnect();}catch(_){}},Math.round((F+0.03)*1000)); /* с запасом после стопа */
-  updVoices();
-}
+function midiKill(k){ midiOff(k); }
 function buildMidiSel(){
   const sel=document.getElementById('midiVoiceSel'); if(!sel) return;
   sel.innerHTML='';
@@ -6478,7 +6458,7 @@ function wavSeqRun(mode){
 
 /* ==== ЧИП 2A03: bridge + init (архитектура YM) ==== */
 let chip2413State='idle'; let chipNode=null, chipGain=null, chipPan=null;
-var chipCore=null;
+var chipCore=null; var chipAlive=false; var gmAlive=false; var chipFrozen=false, gmFrozen=false;
 function CHIP2413_BRIDGE(node){
   return { set_register:function(a,v){ try{ node.port.postMessage({reg:a&255,val:v&255}); }catch(_){} } };
 }
@@ -6493,7 +6473,7 @@ function chip2413EnsureWorklet(){
   }catch(e){ chip2413State='fail'; }
 }
 /* ==== ЧИП 2A03 НА АРХИТЕКТУРЕ YM (worklet) ==== */
-const CHIP2413_WORKLET_SRC="'use strict';\n/* CHIP 2A03-эмулятор для AudioWorklet. Архитектура YM2413: нота = регистр,\n   фикс-каналы, ADSR внутри. Волна — буфер (бит-в-бит тембр dutyBuffer). */\nconst CHIPCONST = {\n  CPU: 1789773,\n  DUTY_PAT: {\n    0.0625:[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\n    0.5:[0,1,1,1,1,0,0,0],\n    0.25:[0,1,1,0,0,0,0,0],\n    0.125:[0,1,0,0,0,0,0,0]\n  },\n  NTSC_NOISE:[4,8,16,32,64,96,128,160,202,254,380,508,762,1016,2034,4068],\n  KB_LO:24, KB_HI:108\n};\nconst WAVEBANK = new Map();\nfunction chipFQ(m){ return 440*Math.pow(2,(m-69)/12); }\nfunction chipDAC(x){ return Math.round((x+1)*7.5)/7.5-1; }\n\nfunction chipWave(kind,d,f,sr){\n  const key=kind+':'+(d||0)+':'+Math.round(f);\n  const hit=WAVEBANK.get(key); if(hit) return hit;\n  let N, ch, i;\n  if(kind==='duty'){\n    const pat=CHIPCONST.DUTY_PAT[d]||CHIPCONST.DUTY_PAT[0.5];\n    N=Math.max(16,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++) ch[i]=pat[(i*pat.length/N)|0]?(1-d):(-d);\n  } else if(kind==='saw'){\n    N=Math.max(14,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++){ const s=Math.min(6,Math.floor(i*7/N)); ch[i]=s/6*2-1; }\n  } else if(kind==='tri'){\n    N=Math.max(32,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++){ const s=Math.floor(i*32/N)%32; const lvl=s<=15?s:31-s; ch[i]=(lvl/15)*2-1; }\n  } else if(kind==='sine'){\n    N=Math.max(16,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++) ch[i]=chipDAC(Math.sin(2*Math.PI*i/N));\n  } else if(kind==='round'){\n    N=Math.max(16,Math.round(sr/f)); ch=new Float32Array(N);\n    const R=Math.max(2,Math.round(N*0.12));\n    for(i=0;i<N;i++){ const p=i/N; let x;\n      if(p<R/N){ const u=i/R; x=-1+2*u*u*(3-2*u); } else if(p<0.5) x=1; else x=-1;\n      ch[i]=x; }\n  } else if(kind==='nwave'){\n    N=Math.max(16,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++){ const p=i/N; let x;\n      if(p<1/3)x=-1+6*p; else if(p<2/3)x=1-6*(p-1/3); else x=-1+6*(p-2/3);\n      ch[i]=x; }\n  } else { N=16; ch=new Float32Array(N); }\n  ch[0]=0;\n  let mn=0; for(i=0;i<N;i++)mn+=ch[i]; mn/=N;\n  for(i=0;i<N;i++)ch[i]-=mn;\n  WAVEBANK.set(key,ch); return ch;\n}\n\nconst VOICES = {\n  'pulse50':['duty',0.5,-1,0],'pulse25':['duty',0.25,-1,0],'pulse12':['duty',0.125,-1,0],\n  'pulse6':['duty',0.0625,-1,0],'saw':['saw',0,0,0],'tri':['tri',0,0,0],\n  'sine':['sine',0,0,0],'square':['square',0,0,1],'pulseR':['round',0,-1,0],\n  'nwave':['nwave',0,0,0],'noiseL':['noise',0,0,0],'noiseS':['noise',0,0,0],\n  'triBass':['tri',0,-1,0],'sawBass':['saw',0,-1,0],'sineBass':['sine',0,-1,0]\n};\n/* индексы голосов для регистра: host передаёт число (id → idx) */\nconst V_IDX = {};\n{ let i=0; for(const k in VOICES) V_IDX[k]=i++; }\nconst V_LIST = Object.keys(VOICES);\n\nclass ChipChan {\n  constructor(sr){ this.chanIdx=0; this.sr=sr; this.reset(); }\n  reset(){\n    this.note=-1;this.vel=100;this.vIdx=0;\n    this.kind='duty';this.duty=0.5;this.octave=-1;this.nes=0;\n    this.wav=null;this.N=16;this.phase=0;this.freq=440;\n    this.noiseTimer=1;this.noiseTick=0;this.noiseInterval=1;this.lfsr=1;\n    // линейная огибающая амплитуды\n    this.g=0;this.gTarget=0;this.gStep=0;this.peak=0.25;this.level=0;\n    this.state='F';\n    this.aS=0.005;this.dS=0.15;this.sustain=0.6;this.rS=0.3;\n    this.done=false;\n  }\n  applyVoiceN(idx){\n    this.vIdx=idx&255; const v=VOICES[V_LIST[idx&255]];\n    if(!v) return;\n    this.kind=v[0];this.duty=v[1]||0.5;this.octave=v[2]||0;this.nes=v[3]||0;\n    if(this.state!=='F') this.rebuild();\n  }\n  noteOn(note,vel){\n    this.note=note; if(vel>0)this.vel=vel;\n    this.peak=(this.nes?0.28:0.25)*Math.pow(this.vel/127,1.3);\n    this.rebuild();\n    this.state='A'; this.g=0; this.level=0;\n    this.startG=0; this.gTarget=this.peak;\n    this.gStep=this.peak/ Math.max(1,this.aS*this.sr);\n  }\n  rebuild(){\n    const n=this.note+this.octave*12;\n    const f=chipFQ(n); let freq;\n    if(this.kind==='duty'){\n      const p=Math.round(CHIPCONST.CPU/(16*f)-1); if(p<8){this.done=true;this.state='F';return;}\n      freq=CHIPCONST.CPU/(16*(p+1)); this.wav=chipWave('duty',this.duty,freq,this.sr);\n    } else if(this.kind==='saw'){\n      const p=Math.round(CHIPCONST.CPU/(14*f)-1); if(p<8){this.done=true;this.state='F';return;}\n      freq=CHIPCONST.CPU/(14*(p+1)); this.wav=chipWave('saw',0,freq,this.sr);\n    } else if(this.kind==='tri'||this.kind==='sine'){\n      const p=Math.round(CHIPCONST.CPU/(32*f)-1); if(p<1){this.done=true;this.state='F';return;}\n      freq=CHIPCONST.CPU/(32*(p+1)); this.wav=chipWave(this.kind,0,freq,this.sr);\n    } else if(this.kind==='round'){\n      const p=Math.round(CHIPCONST.CPU/(16*f)-1); if(p<8){this.done=true;this.state='F';return;}\n      freq=CHIPCONST.CPU/(16*(p+1)); this.wav=chipWave('round',0,freq,this.sr);\n    } else if(this.kind==='nwave'){ this.wav=chipWave('nwave',0,f,this.sr); freq=f; }\n    else if(this.kind==='square'){ this.wav=null; this.N=0; this.phase=0; freq=f; }\n    else if(this.kind==='noise'){\n      const r=(this.note-CHIPCONST.KB_LO)/(CHIPCONST.KB_HI-CHIPCONST.KB_LO);\n      const idx=Math.min(15,Math.max(0,Math.round((1-r)*15)));\n      this.noiseTimer=CHIPCONST.NTSC_NOISE[idx];\n      this.noiseInterval=Math.max(1,Math.round((CHIPCONST.CPU/(2*(this.noiseTimer+1)))/this.sr));\n    }\n    if(this.wav){ this.N=this.wav.length; }\n    this.phase=0; this.freq=freq||f; this.done=false;\n  }\n  keyOff(){\n    if(this.state==='F') return;\n    this.state='R'; this.gTarget=0;\n    this.gStep = this.g/ Math.max(1,this.rS*this.sr)*1.0; if(this.gStep<1e-9)this.gStep=1e-9;\n  }\n  calc(){\n    if(this.done){ this.g=0; return 0; }\n    if(this.state==='F'){ this.g=0; return 0; }\n    // Env\n    if(this.state==='A'){ this.g+=this.gStep; if(this.g>=this.gTarget){ this.g=this.gTarget; this.state='D'; const susL=this.gTarget*this.sustain; this.gTarget=susL; this.gStep = (this.g-susL)/Math.max(1,this.dS*this.sr); } }\n    else if(this.state==='D'){ this.g-=this.gStep; if(this.g<=this.gTarget){ this.g=this.gTarget; this.state='S'; this.gStep=0; } }\n    else if(this.state==='S'){}\n    else if(this.state==='R'){ this.g-=this.gStep; if(this.g<=0){ this.g=0; this.state='F'; return 0; } }\n    // Wave\n    let w;\n    if(this.kind==='nwave'||this.kind==='square'){\n      if(this.kind==='square'){ w=Math.sin(2*Math.PI*this.phase)>0?1:-1; this.phase+=this.freq/this.sr; if(this.phase>=1)this.phase-=1; }\n      else { const idx=this.phase|0; w=this.wav[idx]; this.phase+=1; if(this.phase>=this.N)this.phase-=this.N; }\n    } else if(this.kind==='noise'){\n      if(this.noiseTick<=0){ this.noiseTick=this.noiseInterval; const fb=(this.lfsr&1)^((this.lfsr>>1)&1); this.lfsr=(this.lfsr>>1)|(fb<<14); w=(this.lfsr&1)?1:-1; } else {--this.noiseTick; w=(this.lfsr&1)?1:-1; }\n    } else {\n      const idx=this.phase|0; w=this.wav[idx]; this.phase+=1; if(this.phase>=this.N)this.phase-=this.N;\n    }\n    return w*this.g;\n  }\n}\nclass CHIP2413 {\n  constructor(sr){ this.channels=[]; for(let i=0;i<16;i++)this.channels.push(new ChipChan(sr)); }\n  set_register(a,v){\n    const ch=this.channels;\n    if(a<0x10){ const c=ch[a]; c.noteOn(v&0x7f, (v>>7)&0x7f); }\n    else if(a<0x20){ ch[a-0x10].applyVoiceN(v&255); }\n    else if(a===0x20){ for(let i=0;i<16;i++) if((v>>i)&1) ch[i].keyOff(); }\n    else if(a===0x21){ for(let i=0;i<16;i++) ch[i].keyOff(); }\n    else if(a===0x2f){ WAVEBANK.clear(); for(let i=0;i<16;i++)ch[i].reset(); }\n  }\n  calc(){ let sum=0; for(let i=0;i<16;i++){ sum+=this.channels[i].calc(); } return sum*0.33; }\n}\nclass CHIP2413Proc extends AudioWorkletProcessor {\n  constructor(){ super(); this.core=new CHIP2413(sampleRate); this.port.onmessage=(e)=>{ const d=e.data||{}; if(typeof d.reg==='number'&&typeof d.val==='number') this.core.set_register(d.reg&255,d.val&255); }; }\n  process(inputs,outputs){ const out=outputs[0]&&outputs[0][0]; if(!out)return true;\n    for(let i=0;i<out.length;i++){ let s=this.core.calc(); if(!isFinite(s))s=0; if(s>1)s=1;else if(s<-1)s=-1; out[i]=s; } return true; }\n}\nregisterProcessor('chip2413-proc', CHIP2413Proc);";
+const CHIP2413_WORKLET_SRC="'use strict';\n/* CHIP 2A03-эмулятор для AudioWorklet. Архитектура YM2413: нота = регистр,\n   фикс-каналы, ADSR внутри. Волна — буфер (бит-в-бит тембр dutyBuffer). */\nconst CHIPCONST = {\n  CPU: 1789773,\n  DUTY_PAT: {\n    0.0625:[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\n    0.5:[0,1,1,1,1,0,0,0],\n    0.25:[0,1,1,0,0,0,0,0],\n    0.125:[0,1,0,0,0,0,0,0]\n  },\n  NTSC_NOISE:[4,8,16,32,64,96,128,160,202,254,380,508,762,1016,2034,4068],\n  KB_LO:24, KB_HI:108\n};\nconst WAVEBANK = new Map();\nfunction chipFQ(m){ return 440*Math.pow(2,(m-69)/12); }\nfunction chipDAC(x){ return Math.round((x+1)*7.5)/7.5-1; }\n\nfunction chipWave(kind,d,f,sr){\n  const key=kind+':'+(d||0)+':'+Math.round(f);\n  const hit=WAVEBANK.get(key); if(hit) return hit;\n  let N, ch, i;\n  if(kind==='duty'){\n    const pat=CHIPCONST.DUTY_PAT[d]||CHIPCONST.DUTY_PAT[0.5];\n    N=Math.max(16,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++) ch[i]=pat[(i*pat.length/N)|0]?(1-d):(-d);\n  } else if(kind==='saw'){\n    N=Math.max(14,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++){ const s=Math.min(6,Math.floor(i*7/N)); ch[i]=s/6*2-1; }\n  } else if(kind==='tri'){\n    N=Math.max(32,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++){ const s=Math.floor(i*32/N)%32; const lvl=s<=15?s:31-s; ch[i]=(lvl/15)*2-1; }\n  } else if(kind==='sine'){\n    N=Math.max(16,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++) ch[i]=chipDAC(Math.sin(2*Math.PI*i/N));\n  } else if(kind==='round'){\n    N=Math.max(16,Math.round(sr/f)); ch=new Float32Array(N);\n    const R=Math.max(2,Math.round(N*0.12));\n    for(i=0;i<N;i++){ const p=i/N; let x;\n      if(p<R/N){ const u=i/R; x=-1+2*u*u*(3-2*u); } else if(p<0.5) x=1; else x=-1;\n      ch[i]=x; }\n  } else if(kind==='nwave'){\n    N=Math.max(16,Math.round(sr/f)); ch=new Float32Array(N);\n    for(i=0;i<N;i++){ const p=i/N; let x;\n      if(p<1/3)x=-1+6*p; else if(p<2/3)x=1-6*(p-1/3); else x=-1+6*(p-2/3);\n      ch[i]=x; }\n  } else { N=16; ch=new Float32Array(N); }\n  ch[0]=0;\n  let mn=0; for(i=0;i<N;i++)mn+=ch[i]; mn/=N;\n  for(i=0;i<N;i++)ch[i]-=mn;\n  WAVEBANK.set(key,ch); return ch;\n}\n\nconst VOICES = {\n  'pulse50':['duty',0.5,-1,0],'pulse25':['duty',0.25,-1,0],'pulse12':['duty',0.125,-1,0],\n  'pulse6':['duty',0.0625,-1,0],'saw':['saw',0,0,0],'tri':['tri',0,0,0],\n  'sine':['sine',0,0,0],'square':['square',0,0,1],'pulseR':['round',0,-1,0],\n  'nwave':['nwave',0,0,0],'noiseL':['noise',0,0,0],'noiseS':['noise',0,0,0],\n  'triBass':['tri',0,-1,0],'sawBass':['saw',0,-1,0],'sineBass':['sine',0,-1,0]\n};\n/* индексы голосов для регистра: host передаёт число (id → idx) */\nconst V_IDX = {};\n{ let i=0; for(const k in VOICES) V_IDX[k]=i++; }\nconst V_LIST = Object.keys(VOICES);\n\nclass ChipChan {\n  constructor(sr){ this.chanIdx=0; this.sr=sr; this.reset(); }\n  reset(){\n    this.note=-1;this.vel=100;this.vIdx=0;\n    this.kind='duty';this.duty=0.5;this.octave=-1;this.nes=0;\n    this.wav=null;this.N=16;this.phase=0;this.freq=440;\n    this.noiseTimer=1;this.noiseTick=0;this.noiseInterval=1;this.lfsr=1;\n    // линейная огибающая амплитуды\n    this.g=0;this.gTarget=0;this.gStep=0;this.peak=0.25;this.level=0;\n    this.state='F';\n    this.aS=0.005;this.dS=0.15;this.sustain=0.6;this.rS=0.3;\n    this.done=false;\n  }\n  applyVoiceN(idx){\n    this.vIdx=idx&255; const v=VOICES[V_LIST[idx&255]];\n    if(!v) return;\n    this.kind=v[0];this.duty=v[1]||0.5;this.octave=v[2]||0;this.nes=v[3]||0;\n    if(this.state!=='F') this.rebuild();\n  }\n  noteOn(note,vel){\n    this.note=note; if(vel>0)this.vel=vel;\n    this.peak=(this.nes?0.28:0.25)*Math.pow(this.vel/127,1.3);\n    this.rebuild();\n    this.state='A'; this.g=0; this.level=0;\n    this.startG=0; this.gTarget=this.peak;\n    this.gStep=this.peak/ Math.max(1,this.aS*this.sr);\n  }\n  rebuild(){\n    const n=this.note+this.octave*12;\n    const f=chipFQ(n); let freq;\n    if(this.kind==='duty'){\n      const p=Math.round(CHIPCONST.CPU/(16*f)-1); if(p<8){this.done=true;this.state='F';return;}\n      freq=CHIPCONST.CPU/(16*(p+1)); this.wav=chipWave('duty',this.duty,freq,this.sr);\n    } else if(this.kind==='saw'){\n      const p=Math.round(CHIPCONST.CPU/(14*f)-1); if(p<8){this.done=true;this.state='F';return;}\n      freq=CHIPCONST.CPU/(14*(p+1)); this.wav=chipWave('saw',0,freq,this.sr);\n    } else if(this.kind==='tri'||this.kind==='sine'){\n      const p=Math.round(CHIPCONST.CPU/(32*f)-1); if(p<1){this.done=true;this.state='F';return;}\n      freq=CHIPCONST.CPU/(32*(p+1)); this.wav=chipWave(this.kind,0,freq,this.sr);\n    } else if(this.kind==='round'){\n      const p=Math.round(CHIPCONST.CPU/(16*f)-1); if(p<8){this.done=true;this.state='F';return;}\n      freq=CHIPCONST.CPU/(16*(p+1)); this.wav=chipWave('round',0,freq,this.sr);\n    } else if(this.kind==='nwave'){ this.wav=chipWave('nwave',0,f,this.sr); freq=f; }\n    else if(this.kind==='square'){ this.wav=null; this.N=0; this.phase=0; freq=f; }\n    else if(this.kind==='noise'){\n      const r=(this.note-CHIPCONST.KB_LO)/(CHIPCONST.KB_HI-CHIPCONST.KB_LO);\n      const idx=Math.min(15,Math.max(0,Math.round((1-r)*15)));\n      this.noiseTimer=CHIPCONST.NTSC_NOISE[idx];\n      this.noiseInterval=Math.max(1,Math.round((CHIPCONST.CPU/(2*(this.noiseTimer+1)))/this.sr));\n    }\n    if(this.wav){ this.N=this.wav.length; }\n    this.phase=0; this.freq=freq||f; this.done=false;\n  }\n  keyOff(){\n    if(this.state==='F') return;\n    this.state='R'; this.gTarget=0;\n    this.gStep = this.g/ Math.max(1,this.rS*this.sr)*1.0; if(this.gStep<1e-9)this.gStep=1e-9;\n  }\n  calc(){\n    if(this.done){ this.g=0; return 0; }\n    if(this.state==='F'){ this.g=0; return 0; }\n    // Env\n    if(this.state==='A'){ this.g+=this.gStep; if(this.g>=this.gTarget){ this.g=this.gTarget; this.state='D'; const susL=this.gTarget*this.sustain; this.gTarget=susL; this.gStep = (this.g-susL)/Math.max(1,this.dS*this.sr); } }\n    else if(this.state==='D'){ this.g-=this.gStep; if(this.g<=this.gTarget){ this.g=this.gTarget; this.state='S'; this.gStep=0; } }\n    else if(this.state==='S'){}\n    else if(this.state==='R'){ this.g-=this.gStep; if(this.g<=0){ this.g=0; this.state='F'; return 0; } }\n    // Wave\n    let w;\n    if(this.kind==='nwave'||this.kind==='square'){\n      if(this.kind==='square'){ w=Math.sin(2*Math.PI*this.phase)>0?1:-1; this.phase+=this.freq/this.sr; if(this.phase>=1)this.phase-=1; }\n      else { const idx=this.phase|0; w=this.wav[idx]; this.phase+=1; if(this.phase>=this.N)this.phase-=this.N; }\n    } else if(this.kind==='noise'){\n      if(this.noiseTick<=0){ this.noiseTick=this.noiseInterval; const fb=(this.lfsr&1)^((this.lfsr>>1)&1); this.lfsr=(this.lfsr>>1)|(fb<<14); w=(this.lfsr&1)?1:-1; } else {--this.noiseTick; w=(this.lfsr&1)?1:-1; }\n    } else {\n      const idx=this.phase|0; w=this.wav[idx]; this.phase+=1; if(this.phase>=this.N)this.phase-=this.N;\n    }\n    return w*this.g;\n  }\n}\nclass CHIP2413 {\n  constructor(sr){ this.channels=[]; for(let i=0;i<16;i++)this.channels.push(new ChipChan(sr)); }\n  set_register(a,v){\n    const ch=this.channels;\n    if(a<0x10){ const c=ch[a]; c.noteOn(v&0x7f, (v>>7)&0x7f); }\n    else if(a<0x20){ ch[a-0x10].applyVoiceN(v&255); }\n    else if(a===0x20){ for(let i=0;i<16;i++) if((v>>i)&1) ch[i].keyOff(); }\n    else if(a===0x21){ for(let i=0;i<16;i++) ch[i].keyOff(); }\n    else if(a===0x2f){ WAVEBANK.clear(); for(let i=0;i<16;i++)ch[i].reset(); }\n  }\n  calc(){ let sum=0; for(let i=0;i<16;i++){ sum+=this.channels[i].calc(); } return sum*0.33; }\n}\nclass CHIP2413Proc extends AudioWorkletProcessor {\n  constructor(){ super(); this.__beats=0; this.__on=0; this.core=new CHIP2413(sampleRate); this.port.onmessage=(e)=>{ const d=e.data||{}; if(typeof d.reg==='number'&&typeof d.val==='number') this.core.set_register(d.reg&255,d.val&255); }; }\n  process(inputs,outputs){ const out=outputs[0]&&outputs[0][0]; if(!out)return true; this.__beats+=(out&&out.length)||0; if(this.__beats>9600){ this.__beats=0; try{ this.port.postMessage({beat:1}); }catch(_){} }\n    for(let i=0;i<out.length;i++){ let s=this.core.calc(); if(!isFinite(s))s=0; if(s>1)s=1;else if(s<-1)s=-1; out[i]=s; } return true; }\n}\nregisterProcessor('chip2413-proc', CHIP2413Proc);";
 
 let ymWorkletState='idle';   /* idle → loading → ready / fail */
 function YM_BRIDGE(node){
@@ -6540,7 +6520,7 @@ const YM2413_WORKLET_SRC="'use strict';\n/**\n * js2413.js - YM2413 (OPLL) FM So
 const MPL = {
   file: null, trackSel: [], playing: false, soloIdx: -1,
   timer: null, evQueue: [], evPtr: 0,
-  playheadSec: 0, t0wall: 0, stopAt: 0,
+  playheadSec: 0, t0wall: 0, t0c: 0, stopAt: 0,
   speed: 1, /* R30: множитель темпа 0.25–3.0× */
   noteHold: new Map(), /* R30: eng:note -> счётчик нажатий — note-off одной дорожки не гасит голос другой */
   stolen: new Set(),   /* R31: eng:note, чей голос украден steal-oldest'ом — поздний note-off игнорируем */
@@ -6665,7 +6645,7 @@ function mpEngineOn(eng, voice, k, vel){
     if(!audioCtx){ ensureAudio(); }
     if(eng==='chip'){
       state.chipVoice = voice;
-      chipOnCore(k, vel);
+      chipOn(k, vel);
     } else if(eng==='ym'){
       YMS.voice = Math.max(1, Math.min(15, +voice||2));
       const prevMode = state.mode;
@@ -6674,7 +6654,7 @@ function mpEngineOn(eng, voice, k, vel){
       finally { state.mode = prevMode; }
     } else if(eng==='gm'){
       midiProg = +voice||0;
-      midiOnCore(k, vel);
+      midiOn(k, vel);
     }
   }catch(err){
     /* R38-fix(8): НЕ глотаем молча — иначе движок умирает без следа и «журнал
@@ -6796,7 +6776,7 @@ function mpTick(){
 
   /* R30: учёт скорости. События лежат в реальных секундах; пройденное время
      масштабируем на MPL.speed — ускорение/замедление без перестройки очереди. */
-  const nowSec = (performance.now()-MPL.t0wall)/1000 * MPL.speed + MPL.startAt;
+  const nowSec = ((audioCtx?audioCtx.currentTime*1000:performance.now())-MPL.t0wall)/1000 * MPL.speed + MPL.startAt;
   /* R29: таймер обновляется КАЖДЫЙ тик (раньше время писалось только в конце,
      поэтому дисплей «молчал» во время проигрывания). */
   mpTimeDisplay(nowSec);
@@ -6844,7 +6824,7 @@ function mpStopNow(){
   MPL.playing=false;
   if(MPL.timer){ clearInterval(MPL.timer); MPL.timer=null; }
   /* R30: снимаем флаг подавления ноут-лога/подсветки */
-  window.__mpActive=false;
+  window.__mpActive=false; try{ mpRerouteAll(); }catch(_){}
   mpSetSpdHidden(false); /* R34: возвращаем кнопки скорости */
   MPL.noteHold.clear(); MPL.live.clear(); MPL.stolen.clear(); MPL.ceiling.clear();
   mpAllOff();
@@ -6864,12 +6844,12 @@ function mpPlayTrack(idx){
      Используем startCtx движка (резюмит + ждёт), чтобы первый голос не стартовал
      в замороженное аудио-время (иначе звука нет, хотя логи идут). */
   try{ startCtx(function(){}); }catch(_){}
-  window.__mpActive=true; /* R30: глушим нотный лог/подсветку на время игры */
+  window.__mpActive=true; try{ mpRerouteAll(); }catch(_){} /* R30: глушим нотный лог/подсветку на время игры */
   mpSetSpdHidden(true); /* R34: прячем кнопки скорости на время игры */
   MPL.soloIdx = idx;
   MPL.evQueue = buildEvQueue();
   MPL.evPtr = 0; MPL.startAt = 0; MPL.live.clear(); MPL.noteHold.clear(); MPL.stolen.clear(); MPL.ceiling.clear();
-  MPL.t0wall = performance.now();
+  MPL.t0wall = (audioCtx?audioCtx.currentTime*1000:performance.now());
   MPL.playing = true;
   const last = MPL.evQueue.length? MPL.evQueue[MPL.evQueue.length-1].sec : 0;
   MPL.maxSec = last;
@@ -6888,7 +6868,7 @@ function mpPlayAll(){
   mpSetSpdHidden(true); /* R34: прячем кнопки скорости на время игры */
   MPL.evQueue = buildEvQueue();
   MPL.evPtr = 0; MPL.startAt = 0; MPL.live.clear(); MPL.noteHold.clear(); MPL.stolen.clear(); MPL.ceiling.clear();
-  MPL.t0wall = performance.now();
+  MPL.t0wall = (audioCtx?audioCtx.currentTime*1000:performance.now());
   MPL.playing = true;
   const last = MPL.evQueue.length? MPL.evQueue[MPL.evQueue.length-1].sec : 0;
   MPL.maxSec = last;
@@ -6965,16 +6945,19 @@ function mpEnsureBus(){
   if(!audioCtx || !fxBus) return false;
   try{
     __mpBus=audioCtx.createGain(); __mpBus.gain.value=0.55;
-    /* R38-fix(14) ДИАГНОСТИКА клиппера: WaveShaper с oversample 4x на сумме
-       резких квадратных фронтов может давать паразитный звон при полифонии
-       (треск при 2+ нотах, не зависящий от громкости - НЕ перегруз, т.к. при
-       N=2 и √N-нормировке fix13 сумма всего ~0.4). Убираем WaveShaper совсем
-       для проверки: __mpBus -> компрессор -> fxBus. */
-    const __mpLim=audioCtx.createDynamicsCompressor();
-    __mpLim.threshold.value=-14; __mpLim.knee.value=8;
-    __mpLim.ratio.value=4; __mpLim.attack.value=0.003; __mpLim.release.value=0.12;
-    __mpLim.makeupGain.value=2.2;
-    __mpBus.connect(__mpLim); __mpLim.connect(fxBus);
+    /* R41-fix(Android-треск): __mpBus -> МЯГКИЙ WaveShaper-клиппер -> fxBus.
+       DynamicsCompressor (R38-fix14) на Android висел/плыл темп; простой субмикс
+       вернул треск от суммы резких квадратных фронтов 8bit/GM при полифонии
+       (master-clip их не успевал). WaveShaper на мягкой кривой с oversample 2x
+       срезает суммарные пики ПЛАВНО, не даёт задержки/виса на Android (в отличие
+       от DynamicsCompressor) — треск уходит, темп стабилен. Контакт с моментов
+       будущего плеера сохраняется. */
+    const __mpShp=new Float32Array(1024);
+    for(let i=0;i<1024;i++){ const x=(i/511.5)-1, a=Math.abs(x); __mpShp[i]=Math.sign(x)*(a<0.75?a:(0.75+0.25*Math.tanh((a-0.75)/0.25))); }
+    const __mpClip=audioCtx.createWaveShaper(); try{ __mpClip.oversample='2x'; }catch(_){}
+    __mpClip.curve=__mpShp;
+    __mpBus.connect(__mpClip); __mpClip.connect(fxBus);
+    try{ mpRerouteAll(); }catch(_){}
     return true;
   }catch(_){ return false; }
 }
@@ -7002,12 +6985,12 @@ function wire(){
     const wasPlaying = MPL.playing;
     let cur = 0;
     if(wasPlaying && MPL.t0wall){
-      cur = (performance.now()-MPL.t0wall)/1000 * MPL.speed + MPL.startAt;
+      cur = ((audioCtx?audioCtx.currentTime*1000:performance.now())-MPL.t0wall)/1000 * MPL.speed + MPL.startAt;
     }
     MPL.speed = Math.min(3, Math.max(0.25, +(MPL.speed*factor).toFixed(3)));
     if(wasPlaying){
       MPL.startAt = cur;
-      MPL.t0wall = performance.now();
+      cur = ((audioCtx?audioCtx.currentTime*1000:performance.now())-MPL.t0wall)/1000 * MPL.speed + MPL.startAt;
     }
     spdShow();
     mlog('MIDI: скорость → '+MPL.speed.toFixed(2)+'×');
