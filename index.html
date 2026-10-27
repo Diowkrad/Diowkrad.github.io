@@ -230,7 +230,7 @@ a.btn{
   cursor:pointer;
   box-shadow:2px 2px 0 #000;
   font-size:0.85rem;
-  width:180px;
+      width: 280px;
   height:40px;
   line-height:22px;
   text-align:center;
@@ -525,6 +525,17 @@ body.kb-single #keys2{ display:none !important; }
   #keys, #keys2{ transform:scaleY(0.75); transform-origin:top left; }
   .kbd-wrap{ height:114px; }
 }
+.p_block_flex-wrap{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+	border-radius: 1920px;
+	border-bottom: 6px inset #1a1a2e;
+	border-top: 2px inset #e1e1ff;;
+	    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06 2px, #000000 2px, #000000 4px), repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+    background-size: 2px 3px, 12px 12px;
+}
 </style>
 </head>
 <body>
@@ -541,6 +552,9 @@ animation: gradientMove 60s ease infinite;    text-align: center;
  <h3 class="logotype"><div>v1.7.0 «Cheesy Teddy Bear»</div></h3>
  </div>
 <!-- ================= ТАБ-БАР ================= -->
+
+
+
 <nav class="panel_2 tabs" id="tabs" style="border: 0px outset #950; background:none;
 margin: 1px;
 ">
@@ -552,12 +566,258 @@ margin: 1px;
     <button data-view="view-download">СКАЧАТЬ</button>
  
 </nav>
+<main id="app">
+<div class="p_block_flex-wrap" >
+<div class="p_block" >
+						<div>
+							<span class="mishka-wrap" style="display:inline-block; text-decoration:none; line-height:0;">
+<svg class="bear" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:380px; height:380px; cursor:pointer;">
+  <defs>
+    <radialGradient id="mgHead" cx="40%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#f2b48c"/><stop offset="55%" stop-color="#e69f70"/><stop offset="100%" stop-color="#c97f4e"/>
+    </radialGradient>
+    <radialGradient id="mgBody" cx="42%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#f0b183"/><stop offset="60%" stop-color="#e29564"/><stop offset="100%" stop-color="#c17747"/>
+    </radialGradient>
+    <radialGradient id="mgMuzzle" cx="40%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffedbc"/><stop offset="70%" stop-color="#fbdf9d"/><stop offset="100%" stop-color="#eec77f"/>
+    </radialGradient>
+    <radialGradient id="mgInnerEar" cx="45%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#fff0c2"/><stop offset="100%" stop-color="#f4d98f"/>
+    </radialGradient>
+    <radialGradient id="mgPaw" cx="40%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#eda76f"/><stop offset="100%" stop-color="#c9793f"/>
+    </radialGradient>
+    <radialGradient id="mgFoot" cx="42%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#e59a60"/><stop offset="100%" stop-color="#b96a34"/>
+    </radialGradient>
+    <radialGradient id="mgScarf" cx="40%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#ffd94f"/><stop offset="100%" stop-color="#f0a92c"/>
+    </radialGradient>
+    <radialGradient id="mgHeart" cx="40%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#fff6d8"/><stop offset="100%" stop-color="#fbe7ac"/>
+    </radialGradient>
+    <linearGradient id="mgShine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".55"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="mgSoft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="mgSofter" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
 
-<!-- ================= ГЛАВНЫЙ БЛОК ================= -->
-<main>
+  <ellipse class="shadow" cx="256" cy="470" rx="150" ry="24" fill="#b97b45" opacity=".55" filter="url(#mgSofter)"/>
+
+  <g class="body-group">
+    <g class="ear-left">
+      <circle cx="150" cy="90" r="52" fill="url(#mgPaw)"/>
+      <circle cx="150" cy="92" r="30" fill="url(#mgInnerEar)"/>
+      <path d="M128 68 q10 -14 26 -12" stroke="#fff" stroke-opacity=".45" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M136 104 q4 4 10 6" stroke="#c98a4e" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M142 96 q6 6 14 8" stroke="#c98a4e" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <g class="ear-right">
+      <circle cx="362" cy="90" r="52" fill="url(#mgPaw)"/>
+      <circle cx="362" cy="92" r="30" fill="url(#mgInnerEar)"/>
+      <path d="M340 68 q10 -14 26 -12" stroke="#fff" stroke-opacity=".45" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M348 104 q4 4 10 6" stroke="#c98a4e" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M354 96 q6 6 14 8" stroke="#c98a4e" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <g class="head">
+      <circle cx="256" cy="190" r="138" fill="url(#mgHead)"/>
+      <path d="M190 96 q30 -34 66 -34 q36 0 66 34 q-30 -18 -66 -18 q-36 0 -66 18z" fill="#f9c79b" opacity=".7"/>
+      <ellipse cx="210" cy="110" rx="46" ry="26" fill="url(#mgShine)" opacity=".5"/>
+      <path d="M256 60 v26" stroke="#b9713f" stroke-width="3" stroke-dasharray="7 6" stroke-linecap="round" opacity=".55"/>
+      <path d="M212 148 q14 -8 28 -2" stroke="#8a4f26" stroke-width="4.5" fill="none" stroke-linecap="round" opacity=".85"/>
+      <path d="M272 146 q14 -6 28 2" stroke="#8a4f26" stroke-width="4.5" fill="none" stroke-linecap="round" opacity=".85"/>
+      <g class="eye left">
+        <ellipse cx="224" cy="172" rx="10" ry="13" fill="#3d3a4e"/>
+        <circle cx="220.5" cy="167" r="3.2" fill="#fff" opacity=".95"/>
+        <circle cx="227" cy="176" r="1.6" fill="#fff" opacity=".6"/>
+      </g>
+      <g class="eye right">
+        <ellipse cx="288" cy="172" rx="10" ry="13" fill="#3d3a4e"/>
+        <circle cx="284.5" cy="167" r="3.2" fill="#fff" opacity=".95"/>
+        <circle cx="291" cy="176" r="1.6" fill="#fff" opacity=".6"/>
+      </g>
+      <path class="lid" d="M212 172 q12 -12 24 0" stroke="#3d3a4e" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path class="lid" d="M276 172 q12 -12 24 0" stroke="#3d3a4e" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="196" cy="200" rx="17" ry="10" fill="#f4836d" opacity=".38"/>
+      <ellipse cx="316" cy="200" rx="17" ry="10" fill="#f4836d" opacity=".38"/>
+      <circle cx="185" cy="192" r="2" fill="#c9764a" opacity=".7"/>
+      <circle cx="196" cy="188" r="1.8" fill="#c9764a" opacity=".7"/>
+      <circle cx="205" cy="194" r="1.6" fill="#c9764a" opacity=".7"/>
+      <circle cx="307" cy="194" r="2" fill="#c9764a" opacity=".7"/>
+      <circle cx="316" cy="188" r="1.8" fill="#c9764a" opacity=".7"/>
+      <circle cx="327" cy="192" r="1.6" fill="#c9764a" opacity=".7"/>
+      <ellipse cx="256" cy="222" rx="64" ry="48" fill="url(#mgMuzzle)"/>
+      <ellipse cx="234" cy="204" rx="22" ry="14" fill="url(#mgShine)" opacity=".55"/>
+      <path d="M242 206 q14 -10 28 0 q4 4 -2 10 q-9 8 -24 0 q-6 -6 -2 -10z" fill="#6b4a3a"/>
+      <ellipse cx="250" cy="207" rx="6" ry="3.4" fill="#fff" opacity=".45"/>
+      <path d="M238 232 q18 16 36 0" stroke="#6b4a3a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M248 238 q8 8 16 1 q-3 9 -9 9 q-7 0 -7 -10z" fill="#e2606a"/>
+      <path d="M248 238 q8 8 16 1" stroke="#6b4a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="238" cy="216" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="232" cy="222" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="238" cy="227" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="274" cy="216" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="280" cy="222" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="274" cy="227" r="1.7" fill="#8a5a34" opacity=".8"/>
+    </g>
+
+    <ellipse cx="256" cy="372" rx="128" ry="112" fill="url(#mgBody)"/>
+    <ellipse cx="256" cy="386" rx="74" ry="80" fill="#f4c68d"/>
+    <ellipse cx="256" cy="386" rx="74" ry="80" fill="none" stroke="#c9854c" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round" opacity=".8"/>
+    <ellipse cx="228" cy="348" rx="34" ry="22" fill="url(#mgShine)" opacity=".5"/>
+    <g opacity=".95">
+      <ellipse cx="330" cy="392" rx="26" ry="20" fill="#f7d8a4" transform="rotate(-12 330 392)"/>
+      <ellipse cx="330" cy="392" rx="26" ry="20" fill="none" stroke="#c98a4e" stroke-width="2.5" stroke-dasharray="6 5" transform="rotate(-12 330 392)"/>
+      <path d="M318 392 h24 M330 382 v20" stroke="#d99a5e" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+    </g>
+
+    <path d="M186 296 q70 40 140 0 q6 26 -6 34 q-64 34 -128 0 q-12 -8 -6 -34z" fill="url(#mgScarf)"/>
+    <path d="M186 296 q70 40 140 0 q2 8 1 12 q-70 42 -142 0 q-1 -4 1 -12z" fill="#ffffff" opacity=".22"/>
+    <path d="M196 322 l0 0" stroke="none"/>
+    <path d="M236 322 q20 -16 40 0 q-6 16 -20 16 q-14 0 -20 -16z" fill="#f5b62e"/>
+    <path d="M244 328 q12 -8 24 0" stroke="#d9931a" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>
+    <path d="M262 334 q14 34 8 58 q-2 8 -12 8 q-10 0 -12 -10 q-6 -26 -4 -54z" fill="#f6b62f"/>
+    <path d="M246 396 l-2 12 M256 398 l0 12 M266 396 l2 12" stroke="#e8a51f" stroke-width="4" stroke-linecap="round"/>
+    <path d="M266 348 q4 20 2 40" stroke="#ffffff" stroke-opacity=".25" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <g>
+      <path d="M136 318 q-34 30 -34 74 q0 34 26 44 q26 8 44 -16 q14 -22 8 -58 q-6 -34 -44 -44z" fill="url(#mgPaw)"/>
+      <ellipse cx="146" cy="418" rx="26" ry="24" fill="#f0b479"/>
+      <ellipse cx="146" cy="418" rx="15" ry="12" fill="#f9dcae"/>
+      <path d="M136 408 v6 M146 404 v7 M156 408 v6" stroke="#c9884e" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+    </g>
+
+    <g class="paw-right">
+      <path d="M376 318 q34 30 34 74 q0 34 -26 44 q-26 8 -44 -16 q-14 -22 -8 -58 q6 -34 44 -44z" fill="url(#mgPaw)"/>
+      <ellipse cx="366" cy="418" rx="26" ry="24" fill="#f0b479"/>
+      <ellipse cx="366" cy="418" rx="15" ry="12" fill="#f9dcae"/>
+      <path d="M356 408 v6 M366 404 v7 M376 408 v6" stroke="#c9884e" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+      <ellipse cx="392" cy="336" rx="16" ry="9" fill="url(#mgShine)" opacity=".55" transform="rotate(30 392 336)"/>
+    </g>
+
+    <g>
+      <ellipse cx="186" cy="448" rx="52" ry="46" fill="url(#mgFoot)"/>
+      <ellipse cx="186" cy="448" rx="30" ry="27" fill="#f2c48d"/>
+      <path d="M168 470 q18 10 36 0" stroke="#c9884e" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
+      <path d="M170 438 q-3 -10 4 -16 M186 432 q0 -11 0 -11 M202 438 q3 -10 -4 -16" stroke="#c9884e" stroke-width="3" stroke-linecap="round" fill="none" opacity=".75"/>
+      <path d="M186 440 c-4 -8 -16 -6 -16 3 c0 8 10 12 16 17 c6 -5 16 -9 16 -17 c0 -9 -12 -11 -16 -3z" fill="url(#mgHeart)"/>
+      <path d="M180 444 q3 -3 6 -2" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7" fill="none"/>
+    </g>
+    <g>
+      <ellipse cx="326" cy="448" rx="52" ry="46" fill="url(#mgFoot)"/>
+      <ellipse cx="326" cy="448" rx="30" ry="27" fill="#f2c48d"/>
+      <path d="M308 470 q18 10 36 0" stroke="#c9884e" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
+      <path d="M310 438 q-3 -10 4 -16 M326 432 q0 -11 0 -11 M342 438 q3 -10 -4 -16" stroke="#c9884e" stroke-width="3" stroke-linecap="round" fill="none" opacity=".75"/>
+      <path d="M326 440 c-4 -8 -16 -6 -16 3 c0 8 10 12 16 17 c6 -5 16 -9 16 -17 c0 -9 -12 -11 -16 -3z" fill="url(#mgHeart)"/>
+      <path d="M320 444 q3 -3 6 -2" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7" fill="none"/>
+    </g>
+
+    <ellipse cx="200" cy="330" rx="30" ry="18" fill="url(#mgShine)" opacity=".4"/>
+  </g>
+
+  <g fill="#ffd94f" stroke="#e8a51f" stroke-width="2">
+    <path class="star" d="M120 150 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5z"/>
+    <path class="star" d="M400 120 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5z"/>
+    <path class="star" d="M410 260 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/>
+    <path class="star" d="M105 270 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/>
+  </g>
+</svg>
+</span>
+<style>
+  #app .mishka-wrap{ display:inline-block; }
+  #app .mishka-wrap .bear{ display:block; cursor:pointer; }
+  #app .mishka-wrap .paw-right{
+    transform-box:view-box; transform-origin:402px 300px;
+    transition:transform .4s cubic-bezier(.34,1.6,.64,1);
+    transform:rotate(0deg) translateY(0);
+  }
+  #app .mishka-wrap .bear:hover .paw-right{ transform:rotate(-38deg) translateY(-10px); }
+  #app .mishka-wrap .ear-left{ transform-box:view-box; transform-origin:150px 90px; transition:transform .5s ease; }
+  #app .mishka-wrap .ear-right{ transform-box:view-box; transform-origin:362px 90px; transition:transform .5s ease; }
+  #app .mishka-wrap .bear:hover .ear-left{ animation:mg-earL 1.4s ease-in-out infinite; }
+  #app .mishka-wrap .bear:hover .ear-right{ animation:mg-earR 1.4s ease-in-out infinite; }
+  @keyframes mg-earL{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(-6deg)} }
+  @keyframes mg-earR{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(6deg)} }
+  #app .mishka-wrap .head{ transform-box:view-box; transform-origin:256px 250px; transition:transform .5s ease; }
+  #app .mishka-wrap .bear:hover .head{ animation:mg-nod 1.6s ease-in-out infinite; }
+  @keyframes mg-nod{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(3deg) translateY(3px)} }
+  #app .mishka-wrap .bear:active,#app .mishka-wrap .bear.jumping{ animation:mg-jump .55s cubic-bezier(.3,0,.4,1); }
+  @keyframes mg-jump{
+    0%{transform:translateY(0) scale(1,1)}
+    15%{transform:translateY(4px) scale(1.04,.96)}
+    40%{transform:translateY(-30px) scale(1.03,.97)}
+    65%{transform:translateY(0) scale(.95,1.06)}
+    80%{transform:translateY(-10px) scale(1,1)}
+    100%{transform:translateY(0) scale(1,1)}
+  }
+  #app .mishka-wrap .shadow{ transform-box:view-box; transform-origin:256px 470px; transition:transform .3s ease,opacity .3s ease; }
+  #app .mishka-wrap .bear:active .shadow,#app .mishka-wrap .bear.jumping .shadow{ animation:mg-shadow .55s cubic-bezier(.3,0,.4,1); }
+  @keyframes mg-shadow{
+    0%{transform:scale(1); opacity:.9}
+    40%{transform:scale(.6,.5); opacity:.4}
+    65%{transform:scale(1.08,.9); opacity:1}
+    80%{transform:scale(.95); opacity:.85}
+    100%{transform:scale(1); opacity:.9}
+  }
+  #app .mishka-wrap .eye{ transform-box:fill-box; transform-origin:center; animation:mg-blink 4.6s infinite; }
+  #app .mishka-wrap .eye.right{ animation-delay:4.4s; }
+  @keyframes mg-blink{ 0%,4%,100%{transform:scaleY(1)} 6%{transform:scaleY(.08)} 8%,10%{transform:scaleY(1)} }
+  #app .mishka-wrap .lid{ opacity:0; transition:opacity .08s; }
+  #app .mishka-wrap .bear:hover .lid{ opacity:1; }
+  #app .mishka-wrap .star{ transform-box:fill-box; transform-origin:center; opacity:0; transform:scale(.3) rotate(0deg); transition:opacity .3s ease,transform .5s ease; }
+  #app .mishka-wrap .bear:hover .star{ opacity:1; animation:mg-twinkle 1.4s ease-in-out infinite; }
+  #app .mishka-wrap .bear:hover .star:nth-of-type(2){ animation-delay:.25s; }
+  #app .mishka-wrap .bear:hover .star:nth-of-type(3){ animation-delay:.5s; }
+  #app .mishka-wrap .bear:hover .star:nth-of-type(4){ animation-delay:.75s; }
+  @keyframes mg-twinkle{
+    0%{opacity:.2; transform:scale(.4) rotate(0deg)}
+    50%{opacity:1; transform:scale(1.15) rotate(35deg)}
+    100%{opacity:.2; transform:scale(.4) rotate(70deg)}
+  }
+  #app .mishka-wrap .body-group{ transform-box:view-box; transform-origin:256px 400px; animation:mg-breathe 4s ease-in-out infinite; }
+  @keyframes mg-breathe{ 0%,100%{transform:scale(1,1)} 50%{transform:scale(1.012,.992)} }
+</style>
+<script>
+(function(){
+  var b=document.querySelector('.mishka-wrap .bear');
+  if(!b) return;
+  function jump(){
+    b.classList.remove('jumping');
+    void b.offsetWidth;
+    b.classList.add('jumping');
+  }
+  b.addEventListener('pointerdown',jump);
+  b.addEventListener('animationend',function(e){ if(e.animationName==='mg-jump') b.classList.remove('jumping'); });
+
+  /* Реакция медведя на нажатие нотных клавиш (раскладки из «УПРАВЛЕНИЕ»):
+     2 ряда: ZSXDCVGBHNM,.;/' + Q2W3ER5T6Y7UI9O0P[]'
+     1 ряд:  AWSEDFTGYHUJKOLP;'
+     Любая из них заставляет медведя прыгнуть в такт нажатию.
+     Автоповтор (e.repeat) пропускаем, чтобы зажатая клавиша не везла перезапуск. */
+  var NOTE_KEYS={};
+  ('ZSXDCVGBHNM,.;/\"Q2W3ER5T6Y7UI9O0P[]\'AWSEDFTGYHUJKOLP').split('').forEach(function(k){ NOTE_KEYS[k.toLowerCase()]=1; });
+  document.addEventListener('keydown',function(e){
+    if(e.repeat) return;
+    var t=e.target;
+    if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+    if(!NOTE_KEYS[(e.key||'').toLowerCase()]) return;
+    jump();
+  });
+})();
+</script>
+						</div>
+					</div>
+</div>
+
+
 
   <!-- ---------- ВКЛАДКА: О ПРОЕКТЕ ---------- -->
   <section id="view-about">
+
+<!-- ================= ГЛАВНЫЙ БЛОК ================= -->
     <div class="panel_lcd">
       <div class="lcd lcd-full">
         <h2>О ПРОЕКТЕ</h2>
@@ -928,8 +1188,8 @@ VIII. СОСТОЯНИЕ НА МОМЕНТ СОСТАВЛЕНИЯ README
 	<h2> 🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» 🥈 </h2>
 			
 	<p>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» ☩ R0041.zip" download>▼ СКАЧАТЬ</a>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» ☩ R0041.html">🧸 «Ultimate» 🥈</a>
+		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear」 ☩ R41+12.zip" download>▼ СКАЧАТЬ</a>
+		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear」 ☩ R41+12.html">🧸 «Cheesy Teddy Bear» 🥈</a>
 		
 		
 		<h2> 🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - Fraims v1.0.1 🥈 </h2>
@@ -1028,7 +1288,6 @@ VIII. СОСТОЯНИЕ НА МОМЕНТ СОСТАВЛЕНИЯ README
     </div>
   </section>
 
-</main>
 
 <!-- ================= ФУТЕР ================= -->
 <footer class="panel row_b">
@@ -1047,6 +1306,6 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
   });
 });
 </script>
-
+</main>
 </body>
 </html>
