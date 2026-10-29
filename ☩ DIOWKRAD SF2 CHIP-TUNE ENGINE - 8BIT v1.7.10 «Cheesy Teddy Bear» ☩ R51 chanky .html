@@ -6066,13 +6066,13 @@ $('#btnArp').addEventListener('click',()=>{
 });
 
 /* ---------- осциллограф движка ---------- */
+
 (function scopeLoop(){
   const cv=document.getElementById('scope');
   if(!cv) return;
   const ctx=cv.getContext('2d');
   function draw(){
     requestAnimationFrame(draw);
-    if(!__diagGate()) return; /* R43-Stap16 FPS: mobile-троттлинг */
     ctx.fillStyle='#050d08'; ctx.fillRect(0,0,cv.width,cv.height);
     ctx.strokeStyle='#174a17';
     for(let x=0;x<cv.width;x+=30){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,cv.height); ctx.stroke(); }
@@ -6092,6 +6092,7 @@ $('#btnArp').addEventListener('click',()=>{
   }
   draw();
 })();
+
 
 /* R41-Stap14: МОНИТОР «DIOWKRAD ATTRACTOR» — y(t) реального выхода крашера.
    Пунктир на ±0.666 (сатурация барьера 2/3). Обновляется rAF. */
