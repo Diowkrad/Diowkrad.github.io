@@ -82,9 +82,11 @@
   border:3px solid #950;
 }
 
+html{
+  background:#103;
+}
 body{
-	background:#103;
-	background-image: url('img.png');
+  background:transparent;
       color: var(--text-main);
       margin: 0;
       padding: 25px;
@@ -539,6 +541,31 @@ body.kb-single #keys2{ display:none !important; }
 </style>
 </head>
 <body>
+<!-- ☩ ФОН: GLSL-планета R46 «ГРАНЬ» перенесена на задний план. Канва позади интерфейса,
+     клики и клавиши не перехватывает, при отсутствии WebGL интерфейс работает как раньше.
+     Константы — в блоке «КОНСТАНТЫ СИМУЛЯЦИИ ФОНА» в конце файла. ☩ -->
+<canvas id="glbg" aria-hidden="true"></canvas>
+<style>
+/* фон-канва: позади всего интерфейса, не перехватывает клики */
+canvas#glbg{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:-1;
+  pointer-events:none;
+  display:block;
+}
+/* CRT-развёртка в духе GLSL-стенда поверх всего экрана (снять при надобности) */
+html::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:9;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px);
+}
+</style>
 <div class="rack-mount">
 <!-- ================= ШАПКА ================= -->
 <header class="panel">
@@ -1007,19 +1034,7 @@ margin: 1px;
 		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» ☩ R51 chanky Stap15 RD.html">🧸 Выстовачная версия 🥈</a>
 		
 	</p>
-	  
-	  
 
-	<h2>СКАЧАТЬ</h2>
-	<h2> 🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» R45 🥈 </h2>
-			
-	<p>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear」 ☩ R45 chanky.zip" download>▼ СКАЧАТЬ v1</a>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» ☩ R48 chanky 2.zip" download>▼ СКАЧАТЬ v2</a>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear」 ☩ R45 chanky.html">🧸 «Cheesy Teddy Bear» v1🥈</a>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» ☩ R48 chanky 2">🧸 «Cheesy Teddy Bear» v2🥈</a>
-		
-		
 		<h2> 🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - Fraims v1.0.1 🥈 </h2>
 		
 		<p>DIOWKRAD Fraimwork . Посути отдай это ИИ и она сделает тебе сентезатор с моими решениями и баг фиксом. Звуковой баг в JS у меня под пристальным контролем.</p>
@@ -1135,5 +1150,304 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
 });
 </script>
 </main>
+<script>
+/* ═══════════════ КОНСТАНТЫ СИМУЛЯЦИИ ФОНА (править здесь) ═══════════════ */
+/* Графика перенесена из GLSL-стенда R46 «ГРАНЬ» без изменений шейдера.      */
+const PLANET_RADIUS_KM  = 19371.0;   /* радиус планеты, км                    */
+const FLIGHT_SPEED_KMH  = 92000.0;   /* скорость полёта, км/ч                 */
+const SIM_TIME_SCALE    = 60.0;      /* 1 реальная секунда = N секунд симуляции */
+const DAY_CYCLE_HOURS   = 1.0;       /* длительность суток, сим-часов         */
+const CAMERA_ALT_KM     = 900.0;     /* высота орбиты камеры                  */
+const FOV_DEG           = 90.0;      /* вертикальный угол обзора              */
+const RENDER_SCALE      = 1.0;       /* в стенде было 2.3 — для фона тяжело; 1.0 честнее */
+const START_PHASE_RAD   = 0.0;       /* стартовое положение камеры на орбите  */
+
+const CAM_R = 1.0 + CAMERA_ALT_KM / PLANET_RADIUS_KM;
+const ORBIT_PERIOD_SIM_SEC = (2*Math.PI*PLANET_RADIUS_KM/FLIGHT_SPEED_KMH)*3600.0;
+const DAY_CYCLE_SIM_SEC = DAY_CYCLE_HOURS*3600.0;
+const FOV_TAN = Math.tan(FOV_DEG*0.5*Math.PI/180.0);
+/* ════════════════════════════════════════════════════ */
+
+/* шейдеры — дословно из стенда R46, без изменений */
+const VERT = 'attribute vec2 aPos;\nvoid main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
+
+
+
+const FRAG = `precision highp float;
+uniform vec2  uRes;
+uniform float uTime;
+uniform float uCamA;
+uniform float uSunA;
+
+#define R    1.0
+#define CAMR __CAMR__
+#define FOT  __FOT__
+
+/* --- хэш и шумы (средний слой) --- */
+float hash13(vec3 p){
+  p = fract(p*0.3183099 + vec3(0.1,0.2,0.3));
+  p *= 17.0;
+  return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
+}
+float vnoise(vec3 x){
+  vec3 i = floor(x);
+  vec3 f = fract(x);
+  f = f*f*(3.0-2.0*f);
+  float n0=hash13(i);
+  float n1=hash13(i+vec3(1.0,0.0,0.0));
+  float n2=hash13(i+vec3(0.0,1.0,0.0));
+  float n3=hash13(i+vec3(1.0,1.0,0.0));
+  float n4=hash13(i+vec3(0.0,0.0,1.0));
+  float n5=hash13(i+vec3(1.0,0.0,1.0));
+  float n6=hash13(i+vec3(0.0,1.0,1.0));
+  float n7=hash13(i+vec3(1.0,1.0,1.0));
+  return mix(mix(mix(n0,n1,f.x),mix(n2,n3,f.x),f.y),
+             mix(mix(n4,n5,f.x),mix(n6,n7,f.x),f.y),f.z);
+}
+/* тяжёлый: 5 октав */
+float fbm5(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
+  return v;
+}
+/* средний: 3 октавы */
+float fbm3(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=0.5; }
+  return v;
+}
+
+/* --- звёзды: три слоя гридов с мерцанием --- */
+vec3 stars(vec3 rd){
+  vec3 c = vec3(0.0);
+  for(int L=0; L<3; L++){
+    float sc = 90.0 + float(L)*80.0;
+    vec3 g  = rd*sc;
+    vec3 id = floor(g);
+    vec3 fr = fract(g) - 0.5;
+    float h = hash13(id + float(L)*37.0);
+    if(h > 0.975){
+      vec3 off = (vec3(hash13(id+1.0), hash13(id+2.0), hash13(id+3.0)) - 0.5)*0.6;
+      float d  = length(fr - off);
+      float tw = 0.55 + 0.45*sin(uTime*(1.0+h*4.0) + h*40.0);
+      float s  = (1.0 - smoothstep(0.0, 0.14, d))*tw;
+      vec3 tint = mix(vec3(0.70,0.80,1.0), vec3(1.0,0.85,0.60), hash13(id+4.0));
+      c += s*tint*(0.35 + h*0.8);
+    }
+  }
+  return c;
+}
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
+
+  /* --- камера: орбита через полюса, ось планеты = Y --- */
+  vec3 camPos = vec3(cos(uCamA)*CAMR, sin(uCamA)*CAMR, 0.0);
+  vec3 fwd = vec3(-sin(uCamA), cos(uCamA), 0.0);
+  vec3 up0 = normalize(camPos);
+  fwd = normalize(mix(fwd, -up0, 0.22));
+  vec3 right = normalize(cross(fwd, up0));
+  vec3 upv   = cross(right, fwd);
+  vec3 rd    = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
+
+  /* солнце — экваториальный круг с лёгким наклоном; луна — отстает на 0.9 рад */
+  float st = sin(uSunA), ct = cos(uSunA);
+  vec3 sunDir  = normalize(vec3(ct, 0.22*st, st));
+  vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
+
+  /* пересечение луча со сферой планеты */
+  float b    = dot(camPos, rd);
+  float cc   = dot(camPos, camPos) - R*R;
+  float disc = b*b - cc;
+  float tHit = -b - sqrt(max(disc, 0.0));
+  bool hitP  = (disc > 0.0) && (tHit > 0.0);
+
+  float dayLocal = dot(normalize(camPos), sunDir);
+  float dayness  = smoothstep(-0.25, 0.30, dayLocal);
+
+  vec3 col = vec3(0.0);
+
+  if(hitP){
+    /* ---- ПЛАНЕТА ---- */
+    vec3 p = camPos + rd*tHit;
+    vec3 n = normalize(p);
+    float nl  = dot(n, sunDir);
+    float lit = smoothstep(-0.06, 0.18, nl);
+
+    /* континенты: тяжёлый fbm по нормали, планета медленно вращается */
+    vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
+    float cont = fbm5(sp);
+    float land = smoothstep(0.46, 0.54, cont);
+    vec3 ocean = vec3(0.02,0.10,0.22);
+    vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
+    float ice  = smoothstep(0.80, 0.94, abs(n.y));
+    vec3 surf  = mix(ocean, landc, land);
+    surf = mix(surf, vec3(0.85,0.90,0.95), ice);
+
+    /* облака: второй тяжёлый слой, свой дрейф */
+    float cl = fbm5(n*4.2 + vec3(uTime*0.010, 0.0, -uTime*0.006));
+    cl = smoothstep(0.50, 0.74, cl);
+    surf = mix(surf, vec3(0.95,0.97,1.0), cl*0.9);
+
+    vec3 colDay = surf*(0.15 + 1.05*lit);
+    /* блик океана */
+    vec3 hv = normalize(sunDir - rd);
+    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
+    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+
+    /* ночь: огни городов на суше, мерцание */
+    float cellH = hash13(floor(n*90.0));
+    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
+    vec3 colNight = surf*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+
+    col = mix(colNight, colDay, lit);
+
+    /* атмосферный ободок на лимбе */
+    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    col += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
+
+    /* полярные сияния на ночном полюсе */
+    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
+    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
+    col += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
+  } else {
+    /* ---- НЕБО ---- */
+    float daySky = smoothstep(-0.15, 0.35, dayLocal);
+
+    /* ночь: база + звёзды + млечный путь */
+    vec3 night = vec3(0.004,0.006,0.013);
+    night += stars(rd)*1.15;
+    float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
+    night += vec3(0.5,0.55,0.75)*bandW*fbm3(rd*4.0)*0.35;
+
+    /* день: градиент к горизонту, зарево у солнца, облака на куполе */
+    float horiz = 1.0 - abs(dot(rd, up0));
+    vec3 day = mix(vec3(0.25,0.45,0.85), vec3(0.55,0.75,1.0), horiz*0.85);
+    float sunAmt = max(dot(rd, sunDir), 0.0);
+    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.40;
+    float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
+    skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
+    day = mix(day, vec3(1.0), skycl*0.75);
+    float dSun = dot(rd, sunDir);
+    day += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, dSun)*3.0;
+    day += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
+
+    col = mix(night, day, daySky);
+
+    /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
+    float closest = length(camPos - rd*b);
+    float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
+    col += vec3(0.30,0.55,1.0)*atmo*dayness*0.85;
+
+    /* луна: диск с кратерами, свечение */
+    float dM = dot(rd, moonDir);
+    float mdisc = smoothstep(0.99950, 0.99980, dM);
+    if(mdisc > 0.0){
+      vec3 lp = rd - moonDir*dM;
+      float cr = fbm3(lp*260.0);
+      vec3 mc = vec3(0.78,0.78,0.74)*(0.55 + 0.45*cr);
+      float mlit = smoothstep(-0.15, 0.15, dot(moonDir, sunDir));
+      vec3 mc2 = mc*mix(0.10, 1.0, mlit);
+      col = mix(col, mc2, mdisc);
+      col += vec3(0.60,0.65,0.85)*pow(max(dM,0.0), 900.0)*0.30;
+    }
+  }
+
+  /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
+  col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
+  col = col/(1.0 + col*0.30);
+  col = pow(col, vec3(0.92));
+  float vig = 1.0 - 0.22*dot(uv*0.55, uv*0.55);
+  col *= max(vig, 0.0);
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+
+
+const FRAG_SRC = FRAG
+  .replace('__CAMR__', CAM_R.toFixed(6))
+  .replace('__FOT__', FOV_TAN.toFixed(6));
+
+(function(){
+'use strict';
+const cv = document.getElementById('glbg');
+const gl = cv.getContext('webgl', {antialias:false, depth:false, alpha:false})
+        || cv.getContext('experimental-webgl', {antialias:false, depth:false, alpha:false});
+if(!gl){
+  cv.remove();
+  console.warn('R46 ФОН: WebGL недоступен — фон остаётся базовым, интерфейс не затронут');
+  return;
+}
+function sh(type, srcStr){
+  const s = gl.createShader(type);
+  gl.shaderSource(s, srcStr);
+  gl.compileShader(s);
+  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+    const log = gl.getShaderInfoLog(s) || 'неизвестная ошибка';
+    console.error('R46 ФОН: ошибка шейдера:\n' + log);
+    return null;
+  }
+  return s;
+}
+const prog = gl.createProgram();
+const vs = sh(gl.VERTEX_SHADER, VERT);
+const fs = sh(gl.FRAGMENT_SHADER, FRAG_SRC);
+gl.attachShader(prog, vs);
+gl.attachShader(prog, fs);
+gl.linkProgram(prog);
+if(!gl.getProgramParameter(prog, gl.LINK_STATUS) || !vs || !fs){
+  console.error('R46 ФОН: ошибка линковки:\n' + (gl.getProgramInfoLog(prog)||''));
+  cv.remove();
+  return;
+}
+gl.useProgram(prog);
+
+/* один большой треугольник на весь экран */
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+const locA = gl.getAttribLocation(prog, 'aPos');
+gl.enableVertexAttribArray(locA);
+gl.vertexAttribPointer(locA, 2, gl.FLOAT, false, 0, 0);
+
+const uRes = gl.getUniformLocation(prog, 'uRes');
+const uT   = gl.getUniformLocation(prog, 'uTime');
+const uCA  = gl.getUniformLocation(prog, 'uCamA');
+const uSA  = gl.getUniformLocation(prog, 'uSunA');
+
+function resize(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(1, Math.floor(innerWidth  * dpr * RENDER_SCALE));
+  const h = Math.max(1, Math.floor(innerHeight * dpr * RENDER_SCALE));
+  if(cv.width !== w || cv.height !== h){
+    cv.width = w; cv.height = h;
+    gl.viewport(0, 0, w, h);
+  }
+}
+addEventListener('resize', resize);
+resize();
+
+/* главный цикл: RAF сам замирает в фоновой вкладке, dt зажат сверху */
+let simTime = 0, last = performance.now();
+function frame(now){
+  resize();
+  const dt = Math.min((now - last)/1000, 0.1);
+  last = now;
+  simTime += dt*SIM_TIME_SCALE;
+
+  const camA = START_PHASE_RAD + 2*Math.PI*simTime/ORBIT_PERIOD_SIM_SEC;
+  const sunA = 2*Math.PI*simTime/DAY_CYCLE_SIM_SEC;
+
+  gl.uniform2f(uRes, cv.width, cv.height);
+  gl.uniform1f(uT, simTime);
+  gl.uniform1f(uCA, camA);
+  gl.uniform1f(uSA, sunA);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
