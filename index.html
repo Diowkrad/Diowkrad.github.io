@@ -18,18 +18,18 @@
    ============================================================ */
 
 .rack-mount {
-      width: 100%;
-      max-width: 1100px;
-      background: var(--bg-panel);
-      border: 2px solid var(--border-color);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-	      background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
-    background-size: 2px 1px, 18px 18px;    border: 4px outset #950;
+         width: 100%;
+    max-width: 1100px;
+    background: var(--bg-panel);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgb(0 3 30 / 8%) 0px, #000000ad 2px, #00000087 2px, #00000096 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a000080 0px, #001a00a6 1px, #00002ea8 1px, #000000b8 6px);
+    background-size: 2px 1px, 18px 18px;
+    border: 4px outset #995500;
     }
 
 
@@ -283,21 +283,19 @@ a.btn:active{ border-style:inset; }
 
 /* LCD-экран */
 .lcd{
-  background:#0a2a12;
-  border:6px inset #1a1a2e;
-  color:var(--cyan);
-  padding:8px 12px;
-  font-size:0.9rem;
-  margin:10px 5px 0px 5px;
-  height:320px;
-  width:240px;
-  max-width:100%;
-  overflow:auto;
-  line-height:150%;
-  background-image:
-    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
-    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
-  background-size: 2px 3px, 12px 12px;
+      background: #00000061;
+    border: 6px inset #1a1a2e;
+    color: #a3ff52;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    margin: 10px 5px 0px 5px;
+    height: 320px;
+    width: 240px;
+    max-width: 100%;
+    overflow: auto;
+    line-height: 150%;
+    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06bd 2px, #000000bd 2px, #000000bd 4px), repeating-radial-gradient(circle at 50% 50%, #000000b0 1px, #000000b0 1px, #0a1a12b0 1px, #0a1a12b0 6px);
+    background-size: 2px 3px, 12px 12px;
 }
 
 /* анимированная вывеска */
@@ -514,7 +512,7 @@ body.kb-single #keys2{ display:none !important; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-start;    border-radius: 24px;
 }
 
 /* подзаголовки внутри LCD */
@@ -566,7 +564,12 @@ html::after{
   background:repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px);
 }
 </style>
-<div class="rack-mount">
+<div class="rack-mount" style="
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
+    align-items: center;
+">
 <!-- ================= ШАПКА ================= -->
 <header class="panel">
   <h1 class="logotype">🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT 🥈 </h1><br>
@@ -593,8 +596,24 @@ margin: 1px;
     <button data-view="view-download">СКАЧАТЬ</button>
  
 </nav>
-<main id="app">
-<div class="p_block_flex-wrap" >
+<main id="app" style="
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+	max-width: 900px;
+">
+<div class="p_block_flex-wrap" style="
+       background-color: #10111dcf;
+    background-image: linear-gradient(5deg, #013b147d 0 16px, transparent 16px 26px, #14411000 4px 4px, transparent 4px 5px, #0a390873 55px 70px, transparent 70px 88px, #2350197a 88px 96px, transparent 96px 115px, #14411000 115px 128px, transparent 128px 142px, #2e5c257a 142px 148px, transparent 148px 165px), linear-gradient(31deg, transparent 0 12px, #14411070 12px 19px, transparent 19px 44px, #2350196b 44px 51px, transparent 51px 76px, #0a390875 76px 83px, transparent 83px 108px, #144110 108px 115px, transparent 115px 140px, #2e5c256e 140px 147px, transparent 147px 168px), linear-gradient(71deg, transparent 0 18px, #23501994 18px 25px, transparent 25px 55px, #0a3908a1 55px 62px, transparent 62px 92px, #14411000 92px 99px, transparent 99px 130px, #2e5c257d 130px 137px, transparent 137px 165px);
+    background-size: 26px 27px;
+    background-repeat: repeat;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    align-content: center;    min-width: 440px;
+">
 <div class="p_block" >
 						<div>
 							<span class="mishka-wrap" style="display:inline-block; text-decoration:none; line-height:0;">
@@ -1135,8 +1154,13 @@ margin: 1px;
 
 
 <!-- ================= ФУТЕР ================= -->
-<footer class="panel row_b">
-  <span>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ © 2026▮ Diowkrad Studio ® 2011-2026</span>
+<footer class="panel row_b" style=" border-radius: 1280px;">
+  <span style="
+    display: flex;
+    width: 100%;
+    margin: 0px 45px;
+   
+">☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ © 2026▮ Diowkrad Studio ® 2011-2026</span>
 </footer>
 
 <script>
@@ -1151,6 +1175,7 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
   });
 });
 </script>
+</div>
 </main>
 <script>
 /* ═══════════════ КОНСТАНТЫ СИМУЛЯЦИИ ФОНА (править здесь) ═══════════════ */
