@@ -954,6 +954,7 @@ margin: 1px;
           <li>←→ — смена октавы.</li>
           <li>Num7 Num8 Num9 — сустейн 1/8 · 1/4 · 1/2.</li>
           <li>Раскладка привязана к физическим кодам клавиш — ЙЦУКЕН работает сам собой.</li>
+          <li>Фон: кнопка «ФОН: ПИЛОТ» (справа внизу) включает ручное управление фоном: W/S — скорость полёта, A/D — поворот.</li>
           <li>Тумблер КЛАВИАТУРА глушит только ПК-ряд; MIDI и мышь всегда живые.</li>
         </ul>
       </div>
@@ -1173,7 +1174,7 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
   });
 });
 </script>
-</div>
+
 </main>
 <script>
 /* ═══════════════ КОНСТАНТЫ СИМУЛЯЦИИ ФОНА (править здесь) ═══════════════ */
@@ -1452,6 +1453,50 @@ function resize(){
 addEventListener('resize', resize);
 resize();
 
+/* ═══════════ РУЧНОЙ ПИЛОТ ФОНА (править коэффициенты здесь) ═══════════
+   Кнопка «ФОН: ПИЛОТ» справа внизу включает режим; пока он включён,
+   W/S — скорость полёта (вниз до полной остановки, вверх до ×6),
+   A/D — поворот камеры влево/вправо. Клавиши перехватываются в capture
+   до клавиатуры движка, поэтому в режиме пилота нот они не играют.
+   Выключение режима (или потеря фокуса окна) возвращает ×1 и угол 0. */
+const bgPilot = { on:false, speed:1.0, yaw:0.0, orbitA:0.0, keys:new Set() };
+const BG_SPD_RATE = 1.4;   /* изменение множителя скорости, единиц/с  */
+const BG_SPD_MIN  = 0.0, BG_SPD_MAX = 6.0;
+const BG_YAW_RATE = 0.45;  /* рад поворота в секунду                  */
+const BG_KEYMAP   = { KeyW:1, KeyS:1, KeyA:1, KeyD:1 };
+
+const bgCtlBox = document.createElement('div');
+bgCtlBox.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:50;display:flex;gap:6px;flex-direction: column-reverse;align-items:center;';
+const bgBtn = document.createElement('button');
+bgBtn.textContent = 'ФОН: ПИЛОТ';
+const bgHud = document.createElement('span');
+bgHud.style.cssText = 'background:#000;color:var(--cyan);border:2px inset #950;padding:4px 8px;font-family:inherit;font-size:0.75rem;min-width:110px;text-align:center;';
+bgCtlBox.appendChild(bgBtn); bgCtlBox.appendChild(bgHud);
+document.body.appendChild(bgCtlBox);
+
+function bgHudUpd(){
+  bgHud.textContent = bgPilot.on
+    ? '\u00d7' + bgPilot.speed.toFixed(2) + ' | ' + (((bgPilot.yaw*180/Math.PI)%360+360)%360).toFixed(0) + '\u00b0'
+    : '';
+}
+function bgReset(){ bgPilot.speed = 1.0; bgPilot.yaw = 0.0; bgPilot.orbitA = 0.0; bgPilot.keys.clear(); bgHudUpd(); }
+bgBtn.addEventListener('click', function(){
+  bgPilot.on = !bgPilot.on;
+  if(!bgPilot.on) bgReset();
+  bgBtn.classList.toggle('on', bgPilot.on);
+  bgHudUpd();
+});
+addEventListener('keydown', function(e){
+  if(!bgPilot.on || !BG_KEYMAP[e.code]) return;
+  e.preventDefault(); e.stopPropagation();
+  bgPilot.keys.add(e.code);
+}, true);
+addEventListener('keyup', function(e){
+  if(!bgPilot.on || !BG_KEYMAP[e.code]) return;
+  bgPilot.keys.delete(e.code);
+}, true);
+addEventListener('blur', function(){ if(bgPilot.on) bgReset(); });
+
 /* главный цикл: RAF сам замирает в фоновой вкладке, dt зажат сверху */
 let simTime = 0, last = performance.now();
 function frame(now){
@@ -1460,7 +1505,21 @@ function frame(now){
   last = now;
   simTime += dt*SIM_TIME_SCALE;
 
-  const camA = START_PHASE_RAD + 2*Math.PI*simTime/ORBIT_PERIOD_SIM_SEC;
+  /* ☩ ручной пилот: интеграция управления (W/S скорость, A/D поворот) */
+  if(bgPilot.on){
+    for(const k of bgPilot.keys){
+      if(k==='KeyW')      bgPilot.speed += dt*BG_SPD_RATE;
+      else if(k==='KeyS') bgPilot.speed -= dt*BG_SPD_RATE;
+      else if(k==='KeyA') bgPilot.yaw   -= dt*BG_YAW_RATE;
+      else if(k==='KeyD') bgPilot.yaw   += dt*BG_YAW_RATE;
+    }
+    bgPilot.speed = Math.min(BG_SPD_MAX, Math.max(BG_SPD_MIN, bgPilot.speed));
+    bgHudUpd();
+  }
+  /* угол орбиты копится отдельно — смена скорости не дёргает картинку скачком;
+     simTime продолжает идти, поэтому сутки и погода живут своей жизнью */
+  bgPilot.orbitA += dt*(2*Math.PI/ORBIT_PERIOD_SIM_SEC)*SIM_TIME_SCALE*bgPilot.speed;
+  const camA = START_PHASE_RAD + bgPilot.orbitA + bgPilot.yaw;
   const sunA = 2*Math.PI*simTime/DAY_CYCLE_SIM_SEC;
 
   gl.uniform2f(uRes, cv.width, cv.height);
