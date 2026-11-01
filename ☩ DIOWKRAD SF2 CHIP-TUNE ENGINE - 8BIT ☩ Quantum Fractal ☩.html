@@ -8034,6 +8034,21 @@
 		}
 
 /** YM2413.gm2413EnsureWorklet() — выполняет вспомогательное действие «gm2413 ensure worklet» */
+		function diowkLoadUnified(ctx) {
+			if (ctx.__diowkMod) return ctx.__diowkMod;
+			ctx.__diowkMod = new Promise(function(resolve, reject) {
+				try {
+					const _u = URL.createObjectURL(new Blob([DIOWK_UNIFIED_SRC], {
+						type: 'application/javascript'
+					}));
+					ctx.audioWorklet.addModule(_u).then(resolve, reject);
+				} catch (e) {
+					reject(e);
+				}
+			});
+			return ctx.__diowkMod;
+		}
+		/** YM2413.diowkLoadUnified(ctx) — единая загрузка ворклет-модуля (один addModule на AudioContext) */
 		function gm2413EnsureWorklet() {
 			if (gm2413State !== 'idle' || !audioCtx || !audioCtx.audioWorklet) return;
 			if (window.location && window.location.protocol === 'file:') {
@@ -8049,20 +8064,13 @@
 					log('GM2413: ворклет не загрузился за 3 с — фолбэк старый GM.');
 				}
 			}, 3000);
-			try {
-				const _u = URL.createObjectURL(new Blob([DIOWK_UNIFIED_SRC], {
-					type: 'application/javascript'
-				}));
-				audioCtx.audioWorklet.addModule(_u).then(function() {
+			diowkLoadUnified(audioCtx).then(function() {
 					gm2413State = 'ready';
 					log('GM2413: ворклет загружен — конвейер MIDI GM готов.');
 				}).catch(function(e) {
 					gm2413State = 'fail';
 					log('GM2413: ворклет недоступен (' + ((e && e.message) || e) + ') — фолбэк старый GM.');
-				});
-			} catch (e) {
-				gm2413State = 'fail';
-			}
+			});
 		}
 		const gmNoteChan = new Map();
 
@@ -8185,20 +8193,13 @@
 					log('SF2413: ворклет не загрузился за 3 с — фолбэк старый SF2.');
 				}
 			}, 3000);
-			try {
-				const _u = URL.createObjectURL(new Blob([DIOWK_UNIFIED_SRC], {
-					type: 'application/javascript'
-				}));
-				audioCtx.audioWorklet.addModule(_u).then(function() {
+			diowkLoadUnified(audioCtx).then(function() {
 					sf2413State = 'ready';
 					log('SF2413: ворклет загружен — конвейер SoundFont готов.');
 				}).catch(function(e) {
 					sf2413State = 'fail';
 					log('SF2413: ворклет недоступен (' + ((e && e.message) || e) + ') — фолбэк старый SF2.');
-				});
-			} catch (e) {
-				sf2413State = 'fail';
-			}
+			});
 		}
 
 /** YM2413.sfAudioReady() — выполняет вспомогательное действие «sf audio ready» */
@@ -9841,11 +9842,7 @@
 					log('CHIP2413: ворклет не загрузился за 3 с — фолбэк старый чип.');
 				}
 			}, 3000);
-			try {
-				const _u = URL.createObjectURL(new Blob([DIOWK_UNIFIED_SRC], {
-					type: 'application/javascript'
-				}));
-				audioCtx.audioWorklet.addModule(_u).then(function() {
+			diowkLoadUnified(audioCtx).then(function() {
 					chip2413State = 'ready';
 					log('CHIP2413: ворклет загружен — конвейер 2A03 готов.');
 					try {
@@ -9854,10 +9851,7 @@
 				}).catch(function(e) {
 					chip2413State = 'fail';
 					log('CHIP2413: ворклет недоступен (' + ((e && e.message) || e) + ') — фолбэк старый чип.');
-				});
-			} catch (e) {
-				chip2413State = 'fail';
-			}
+			});
 		}
 
 /** YM2413.chip2614BuildNode() — выполняет вспомогательное действие «chip2614 build node» */
@@ -9946,11 +9940,7 @@
 					heartFallback();
 				}
 			}, 3000);
-			try {
-				const _u = URL.createObjectURL(new Blob([DIOWK_UNIFIED_SRC], {
-					type: 'application/javascript'
-				}));
-				audioCtx.audioWorklet.addModule(_u).then(function() {
+			diowkLoadUnified(audioCtx).then(function() {
 					ymWorkletState = 'ready';
 					log('ВАЛИДАТОР: ворклет YM2413 загружен — сэмпл-точный конвейер готов.');
 					heartStart();
@@ -9958,12 +9948,7 @@
 					ymWorkletState = 'fail';
 					log('YM2413: ворклет недоступен (' + ((e && e.message) || e) + ') — работает фолбэк ScriptProcessor.');
 					heartFallback();
-				});
-			} catch (e) {
-				ymWorkletState = 'fail';
-				log('YM2413: ворклет не поддерживается — работает фолбэк ScriptProcessor.');
-				heartFallback();
-			}
+			});
 		}
 
 	
