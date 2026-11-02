@@ -1861,10 +1861,11 @@ var CFG = {
   RESP: 11.0,                                                   /* нарастание рулей, 1/с */
   DRAG_YAW: 0.0030, DRAG_PITCH: 0.0024,                         /* мышь, рад/пиксель */
   MINR: 1.045,                                                  /* мин. радиус орбиты */
-  PICK_N: 12, PICK_RMIN: 1.16, PICK_RMAX: 1.78, PICK_RAD: 0.075,
+  CAKE_N: 12, CHEESE_N: 18, PICK_RMIN: 1.16, PICK_RMAX: 1.78, PICK_RAD: 0.075,
   MOON_R: [1.70, 2.05, 2.40, 2.75], MOON_SZ: [0.10, 0.12, 0.13, 0.15],
   FOV_TAN: Math.tan(60.0*0.5*Math.PI/180.0),
-  BUBBLE_R: 1.90, OUT_RMIN: 1.95, OUT_RMAX: 3.20, PEPPER_N: 4,
+  BUBBLE_R: 1.90, OUT_RMIN: 1.95, OUT_RMAX: 3.20, PEPPER_N: 20,
+  BIG_CAKE_N: 6, BIG_CHEESE_N: 9,
   PTS: { cake: 25, cheese: 50, moon: 175 },
   MOON_CAP0: 3, CAP_STEP: 2500, BONUS_N: 50, IMMUNE_T: 30, START_PROV: 10
 };
@@ -2119,14 +2120,22 @@ function rndDir(){
 }
 function genWorld(){
   for(var pi = 0; pi < 3; pi++){
-    for(var i = 0; i < CFG.PICK_N; i++){
+    for(var i = 0; i < CFG.CAKE_N; i++){
       var dir = rndDir();
       var r = CFG.PICK_RMIN + Math.random()*(CFG.PICK_RMAX - CFG.PICK_RMIN);
       var ax = cross(dir, rndDir());
       if(len(ax) < 0.05) ax = [0,1,0];
-      var kind = Math.random() < 0.5 ? 'cake' : 'cheese';
-      ITEMS.push({ el: makeSprite(kind === 'cake' ? '🧁' : '🧀'),
-        kind: kind, p0: mul(dir, r), axis: norm(ax),
+      ITEMS.push({ el: makeSprite('🧁'),
+        kind: 'cake', p0: mul(dir, r), axis: norm(ax),
+        w: 0.05 + Math.random()*0.10, planet: pi, angle: 0 });
+    }
+    for(var i = 0; i < CFG.CHEESE_N; i++){
+      var dir = rndDir();
+      var r = CFG.PICK_RMIN + Math.random()*(CFG.PICK_RMAX - CFG.PICK_RMIN);
+      var ax = cross(dir, rndDir());
+      if(len(ax) < 0.05) ax = [0,1,0];
+      ITEMS.push({ el: makeSprite('🧀'),
+        kind: 'cheese', p0: mul(dir, r), axis: norm(ax),
         w: 0.05 + Math.random()*0.10, planet: pi, angle: 0 });
     }
     if(pi === 1){
@@ -2138,14 +2147,22 @@ function genWorld(){
           axis: norm(mAx), w: 0.04 + 0.03*m, planet: 1, sz: CFG.MOON_SZ[m], angle: 0, kind: 'moon', mi: m });
       }
     }
-    for(var g = 0; g < 6; g++){
+    for(var g = 0; g < CFG.BIG_CAKE_N; g++){
       var gdir = rndDir();
       var gr = CFG.OUT_RMIN + Math.random()*(CFG.OUT_RMAX - CFG.OUT_RMIN);
       var gax = cross(gdir, rndDir());
       if(len(gax) < 0.05) gax = [0,1,0];
-      var gkind = Math.random() < 0.5 ? 'cake' : 'cheese';
-      ITEMS.push({ el: makeSprite(gkind === 'cake' ? '🧁' : '🧀'),
-        kind: gkind, p0: mul(gdir, gr), axis: norm(gax),
+      ITEMS.push({ el: makeSprite('🧁'),
+        kind: 'cake', p0: mul(gdir, gr), axis: norm(gax),
+        w: 0.04 + Math.random()*0.08, planet: pi, sz: 0.104, big: 1, angle: 0 });
+    }
+    for(var g = 0; g < CFG.BIG_CHEESE_N; g++){
+      var gdir = rndDir();
+      var gr = CFG.OUT_RMIN + Math.random()*(CFG.OUT_RMAX - CFG.OUT_RMIN);
+      var gax = cross(gdir, rndDir());
+      if(len(gax) < 0.05) gax = [0,1,0];
+      ITEMS.push({ el: makeSprite('🧀'),
+        kind: 'cheese', p0: mul(gdir, gr), axis: norm(gax),
         w: 0.04 + Math.random()*0.08, planet: pi, sz: 0.104, big: 1, angle: 0 });
     }
     for(var q = 0; q < CFG.PEPPER_N; q++){
