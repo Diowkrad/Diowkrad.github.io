@@ -955,7 +955,7 @@ margin: 1px;
           <li>←→ — смена октавы.</li>
           <li>Num7 Num8 Num9 — сустейн 1/8 · 1/4 · 1/2.</li>
           <li>Раскладка привязана к физическим кодам клавиш — ЙЦУКЕН работает сам собой.</li>
-          <li>ИГРА: кнопка «ИГРА: СТАРТ» — включить полёт. W/S — тяга, A/D — рысканье, ↑/↓ — тангаж, Q/E — крен, мышь — взгляд, G/J — смена планеты. Кексики 🧁 и сыр 🧀 собирайте пролётом.</li>
+          <li>ИГРА: кнопка «ИГРА: СТАРТ» — свободный полёт. W/S — тяга, A/D — рысканье, ↑/↓ — тангаж, Q/E — крен, мышь — взгляд, G/J — смена планеты. Кексики 🧁 и сыр 🧀 собирайте пролётом.</li>
           <li>Тумблер КЛАВИАТУРА глушит только ПК-ряд; MIDI и мышь всегда живые.</li>
         </ul>
       </div>
@@ -1533,7 +1533,7 @@ void main(){
     col += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
     }
     else if(uPlanet < 1.5){
-      /* ---- АУРЕЛИЯ: газовый гигант с полосами и штормом ---- */
+      /* ---- ЧИЗИЯ: газовый гигант с полосами и штормом ---- */
       float lat = n.y;
       float warp = fbm3(n*2.6 + vec3(uTime*0.008, 0.0, 0.0));
       float bands = sin(lat*16.0 + warp*3.2);
@@ -1554,7 +1554,7 @@ void main(){
       col += vec3(0.90, 0.75, 0.50)*fresA*(0.2 + 0.8*lit)*0.8;
     }
     else {
-      /* ---- ПИРРА: магматический мир с реками лавы ---- */
+      /* ---- НГАЛИН: магматический мир с реками лавы ---- */
       float rock = fbm5(n*3.2);
       vec3 surf = mix(vec3(0.05, 0.045, 0.05), vec3(0.16, 0.13, 0.12), rock);
       float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
@@ -1694,7 +1694,7 @@ if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
   return;
 }
 if(bgFallback){
-  console.warn('R46 ФОН: игровой шейдер не собрался — работает базовая ТЕРРА (см. ошибку компиляции выше)');
+  console.warn('R46 ФОН: игровой шейдер не собрался — работает базовый ХИТОМИ (см. ошибку компиляции выше)');
 }
 window.__bgInfo = { fallback: bgFallback };
 gl.useProgram(prog);
@@ -1844,7 +1844,11 @@ function resetBasis(){
 resetBasis();
 var yawV = 0, pitchV = 0, rollV = 0, speed = CFG.SPD_DEF;
 var keys = {}, drag = null;
-var planet = 0, PLANET_NAMES = ['ТЕРРА', 'АУРЕЛИЯ', 'ПИРРА'];
+/* ---------- НАЗВАНИЯ ПЛАНЕТ ---------- */
+/* ---------- ХИТОМИ: Жизнепригодная планета названая в честь игрока покарившего великий трактор в игре ELITE-DANGEROUS в центре галлактики находящийся под СТРЕЛЕЦ-А* в 460с.г и на 360с.л в сторону нетронног поля где огромное скопление нетронных Звезд , белых карликов и Чёрных дыр. ---------- */
+/* ---------- ЧИЗИЯ : Какой сырный мишка не захочит себе огромнуя планет состоящию из сыра. Планета была притянута Разумными плюшивыми медведями с планеты ХИТОМИ спомощью квантового гравитационного завхвата. И зачем они это сделали ? Теперь по звездной системе летает сыр и остатки когдато пышных колец этой планеты. Говорят они состояли из кексиков.  ---------- */
+/* ---------- НГАЛИН: Гравитационные Эксперементы плюшевых медведий с притяжением ЧИЗИИ закончились притяжением когдато брошенной в сторону Дарк войда старшего брата планеты ХИТОМИ . ХИТОМИ не хотела чтобы НГАЛИН Держался постоянно за нее и жил дальше сам . Однако из за Плюшевых медведей ХИТОМИ некогда не избавится от НГАЛИН. ---------- */
+var planet = 0, PLANET_NAMES = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН'];
 var gameOn = false, switching = false;
 
 /* ---------- ЗВУК: звук грузится по URL: Music.ogg, loop1.ogg, loop2.ogg рядом с HTML ---------- */
@@ -2218,17 +2222,17 @@ window.addEventListener('pointerup', function(){ drag = null; });
 
 function applyGameMode(){
   document.body.classList.toggle('dgame', gameOn);
-  layer.style.display = gameOn ? 'block' : 'none';
-  hud.style.display = gameOn ? 'block' : 'none';
-  btnPilot.textContent = gameOn ? 'ИГРА: СТОП' : 'ИГРА: СТАРТ';
   btnPilot.classList.toggle('on', gameOn);
+  if(!btnPilot.disabled) btnPilot.textContent = gameOn ? 'ИГРА: СТОП' : 'ИГРА: СТАРТ';
+  layer.style.display = gameOn ? '' : 'none';
+  hud.style.display = gameOn ? '' : 'none';
+  keys = {}; drag = null;
+  if(gameOn){ tryMusic(); }
+  else if(sfx.music){ sfx.music.pause(); }
 }
 btnPilot.addEventListener('click', function(){
   gameOn = !gameOn;
   applyGameMode();
-  keys = {}; drag = null;
-  if(gameOn){ tryMusic(); }
-  else if(sfx.music){ sfx.music.pause(); }
 });
 btnMusic.addEventListener('click', function(){
   sfx.musicOn = !sfx.musicOn;
@@ -2242,10 +2246,9 @@ btnMusic.addEventListener('click', function(){
 var bgInfo = window.__bgInfo || {};
 if(bgInfo.fallback){
   gameOn = false;
-  document.body.classList.remove('dgame');
+  applyGameMode();
   btnPilot.disabled = true;
-  btnPilot.classList.remove('on');
-  btnPilot.textContent = 'ФОН: БАЗОВЫЙ';
+  btnPilot.textContent = 'ИГРА: БАЗОВЫЙ';
   gameErr('ФОН: игровой шейдер не собрался — включён базовый R46, игра ждёт починки. Ошибка компиляции в консоли (F12).');
 }
 
