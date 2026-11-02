@@ -943,6 +943,7 @@ margin: 1px;
     <div class="panel_lcd">
       <div class="lcd lcd-full">
         <h2>УПРАВЛЕНИЕ</h2>
+        <p>ИГРА: СТАРТ — W/S тяга, A/D рысканье, ↑/↓ тангаж, Q/E крен, G/J планеты, мышь — взгляд, H — интерфейс.</p>
         <h3>2 ряда — зигзаг на две октавы</h3>
         <p>Нижний ряд (C4…F5): ZSXDCVGBHNJM,L.;/'// ;=D#5 · /=E5 · '=F5</p>
         <p>Верхний ряд (C5…F#6, ровно октава выше): Q2W3ER5T6Y7UI9O0P[]//
@@ -954,8 +955,8 @@ margin: 1px;
           <li>←→ — смена октавы.</li>
           <li>Num7 Num8 Num9 — сустейн 1/8 · 1/4 · 1/2.</li>
           <li>Раскладка привязана к физическим кодам клавиш — ЙЦУКЕН работает сам собой.</li>
+          <li>ИГРА: кнопка «ИГРА: СТАРТ» — включить полёт. W/S — тяга, A/D — рысканье, ↑/↓ — тангаж, Q/E — крен, мышь — взгляд, G/J — смена планеты. Кексики 🧁 и сыр 🧀 собирайте пролётом.</li>
           <li>Тумблер КЛАВИАТУРА глушит только ПК-ряд; MIDI и мышь всегда живые.</li>
-          <li>ФОН: ПИЛОТ (кнопка справа внизу): W/S — скорость полёта, A/D — поворот, ↑/↓ — тангаж; планету можно тащить мышью (по фону или правой кнопкой). В полёте эти клавиши не играют ноты.</li>
         </ul>
       </div>
     </div>
@@ -1152,12 +1153,6 @@ margin: 1px;
   </section>
 
 
-<!-- ☩ ПИЛОТ ФОНА: кнопка и индикатор ручной камеры ☩ -->
-<div id="pilotBar" style="position:fixed; right:12px; bottom:12px; z-index:10; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-  <div id="pilotInfo" style="display:none; font-family:'Courier New',monospace; font-size:0.72rem; letter-spacing:1px; color:#7dff8a; background:#000c; border:2px outset #950; padding:4px 8px; white-space:pre;">СКОРОСТЬ ×1.0   ПОВОРОТ 0°   ТАНГАЖ 0°</div>
-  <button id="pilotBtn" style="width:auto; height:34px; font-size:0.75rem; padding:4px 14px;">ФОН: ПИЛОТ</button>
-</div>
-
 <!-- ================= ФУТЕР ================= -->
 <footer class="panel row_b" style=" border-radius: 1280px;">
   <span style="
@@ -1205,13 +1200,11 @@ const VERT = 'attribute vec2 aPos;\nvoid main(){ gl_Position = vec4(aPos, 0.0, 1
 
 
 
-const FRAG = `precision highp float;
+const FRAG_BASE = `precision highp float;
 uniform vec2  uRes;
 uniform float uTime;
 uniform float uCamA;
 uniform float uSunA;
-uniform float uTilt;
-uniform float uYaw;
 
 #define R    1.0
 #define CAMR __CAMR__
@@ -1277,13 +1270,9 @@ void main(){
 
   /* --- камера: орбита через полюса, ось планеты = Y --- */
   vec3 camPos = vec3(cos(uCamA)*CAMR, sin(uCamA)*CAMR, 0.0);
+  vec3 fwd = vec3(-sin(uCamA), cos(uCamA), 0.0);
   vec3 up0 = normalize(camPos);
-  /* руль: поворот взгляда вокруг радиуса-вектора (A/D и драг) */
-  vec3 tang = vec3(-sin(uCamA), cos(uCamA), 0.0);
-  vec3 side = vec3(0.0, 0.0, 1.0);
-  vec3 fwd = normalize(tang*cos(uYaw) + side*sin(uYaw));
-  /* тангаж: наклон от горизонта к надиру (стрелки) */
-  fwd = normalize(mix(fwd, -up0, uTilt));
+  fwd = normalize(mix(fwd, -up0, 0.22));
   vec3 right = normalize(cross(fwd, up0));
   vec3 upv   = cross(right, fwd);
   vec3 rd    = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
@@ -1400,9 +1389,265 @@ void main(){
   gl_FragColor = vec4(col, 1.0);
 }`;
 
+const FRAG = `precision highp float;
+uniform vec2  uRes;
+uniform float uTime;
+uniform float uCamA;
+uniform float uSunA;
+uniform vec3  uCamPos;
+uniform vec3  uCamR;
+uniform vec3  uCamU;
+uniform vec3  uCamF;
+uniform float uPlanet;
+
+#define R    1.0
+#define CAMR __CAMR__
+#define FOT  __FOT__
+
+/* --- хэш и шумы (средний слой) --- */
+float hash13(vec3 p){
+  p = fract(p*0.3183099 + vec3(0.1,0.2,0.3));
+  p *= 17.0;
+  return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
+}
+float vnoise(vec3 x){
+  vec3 i = floor(x);
+  vec3 f = fract(x);
+  f = f*f*(3.0-2.0*f);
+  float n0=hash13(i);
+  float n1=hash13(i+vec3(1.0,0.0,0.0));
+  float n2=hash13(i+vec3(0.0,1.0,0.0));
+  float n3=hash13(i+vec3(1.0,1.0,0.0));
+  float n4=hash13(i+vec3(0.0,0.0,1.0));
+  float n5=hash13(i+vec3(1.0,0.0,1.0));
+  float n6=hash13(i+vec3(0.0,1.0,1.0));
+  float n7=hash13(i+vec3(1.0,1.0,1.0));
+  return mix(mix(mix(n0,n1,f.x),mix(n2,n3,f.x),f.y),
+             mix(mix(n4,n5,f.x),mix(n6,n7,f.x),f.y),f.z);
+}
+/* тяжёлый: 5 октав */
+float fbm5(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
+  return v;
+}
+/* средний: 3 октавы */
+float fbm3(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=0.5; }
+  return v;
+}
+
+/* --- звёзды: три слоя гридов с мерцанием --- */
+vec3 stars(vec3 rd){
+  vec3 c = vec3(0.0);
+  for(int L=0; L<3; L++){
+    float sc = 90.0 + float(L)*80.0;
+    vec3 g  = rd*sc;
+    vec3 id = floor(g);
+    vec3 fr = fract(g) - 0.5;
+    float h = hash13(id + float(L)*37.0);
+    if(h > 0.975){
+      vec3 off = (vec3(hash13(id+1.0), hash13(id+2.0), hash13(id+3.0)) - 0.5)*0.6;
+      float d  = length(fr - off);
+      float tw = 0.55 + 0.45*sin(uTime*(1.0+h*4.0) + h*40.0);
+      float s  = (1.0 - smoothstep(0.0, 0.14, d))*tw;
+      vec3 tint = mix(vec3(0.70,0.80,1.0), vec3(1.0,0.85,0.60), hash13(id+4.0));
+      c += s*tint*(0.35 + h*0.8);
+    }
+  }
+  return c;
+}
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
+
+  /* --- камера: свободный полёт — позиция и базис приходят из JS --- */
+  vec3 camPos = uCamPos;
+  vec3 fwd    = normalize(uCamF);
+  vec3 right  = normalize(uCamR);
+  vec3 upv    = normalize(uCamU);
+  vec3 rd     = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
+  vec3 up0    = normalize(camPos);
+
+  /* солнце — экваториальный круг с лёгким наклоном; луна — отстает на 0.9 рад */
+  float st = sin(uSunA), ct = cos(uSunA);
+  vec3 sunDir  = normalize(vec3(ct, 0.22*st, st));
+  vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
+
+  /* пересечение луча со сферой планеты */
+  float b    = dot(camPos, rd);
+  float cc   = dot(camPos, camPos) - R*R;
+  float disc = b*b - cc;
+  float tHit = -b - sqrt(max(disc, 0.0));
+  bool hitP  = (disc > 0.0) && (tHit > 0.0);
+
+  float dayLocal = dot(normalize(camPos), sunDir);
+  float dayness  = smoothstep(-0.25, 0.30, dayLocal);
+
+  vec3 col = vec3(0.0);
+
+  if(hitP){
+    /* ---- ПЛАНЕТА ---- */
+    vec3 p = camPos + rd*tHit;
+    vec3 n = normalize(p);
+    float nl  = dot(n, sunDir);
+    float lit = smoothstep(-0.06, 0.18, nl);
+
+    if(uPlanet < 0.5){
+    /* континенты: тяжёлый fbm по нормали, планета медленно вращается */
+    vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
+    float cont = fbm5(sp);
+    float land = smoothstep(0.46, 0.54, cont);
+    vec3 ocean = vec3(0.02,0.10,0.22);
+    vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
+    float ice  = smoothstep(0.80, 0.94, abs(n.y));
+    vec3 surf  = mix(ocean, landc, land);
+    surf = mix(surf, vec3(0.85,0.90,0.95), ice);
+
+    /* облака: второй тяжёлый слой, свой дрейф */
+    float cl = fbm5(n*4.2 + vec3(uTime*0.010, 0.0, -uTime*0.006));
+    cl = smoothstep(0.50, 0.74, cl);
+    surf = mix(surf, vec3(0.95,0.97,1.0), cl*0.9);
+
+    vec3 colDay = surf*(0.15 + 1.05*lit);
+    /* блик океана */
+    vec3 hv = normalize(sunDir - rd);
+    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
+    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+
+    /* ночь: огни городов на суше, мерцание */
+    float cellH = hash13(floor(n*90.0));
+    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
+    vec3 colNight = surf*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+
+    col = mix(colNight, colDay, lit);
+
+    /* атмосферный ободок на лимбе */
+    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    col += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
+
+    /* полярные сияния на ночном полюсе */
+    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
+    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
+    col += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
+    }
+    else if(uPlanet < 1.5){
+      /* ---- АУРЕЛИЯ: газовый гигант с полосами и штормом ---- */
+      float lat = n.y;
+      float warp = fbm3(n*2.6 + vec3(uTime*0.008, 0.0, 0.0));
+      float bands = sin(lat*16.0 + warp*3.2);
+      float bands2 = sin(lat*34.0 + 1.7);
+      vec3 band1 = vec3(0.87, 0.80, 0.62);
+      vec3 band2 = vec3(0.72, 0.55, 0.34);
+      vec3 band3 = vec3(0.93, 0.88, 0.74);
+      vec3 surf = mix(band1, band2, smoothstep(-0.6, 0.6, bands));
+      surf = mix(surf, band3, 0.5 + 0.5*sin(lat*7.0 + 1.0));
+      surf = mix(surf, band2*0.92, 0.25*smoothstep(0.3, 0.9, bands2));
+      vec3 sdir = normalize(vec3(cos(uTime*0.02 + 2.0), -0.30, sin(uTime*0.02 + 2.0)));
+      float angS = acos(clamp(dot(n, sdir), -1.0, 1.0));
+      float storm = 1.0 - smoothstep(0.05, 0.16, angS);
+      surf = mix(surf, vec3(0.80, 0.42, 0.22), storm*0.85);
+      surf *= 0.92 + 0.16*fbm3(n*9.0 + vec3(uTime*0.05, 0.0, 0.0));
+      col = surf*(0.06 + 1.05*lit);
+      float fresA = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+      col += vec3(0.90, 0.75, 0.50)*fresA*(0.2 + 0.8*lit)*0.8;
+    }
+    else {
+      /* ---- ПИРРА: магматический мир с реками лавы ---- */
+      float rock = fbm5(n*3.2);
+      vec3 surf = mix(vec3(0.05, 0.045, 0.05), vec3(0.16, 0.13, 0.12), rock);
+      float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
+      float riv2 = fbm3(n*7.0 - vec3(uTime*0.015, 0.0, 0.0));
+      float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+                 + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+      lava = min(lava, 1.0);
+      float pulse = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
+      col = surf*(0.05 + 0.9*lit) + vec3(1.0, 0.38, 0.06)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
+      float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+      col += vec3(1.0, 0.45, 0.10)*fresP*0.25;
+    }
+  } else {
+    /* ---- НЕБО ---- */
+    float daySky = smoothstep(-0.15, 0.35, dayLocal);
+
+    /* ночь: база + звёзды + млечный путь */
+    vec3 night = vec3(0.004,0.006,0.013);
+    night += stars(rd)*1.15;
+    float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
+    night += vec3(0.5,0.55,0.75)*bandW*fbm3(rd*4.0)*0.35;
+
+    /* день: градиент к горизонту, зарево у солнца, облака на куполе */
+    float horiz = 1.0 - abs(dot(rd, up0));
+    vec3 day = mix(vec3(0.25,0.45,0.85), vec3(0.55,0.75,1.0), horiz*0.85);
+    float sunAmt = max(dot(rd, sunDir), 0.0);
+    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.40;
+    float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
+    skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
+    day = mix(day, vec3(1.0), skycl*0.75);
+    float dSun = dot(rd, sunDir);
+    day += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, dSun)*3.0;
+    day += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
+
+    col = mix(night, day, daySky);
+
+    /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
+    float closest = length(camPos - rd*b);
+    float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
+    col += vec3(0.30,0.55,1.0)*atmo*dayness*0.85;
+
+    /* луна: диск с кратерами, свечение */
+    float dM = dot(rd, moonDir);
+    float mdisc = smoothstep(0.99950, 0.99980, dM);
+    if(uPlanet < 0.5 && mdisc > 0.0){
+      vec3 lp = rd - moonDir*dM;
+      float cr = fbm3(lp*260.0);
+      vec3 mc = vec3(0.78,0.78,0.74)*(0.55 + 0.45*cr);
+      float mlit = smoothstep(-0.15, 0.15, dot(moonDir, sunDir));
+      vec3 mc2 = mc*mix(0.10, 1.0, mlit);
+      col = mix(col, mc2, mdisc);
+      col += vec3(0.60,0.65,0.85)*pow(max(dM,0.0), 900.0)*0.30;
+    }
+  }
+
+  /* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
+  if(uPlanet > 0.5 && uPlanet < 1.5){
+    vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
+    float denom = dot(rd, nR);
+    if(abs(denom) > 0.0035){
+      float tR = -dot(camPos, nR)/denom;
+      if(tR > 0.05 && (!hitP || tR < tHit)){
+        vec3 q = camPos + rd*tR;
+        float rr = length(q);
+        if(rr > 1.45 && rr < 2.35){
+          float gap = smoothstep(1.76, 1.78, rr)*(1.0 - smoothstep(1.84, 1.86, rr));
+          float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
+          float edge = smoothstep(1.45, 1.52, rr)*(1.0 - smoothstep(2.28, 2.35, rr));
+          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
+          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
+          float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
+          alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
+          col = mix(col, vec3(0.85, 0.76, 0.58)*bright, alpha*0.9);
+        }
+      }
+    }
+  }
+
+  /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
+  col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
+  col = col/(1.0 + col*0.30);
+  col = pow(col, vec3(0.92));
+  float vig = 1.0 - 0.22*dot(uv*0.55, uv*0.55);
+  col *= max(vig, 0.0);
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
 
 
 const FRAG_SRC = FRAG
+  .replace('__CAMR__', CAM_R.toFixed(6))
+  .replace('__FOT__', FOV_TAN.toFixed(6));
+const FRAG_BASE_SRC = FRAG_BASE
   .replace('__CAMR__', CAM_R.toFixed(6))
   .replace('__FOT__', FOV_TAN.toFixed(6));
 
@@ -1414,8 +1659,6 @@ const gl = cv.getContext('webgl', {antialias:false, depth:false, alpha:false})
 if(!gl){
   cv.remove();
   console.warn('R46 ФОН: WebGL недоступен — фон остаётся базовым, интерфейс не затронут');
-  var pb0 = document.getElementById('pilotBar');
-  if(pb0) pb0.remove();
   return;
 }
 function sh(type, srcStr){
@@ -1431,15 +1674,29 @@ function sh(type, srcStr){
 }
 const prog = gl.createProgram();
 const vs = sh(gl.VERTEX_SHADER, VERT);
-const fs = sh(gl.FRAGMENT_SHADER, FRAG_SRC);
+let fs = sh(gl.FRAGMENT_SHADER, FRAG_SRC);
+let bgFallback = false;
+if(!fs){
+  bgFallback = true;
+  fs = sh(gl.FRAGMENT_SHADER, FRAG_BASE_SRC);
+}
+if(!vs || !fs){
+  console.error('R46 ФОН: оба шейдера не собрались — фон отключён');
+  cv.remove();
+  return;
+}
 gl.attachShader(prog, vs);
 gl.attachShader(prog, fs);
 gl.linkProgram(prog);
-if(!gl.getProgramParameter(prog, gl.LINK_STATUS) || !vs || !fs){
+if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
   console.error('R46 ФОН: ошибка линковки:\n' + (gl.getProgramInfoLog(prog)||''));
   cv.remove();
   return;
 }
+if(bgFallback){
+  console.warn('R46 ФОН: игровой шейдер не собрался — работает базовая ТЕРРА (см. ошибку компиляции выше)');
+}
+window.__bgInfo = { fallback: bgFallback };
 gl.useProgram(prog);
 
 /* один большой треугольник на весь экран */
@@ -1454,74 +1711,11 @@ const uRes = gl.getUniformLocation(prog, 'uRes');
 const uT   = gl.getUniformLocation(prog, 'uTime');
 const uCA  = gl.getUniformLocation(prog, 'uCamA');
 const uSA  = gl.getUniformLocation(prog, 'uSunA');
-const uTiltA = gl.getUniformLocation(prog, 'uTilt');
-const uYawA  = gl.getUniformLocation(prog, 'uYaw');
-
-/* ☩ ПИЛОТ ФОНА: ручная камера — W/S скорость, A/D поворот, ↑/↓ тангаж, драг мышью ☩ */
-const pilot = { on:false, spd:1, spdT:1, yaw:0, yawV:0, tilt:0.22, tiltV:0,
-  orbitA:START_PHASE_RAD, _w:false, _s:false, _a:false, _d:false, _au:false, _ad:false };
-const PILOT_RATE = 2*Math.PI*SIM_TIME_SCALE/ORBIT_PERIOD_SIM_SEC;
-const pilotBtn  = document.getElementById('pilotBtn');
-const pilotInfo = document.getElementById('pilotInfo');
-function pilotSync(){
-  if(pilotBtn)  pilotBtn.classList.toggle('on', pilot.on);
-  if(pilotInfo) pilotInfo.style.display = pilot.on ? 'block' : 'none';
-}
-if(pilotBtn) pilotBtn.addEventListener('click', function(){
-  pilot.on = !pilot.on;
-  if(!pilot.on) pilot.spdT = 1;
-  pilotSync();
-});
-
-/* клавиши пилота: перехват в capture-фазе, чтобы нотный движок их не видел */
-const PILOT_KEYS = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, ArrowUp:1, ArrowDown:1 };
-const PILOT_MAP  = { KeyW:'_w', KeyS:'_s', KeyA:'_a', KeyD:'_d', ArrowUp:'_au', ArrowDown:'_ad' };
-function pilotKey(e, down){
-  if(!pilot.on || !PILOT_KEYS[e.code]) return;
-  const t = e.target;
-  if(t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)) return;
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  e.stopPropagation();
-  pilot[PILOT_MAP[e.code]] = down;
-}
-addEventListener('keydown', function(e){ pilotKey(e, true);  }, true);
-addEventListener('keyup',   function(e){ pilotKey(e, false); }, true);
-
-/* драг: левой — по фону (пустые места страницы), правой — где угодно вне кнопок и полей */
-let pilotDrag = null;
-function pilotNoDrag(t){
-  return !!(t && t.closest && t.closest('button, input, select, label, a, nav, footer, main'));
-}
-addEventListener('pointerdown', function(e){
-  if(!pilot.on || pilotDrag) return;
-  const t = e.target;
-  const leftBg   = e.button===0 && (t===document.body || t===document.documentElement);
-  const rightAny = e.button===2 && !pilotNoDrag(t);
-  if(!leftBg && !rightAny) return;
-  if(rightAny) e.preventDefault();
-  pilotDrag = { x:e.clientX, y:e.clientY };
-});
-addEventListener('pointermove', function(e){
-  if(!pilotDrag) return;
-  const dx = e.clientX - pilotDrag.x, dy = e.clientY - pilotDrag.y;
-  pilotDrag.x = e.clientX; pilotDrag.y = e.clientY;
-  pilot.yaw  += dx*0.004;   /* тащим планету: сцена следует за мышью */
-  pilot.tilt -= dy*0.003;
-  pilot.tilt  = Math.min(0.8, Math.max(0.02, pilot.tilt));
-});
-addEventListener('pointerup',     function(){ pilotDrag = null; });
-addEventListener('pointercancel', function(){ pilotDrag = null; });
-addEventListener('contextmenu',   function(e){ if(pilot.on && pilotDrag) e.preventDefault(); });
-addEventListener('blur', function(){
-  ['_w','_s','_a','_d','_au','_ad'].forEach(function(k){ pilot[k] = false; });
-  pilotDrag = null;
-});
-function pilotText(){
-  return 'СКОРОСТЬ ×' + pilot.spdT.toFixed(1) +
-         '   ПОВОРОТ ' + Math.round(pilot.yaw*180/Math.PI) + '°' +
-         '   ТАНГАЖ '   + Math.round((pilot.tilt - 0.22)*180/Math.PI) + '°';
-}
+const uCP = gl.getUniformLocation(prog, 'uCamPos');
+const uCR = gl.getUniformLocation(prog, 'uCamR');
+const uCU = gl.getUniformLocation(prog, 'uCamU');
+const uCF = gl.getUniformLocation(prog, 'uCamF');
+const uPL = gl.getUniformLocation(prog, 'uPlanet');
 
 function resize(){
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1535,50 +1729,567 @@ function resize(){
 addEventListener('resize', resize);
 resize();
 
-/* главный цикл: RAF сам замирает в фоновой вкладке, dt зажат сверху */
+/* главный цикл: RAF сам замирает в фоновой вкладке, dt зажат сверху.
+   Камера: свободный полёт из игрового скрипта (__gameState) либо
+   орбитальное зеркало R46 (пилот выключен / игровой шейдер не собрался). */
 let simTime = 0, last = performance.now();
 function frame(now){
   resize();
   const dt = Math.min((now - last)/1000, 0.1);
   last = now;
   simTime += dt*SIM_TIME_SCALE;
-
-  /* ☩ физика пилота: разгон/торможение, инерция поворота и тангажа ☩ */
-  if(pilot.on){
-    if(pilot._w)       pilot.spdT  = Math.min(6,  pilot.spdT + 2.5*dt);
-    else if(pilot._s)  pilot.spdT  = Math.max(0,  pilot.spdT - 3.5*dt);
-    else               pilot.spdT += (1 - pilot.spdT)*Math.min(1, dt*0.8);
-    if(pilot._a)       pilot.yawV  = Math.min(1.6, pilot.yawV + 2.2*dt);
-    else if(pilot._d)  pilot.yawV  = Math.max(-1.6, pilot.yawV - 2.2*dt);
-    else               pilot.yawV *= Math.exp(-dt*2.0);
-    if(pilot._au)      pilot.tiltV = Math.min(1.2, pilot.tiltV + 2.2*dt);
-    else if(pilot._ad) pilot.tiltV = Math.max(-1.2, pilot.tiltV - 2.2*dt);
-    else               pilot.tiltV *= Math.exp(-dt*2.0);
-  } else {
-    pilot.spdT  += (1 - pilot.spdT)*Math.min(1, dt*0.8);
-    pilot.yawV  *= Math.exp(-dt*2.0);
-    pilot.tiltV *= Math.exp(-dt*2.0);
-  }
-  pilot.yaw  += pilot.yawV*dt;
-  pilot.tilt += pilot.tiltV*dt*0.35;
-  pilot.tilt  = Math.min(0.8, Math.max(0.02, pilot.tilt));
-  pilot.orbitA += PILOT_RATE*pilot.spdT*dt;
-  const camA = pilot.orbitA;
+  window.__bgSim = simTime;
   const sunA = 2*Math.PI*simTime/DAY_CYCLE_SIM_SEC;
+  const g = window.__gameState;
+
+  if(g && g.active){
+    gl.uniform1f(uPL, g.planet);
+    gl.uniform3f(uCP, g.pos[0], g.pos[1], g.pos[2]);
+    gl.uniform3f(uCR, g.right[0], g.right[1], g.right[2]);
+    gl.uniform3f(uCU, g.up[0], g.up[1], g.up[2]);
+    gl.uniform3f(uCF, g.fwd[0], g.fwd[1], g.fwd[2]);
+  } else {
+    const camA = START_PHASE_RAD + 2*Math.PI*simTime/ORBIT_PERIOD_SIM_SEC;
+    const cx = Math.cos(camA)*CAM_R, cy = Math.sin(camA)*CAM_R;
+    let f0x = -Math.sin(camA), f0y = Math.cos(camA);
+    let u0x = Math.cos(camA), u0y = Math.sin(camA);
+    let f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
+    const f1l = Math.sqrt(f1x*f1x + f1y*f1y) || 1;
+    f1x /= f1l; f1y /= f1l;
+    /* right = fwd x up0 (z-компоненты нулевые у обоих) */
+    const r1z = f1x*u0y - f1y*u0x;
+    /* upv = right x fwd */
+    const p1x = -r1z*f1y, p1y = r1z*f1x;
+    gl.uniform1f(uPL, 0);
+    gl.uniform3f(uCP, cx, cy, 0);
+    gl.uniform3f(uCF, f1x, f1y, 0);
+    gl.uniform3f(uCR, 0, 0, r1z);
+    gl.uniform3f(uCU, p1x, p1y, 0);
+  }
 
   gl.uniform2f(uRes, cv.width, cv.height);
   gl.uniform1f(uT, simTime);
-  gl.uniform1f(uCA, camA);
   gl.uniform1f(uSA, sunA);
-  gl.uniform1f(uTiltA, pilot.tilt);
-  gl.uniform1f(uYawA, pilot.yaw);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-  if(pilot.on && pilotInfo) pilotInfo.textContent = pilotText();
 
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+})();
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ☩ ИГРА: СВОБОДНЫЙ ПОЛЁТ — ПЛАНЕТЫ, КОЛЬЦА, КЕКСИКИ И СЫР ☩
+   Камера свободная: позиция + базис (fwd/right/up) честно летят.
+   W/S — тяга, A/D — рысканье, ↑/↓ — тангаж, Q/E — крен, мышь — взгляд,
+   G/J — смена планеты. Кексики 🧁 и сыр 🧀 собираются пролётом.
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+function gameErr(msg){
+  var d = document.getElementById('gameErrLine');
+  if(!d){
+    d = document.createElement('div');
+    d.id = 'gameErrLine';
+    d.style.cssText = 'position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:200;background:#2a0808;color:#ff9b9b;border:2px outset #900;font:12px/1.4 monospace;padding:4px 12px;max-width:92vw;';
+    document.body.appendChild(d);
+  }
+  d.textContent = msg;
+  setTimeout(function(){ if(d.parentNode) d.remove(); }, 12000);
+}
+window.addEventListener('error', function(ev){
+  gameErr('ОШИБКА СТРАНИЦЫ: ' + (ev && ev.message ? ev.message : 'unknown'));
+});
+
+try{
+
+/* ---------- КОНФИГ (править здесь) ---------- */
+var CFG = {
+  SPD_MIN: 0.0, SPD_MAX: 0.22, SPD_DEF: 0.055, SPD_RATE: 0.16,  /* скорость, ед./с */
+  YAW_MAX: 0.90, PITCH_MAX: 0.75, ROLL_MAX: 1.30,               /* рули, рад/с */
+  RESP: 11.0,                                                   /* нарастание рулей, 1/с */
+  DRAG_YAW: 0.0030, DRAG_PITCH: 0.0024,                         /* мышь, рад/пиксель */
+  MINR: 1.045,                                                  /* мин. радиус орбиты */
+  PICK_N: 12, PICK_RMIN: 1.16, PICK_RMAX: 1.78, PICK_RAD: 0.075,
+  MOON_R: [1.70, 2.05, 2.40, 2.75], MOON_SZ: [0.10, 0.12, 0.13, 0.15],
+  FOV_TAN: Math.tan(60.0*0.5*Math.PI/180.0)
+};
+
+/* ---------- ВЕКТОРА ---------- */
+function add(a,b){ return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]; }
+function sub(a,b){ return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
+function mul(a,s){ return [a[0]*s, a[1]*s, a[2]*s]; }
+function dot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+function cross(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+function len(a){ return Math.sqrt(dot(a,a)); }
+function norm(a){ var l = len(a)||1; return [a[0]/l, a[1]/l, a[2]/l]; }
+function rotAxis(v, k, ang){
+  var c = Math.cos(ang), s = Math.sin(ang);
+  var kv = cross(k, v);
+  return add(add(mul(v,c), mul(kv,s)), mul(k, dot(k,v)*(1-c)));
+}
+
+/* ---------- ПОЛЁТ: состояние ---------- */
+var CAMR0 = 1.0 + 1000.0/29371.0;
+var A0 = 0.0;
+var F = { pos: [Math.cos(A0)*CAMR0, Math.sin(A0)*CAMR0, 0], fwd: null, up: null, right: null };
+function resetBasis(){
+  var f0 = [-Math.sin(A0), Math.cos(A0), 0];
+  var u0 = norm(F.pos);
+  var f1 = [f0[0]*0.78 - u0[0]*0.22, f0[1]*0.78 - u0[1]*0.22, 0];
+  F.fwd = norm(f1);
+  F.right = norm(cross(F.fwd, u0));
+  F.up = cross(F.right, F.fwd);
+}
+resetBasis();
+var yawV = 0, pitchV = 0, rollV = 0, speed = CFG.SPD_DEF;
+var keys = {}, drag = null;
+var planet = 0, PLANET_NAMES = ['ТЕРРА', 'АУРЕЛИЯ', 'ПИРРА'];
+var gameOn = false, switching = false;
+
+/* ---------- ЗВУК: звук грузится по URL: Music.ogg, loop1.ogg, loop2.ogg рядом с HTML ---------- */
+var AUDIO_URLS = { music: 'Music.ogg', cake: 'loop1.ogg', cheese: 'loop2.ogg' };
+var audioWarn = {};
+
+var sfx = { music: null, cake: null, cheese: null, musicOn: true, started: false };
+function loadAudio(name){
+  try{
+    var a = new Audio(AUDIO_URLS[name]);
+    a.addEventListener('error', function(){
+      if(!audioWarn[name]){ audioWarn[name] = true; console.warn('[ИГРА] Файл ' + AUDIO_URLS[name] + ' не найден рядом с HTML — этот звук не заиграет'); }
+    });
+    return a;
+  }catch(e){ return null; }
+}
+function ensureAudio(){
+  if(sfx.started) return;
+  sfx.music = loadAudio('music');
+  if(sfx.music){ sfx.music.loop = true; sfx.music.volume = 0.45; }
+  sfx.cake = loadAudio('cake');
+  sfx.cheese = loadAudio('cheese');
+  sfx.started = true;
+}
+function tryMusic(){
+  ensureAudio();
+  if(!sfx.music || !sfx.musicOn) return;
+  var p = sfx.music.play();
+  if(p && p.catch) p.catch(function(){});
+}
+function playPickup(kind){
+  if(!sfx.musicOn || !sfx.started) return;
+  try{
+    var a = (kind === 'cake' ? sfx.cake : sfx.cheese).cloneNode();
+    a.volume = 0.55;
+    var p = a.play();
+    if(p && p.catch) p.catch(function(){});
+  }catch(e){}
+}
+
+/* ---------- DOM: слой спрайтов, HUD, кнопки, фейд ---------- */
+var layer = document.createElement('div');
+layer.style.cssText = 'position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden;';
+document.body.appendChild(layer);
+layer.setAttribute('data-keep','1');
+(function(){
+  var css = document.createElement('style');
+  css.textContent = 'body.dgame > :not(#glbg):not([data-keep]):not(#gameErrLine){display:none !important;}';
+  document.head.appendChild(css);
+})();
+var fadeEl = document.createElement('div');
+fadeEl.style.cssText = 'position:fixed;inset:0;z-index:45;pointer-events:none;background:#000;opacity:0;transition:opacity .28s linear;';
+document.body.appendChild(fadeEl);
+fadeEl.setAttribute('data-keep','1');
+var hud = document.createElement('div');
+hud.style.cssText = 'position:fixed;left:10px;top:10px;z-index:50;background:rgba(3,8,13,.8);border:2px inset #950;color:#7dff8a;font:12px/1.5 monospace;padding:6px 10px;pointer-events:none;white-space:pre;';
+document.body.appendChild(hud);
+hud.setAttribute('data-keep','1');
+var ctl = document.createElement('div');
+ctl.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:50;display:flex;flex-direction:column-reverse;align-items:center;gap:6px;';
+var btnPilot = document.createElement('button');
+btnPilot.textContent = 'ИГРА: СТАРТ';
+var btnMusic = document.createElement('button');
+btnMusic.textContent = 'МУЗЫКА';
+ctl.appendChild(btnPilot); ctl.appendChild(btnMusic);
+document.body.appendChild(ctl);
+ctl.setAttribute('data-keep','1');
+
+function makeSprite(ch){
+  var d = document.createElement('div');
+  d.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;user-select:none;will-change:transform;display:none;';
+  d.textContent = ch;
+  layer.appendChild(d);
+  return d;
+}
+
+/* ---------- МИР: предметы и луны ---------- */
+var ITEMS = [], MOONS = [];
+function rndDir(){
+  var a = Math.random()*Math.PI*2, z = Math.random()*1.6 - 0.8;
+  var r = Math.sqrt(Math.max(0, 1 - z*z));
+  return [r*Math.cos(a), z, r*Math.sin(a)];
+}
+function genWorld(){
+  for(var pi = 0; pi < 3; pi++){
+    for(var i = 0; i < CFG.PICK_N; i++){
+      var dir = rndDir();
+      var r = CFG.PICK_RMIN + Math.random()*(CFG.PICK_RMAX - CFG.PICK_RMIN);
+      var ax = cross(dir, rndDir());
+      if(len(ax) < 0.05) ax = [0,1,0];
+      var kind = Math.random() < 0.5 ? 'cake' : 'cheese';
+      ITEMS.push({ el: makeSprite(kind === 'cake' ? '🧁' : '🧀'),
+        kind: kind, p0: mul(dir, r), axis: norm(ax),
+        w: 0.05 + Math.random()*0.10, planet: pi, angle: 0 });
+    }
+    if(pi === 1){
+      for(var m = 0; m < 4; m++){
+        var md = rndDir();
+        var mAx = cross(md, rndDir());
+        if(len(mAx) < 0.05) mAx = [0,1,0];
+        MOONS.push({ el: makeSprite('🌕'), p0: mul(md, CFG.MOON_R[m]),
+          axis: norm(mAx), w: 0.04 + 0.03*m, planet: 1, sz: CFG.MOON_SZ[m], angle: 0 });
+      }
+    }
+  }
+}
+genWorld();
+
+/* ---------- МЕДВЕДЬ-ПИЛОТ ---------- */
+var BEAR_D = 0.35, BEAR_SZ = 0.05;
+var bearWrap = null;
+(function(){
+  try{
+    var g = document.getElementById('mgHead');
+    var svg = g ? g.ownerSVGElement : null;
+    if(!svg) return;
+    bearWrap = document.createElement('div');
+    bearWrap.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;will-change:transform;transform-origin:50% 50%;display:none;';
+    var html = svg.outerHTML
+      .replace(/mg([A-Za-z]+)/g, 'zg$1')
+      .replace('width:380px; height:380px; cursor:pointer;', 'width:100%;height:100%;display:block;');
+    bearWrap.innerHTML = html;
+    layer.appendChild(bearWrap);
+  }catch(e){ bearWrap = null; }
+})();
+
+/* ---------- ПРОЕКЦИЯ И ПЕРЕКРЫТИЯ ---------- */
+var RING_N = norm([0.22, 1.0, 0.18]);
+var RING_IN = 1.45, RING_OUT = 2.35, GAP_IN = 1.76, GAP_OUT = 1.86;
+function ringOccl(camPos, dir, dist){
+  var denom = dot(dir, RING_N);
+  if(Math.abs(denom) < 1e-4) return false;
+  var t = -dot(camPos, RING_N)/denom;
+  if(t <= 0 || t >= dist) return false;
+  var q = add(camPos, mul(dir, t));
+  var r = len(q);
+  return (r > RING_IN && r < RING_OUT && !(r > GAP_IN && r < GAP_OUT));
+}
+function project(p, cam, W, H){
+  var v = sub(p, cam.pos);
+  var dist = len(v);
+  var z = dot(v, cam.fwd);
+  if(z < 0.03) return null;
+  var dir = mul(v, 1/(dist||1));
+  var tC = -dot(cam.pos, dir);
+  if(tC > 0 && tC < dist){
+    var q = add(cam.pos, mul(dir, tC));
+    if(dot(q,q) < 1.0) return { occl: true };
+  }
+  var ux = dot(v, cam.right)/(z*CFG.FOV_TAN);
+  var uy = dot(v, cam.up)/(z*CFG.FOV_TAN);
+  var sx = (ux*H + W)/2;
+  var sy = (H - uy*H)/2;
+  if(sx < -90 || sx > W + 90 || sy < -90 || sy > H + 90) return null;
+  return { x: sx, y: sy, z: z };
+}
+function sunDirNow(simT){
+  var sa = 2*Math.PI*simT/3600.0;
+  return norm([Math.cos(sa), 0.22*Math.sin(sa), Math.sin(sa)]);
+}
+
+/* ---------- СБОР И ЭФФЕКТЫ ---------- */
+var score = { cake: 0, cheese: 0 };
+try{
+  var saved = JSON.parse(localStorage.getItem('diowkrad_game_score') || 'null');
+  if(saved){ score.cake = saved.cake || 0; score.cheese = saved.cheese || 0; }
+}catch(e){}
+function saveScore(){ try{ localStorage.setItem('diowkrad_game_score', JSON.stringify(score)); }catch(e){} }
+function flash(x, y, kind){
+  var col = kind === 'cake' ? '#ffd9f0' : '#ffe97d';
+  var f = document.createElement('div');
+  f.style.cssText = 'position:absolute;left:0;top:0;width:60px;height:60px;margin:-30px 0 0 -30px;'
+    + 'border:3px solid ' + col + ';border-radius:50%;pointer-events:none;z-index:6000;'
+    + 'transform:translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(0.3);'
+    + 'transition:transform .5s ease-out, opacity .5s ease-out;';
+  layer.appendChild(f);
+  requestAnimationFrame(function(){
+    f.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(2.6)';
+    f.style.opacity = '0';
+  });
+  setTimeout(function(){ if(f.parentNode) f.remove(); }, 550);
+}
+function respawn(it){
+  var d, guard = 0;
+  do{ d = rndDir(); guard++; } while(dot(d, F.fwd) > -0.25 && guard < 40);
+  var r = CFG.PICK_RMIN + Math.random()*(CFG.PICK_RMAX - CFG.PICK_RMIN);
+  it.p0 = mul(d, r);
+  var ax = cross(d, rndDir());
+  it.axis = len(ax) < 0.05 ? [0,1,0] : norm(ax);
+  it.w = 0.05 + Math.random()*0.10;
+  it.angle = 0;
+}
+function collect(it, pr){
+  score[it.kind]++;
+  saveScore();
+  playPickup(it.kind);
+  flash(pr.x, pr.y, it.kind);
+  respawn(it);
+}
+
+/* ---------- ФИЗИКА ПОЛЁТА ---------- */
+function physics(dt){
+  var ty = 0, tp = 0, tr = 0;
+  if(keys.KeyD) ty += 1;
+  if(keys.KeyA) ty -= 1;
+  if(keys.ArrowUp) tp += 1;
+  if(keys.ArrowDown) tp -= 1;
+  if(keys.KeyE) tr += 1;
+  if(keys.KeyQ) tr -= 1;
+  var k = Math.min(1, dt*CFG.RESP);
+  yawV   += (ty*CFG.YAW_MAX   - yawV)*k;
+  if(!drag) pitchV += (tp*CFG.PITCH_MAX - pitchV)*k;
+  rollV  += (tr*CFG.ROLL_MAX  - rollV)*k;
+  if(keys.KeyW) speed += CFG.SPD_RATE*dt;
+  if(keys.KeyS) speed -= CFG.SPD_RATE*dt;
+  speed = Math.max(CFG.SPD_MIN, Math.min(CFG.SPD_MAX, speed));
+  if(Math.abs(rollV) > 1e-6){
+    F.right = rotAxis(F.right, F.fwd, rollV*dt);
+    F.up    = rotAxis(F.up,    F.fwd, rollV*dt);
+  }
+  if(Math.abs(pitchV) > 1e-6){
+    F.fwd = rotAxis(F.fwd, F.right, pitchV*dt);
+    F.up  = rotAxis(F.up,  F.right, pitchV*dt);
+  }
+  if(Math.abs(yawV) > 1e-6){
+    F.fwd   = rotAxis(F.fwd,   F.up, yawV*dt);
+    F.right = rotAxis(F.right, F.up, yawV*dt);
+  }
+  F.fwd = norm(F.fwd);
+  F.right = norm(sub(F.right, mul(F.fwd, dot(F.right, F.fwd))));
+  F.up = cross(F.right, F.fwd);
+  var finChk = F.fwd[0]+F.fwd[1]+F.fwd[2]+F.right[0]+F.right[1]+F.right[2]+F.up[0]+F.up[1]+F.up[2]+F.pos[0]+F.pos[1]+F.pos[2];
+  if(!isFinite(finChk)){ resetBasis(); }
+  F.pos = add(F.pos, mul(F.fwd, speed*dt));
+  var r = len(F.pos);
+  if(r < CFG.MINR){
+    var nrm = mul(F.pos, 1/(r||1));
+    F.pos = mul(nrm, CFG.MINR);
+    var inw = dot(F.fwd, nrm);
+    if(inw < 0) F.fwd = norm(sub(F.fwd, mul(nrm, inw)));
+  }
+}
+
+/* ---------- ОТРИСОВКА СПРАЙТОВ ---------- */
+function drawSprites(cam, W, H, bgSim, dt){
+  var sun = sunDirNow(bgSim), i, it, pr, p;
+  var bearWp = add(cam.pos, mul(cam.fwd, BEAR_D));
+  for(i = 0; i < ITEMS.length; i++){
+    it = ITEMS[i];
+    if(it.planet !== planet){ it.el.style.display = 'none'; continue; }
+    it.angle += it.w*dt;
+    p = rotAxis(it.p0, it.axis, it.angle);
+    pr = project(p, cam, W, H);
+    if(!pr || pr.occl){ it.el.style.display = 'none'; continue; }
+    if(planet === 1){
+      var v2 = sub(p, cam.pos), d2 = len(v2);
+      if(ringOccl(cam.pos, mul(v2, 1/(d2||1)), d2)){ it.el.style.display = 'none'; continue; }
+    }
+    var size = Math.max(14, Math.min(H*1.2, (0.052/pr.z)*H));
+    var op = Math.min(1, Math.max(0.05, (pr.z - 0.05)/0.08));
+    var dl = dot(norm(p), sun);
+    it.el.style.display = 'block';
+    it.el.style.transform = 'translate(' + pr.x.toFixed(1) + 'px,' + pr.y.toFixed(1) + 'px) translate(-50%,-50%)';
+    it.el.style.fontSize = size.toFixed(1) + 'px';
+    it.el.style.opacity = op.toFixed(2);
+    it.el.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, dl)).toFixed(2) + ')';
+    it.el.style.zIndex = String(5000 - Math.round(pr.z*100));
+    if(gameOn && len(sub(p, bearWp)) < CFG.PICK_RAD) collect(it, pr);
+  }
+  for(i = 0; i < MOONS.length; i++){
+    var mo = MOONS[i];
+    if(mo.planet !== planet){ mo.el.style.display = 'none'; continue; }
+    mo.angle += mo.w*dt;
+    var mp = rotAxis(mo.p0, mo.axis, mo.angle);
+    var mpr = project(mp, cam, W, H);
+    if(!mpr || mpr.occl){ mo.el.style.display = 'none'; continue; }
+    if(planet === 1){
+      var vv = sub(mp, cam.pos), dd = len(vv);
+      if(ringOccl(cam.pos, mul(vv, 1/(dd||1)), dd)){ mo.el.style.display = 'none'; continue; }
+    }
+    var msize = Math.max(10, Math.min(H*1.6, (mo.sz/mpr.z)*H));
+    var mdl = dot(norm(mp), sun);
+    mo.el.style.display = 'block';
+    mo.el.style.transform = 'translate(' + mpr.x.toFixed(1) + 'px,' + mpr.y.toFixed(1) + 'px) translate(-50%,-50%)';
+    mo.el.style.fontSize = msize.toFixed(1) + 'px';
+    mo.el.style.opacity = Math.min(1, Math.max(0.15, (mpr.z - 0.10)/0.10)).toFixed(2);
+    mo.el.style.filter = 'brightness(' + (0.35 + 0.65*Math.max(0, mdl)).toFixed(2) + ')';
+    mo.el.style.zIndex = String(5000 - Math.round(mpr.z*100));
+  }
+  if(bearWrap && gameOn){
+    var bpr = project(bearWp, cam, W, H);
+    if(bpr && !bpr.occl){
+      var bv = sub(bearWp, cam.pos), bd = len(bv);
+      var bo = (planet === 1) ? ringOccl(cam.pos, mul(bv, 1/(bd||1)), bd) : false;
+      if(!bo){
+        var bdl = dot(norm(bearWp), sun);
+        var bsize = Math.max(28, Math.min(H*0.9, (BEAR_SZ/bpr.z)*H));
+        var bank = Math.max(-28, Math.min(28, rollV/(CFG.ROLL_MAX||1)*28));
+        bearWrap.style.display = 'block';
+        bearWrap.style.transform = 'translate(' + bpr.x.toFixed(1) + 'px,' + bpr.y.toFixed(1) + 'px) translate(-50%,-50%) rotate(' + bank.toFixed(1) + 'deg)';
+        bearWrap.style.width = bsize.toFixed(1) + 'px';
+        bearWrap.style.height = bsize.toFixed(1) + 'px';
+        bearWrap.style.opacity = Math.min(1, Math.max(0.15, (bpr.z - 0.10)/0.10)).toFixed(2);
+        bearWrap.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, bdl)).toFixed(2) + ')';
+        bearWrap.style.zIndex = String(5000 - Math.round(bpr.z*100));
+      } else bearWrap.style.display = 'none';
+    } else bearWrap.style.display = 'none';
+  } else if(bearWrap) bearWrap.style.display = 'none';
+}
+
+/* ---------- HUD И ПЕРЕКЛЮЧЕНИЕ ПЛАНЕТ ---------- */
+function updHud(){
+  hud.textContent = 'ПЛАНЕТА: ' + PLANET_NAMES[planet]
+    + '\n×тяга: ' + speed.toFixed(2) + '  (' + Math.round(speed/CFG.SPD_MAX*100) + '%)'
+    + '\n🧁 ' + score.cake + '   🧀 ' + score.cheese;
+}
+function switchPlanet(dir){
+  if(switching) return;
+  switching = true;
+  fadeEl.style.opacity = '1';
+  setTimeout(function(){
+    planet = (planet + dir + 3) % 3;
+    updHud();
+    fadeEl.style.opacity = '0';
+    setTimeout(function(){ switching = false; }, 300);
+  }, 300);
+}
+
+/* ---------- ВВОД ---------- */
+var KEYSET = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, KeyQ:1, KeyE:1, KeyG:1, KeyJ:1, ArrowUp:1, ArrowDown:1 };
+window.addEventListener('keydown', function(e){
+  if(gameOn && e.code === 'KeyH' && !e.repeat){
+    e.preventDefault(); e.stopPropagation();
+    document.body.classList.toggle('dgame');
+    return;
+  }
+  if(!gameOn || !KEYSET[e.code]) return;
+  e.preventDefault(); e.stopPropagation();
+  if(e.code === 'KeyG' && !e.repeat) switchPlanet(1);
+  else if(e.code === 'KeyJ' && !e.repeat) switchPlanet(-1);
+  else keys[e.code] = 1;
+  tryMusic();
+}, true);
+window.addEventListener('keyup', function(e){
+  if(!gameOn || !KEYSET[e.code]) return;
+  e.preventDefault(); e.stopPropagation();
+  keys[e.code] = 0;
+}, true);
+addEventListener('blur', function(){ keys = {}; drag = null; });
+window.addEventListener('pointerdown', function(e){
+  if(!gameOn) return;
+  var t = e.target;
+  if(t && t.closest && t.closest('button,input,select,a,.panel,.lcd,.kbd-wrap,#keys,#keys2')) return;
+  drag = { x: e.clientX, y: e.clientY };
+  tryMusic();
+});
+window.addEventListener('pointermove', function(e){
+  if(!drag || !gameOn) return;
+  var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  drag.x = e.clientX; drag.y = e.clientY;
+  if(dx){
+    F.fwd = norm(rotAxis(F.fwd, F.up, -dx*CFG.DRAG_YAW));
+    F.right = norm(rotAxis(F.right, F.up, -dx*CFG.DRAG_YAW));
+  }
+  if(dy){
+    F.fwd = norm(rotAxis(F.fwd, F.right, dy*CFG.DRAG_PITCH));
+    F.up = norm(rotAxis(F.up, F.right, dy*CFG.DRAG_PITCH));
+  }
+});
+window.addEventListener('pointerup', function(){ drag = null; });
+
+function applyGameMode(){
+  document.body.classList.toggle('dgame', gameOn);
+  layer.style.display = gameOn ? 'block' : 'none';
+  hud.style.display = gameOn ? 'block' : 'none';
+  btnPilot.textContent = gameOn ? 'ИГРА: СТОП' : 'ИГРА: СТАРТ';
+  btnPilot.classList.toggle('on', gameOn);
+}
+btnPilot.addEventListener('click', function(){
+  gameOn = !gameOn;
+  applyGameMode();
+  keys = {}; drag = null;
+  if(gameOn){ tryMusic(); }
+  else if(sfx.music){ sfx.music.pause(); }
+});
+btnMusic.addEventListener('click', function(){
+  sfx.musicOn = !sfx.musicOn;
+  btnMusic.classList.toggle('on', sfx.musicOn);
+  btnMusic.textContent = sfx.musicOn ? 'МУЗЫКА' : 'МУЗЫКА (выкл)';
+  if(sfx.musicOn){ tryMusic(); }
+  else if(sfx.music){ sfx.music.pause(); }
+});
+
+/* ---------- ПРОВЕРКА ОКРУЖЕНИЯ ---------- */
+var bgInfo = window.__bgInfo || {};
+if(bgInfo.fallback){
+  gameOn = false;
+  document.body.classList.remove('dgame');
+  btnPilot.disabled = true;
+  btnPilot.classList.remove('on');
+  btnPilot.textContent = 'ФОН: БАЗОВЫЙ';
+  gameErr('ФОН: игровой шейдер не собрался — включён базовый R46, игра ждёт починки. Ошибка компиляции в консоли (F12).');
+}
+
+/* ---------- ГЛАВНЫЙ ЦИКЛ ИГРЫ ---------- */
+var simT = 0, lastT = performance.now();
+function loop(now){
+  requestAnimationFrame(loop);
+  try{
+    var dt = Math.min((now - lastT)/1000, 0.1);
+    lastT = now;
+    simT += dt;
+    var bgSim = (typeof window.__bgSim === 'number') ? window.__bgSim : simT*60.0;
+    var W = window.innerWidth, H = window.innerHeight;
+    var cam;
+    if(gameOn){
+      physics(dt);
+      cam = { pos: F.pos, fwd: F.fwd, up: F.up, right: F.right };
+      window.__gameState = { active: true, planet: planet,
+        pos: F.pos, fwd: F.fwd, up: F.up, right: F.right };
+    } else {
+      var camA = 2*Math.PI*bgSim/2275.9;
+      var cx = Math.cos(camA)*1.034, cy = Math.sin(camA)*1.034;
+      var f0x = -Math.sin(camA), f0y = Math.cos(camA);
+      var u0x = Math.cos(camA), u0y = Math.sin(camA);
+      var f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
+      var fl = Math.sqrt(f1x*f1x + f1y*f1y) || 1;
+      f1x /= fl; f1y /= fl;
+      var r1z = f1x*u0y - f1y*u0x;
+      cam = { pos: [cx, cy, 0], fwd: [f1x, f1y, 0], right: [0, 0, r1z], up: [-r1z*f1y, r1z*f1x, 0] };
+      window.__gameState = { active: false };
+    }
+    drawSprites(cam, W, H, bgSim, dt);
+    updHud();
+  }catch(e){
+    gameErr('ИГРА: ошибка кадра — ' + (e && e.message ? e.message : e));
+  }
+}
+applyGameMode();
+updHud();
+requestAnimationFrame(loop);
+
+}catch(e){
+  gameErr('ИГРА: ошибка запуска — ' + (e && e.message ? e.message : e));
+}
 })();
 </script>
 </body>
