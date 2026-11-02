@@ -826,6 +826,26 @@ margin: 1px;
   #app .mishka-wrap .body-group{ transform-box:view-box; transform-origin:256px 400px; animation:mg-breathe 4s ease-in-out infinite; }
   @keyframes mg-breathe{ 0%,100%{transform:scale(1,1)} 50%{transform:scale(1.012,.992)} }
 </style>
+<style>
+/* ---------- ИГРА: АНИМАЦИЯ КЛОНА МЕДВЕДЯ (gbear — вне #app) ---------- */
+  .gbear .bear{ animation:zg-bob 3.2s ease-in-out infinite; }
+  .gbear .ear-left{ transform-box:view-box; transform-origin:150px 90px; animation:mg-earL 3.4s ease-in-out infinite; }
+  .gbear .ear-right{ transform-box:view-box; transform-origin:362px 90px; animation:mg-earR 3.4s ease-in-out -1.2s infinite; }
+  .gbear .head{ transform-box:view-box; transform-origin:256px 250px; animation:mg-nod 5.2s ease-in-out infinite; }
+  .gbear .eye{ transform-box:fill-box; transform-origin:center; animation:mg-blink 4.6s infinite; }
+  .gbear .eye.right{ animation-delay:4.4s; }
+  .gbear .star{ transform-box:fill-box; transform-origin:center; opacity:1; animation:mg-twinkle 1.4s ease-in-out infinite; }
+  .gbear .star:nth-of-type(2){ animation-delay:.25s; }
+  .gbear .star:nth-of-type(3){ animation-delay:.5s; }
+  .gbear .star:nth-of-type(4){ animation-delay:.75s; }
+  .gbear .bear.jumping{ animation:mg-jump .55s cubic-bezier(.3,0,.4,1); }
+  .gbear .bear.jumping .shadow{ transform-box:view-box; transform-origin:256px 470px; animation:mg-shadow .55s cubic-bezier(.3,0,.4,1); }
+  @keyframes zg-bob{ 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-7px) rotate(2.5deg)} }
+/* ---------- СЕМИСЕГМЕНТНЫЕ СЧЁТЧИКИ ---------- */
+  .segd div{ position:absolute; background:#a3ff52; box-shadow:0 0 6px rgba(163,255,82,.75); }
+  .segd div.h{ clip-path:polygon(0% 50%,16% 0%,84% 0%,100% 50%,84% 100%,16% 100%); }
+  .segd div.v{ clip-path:polygon(50% 0%,100% 16%,100% 84%,50% 100%,0% 84%,0% 16%); }
+</style>
 <script>
 (function(){
   var b=document.querySelector('.mishka-wrap .bear');
@@ -1485,6 +1505,15 @@ void main(){
   float dayLocal = dot(normalize(camPos), sunDir);
   float dayness  = smoothstep(-0.25, 0.30, dayLocal);
 
+  /* ПУЗЫРЬ АТМОСФЕРЫ: дневное небо живёт только внутри пузыря R=1.90 */
+  float camR  = length(camPos);
+  float atmIn = 1.0 - smoothstep(1.786, 1.90, camR);
+
+  /* цвет атмосферы по планете: ХИТОМИ голубая, ЧИЗИЯ #905000, НГАЛИН #300090 */
+  vec3 atmC = vec3(0.30,0.55,1.0);
+  if(uPlanet > 0.5 && uPlanet < 1.5){ atmC = vec3(0.565,0.314,0.0); }
+  else if(uPlanet > 1.5){ atmC = vec3(0.188,0.0,0.565); }
+
   vec3 col = vec3(0.0);
 
   if(hitP){
@@ -1579,22 +1608,23 @@ void main(){
 
     /* день: градиент к горизонту, зарево у солнца, облака на куполе */
     float horiz = 1.0 - abs(dot(rd, up0));
-    vec3 day = mix(vec3(0.25,0.45,0.85), vec3(0.55,0.75,1.0), horiz*0.85);
+    vec3 day = mix(atmC*0.83, mix(atmC, vec3(1.0), 0.42), horiz*0.85);
     float sunAmt = max(dot(rd, sunDir), 0.0);
     day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.40;
     float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
     skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
     day = mix(day, vec3(1.0), skycl*0.75);
     float dSun = dot(rd, sunDir);
-    day += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, dSun)*3.0;
-    day += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
 
-    col = mix(night, day, daySky);
+    col = mix(night, day, daySky*atmIn);
+    /* СОЛНЦЕ ВНЕ ПУЗЫРЯ: диск и ореол светят всегда — и внутри пузыря, и в ночи */
+    col += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, dSun)*3.0;
+    col += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
 
     /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
     float closest = length(camPos - rd*b);
     float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
-    col += vec3(0.30,0.55,1.0)*atmo*dayness*0.85;
+    col += atmC*atmo*dayness*atmIn*0.85;
 
     /* луна: диск с кратерами, свечение */
     float dM = dot(rd, moonDir);
@@ -1607,6 +1637,27 @@ void main(){
       vec3 mc2 = mc*mix(0.10, 1.0, mlit);
       col = mix(col, mc2, mdisc);
       col += vec3(0.60,0.65,0.85)*pow(max(dM,0.0), 900.0)*0.30;
+    }
+    /* СЫРНЫЕ ЛУНЫ ЧИЗИИ: 4 диска на скайбоксе, дрейф за солнцем */
+    if(uPlanet > 0.5 && uPlanet < 1.5){
+      for(int ci=0; ci<4; ci++){
+        float cang = uSunA + 2.1 + 0.77*float(ci);
+        vec3 cdir = normalize(vec3(cos(cang), 0.15 + 0.18*float(ci), sin(cang)));
+        float dC = dot(rd, cdir);
+        float cthr = 0.99960 - 0.00007*float(ci);
+        float cdisc = smoothstep(cthr, cthr + 0.00035, dC);
+        if(cdisc > 0.0){
+          vec3 lp = rd - cdir*dC;
+          float crel = fbm3(lp*420.0);
+          float holes = smoothstep(0.30, 0.62, fbm3(lp*160.0 + vec3(7.3)));
+          vec3 cheese = vec3(1.00,0.82,0.30)*(0.55 + 0.45*crel);
+          cheese = mix(cheese, vec3(0.42,0.28,0.08), holes*0.55);
+          float clit = smoothstep(-0.15, 0.15, dot(cdir, sunDir));
+          vec3 cc2 = cheese*mix(0.10, 1.0, clit);
+          col = mix(col, cc2, cdisc);
+          col += vec3(1.00,0.90,0.60)*pow(max(dC,0.0), 900.0)*0.25;
+        }
+      }
     }
   }
 
@@ -1852,10 +1903,10 @@ var planet = 0, PLANET_NAMES = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН'];
 var gameOn = false, switching = false;
 
 /* ---------- ЗВУК: звук грузится по URL: Music.ogg, loop1.ogg, loop2.ogg рядом с HTML ---------- */
-var AUDIO_URLS = { music: 'Music.ogg', cake: 'loop1.ogg', cheese: 'loop2.ogg' };
+var AUDIO_URLS = { music: 'Music.ogg', cake: 'loop1.ogg', cheese: 'loop2.ogg', moon: 'moon.ogg' };
 var audioWarn = {};
 
-var sfx = { music: null, cake: null, cheese: null, musicOn: true, started: false };
+var sfx = { music: null, cake: null, cheese: null, moon: null, musicOn: true, started: false };
 function loadAudio(name){
   try{
     var a = new Audio(AUDIO_URLS[name]);
@@ -1871,6 +1922,7 @@ function ensureAudio(){
   if(sfx.music){ sfx.music.loop = true; sfx.music.volume = 0.45; }
   sfx.cake = loadAudio('cake');
   sfx.cheese = loadAudio('cheese');
+  sfx.moon = loadAudio('moon');
   sfx.started = true;
 }
 function tryMusic(){
@@ -1882,7 +1934,7 @@ function tryMusic(){
 function playPickup(kind){
   if(!sfx.musicOn || !sfx.started) return;
   try{
-    var a = (kind === 'cake' ? sfx.cake : sfx.cheese).cloneNode();
+    var a = (kind === 'cake' ? sfx.cake : (kind === 'cheese' ? sfx.cheese : sfx.moon)).cloneNode();
     a.volume = 0.55;
     var p = a.play();
     if(p && p.catch) p.catch(function(){});
@@ -1917,6 +1969,78 @@ ctl.appendChild(btnPilot); ctl.appendChild(btnMusic);
 document.body.appendChild(ctl);
 ctl.setAttribute('data-keep','1');
 
+/* ---------- СЕМИСЕГМЕНТНЫЕ СЧЁТЧИКИ (кекс/сыр) ---------- */
+var segPanel = null, segCakeEl = null, segCheeseEl = null, segMoonEl = null;
+var SEG_ON = {0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg'};
+var SEG_GEO = [
+  ['h', 5, 0, 15, 5],
+  ['v', 20, 6, 5, 14],
+  ['v', 20, -6, 5, 14],
+  ['h', 5, 41, 15, 5],
+  ['v', 0, -6, 5, 14],
+  ['v', 0, 6, 5, 14],
+  ['h', 5, 20.5, 15, 5]
+];
+function segRowHtml(id, label){
+  var s = '<div style="display:flex;align-items:center;gap:10px;">'
+    + '<span style="font:700 12px/1 monospace;letter-spacing:2px;color:#9fd9a0;">' + label + '</span>'
+    + '<div id="' + id + '" style="display:flex;gap:4px;padding:2px 3px;">';
+  for(var d=0; d<3; d++){
+    s += '<div class="segd" style="position:relative;width:25px;height:46px;">';
+    for(var i=0; i<7; i++){
+      var p = SEG_GEO[i];
+      s += '<div class="' + p[0] + '" style="left:' + p[1] + 'px;'
+        + (p[2] < 0 ? 'bottom:' + (-p[2]) + 'px;' : 'top:' + p[2] + 'px;')
+        + 'width:' + p[3] + 'px;height:' + p[4] + 'px;opacity:.13;"></div>';
+    }
+    s += '</div>';
+  }
+  return s + '</div></div>';
+}
+function segSet(row, val){
+  var n = Math.max(0, Math.min(999, Math.floor(val)));
+  var str = ('00' + n).slice(-3);
+  for(var i=0; i<3; i++){
+    var cell = row.children[i];
+    if(!cell) continue;
+    var on = SEG_ON[+str.charAt(i)] || '';
+    for(var j=0; j<7; j++){
+      var seg = cell.children[j];
+      if(seg) seg.style.opacity = on.indexOf('abcdefg'.charAt(j)) >= 0 ? '1' : '.13';
+    }
+  }
+}
+function segUpdate(){
+  if(!segPanel || !score) return;
+  if(segCakeEl) segSet(segCakeEl, score.cake || 0);
+  if(segCheeseEl) segSet(segCheeseEl, score.cheese || 0);
+  if(segMoonEl) segSet(segMoonEl, score.moon || 0);
+}
+function segBump(kind){
+  if(!segPanel) return;
+  segUpdate();
+  var row = kind === 'moon' ? segMoonEl : (kind === 'cheese' ? segCheeseEl : segCakeEl);
+  if(!row) return;
+  try{
+    row.style.transition = 'none';
+    row.style.transform = 'scale(1.2)';
+    setTimeout(function(){ row.style.transition = 'transform .18s ease'; row.style.transform = 'scale(1)'; }, 40);
+  }catch(e){}
+}
+function initSegPanel(){
+  if(segPanel) return;
+  segPanel = document.createElement('div');
+  segPanel.setAttribute('data-keep', '1');
+  segPanel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:60;display:none;flex-direction:column;gap:8px;background:#0c150c;border:4px inset #1a1a2e;border-radius:8px;padding:12px 14px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
+  segPanel.innerHTML = segRowHtml('segCakeEl','\u{1F941} КЕКС') + segRowHtml('segCheeseEl','\u{1F9C0} СЫР') + segRowHtml('segMoonEl','\u{1F31D} ЛУНА');
+  document.body.appendChild(segPanel);
+  segCakeEl = document.getElementById('segCakeEl');
+  segCheeseEl = document.getElementById('segCheeseEl');
+  segMoonEl = document.getElementById('segMoonEl');
+  segUpdate();
+}
+
+
 function makeSprite(ch){
   var d = document.createElement('div');
   d.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;user-select:none;will-change:transform;display:none;';
@@ -1926,7 +2050,7 @@ function makeSprite(ch){
 }
 
 /* ---------- МИР: предметы и луны ---------- */
-var ITEMS = [], MOONS = [];
+var ITEMS = [];
 function rndDir(){
   var a = Math.random()*Math.PI*2, z = Math.random()*1.6 - 0.8;
   var r = Math.sqrt(Math.max(0, 1 - z*z));
@@ -1949,8 +2073,8 @@ function genWorld(){
         var md = rndDir();
         var mAx = cross(md, rndDir());
         if(len(mAx) < 0.05) mAx = [0,1,0];
-        MOONS.push({ el: makeSprite('🌕'), p0: mul(md, CFG.MOON_R[m]),
-          axis: norm(mAx), w: 0.04 + 0.03*m, planet: 1, sz: CFG.MOON_SZ[m], angle: 0 });
+        ITEMS.push({ el: makeSprite('🌕'), p0: mul(md, CFG.MOON_R[m]),
+          axis: norm(mAx), w: 0.04 + 0.03*m, planet: 1, sz: CFG.MOON_SZ[m], angle: 0, kind: 'moon', mi: m });
       }
     }
   }
@@ -1971,6 +2095,7 @@ var bearWrap = null;
       .replace(/mg([A-Za-z]+)/g, 'zg$1')
       .replace('width:380px; height:380px; cursor:pointer;', 'width:100%;height:100%;display:block;');
     bearWrap.innerHTML = html;
+    bearWrap.classList.add('gbear');
     layer.appendChild(bearWrap);
   }catch(e){ bearWrap = null; }
 })();
@@ -2011,14 +2136,14 @@ function sunDirNow(simT){
 }
 
 /* ---------- СБОР И ЭФФЕКТЫ ---------- */
-var score = { cake: 0, cheese: 0 };
+var score = { cake: 0, cheese: 0, moon: 0 };
 try{
   var saved = JSON.parse(localStorage.getItem('diowkrad_game_score') || 'null');
-  if(saved){ score.cake = saved.cake || 0; score.cheese = saved.cheese || 0; }
+  if(saved){ score.cake = saved.cake || 0; score.cheese = saved.cheese || 0; score.moon = saved.moon || 0; }
 }catch(e){}
 function saveScore(){ try{ localStorage.setItem('diowkrad_game_score', JSON.stringify(score)); }catch(e){} }
 function flash(x, y, kind){
-  var col = kind === 'cake' ? '#ffd9f0' : '#ffe97d';
+  var col = kind === 'cake' ? '#ffd9f0' : (kind === 'cheese' ? '#ffe97d' : '#cfe0ff');
   var f = document.createElement('div');
   f.style.cssText = 'position:absolute;left:0;top:0;width:60px;height:60px;margin:-30px 0 0 -30px;'
     + 'border:3px solid ' + col + ';border-radius:50%;pointer-events:none;z-index:6000;'
@@ -2032,6 +2157,11 @@ function flash(x, y, kind){
   setTimeout(function(){ if(f.parentNode) f.remove(); }, 550);
 }
 function respawn(it){
+  if(it.kind === 'moon'){
+    it.p0 = mul(rndDir(), CFG.MOON_R[it.mi]);
+    it.angle = 0;
+    return;
+  }
   var d, guard = 0;
   do{ d = rndDir(); guard++; } while(dot(d, F.fwd) > -0.25 && guard < 40);
   var r = CFG.PICK_RMIN + Math.random()*(CFG.PICK_RMAX - CFG.PICK_RMIN);
@@ -2046,6 +2176,17 @@ function collect(it, pr){
   saveScore();
   playPickup(it.kind);
   flash(pr.x, pr.y, it.kind);
+  segBump(it.kind);
+  if(bearWrap){
+    var jb = bearWrap.querySelector('.bear');
+    if(jb){
+      jb.classList.remove('jumping');
+      void jb.offsetWidth;
+      jb.classList.add('jumping');
+      clearTimeout(collect._jt);
+      collect._jt = setTimeout(function(){ jb.classList.remove('jumping'); }, 700);
+    }
+  }
   respawn(it);
 }
 
@@ -2107,7 +2248,7 @@ function drawSprites(cam, W, H, bgSim, dt){
       var v2 = sub(p, cam.pos), d2 = len(v2);
       if(ringOccl(cam.pos, mul(v2, 1/(d2||1)), d2)){ it.el.style.display = 'none'; continue; }
     }
-    var size = Math.max(14, Math.min(H*1.2, (0.052/pr.z)*H));
+    var size = Math.max(14, Math.min(H*1.2, ((it.sz || 0.052)/pr.z)*H));
     var op = Math.min(1, Math.max(0.05, (pr.z - 0.05)/0.08));
     var dl = dot(norm(p), sun);
     it.el.style.display = 'block';
@@ -2116,27 +2257,7 @@ function drawSprites(cam, W, H, bgSim, dt){
     it.el.style.opacity = op.toFixed(2);
     it.el.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, dl)).toFixed(2) + ')';
     it.el.style.zIndex = String(5000 - Math.round(pr.z*100));
-    if(gameOn && len(sub(p, bearWp)) < CFG.PICK_RAD) collect(it, pr);
-  }
-  for(i = 0; i < MOONS.length; i++){
-    var mo = MOONS[i];
-    if(mo.planet !== planet){ mo.el.style.display = 'none'; continue; }
-    mo.angle += mo.w*dt;
-    var mp = rotAxis(mo.p0, mo.axis, mo.angle);
-    var mpr = project(mp, cam, W, H);
-    if(!mpr || mpr.occl){ mo.el.style.display = 'none'; continue; }
-    if(planet === 1){
-      var vv = sub(mp, cam.pos), dd = len(vv);
-      if(ringOccl(cam.pos, mul(vv, 1/(dd||1)), dd)){ mo.el.style.display = 'none'; continue; }
-    }
-    var msize = Math.max(10, Math.min(H*1.6, (mo.sz/mpr.z)*H));
-    var mdl = dot(norm(mp), sun);
-    mo.el.style.display = 'block';
-    mo.el.style.transform = 'translate(' + mpr.x.toFixed(1) + 'px,' + mpr.y.toFixed(1) + 'px) translate(-50%,-50%)';
-    mo.el.style.fontSize = msize.toFixed(1) + 'px';
-    mo.el.style.opacity = Math.min(1, Math.max(0.15, (mpr.z - 0.10)/0.10)).toFixed(2);
-    mo.el.style.filter = 'brightness(' + (0.35 + 0.65*Math.max(0, mdl)).toFixed(2) + ')';
-    mo.el.style.zIndex = String(5000 - Math.round(mpr.z*100));
+    if(gameOn && len(sub(p, bearWp)) < CFG.PICK_RAD*(it.kind === 'moon' ? 1.5 : 1.0)) collect(it, pr);
   }
   if(bearWrap && gameOn){
     var bpr = project(bearWp, cam, W, H);
@@ -2162,8 +2283,7 @@ function drawSprites(cam, W, H, bgSim, dt){
 /* ---------- HUD И ПЕРЕКЛЮЧЕНИЕ ПЛАНЕТ ---------- */
 function updHud(){
   hud.textContent = 'ПЛАНЕТА: ' + PLANET_NAMES[planet]
-    + '\n×тяга: ' + speed.toFixed(2) + '  (' + Math.round(speed/CFG.SPD_MAX*100) + '%)'
-    + '\n🧁 ' + score.cake + '   🧀 ' + score.cheese;
+    + '\n×тяга: ' + speed.toFixed(2) + '  (' + Math.round(speed/CFG.SPD_MAX*100) + '%)';
 }
 function switchPlanet(dir){
   if(switching) return;
@@ -2227,6 +2347,7 @@ function applyGameMode(){
   layer.style.display = gameOn ? '' : 'none';
   hud.style.display = gameOn ? '' : 'none';
   keys = {}; drag = null;
+  if(segPanel){ segPanel.style.display = gameOn ? 'flex' : 'none'; if(gameOn) segUpdate(); }
   if(gameOn){ tryMusic(); }
   else if(sfx.music){ sfx.music.pause(); }
 }
@@ -2286,6 +2407,7 @@ function loop(now){
     gameErr('ИГРА: ошибка кадра — ' + (e && e.message ? e.message : e));
   }
 }
+initSegPanel();
 applyGameMode();
 updHud();
 requestAnimationFrame(loop);
