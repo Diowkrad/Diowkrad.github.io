@@ -1,0 +1,371 @@
+precision highp float;
+uniform vec2  uRes;
+uniform float uTime;
+uniform float uCamA;
+uniform float uSunA;
+uniform vec3  uCamPos;
+uniform vec3  uCamR;
+uniform vec3  uCamU;
+uniform vec3  uCamF;
+uniform float uPlanet;
+uniform float uSplash;
+
+#define R    1.0
+#define CAMR __CAMR__
+#define FOT  __FOT__
+
+/* --- хэш и шумы (средний слой) --- */
+float hash13(vec3 p){
+  p = fract(p*0.3183099 + vec3(0.1,0.2,0.3));
+  p *= 17.0;
+  return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
+}
+float vnoise(vec3 x){
+  vec3 i = floor(x);
+  vec3 f = fract(x);
+  f = f*f*(3.0-2.0*f);
+  float n0=hash13(i);
+  float n1=hash13(i+vec3(1.0,0.0,0.0));
+  float n2=hash13(i+vec3(0.0,1.0,0.0));
+  float n3=hash13(i+vec3(1.0,1.0,0.0));
+  float n4=hash13(i+vec3(0.0,0.0,1.0));
+  float n5=hash13(i+vec3(1.0,0.0,1.0));
+  float n6=hash13(i+vec3(0.0,1.0,1.0));
+  float n7=hash13(i+vec3(1.0,1.0,1.0));
+  return mix(mix(mix(n0,n1,f.x),mix(n2,n3,f.x),f.y),
+             mix(mix(n4,n5,f.x),mix(n6,n7,f.x),f.y),f.z);
+}
+/* тяжёлый: 5 октав */
+float fbm5(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
+  return v;
+}
+/* средний: 3 октавы */
+float fbm3(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=0.5; }
+  return v;
+}
+
+/* --- звёзды: три слоя гридов с мерцанием --- */
+vec3 stars(vec3 rd){
+  vec3 c = vec3(0.0);
+  for(int L=0; L<3; L++){
+    float sc = 90.0 + float(L)*80.0;
+    vec3 g  = rd*sc;
+    vec3 id = floor(g);
+    vec3 fr = fract(g) - 0.5;
+    float h = hash13(id + float(L)*37.0);
+    if(h > 0.975){
+      vec3 off = (vec3(hash13(id+1.0), hash13(id+2.0), hash13(id+3.0)) - 0.5)*0.6;
+      float d  = length(fr - off);
+      float tw = 0.55 + 0.45*sin(uTime*(1.0+h*4.0) + h*40.0);
+      float s  = (1.0 - smoothstep(0.0, 0.14, d))*tw;
+      vec3 tint = mix(vec3(0.70,0.80,1.0), vec3(1.0,0.85,0.60), hash13(id+4.0));
+      c += s*tint*(0.35 + h*0.8);
+    }
+  }
+  return c;
+}
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
+
+  /* --- камера: свободный полёт — позиция и базис приходят из JS --- */
+  vec3 camPos = uCamPos;
+  vec3 fwd    = normalize(uCamF);
+  vec3 right  = normalize(uCamR);
+  vec3 upv    = normalize(uCamU);
+  vec3 rd     = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
+  vec3 up0    = normalize(camPos);
+
+  /* солнце — экваториальный круг с лёгким наклоном; луна — отстает на 0.9 рад */
+  float st = sin(uSunA), ct = cos(uSunA);
+  vec3 sunDir  = normalize(vec3(ct, 0.22*st, st));
+  vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
+
+  /* пересечение луча со сферой планеты */
+  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+  vec3 wC = camPos - sC;
+  float b    = dot(wC, rd);
+  float cc   = dot(wC, wC) - R*R;
+  float disc = b*b - cc;
+  float tHit = -b - sqrt(max(disc, 0.0));
+  bool hitP  = (disc > 0.0) && (tHit > 0.0);
+
+  float dayLocal = dot(normalize(camPos), sunDir);
+  float dayness  = smoothstep(-0.25, 0.30, dayLocal);
+
+  /* ПУЗЫРЬ АТМОСФЕРЫ: дневное небо живёт только внутри пузыря R=1.90 */
+  float camR  = length(camPos);
+  float atmIn = 1.0 - smoothstep(1.786, 1.90, camR);
+
+  /* цвет атмосферы по планете: ХИТОМИ голубая, ЧИЗИЯ #905000, НГАЛИН #300090 */
+  vec3 atmC = vec3(0.30,0.55,1.0);
+  if(uPlanet > 0.5 && uPlanet < 1.5){ atmC = vec3(0.565,0.314,0.0); }
+  else if(uPlanet > 1.5 && uPlanet < 2.5){ atmC = vec3(0.188,0.0,0.565); }
+  else if(uPlanet > 2.5){ atmC = vec3(0.039,0.118,0.302); }
+
+  vec3 col = vec3(0.0);
+
+  if(hitP){
+    /* ---- ПЛАНЕТА ---- */
+    vec3 p = camPos + rd*tHit;
+    vec3 n = normalize(p - sC);
+    float nl  = dot(n, sunDir);
+    float lit = smoothstep(-0.06, 0.18, nl);
+
+    if(uPlanet < 0.5){
+    /* континенты: тяжёлый fbm по нормали, планета медленно вращается */
+    vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
+    float cont = fbm5(sp);
+    float land = smoothstep(0.46, 0.54, cont);
+    /* ДЕТАЛЬ: волнение береговой линии (турбулентность) — плавнее граница суши/океана */
+    float coast = fbm3(n*8.0 + vec3(0.0, uTime*0.006, 0.0));
+    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
+    vec3 ocean = vec3(0.02,0.10,0.22);
+    vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
+
+    /* ДЕТАЛЬ: микро-рельеф суши (горы/равнины) — доп. fbm, не меняет границы суши */
+    float mdet = fbm3(n*12.0 + vec3(uTime*0.003, uTime*0.001, 0.0));
+    landc *= 0.85 + 0.30*mdet;
+
+    float ice  = smoothstep(0.80, 0.94, abs(n.y));
+    vec3 surf  = mix(ocean, landc, land);
+    surf = mix(surf, vec3(0.85,0.90,0.95), ice);
+
+    /* облака: второй тяжёлый слой, свой дрейф */
+    float cl = fbm5(n*4.2 + vec3(uTime*0.010, 0.0, -uTime*0.006));
+    cl = smoothstep(0.50, 0.74, cl);
+    surf = mix(surf, vec3(0.95,0.97,1.0), cl*0.9);
+
+    vec3 colDay = surf*(0.15 + 1.05*lit);
+    /* блик океана */
+    vec3 hv = normalize(sunDir - rd);
+    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
+    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+
+    /* ночь: огни городов на суше, мерцание */
+    float cellH = hash13(floor(n*90.0));
+    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
+    vec3 colNight = surf*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+
+    col = mix(colNight, colDay, lit);
+
+    /* атмосферный ободок на лимбе */
+    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    col += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
+
+    /* полярные сияния на ночном полюсе */
+    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
+    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
+    col += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
+    }
+    else if(uPlanet < 1.5){
+      /* ---- ЧИЗИЯ: газовый гигант с полосами и штормом ---- */
+      float lat = n.y;
+      float warp = fbm3(n*2.6 + vec3(uTime*0.008, 0.0, 0.0));
+      float bands = sin(lat*16.0 + warp*3.2);
+      float bands2 = sin(lat*34.0 + 1.7);
+      vec3 band1 = vec3(0.87, 0.80, 0.62);
+      vec3 band2 = vec3(0.72, 0.55, 0.34);
+      vec3 band3 = vec3(0.93, 0.88, 0.74);
+      vec3 surf = mix(band1, band2, smoothstep(-0.6, 0.6, bands));
+      surf = mix(surf, band3, 0.5 + 0.5*sin(lat*7.0 + 1.0));
+      surf = mix(surf, band2*0.92, 0.25*smoothstep(0.3, 0.9, bands2));
+      vec3 sdir = normalize(vec3(cos(uTime*0.02 + 2.0), -0.30, sin(uTime*0.02 + 2.0)));
+      float angS = acos(clamp(dot(n, sdir), -1.0, 1.0));
+      float storm = 1.0 - smoothstep(0.05, 0.16, angS);
+      surf = mix(surf, vec3(0.80, 0.42, 0.22), storm*0.85);
+      surf *= 0.92 + 0.16*fbm3(n*9.0 + vec3(uTime*0.05, 0.0, 0.0));
+      col = surf*(0.06 + 1.05*lit);
+      float fresA = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+      col += vec3(0.90, 0.75, 0.50)*fresA*(0.2 + 0.8*lit)*0.8;
+    }
+    else if(uPlanet < 2.5) {
+      /* ---- НГАЛИН: магматический мир с реками лавы ---- */
+      float rock = fbm5(n*3.2);
+      vec3 surf = mix(vec3(0.05, 0.045, 0.05), vec3(0.16, 0.13, 0.12), rock);
+      float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
+      float riv2 = fbm3(n*7.0 - vec3(uTime*0.015, 0.0, 0.0));
+      float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+                 + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+      lava = min(lava, 1.0);
+      float pulse = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
+      col = surf*(0.05 + 0.9*lit) + vec3(1.0, 0.38, 0.06)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
+      float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+      col += vec3(1.0, 0.45, 0.10)*fresP*0.25;
+    } else {
+      /* ---- ШИНРАРТА-B: нейтронная звезда — поверхность как у НГАЛИН, эффект голубой #eff5f9 ---- */
+      float rock = fbm5(n*3.2);
+      vec3 surf = mix(vec3(0.05,0.045,0.05), vec3(0.16,0.13,0.12), rock);
+      float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
+      float riv2 = fbm3(n*7.0 - vec3(uTime*0.015, 0.0, 0.0));
+      float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+                 + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+      lava = min(lava, 1.0);
+      float pulse = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
+      col = surf*(0.05 + 0.9*lit) + vec3(0.937,0.961,0.976)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
+      float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+      col += vec3(0.60,0.80,1.0)*fresP*0.45;
+    }
+  } else {
+    /* ---- НЕБО ---- */
+    float daySky = smoothstep(-0.15, 0.35, dayLocal);
+
+    /* ночь: база + звёзды + млечный путь */
+    vec3 night = vec3(0.004,0.006,0.013);
+    night += stars(rd)*1.15;
+    float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
+    night += vec3(0.5,0.55,0.75)*bandW*fbm3(rd*4.0)*0.35;
+
+    /* день: градиент к горизонту, зарево у солнца, облака на куполе */
+    float horiz = 1.0 - abs(dot(rd, up0));
+    vec3 day = mix(atmC*0.83, mix(atmC, vec3(1.0), 0.42), horiz*0.85);
+    float sunAmt = max(dot(rd, sunDir), 0.0);
+    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.40;
+    float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
+    skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
+    day = mix(day, vec3(1.0), skycl*0.75);
+    float dSun = dot(rd, sunDir);
+
+    col = mix(night, day, daySky*atmIn);
+    if(uPlanet > 2.5){ col = night; } else {
+    /* СОЛНЦЕ ВНЕ ПУЗЫРЯ: диск и ореол светят всегда — и внутри пузыря, и в ночи */
+    col += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, dSun)*3.0;
+    col += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
+    }
+
+    /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
+    float closest = length(camPos - rd*b);
+    float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
+    if(uPlanet < 2.5){ col += atmC*atmo*dayness*atmIn*0.85; } else { col += vec3(0.05,0.10,0.24)*atmo; }
+
+    /* луна: диск с кратерами, свечение */
+    float dM = dot(rd, moonDir);
+    float mdisc = smoothstep(0.99950, 0.99980, dM);
+    if(uPlanet < 0.5 && mdisc > 0.0){
+      vec3 lp = rd - moonDir*dM;
+      float cr = fbm3(lp*260.0);
+      vec3 mc = vec3(0.78,0.78,0.74)*(0.55 + 0.45*cr);
+      float mlit = smoothstep(-0.15, 0.15, dot(moonDir, sunDir));
+      vec3 mc2 = mc*mix(0.10, 1.0, mlit);
+      col = mix(col, mc2, mdisc);
+      col += vec3(0.60,0.65,0.85)*pow(max(dM,0.0), 900.0)*0.30;
+    }
+    /* СЫРНЫЕ ЛУНЫ ЧИЗИИ: 4 диска на скайбоксе, дрейф за солнцем */
+    if(uPlanet > 0.5 && uPlanet < 1.5){
+      for(int ci=0; ci<4; ci++){
+        float cang = uSunA + 2.1 + 0.77*float(ci);
+        vec3 cdir = normalize(vec3(cos(cang), 0.15 + 0.18*float(ci), sin(cang)));
+        float dC = dot(rd, cdir);
+        float cthr = 0.99960 - 0.00007*float(ci);
+        float cdisc = smoothstep(cthr, cthr + 0.00035, dC);
+        if(cdisc > 0.0){
+          vec3 lp = rd - cdir*dC;
+          float crel = fbm3(lp*420.0);
+          float holes = smoothstep(0.30, 0.62, fbm3(lp*160.0 + vec3(7.3)));
+          vec3 cheese = vec3(1.00,0.82,0.30)*(0.55 + 0.45*crel);
+          cheese = mix(cheese, vec3(0.42,0.28,0.08), holes*0.55);
+          float clit = smoothstep(-0.15, 0.15, dot(cdir, sunDir));
+          vec3 cc2 = cheese*mix(0.10, 1.0, clit);
+          col = mix(col, cc2, cdisc);
+          col += vec3(1.00,0.90,0.60)*pow(max(dC,0.0), 900.0)*0.25;
+        }
+      }
+    }
+  }
+
+
+    /* СЫРНЫЕ ЛУНЫ ШИНРАРТА-B: 8 дисков на скайбоксе, дрейф за солнцем */
+    if(!hitP && uPlanet > 2.5){
+      for(int ci=0; ci<8; ci++){
+        float cang = uSunA + 2.1 + 0.55*float(ci);
+        vec3 cdir = normalize(vec3(cos(cang), 0.10 + 0.13*float(ci), sin(cang)));
+        float dC = dot(rd, cdir);
+        float cthr = 0.99955 - 0.00006*float(ci);
+        float cdisc = smoothstep(cthr, cthr + 0.00022, dC);
+        if(cdisc > 0.0){
+          vec3 lp2 = rd - cdir*dC;
+          float chz = fbm3(lp2*240.0);
+          vec3 cheese = vec3(0.95,0.78,0.30)*(0.55 + 0.45*chz);
+          float clit = smoothstep(-0.15, 0.15, dot(cdir, sunDir));
+          vec3 cc2 = cheese*mix(0.10, 1.0, clit);
+          col = mix(col, cc2, cdisc);
+          col += vec3(1.00,0.90,0.60)*pow(max(dC,0.0), 900.0)*0.25;
+        }
+      }
+    }
+  /* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
+  /* FIX: не рисовать кольца, когда луч попадает в планету — звезда непрозрачна */
+  if(!hitP && uPlanet > 0.5 && uPlanet < 1.5){
+    vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
+    float denom = dot(rd, nR);
+    if(abs(denom) > 0.0035){
+      float tR = -dot(camPos, nR)/denom;
+      if(tR > 0.05 && (!hitP || tR < tHit)){
+        vec3 q = camPos + rd*tR;
+        float rr = length(q);
+        if(rr > 1.45 && rr < 2.35){
+          float gap = smoothstep(1.76, 1.78, rr)*(1.0 - smoothstep(1.84, 1.86, rr));
+          float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
+          float edge = smoothstep(1.45, 1.52, rr)*(1.0 - smoothstep(2.28, 2.35, rr));
+          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
+          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
+          float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
+          alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
+          col = mix(col, vec3(0.85, 0.76, 0.58)*bright, alpha*0.9);
+        }
+      }
+    }
+  }
+
+
+  /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
+     тёплое ядро у полюса, холодное свечение на конце, турбулентные завихрения */
+  if(uPlanet > 2.5){
+    vec3 jC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+    vec3 jW = camPos - jC;
+    float bJ = rd.y;
+    float dJd = dot(rd, jW);
+    float eJ = jW.y;
+    float denJ = 1.0 - bJ*bJ;
+    if(abs(denJ) > 0.0001){
+      float sJ = (eJ - dJd*bJ)/denJ;
+      float tJ = sJ*bJ - dJd;
+      if(tJ > 0.0){
+        float aJ = abs(sJ);
+        /* длинные струи: вдоль оси до 6.5, колокол у полюса */
+        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, 6.5, aJ));
+        /* расширение струи с высотой — конус плазмы */
+        float wJ = 0.04;   /* постоянная ширина струи (не расширяется при отлёте) */
+        vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
+        float rJ = length(cpt);
+        /* турбулентность: закрученные струи — смещение ядра по aJ */
+        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*0.0833);
+        float off = 0.30*(1.0 - exp(-aJ*1.4));
+        float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
+        /* тёплое основание / холодная плазма сверху + неоновый обод */
+        float cool = smoothstep(0.8, 4.2, aJ);
+        vec3 jetCol = mix(vec3(1.0,0.55,0.20), vec3(0.45,0.75,1.0), cool);
+        float twinkle = 0.75 + 0.25*sin(uTime*0.0833 + aJ*5.0);
+        /* основной светящийся шлейф */
+        col += jetCol*along*prof*twinkle*1.6;
+        /* яркое ядро */
+        float core = exp(-(rJ*rJ)/(wJ*wJ*0.10)*0.5);
+        col += vec3(0.95,0.97,1.0)*along*core*twinkle*1.1;
+        /* закрутка: лёгкое смещение потока от оси создаёт живой вихрь */
+        float swirl = exp(-( (rJ - off*turb)*(rJ - off*turb) )/(wJ*wJ*0.6)*0.5);
+        col += jetCol*along*swirl*turb*0.6;
+      }
+    }
+  }
+  /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
+  col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
+  col = col/(1.0 + col*0.30);
+  col = pow(col, vec3(0.92));
+  float vig = 1.0 - 0.22*dot(uv*0.55, uv*0.55);
+  col *= max(vig, 0.0);
+  gl_FragColor = vec4(col, 1.0);
+}

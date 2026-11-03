@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🧸 ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.13 «Quantum Fractal» ☩ 🥈 </title>
+<title>🧸 ☩ HITOMI OF LEGENDS — v1.7.13 «Quantum Fractal» ☩ 🥈 </title>
 <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
 <style>
 /* ============================================================
@@ -588,7 +588,7 @@ style="
 animation: gradientMove 60s ease infinite;    text-align: center;
 "
 >
- <h3 class="logotype"><div>v1.7.13 «Quantum Fractal»<br>Medverdic-core.js v4.0 «Ultimate»</h3></div>
+ <h3 class="logotype"><div>v1.7.13 «Quantum Fractal»<br>Medverdic-core.js v4.0 «Ultimate»<br>На этой страници вы можите поиграт  в игру .<br> HITOMI OF LEGENDS v1.2.5</h3></div>
  </div>
 <!-- ================= ТАБ-БАР ================= -->
 
@@ -1062,7 +1062,7 @@ margin: 1px;
       <div class="lcd lcd-full">
 	  
 	    <h2>СКАЧАТЬ</h2>
-	<h2> 🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.13 «Quantum Fractal» 🥈 </h2>
+	<h2> 🧸 HITOMI OF LEGENDS — v1.7.13 «Quantum Fractal» 🥈 </h2>
 			
 	<p>
 		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ Quantum Fractal ☩.zip" download>▼ СКАЧАТЬ </a>
@@ -2699,6 +2699,13 @@ btnPilot.textContent = 'ИГРА: СТАРТ';
 var btnMusic = document.createElement('button');
 btnMusic.textContent = 'МУЗЫКА';
 ctl.appendChild(btnPilot); ctl.appendChild(btnMusic);
+var btnShelf = document.createElement('a');
+btnShelf.href = 'hitomi.html'; btnShelf.textContent = '🪐 ПОЛКА ПЛАНЕТ';
+btnShelf.style.cssText = 'display:block;font-family:inherit;background:#222;color:#f7cc1d;border:4px outset #950;padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 #000;font-size:0.85rem;width:180px;height:40px;line-height:26px;text-align:center;text-decoration:none;';
+var btnLore = document.createElement('a');
+btnLore.href = 'hitomi_of_legends.html'; btnLore.textContent = '📖 ЛОР';
+btnLore.style.cssText = btnShelf.style.cssText;
+ctl.appendChild(btnShelf); ctl.appendChild(btnLore);
 document.body.appendChild(ctl);
 ctl.setAttribute('data-keep','1');
 
