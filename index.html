@@ -963,7 +963,7 @@ margin: 1px;
     <div class="panel_lcd">
       <div class="lcd lcd-full">
         <h2>УПРАВЛЕНИЕ</h2>
-        <p>ИГРА: СТАРТ — W/S тяга, A/D рысканье, ↑/↓ тангаж, Q/E крен, G/J планеты, мышь — взгляд, H — интерфейс.</p>
+        <p>ИГРА: СТАРТ — W/S тяга, A/D рысканье, ↑/↓ тангаж, Q/E крен, G/J — планеты (вперёд/назад), мышь — взгляд (P — спрятать курсор).</p>
         <h3>2 ряда — зигзаг на две октавы</h3>
         <p>Нижний ряд (C4…F5): ZSXDCVGBHNJM,L.;/'// ;=D#5 · /=E5 · '=F5</p>
         <p>Верхний ряд (C5…F#6, ровно октава выше): Q2W3ER5T6Y7UI9O0P[]//
@@ -1225,6 +1225,8 @@ uniform vec2  uRes;
 uniform float uTime;
 uniform float uCamA;
 uniform float uSunA;
+uniform float uPlanet;
+uniform float uSplash;
 
 #define R    1.0
 #define CAMR __CAMR__
@@ -1290,6 +1292,7 @@ void main(){
 
   /* --- камера: орбита через полюса, ось планеты = Y --- */
   vec3 camPos = vec3(cos(uCamA)*CAMR, sin(uCamA)*CAMR, 0.0);
+if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
   vec3 fwd = vec3(-sin(uCamA), cos(uCamA), 0.0);
   vec3 up0 = normalize(camPos);
   fwd = normalize(mix(fwd, -up0, 0.22));
@@ -1303,8 +1306,10 @@ void main(){
   vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
 
   /* пересечение луча со сферой планеты */
-  float b    = dot(camPos, rd);
-  float cc   = dot(camPos, camPos) - R*R;
+  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+  vec3 wC = camPos - sC;
+  float b    = dot(wC, rd);
+  float cc   = dot(wC, wC) - R*R;
   float disc = b*b - cc;
   float tHit = -b - sqrt(max(disc, 0.0));
   bool hitP  = (disc > 0.0) && (tHit > 0.0);
@@ -1349,6 +1354,21 @@ void main(){
 
     col = mix(colNight, colDay, lit);
 
+    /* ШИНРАРТА-B: поверхность как у НГАЛИН, эффект голубой #eff5f9 */
+    if(uPlanet > 2.5){
+      vec3 nS = normalize(p - sC);
+      float rock = fbm5(nS*3.2);
+      vec3 surfS = mix(vec3(0.05,0.045,0.05), vec3(0.16,0.13,0.12), rock);
+      float riv1 = fbm3(nS*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
+      float riv2 = fbm3(nS*7.0 - vec3(uTime*0.015, 0.0, 0.0));
+      float lavS = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5))) + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+      lavS = min(lavS, 1.0);
+      float pulS = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
+      col = surfS*(0.05 + 0.9*lit) + vec3(0.937,0.961,0.976)*lavS*pulS*(1.6 + (1.0 - lit)*2.6);
+      float fresS = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+      col += vec3(0.60,0.80,1.0)*fresS*0.45;
+    }
+
     /* атмосферный ободок на лимбе */
     float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
     col += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
@@ -1381,10 +1401,12 @@ void main(){
 
     col = mix(night, day, daySky);
 
+    if(uPlanet > 2.5){ col = night; }
+
     /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
     float closest = length(camPos - rd*b);
     float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
-    col += vec3(0.30,0.55,1.0)*atmo*dayness*0.85;
+    if(uPlanet < 2.5){ col += vec3(0.30,0.55,1.0)*atmo*dayness*0.85; } else { col += vec3(0.05,0.10,0.24)*atmo; }
 
     /* луна: диск с кратерами, свечение */
     float dM = dot(rd, moonDir);
@@ -1400,6 +1422,32 @@ void main(){
     }
   }
 
+
+  /* ДЖЕТТЫ ШИНРАРТА-B: два конуса с полюсов по оси Y */
+  if(uPlanet > 2.5){
+    vec3 jC = sC;
+    vec3 jW = camPos - jC;
+    float bJ = rd.y;
+    float dJd = dot(rd, jW);
+    float eJ = jW.y;
+    float denJ = 1.0 - bJ*bJ;
+    if(abs(denJ) > 0.0001){
+      float sJ = (eJ - dJd*bJ)/denJ;
+      float tJ = sJ*bJ - dJd;
+      if(tJ > 0.0){
+        float aJ = abs(sJ);
+        float along = smoothstep(0.92, 1.06, aJ)*(1.0 - smoothstep(1.15, 3.2, aJ));
+        float wJ = 0.02 + 0.06*aJ;
+        vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
+        float rJ = length(cpt);
+        float jit = 0.72 + 0.28*sin(uTime*3.7 + aJ*2.3);
+        float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
+        float core = exp(-(rJ*rJ)/(wJ*wJ*0.16)*0.5);
+        col += vec3(0.60,0.78,1.0)*along*prof*jit*1.15;
+        col += vec3(0.92,0.97,1.0)*along*core*jit*0.9;
+      }
+    }
+  }
   /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
   col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
   col = col/(1.0 + col*0.30);
@@ -1419,6 +1467,7 @@ uniform vec3  uCamR;
 uniform vec3  uCamU;
 uniform vec3  uCamF;
 uniform float uPlanet;
+uniform float uSplash;
 
 #define R    1.0
 #define CAMR __CAMR__
@@ -1496,8 +1545,10 @@ void main(){
   vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
 
   /* пересечение луча со сферой планеты */
-  float b    = dot(camPos, rd);
-  float cc   = dot(camPos, camPos) - R*R;
+  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+  vec3 wC = camPos - sC;
+  float b    = dot(wC, rd);
+  float cc   = dot(wC, wC) - R*R;
   float disc = b*b - cc;
   float tHit = -b - sqrt(max(disc, 0.0));
   bool hitP  = (disc > 0.0) && (tHit > 0.0);
@@ -1512,14 +1563,15 @@ void main(){
   /* цвет атмосферы по планете: ХИТОМИ голубая, ЧИЗИЯ #905000, НГАЛИН #300090 */
   vec3 atmC = vec3(0.30,0.55,1.0);
   if(uPlanet > 0.5 && uPlanet < 1.5){ atmC = vec3(0.565,0.314,0.0); }
-  else if(uPlanet > 1.5){ atmC = vec3(0.188,0.0,0.565); }
+  else if(uPlanet > 1.5 && uPlanet < 2.5){ atmC = vec3(0.188,0.0,0.565); }
+  else if(uPlanet > 2.5){ atmC = vec3(0.039,0.118,0.302); }
 
   vec3 col = vec3(0.0);
 
   if(hitP){
     /* ---- ПЛАНЕТА ---- */
     vec3 p = camPos + rd*tHit;
-    vec3 n = normalize(p);
+    vec3 n = normalize(p - sC);
     float nl  = dot(n, sunDir);
     float lit = smoothstep(-0.06, 0.18, nl);
 
@@ -1582,7 +1634,7 @@ void main(){
       float fresA = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
       col += vec3(0.90, 0.75, 0.50)*fresA*(0.2 + 0.8*lit)*0.8;
     }
-    else {
+    else if(uPlanet < 2.5) {
       /* ---- НГАЛИН: магматический мир с реками лавы ---- */
       float rock = fbm5(n*3.2);
       vec3 surf = mix(vec3(0.05, 0.045, 0.05), vec3(0.16, 0.13, 0.12), rock);
@@ -1595,6 +1647,19 @@ void main(){
       col = surf*(0.05 + 0.9*lit) + vec3(1.0, 0.38, 0.06)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
       float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
       col += vec3(1.0, 0.45, 0.10)*fresP*0.25;
+    } else {
+      /* ---- ШИНРАРТА-B: нейтронная звезда — поверхность как у НГАЛИН, эффект голубой #eff5f9 ---- */
+      float rock = fbm5(n*3.2);
+      vec3 surf = mix(vec3(0.05,0.045,0.05), vec3(0.16,0.13,0.12), rock);
+      float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
+      float riv2 = fbm3(n*7.0 - vec3(uTime*0.015, 0.0, 0.0));
+      float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+                 + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+      lava = min(lava, 1.0);
+      float pulse = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
+      col = surf*(0.05 + 0.9*lit) + vec3(0.937,0.961,0.976)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
+      float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+      col += vec3(0.60,0.80,1.0)*fresP*0.45;
     }
   } else {
     /* ---- НЕБО ---- */
@@ -1617,14 +1682,16 @@ void main(){
     float dSun = dot(rd, sunDir);
 
     col = mix(night, day, daySky*atmIn);
+    if(uPlanet > 2.5){ col = night; } else {
     /* СОЛНЦЕ ВНЕ ПУЗЫРЯ: диск и ореол светят всегда — и внутри пузыря, и в ночи */
     col += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, dSun)*3.0;
     col += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
+    }
 
     /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
     float closest = length(camPos - rd*b);
     float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
-    col += atmC*atmo*dayness*atmIn*0.85;
+    if(uPlanet < 2.5){ col += atmC*atmo*dayness*atmIn*0.85; } else { col += vec3(0.05,0.10,0.24)*atmo; }
 
     /* луна: диск с кратерами, свечение */
     float dM = dot(rd, moonDir);
@@ -1661,6 +1728,26 @@ void main(){
     }
   }
 
+
+    /* СЫРНЫЕ ЛУНЫ ШИНРАРТА-B: 8 дисков на скайбоксе, дрейф за солнцем */
+    if(uPlanet > 2.5){
+      for(int ci=0; ci<8; ci++){
+        float cang = uSunA + 2.1 + 0.55*float(ci);
+        vec3 cdir = normalize(vec3(cos(cang), 0.10 + 0.13*float(ci), sin(cang)));
+        float dC = dot(rd, cdir);
+        float cthr = 0.99955 - 0.00006*float(ci);
+        float cdisc = smoothstep(cthr, cthr + 0.00022, dC);
+        if(cdisc > 0.0){
+          vec3 lp2 = rd - cdir*dC;
+          float chz = fbm3(lp2*240.0);
+          vec3 cheese = vec3(0.95,0.78,0.30)*(0.55 + 0.45*chz);
+          float clit = smoothstep(-0.15, 0.15, dot(cdir, sunDir));
+          vec3 cc2 = cheese*mix(0.10, 1.0, clit);
+          col = mix(col, cc2, cdisc);
+          col += vec3(1.00,0.90,0.60)*pow(max(dC,0.0), 900.0)*0.25;
+        }
+      }
+    }
   /* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
   if(uPlanet > 0.5 && uPlanet < 1.5){
     vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
@@ -1684,6 +1771,32 @@ void main(){
     }
   }
 
+
+  /* ДЖЕТТЫ ШИНРАРТА-B: два конуса с полюсов по оси Y */
+  if(uPlanet > 2.5){
+    vec3 jC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+    vec3 jW = camPos - jC;
+    float bJ = rd.y;
+    float dJd = dot(rd, jW);
+    float eJ = jW.y;
+    float denJ = 1.0 - bJ*bJ;
+    if(abs(denJ) > 0.0001){
+      float sJ = (eJ - dJd*bJ)/denJ;
+      float tJ = sJ*bJ - dJd;
+      if(tJ > 0.0){
+        float aJ = abs(sJ);
+        float along = smoothstep(0.92, 1.06, aJ)*(1.0 - smoothstep(1.15, 3.2, aJ));
+        float wJ = 0.02 + 0.06*aJ;
+        vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
+        float rJ = length(cpt);
+        float jit = 0.72 + 0.28*sin(uTime*3.7 + aJ*2.3);
+        float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
+        float core = exp(-(rJ*rJ)/(wJ*wJ*0.16)*0.5);
+        col += vec3(0.60,0.78,1.0)*along*prof*jit*1.15;
+        col += vec3(0.92,0.97,1.0)*along*core*jit*0.9;
+      }
+    }
+  }
   /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
   col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
   col = col/(1.0 + col*0.30);
@@ -1767,6 +1880,7 @@ const uCR = gl.getUniformLocation(prog, 'uCamR');
 const uCU = gl.getUniformLocation(prog, 'uCamU');
 const uCF = gl.getUniformLocation(prog, 'uCamF');
 const uPL = gl.getUniformLocation(prog, 'uPlanet');
+const uSP = gl.getUniformLocation(prog, 'uSplash');
 
 function resize(){
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1801,7 +1915,7 @@ function frame(now){
     gl.uniform3f(uCF, g.fwd[0], g.fwd[1], g.fwd[2]);
   } else {
     const camA = START_PHASE_RAD + 2*Math.PI*simTime/ORBIT_PERIOD_SIM_SEC;
-    const cx = Math.cos(camA)*CAM_R, cy = Math.sin(camA)*CAM_R;
+    const cx = Math.cos(camA)*CAM_R, cy = Math.sin(camA)*CAM_R - ((!g || !g.active) && window.__splashPlanet === 3 ? 0.14 : 0);
     let f0x = -Math.sin(camA), f0y = Math.cos(camA);
     let u0x = Math.cos(camA), u0y = Math.sin(camA);
     let f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
@@ -1811,7 +1925,7 @@ function frame(now){
     const r1z = f1x*u0y - f1y*u0x;
     /* upv = right x fwd */
     const p1x = -r1z*f1y, p1y = r1z*f1x;
-    gl.uniform1f(uPL, 0);
+    gl.uniform1f(uPL, window.__splashPlanet || 0);
     gl.uniform3f(uCP, cx, cy, 0);
     gl.uniform3f(uCF, f1x, f1y, 0);
     gl.uniform3f(uCR, 0, 0, r1z);
@@ -1821,6 +1935,7 @@ function frame(now){
   gl.uniform2f(uRes, cv.width, cv.height);
   gl.uniform1f(uT, simTime);
   gl.uniform1f(uSA, sunA);
+  gl.uniform1f(uSP, (g && g.active) ? 0.0 : 1.0);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 
   requestAnimationFrame(frame);
@@ -1871,7 +1986,8 @@ var CFG = {
   HP0: 8, HP_STEPS: [1000,5000,12000,20000,50000,100000,150000,250000,500000,1000000],
   BOOST_MULT: 2.5, BOOST_MIN: 30, BOOST_DRAIN: 10, BOOST_REGEN: 90,
   BOOST_CK: 2, BOOST_CH: 1, BOOST_MOON: 5, BOOST_PEPPER: 5,
-  EXP_CAKE: 3, EXP_CHEESE: 5, EXP_MOON: 10, EXP_STEPS: [500, 1500],
+  EXP_CAKE: 3, EXP_CHEESE: 5, EXP_MOON: 10, EXP_STEPS: [500, 1500, 2250],
+  EXP_WIN: 7000,
   MOON_R: [1.70, 2.05, 2.40, 2.75], MOON_SZ: [0.10, 0.12, 0.13, 0.15],
   FOV_TAN: Math.tan(60.0*0.5*Math.PI/180.0),
   FLASH_BAN: 10, FREEZE_T: 16
@@ -1921,12 +2037,13 @@ function resetBasis(){
 }
 resetBasis();
 var yawV = 0, pitchV = 0, rollV = 0, speed = CFG.SPD_DEF;
-var keys = {}, drag = null;
+var keys = {}, drag = null, mouseCtl = false;
 /* ---------- НАЗВАНИЯ ПЛАНЕТ ---------- */
 /* ---------- ХИТОМИ: Жизнепригодная планета названая в честь игрока покарившего великий трактор в игре ELITE-DANGEROUS в центре галлактики находящийся под СТРЕЛЕЦ-А* в 460с.г и на 360с.л в сторону нетронног поля где огромное скопление нетронных Звезд , белых карликов и Чёрных дыр. ---------- */
 /* ---------- ЧИЗИЯ : Какой сырный мишка не захочит себе огромнуя планет состоящию из сыра. Планета была притянута Разумными плюшивыми медведями с планеты ХИТОМИ спомощью квантового гравитационного завхвата. И зачем они это сделали ? Теперь по звездной системе летает сыр и остатки когдато пышных колец этой планеты. Говорят они состояли из кексиков.  ---------- */
 /* ---------- НГАЛИН: Гравитационные Эксперементы плюшевых медведий с притяжением ЧИЗИИ закончились притяжением когдато брошенной в сторону Дарк войда старшего брата планеты ХИТОМИ . ХИТОМИ не хотела чтобы НГАЛИН Держался постоянно за нее и жил дальше сам . Однако из за Плюшевых медведей ХИТОМИ некогда не избавится от НГАЛИН. ---------- */
-var planet = 0, PLANET_NAMES = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН'];
+var planet = 0, PLANET_NAMES = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН', 'ШИНРАРТА-B'];
+var OCCL_Y = 0; /* вертикальный центр окклюзии: звезда опущена на заставке */
 var gameOn = false, switching = false, paused = false, pauseEl = null;
 
 /* ---------- ЗВУК: звук грузится по URL: Music-1.ogg / Music-2.ogg / Music-3.ogg (свой трек на планету), loop1.ogg, loop2.ogg рядом с HTML ---------- */
@@ -2139,12 +2256,13 @@ function updBottomPanel(){
   boostFillEl.style.filter = boostOn ? 'brightness(1.5)' : (boostFuel >= CFG.BOOST_MIN ? 'brightness(1.05)' : 'brightness(0.55) saturate(0.6)');
   updHotbar();
   if(expFillEl){
-    var lvl = (expTotal >= CFG.EXP_STEPS[1]) ? 2 : (expTotal >= CFG.EXP_STEPS[0] ? 1 : 0);
-    var lo = (lvl === 1) ? CFG.EXP_STEPS[0] : 0;
-    var hi = (lvl === 0) ? CFG.EXP_STEPS[0] : CFG.EXP_STEPS[1];
-    var pct = (lvl === 2) ? 100 : Math.max(0, Math.min(100, (expTotal - lo)/(hi - lo)*100));
+    var TH = CFG.EXP_STEPS.concat([CFG.EXP_WIN]);
+    var lvl = 0; while(lvl < TH.length && expTotal >= TH[lvl]) lvl++;
+    var lo = (lvl === 0) ? 0 : TH[lvl - 1];
+    var hi = TH[Math.min(lvl, TH.length - 1)];
+    var pct = (lvl >= TH.length) ? 100 : Math.max(0, Math.min(100, (expTotal - lo)/(hi - lo)*100));
     expFillEl.style.width = pct.toFixed(1) + '%';
-    if(expLabelEl) expLabelEl.textContent = (lvl === 2) ? (expTotal + ' MAX') : (Math.min(expTotal, hi) + '/' + hi);
+    if(expLabelEl) expLabelEl.textContent = (lvl >= TH.length) ? (expTotal + ' ПРОЙДЕНО') : (Math.min(expTotal, hi) + '/' + hi);
   }
 }
 
@@ -2394,13 +2512,14 @@ function initGoPanel(){
   goPanel = document.createElement('div');
   goPanel.setAttribute('data-keep', '1');
   goPanel.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:90;display:none;flex-direction:column;align-items:center;gap:11px;background:#0c150c;border:6px outset #950;border-radius:10px;padding:19px 24px;box-shadow:0 20px 40px rgba(0,0,0,.7);';
-  goPanel.innerHTML = '<div style="font:900 21px/1 monospace;letter-spacing:4px;color:#ff5a4a;text-shadow:2px 2px 0 #3a0000;">GAME OVER</div>'
+  goPanel.innerHTML = '<div id="goTitleEl" style="font:900 21px/1 monospace;letter-spacing:4px;color:#ff5a4a;text-shadow:2px 2px 0 #3a0000;">GAME OVER</div>'
     + segRowHtmlN('goPtsEl', '\u{1F31F} ОЧКИ', 10)
     + '<div id="goMoonEl" style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;"></div>'
     + '<button id="goBtn" style="width:192px;">НАЧАТЬ СНАЧАЛА</button>';
   document.body.appendChild(goPanel);
   goPtsEl = document.getElementById('goPtsEl');
   goMoonEl = document.getElementById('goMoonEl');
+  goTitleEl = document.getElementById('goTitleEl');
   document.getElementById('goBtn').addEventListener('click', function(){
     resetGame();
     gameOver = false;
@@ -2425,6 +2544,19 @@ function doGameOver(){
   showGameOver();
   applyGameMode();
 }
+function doWin(){
+  if(gameOver) return;
+  gameOver = true;
+  gameOn = false;
+  boostOn = false;
+  if(goTitleEl){
+    goTitleEl.textContent = '★ 7000 EXP — ИГРА ПРОЙДЕНА ★';
+    goTitleEl.style.color = '#7dff8a';
+    goTitleEl.style.textShadow = '2px 2px 0 #0a3a10';
+  }
+  showGameOver();
+  applyGameMode();
+}
 function resetGame(){
   score.cake = 0; score.cheese = 0; score.moon = 0;
   provCk = CFG.START_PROV; provCh = CFG.START_PROV;
@@ -2443,6 +2575,7 @@ function resetGame(){
   ITEMS.length = 0;
   genWorld();
   lastHpMax = -1;
+  if(goTitleEl){ goTitleEl.textContent = 'GAME OVER'; goTitleEl.style.color = '#ff5a4a'; goTitleEl.style.textShadow = '2px 2px 0 #3a0000'; }
   expTotal = 0;
   saveScore();
   segUpdate();
@@ -2499,7 +2632,7 @@ var segStockEl = null, segStockCapEl = null;
 var topPanel = null, segPtsEl = null;
 var botPanel = null, hpBarEl = null, boostFillEl = null;
 var expFillEl = null, expLabelEl = null;
-var goPanel = null, goPtsEl = null, goMoonEl = null;
+var goPanel = null, goPtsEl = null, goMoonEl, goTitleEl = null;
 var lensEl = null, lastHpMax = -1;
 function segRowHtml(id, label){
   var s = '<div style="display:flex;align-items:center;gap:8px;">'
@@ -2590,21 +2723,33 @@ function spawnOrbit(kind, glyph, rmin, rmax, sz, wbase, pi){
     axis: norm(ax), w: wbase + Math.random()*0.10, planet: pi, angle: 0, sz: sz });
 }
 function genWorld(){
-  for(var pi = 0; pi < 3; pi++){
+  for(var pi = 0; pi < 4; pi++){
     for(var ci = 0; ci < CFG.CAKE_N; ci++) spawnOrbit('cake', '🧁', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
     for(var hi = 0; hi < CFG.CHEESE_N; hi++) spawnOrbit('cheese', '🧀', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
     for(var bj = 0; bj < CFG.BIG_CAKE_N; bj++) spawnOrbit('cake', '🧁', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
     for(var bk = 0; bk < CFG.BIG_CHEESE_N; bk++) spawnOrbit('cheese', '🧀', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
     for(var pj = 0; pj < CFG.PEPPER_N; pj++) spawnOrbit('pepper', '🌶️', CFG.PEPPER_RMIN, CFG.PEPPER_RMAX, 0.075, 0.45, pi);
     for(var hj = 0; hj < CFG.HEART_N; hj++) spawnOrbit('heart', '❤️', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
-    if(pi === 1){
-      for(var m = 0; m < 4; m++){
+    if(pi === 1 || pi === 3){
+      var mN = (pi === 3) ? 8 : 4;
+      for(var m = 0; m < mN; m++){
         var md = rndDir();
         var mAx = cross(md, rndDir());
         if(len(mAx) < 0.05) mAx = [0,1,0];
-        ITEMS.push({ el: makeSprite('🌕'), p0: mul(md, CFG.MOON_R[m]),
-          axis: norm(mAx), w: 0.04 + 0.03*m, planet: 1, sz: CFG.MOON_SZ[m], angle: 0, kind: 'moon', mi: m });
+        var mR = (pi === 3) ? (1.85 + 1.12*m/7) : CFG.MOON_R[m];
+        var mS = (pi === 3) ? (0.045 + 0.006*(m % 4)) : CFG.MOON_SZ[m];
+        ITEMS.push({ el: makeSprite('🌕'), p0: mul(md, mR),
+          axis: norm(mAx), w: 0.04 + 0.03*(m % 5), planet: pi, sz: mS, angle: 0, kind: 'moon', mi: m });
       }
+    }
+    if(pi === 3){
+      /* ШИНРАРТА-B: двойной запас предметов */
+      for(var c3 = 0; c3 < CFG.CAKE_N; c3++) spawnOrbit('cake', '🧁', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
+      for(var h3 = 0; h3 < CFG.CHEESE_N; h3++) spawnOrbit('cheese', '🧀', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
+      for(var b3 = 0; b3 < CFG.BIG_CAKE_N; b3++) spawnOrbit('cake', '🧁', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
+      for(var k3 = 0; k3 < CFG.BIG_CHEESE_N; k3++) spawnOrbit('cheese', '🧀', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
+      for(var p3 = 0; p3 < CFG.PEPPER_N; p3++) spawnOrbit('pepper', '🌶️', CFG.PEPPER_RMIN, CFG.PEPPER_RMAX, 0.075, 0.45, pi);
+      for(var j3 = 0; j3 < CFG.HEART_N; j3++) spawnOrbit('heart', '❤️', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
     }
   }
 }
@@ -2647,10 +2792,10 @@ function project(p, cam, W, H){
   var z = dot(v, cam.fwd);
   if(z < 0.03) return null;
   var dir = mul(v, 1/(dist||1));
-  var tC = -dot(cam.pos, dir);
+  var tC = -dot(cam.pos, dir) - OCCL_Y*dir[1];
   if(tC > 0 && tC < dist){
     var q = add(cam.pos, mul(dir, tC));
-    if(dot(q,q) < 1.0) return { occl: true };
+    if(dot(q,q) + OCCL_Y*(2.0*q[1] + OCCL_Y) < 1.0) return { occl: true };
   }
   var ux = dot(v, cam.right)/(z*CFG.FOV_TAN);
   var uy = dot(v, cam.up)/(z*CFG.FOV_TAN);
@@ -2710,7 +2855,7 @@ function flash(x, y, kind){
 }
 function respawn(it){
   if(it.kind === 'moon'){
-    it.p0 = mul(rndDir(), CFG.MOON_R[it.mi]);
+    it.p0 = mul(rndDir(), (it.mi < 4 ? CFG.MOON_R[it.mi] : (1.85 + 1.12*it.mi/7)));
     it.angle = 0;
     return;
   }
@@ -2773,6 +2918,7 @@ function collect(it, pr){
   }
   applyMilestones();
   saveScore();
+  if(expTotal >= CFG.EXP_WIN) doWin();
   playPickup(it.kind);
   flash(pr.x, pr.y, it.kind);
   segBump(it.kind);
@@ -2901,23 +3047,37 @@ function drawSprites(cam, W, H, bgSim, dt){
 function updHud(){
   var unlocked = PLANET_NAMES[0]
     + (expTotal >= CFG.EXP_STEPS[0] ? ', ' + PLANET_NAMES[1] : '')
-    + (expTotal >= CFG.EXP_STEPS[1] ? ', ' + PLANET_NAMES[2] : '');
-  var txt = 'ПЛАНЕТА: ' + PLANET_NAMES[planet]
-    + '\nОТКРЫТО: ' + unlocked;
+    + (expTotal >= CFG.EXP_STEPS[1] ? ', ' + PLANET_NAMES[2] : '')
+    + (expTotal >= CFG.EXP_STEPS[2] ? ', ' + PLANET_NAMES[3] : '');
+  var txt = 'ПЛАНЕТА: ' + PLANET_NAMES[planet] + (planet === 3 ? ' ★ ФИНАЛ' : '')
+    + '\nОТКРЫТО: ' + unlocked
+    + (mouseCtl ? '\nМЫШЬ: ВКЛ (P — вернуть курсор)' : '');
   if(hudTxtEl) hudTxtEl.textContent = txt; else hud.textContent = txt;
   var pct = Math.round(speed/CFG.SPD_MAX*100);
   if(hudThrSegEl) segSetN(hudThrSegEl, Math.max(0, Math.min(250, pct)), 3);
 }
+function trackFor(p){ return (p === 3) ? 'Star-1.ogg' : 'Music-' + (p + 1) + '.ogg'; }
 function switchPlanet(dir){
   if(switching) return;
+  var target = -1;
   if(dir > 0){
-    var need = (planet === 0) ? CFG.EXP_STEPS[0] : CFG.EXP_STEPS[1];
+    if(planet >= 3) return;
+    var need = CFG.EXP_STEPS[planet];
     if(expTotal < need){
       if(expFillEl){
         expFillEl.style.background = '#ff5a4a';
         setTimeout(function(){ if(expFillEl) expFillEl.style.background = 'linear-gradient(90deg,#0b4d1f,#7dff8a,#d6ffb0)'; }, 300);
       }
       return;
+    }
+    target = planet + 1;
+  } else {
+    if(planet === 0){
+      /* назад с ХИТОМИ — только к уже открытой звезде: раньше времени не переключит */
+      if(expTotal < CFG.EXP_STEPS[2]) return;
+      target = 3;
+    } else {
+      target = planet - 1;
     }
   }
   switching = true;
@@ -2926,9 +3086,9 @@ function switchPlanet(dir){
   shots.length = 0;
   fadeEl.style.opacity = '1';
   setTimeout(function(){
-    planet = (planet + dir + 3) % 3;
+    planet = target;
     if(sfx.music && sfx.started){
-      try{ sfx.music.pause(); sfx.music.src = 'Music-' + (planet + 1) + '.ogg'; }catch(e){}
+      try{ sfx.music.pause(); sfx.music.src = trackFor(planet); }catch(e){}
     }
     updHud();
     fadeEl.style.opacity = '0';
@@ -2941,6 +3101,7 @@ function switchPlanet(dir){
 function setPaused(v){
   if(paused === v) return;
   paused = v;
+  if(v && document.pointerLockElement) document.exitPointerLock();
   if(pauseEl) pauseEl.style.display = v ? 'flex' : 'none';
   if(sfx.music){
     if(v) sfx.music.pause();
@@ -2954,9 +3115,9 @@ function initPausePanel(){
   pauseEl.innerHTML =
     '<div style="font:900 20px/1 monospace;letter-spacing:5px;color:#f7cc1d;text-shadow:2px 2px 0 #7a5c00;">ПАУЗА</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#7dff8a;">УПРАВЛЕНИЕ</div>'
-    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G / J — следующая / предыдущая планета<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
+    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G / J — следующая / предыдущая планета<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#f7cc1d;">МЕХАНИКИ</div>'
-    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Кексик +3 EXP, сыр +5 EXP, луна +10 EXP (крупные — вдвое)<br>500 EXP — ЧИЗИЯ, 1500 EXP — НГАЛИН<br>Добыча наполняет Форсаж: кексик +2%, сыр +1%, луна +5%<br>Форсаж — разгон до ×2.5, тает за 10 с, реген 100% за 90 с<br>Магнит — 12 с притяжения, Залп — 10 снарядов, Цель — 5 самонаводящихся<br>Вспышка — перчики исчезают на 10 с, Заморозка — стоп на 16 с<br>Обменник — кексики ↔ сыр 1:1, обратно 1 кексик = 2 сыра</div>'
+    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Кексик +3 EXP, сыр +5 EXP, луна +10 EXP (крупные — вдвое)<br>500 EXP — ЧИЗИЯ, 1500 EXP — НГАЛИН, 2250 EXP — ШИНРАРТА-B<br>7000 EXP — ИГРА ПРОЙДЕНА<br>Добыча наполняет Форсаж: кексик +2%, сыр +1%, луна +5%<br>Форсаж — разгон до ×2.5, тает за 10 с, реген 100% за 90 с<br>Магнит — 12 с притяжения, Залп — 10 снарядов, Цель — 5 самонаводящихся<br>Вспышка — перчики исчезают на 10 с, Заморозка — стоп на 16 с<br>Обменник — кексики ↔ сыр 1:1, обратно 1 кексик = 2 сыра</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#ff5a4a;">ПРАВИЛА</div>'
     + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Собирайте кексики и сыр, открывайте планеты за EXP<br>Перчик отнимает 1 HP и опустошает шкалу Форсажа на 5%<br>Аптечка восстанавливает 1 HP (максимум 8)<br>Нулевая провизия игру не завершает — опасен только ноль HP<br>HP = 0 — Game Over</div>'
     + '<button id="pauseBtn" style="width:192px;">ПРОДОЛЖИТЬ</button>';
@@ -2965,8 +3126,32 @@ function initPausePanel(){
 }
 
 /* ---------- ВВОД ---------- */
-var KEYSET = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, KeyQ:1, KeyE:1, KeyG:1, KeyJ:1, ArrowUp:1, ArrowDown:1 };
+var KEYSET = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, KeyQ:1, KeyE:1, KeyG:1, KeyJ:1, KeyP:1, ArrowUp:1, ArrowDown:1 };
+window.__splashPlanet = 0;
+var SPLASH_TOAST = null;
+function cycleSplash(){
+  window.__splashPlanet = ((window.__splashPlanet || 0) + 1) % 4;
+  var nm = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН', 'ШИНРАРТА-B'][window.__splashPlanet];
+  try{
+    if(sfx.music && sfx.musicOn){
+      sfx.music.pause();
+      sfx.music.src = trackFor(window.__splashPlanet);
+      sfx.music.play().catch(function(){});
+    }
+  }catch(e){}
+  if(SPLASH_TOAST && SPLASH_TOAST.parentNode) SPLASH_TOAST.remove();
+  SPLASH_TOAST = document.createElement('div');
+  SPLASH_TOAST.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:120;font:700 12px/1 monospace;letter-spacing:2px;color:#7dff8a;background:#0c150cdd;border:3px outset #950;border-radius:8px;padding:9px 16px;pointer-events:none;';
+  SPLASH_TOAST.textContent = 'ЗАСТАВКА: ' + nm;
+  document.body.appendChild(SPLASH_TOAST);
+  setTimeout(function(){ if(SPLASH_TOAST && SPLASH_TOAST.parentNode) SPLASH_TOAST.remove(); }, 1800);
+}
 window.addEventListener('keydown', function(e){
+  if(e.code === 'KeyZ' && !e.repeat && !gameOn){
+    e.preventDefault(); e.stopPropagation();
+    cycleSplash();
+    return;
+  }
   if(gameOn && e.code === 'Escape' && !e.repeat){
     e.preventDefault(); e.stopPropagation();
     document.body.classList.toggle('dgame');
@@ -2996,6 +3181,7 @@ window.addEventListener('keydown', function(e){
   e.preventDefault(); e.stopPropagation();
   if(e.code === 'KeyG' && !e.repeat) switchPlanet(1);
   else if(e.code === 'KeyJ' && !e.repeat) switchPlanet(-1);
+  else if(e.code === 'KeyP' && !e.repeat) toggleMouse();
   else keys[e.code] = 1;
   tryMusic();
 }, true);
@@ -3011,7 +3197,7 @@ window.addEventListener('keyup', function(e){
 }, true);
 addEventListener('blur', function(){ keys = {}; drag = null; });
 window.addEventListener('pointerdown', function(e){
-  if(!gameOn) return;
+  if(!gameOn || mouseCtl) return;
   var t = e.target;
   if(t && t.closest && t.closest('button,input,select,a,.panel,.lcd,.kbd-wrap,#keys,#keys2')) return;
   drag = { x: e.clientX, y: e.clientY };
@@ -3032,6 +3218,29 @@ window.addEventListener('pointermove', function(e){
 });
 window.addEventListener('pointerup', function(){ drag = null; });
 
+/* ---------- МЫШЬ: СКРЫТИЕ КУРСОРА (P) ---------- */
+function toggleMouse(){
+  if(!gameOn) return;
+  if(document.pointerLockElement){ document.exitPointerLock(); }
+  else { tryMusic(); document.body.requestPointerLock(); }
+}
+document.addEventListener('pointerlockchange', function(){
+  mouseCtl = !!document.pointerLockElement;
+});
+document.addEventListener('pointerlockerror', function(){ mouseCtl = false; });
+window.addEventListener('mousemove', function(e){
+  if(!mouseCtl || !gameOn || paused) return;
+  var dx = e.movementX || 0, dy = e.movementY || 0;
+  if(dx){
+    F.fwd = norm(rotAxis(F.fwd, F.up, -dx*CFG.DRAG_YAW));
+    F.right = norm(rotAxis(F.right, F.up, -dx*CFG.DRAG_YAW));
+  }
+  if(dy){
+    F.fwd = norm(rotAxis(F.fwd, F.right, dy*CFG.DRAG_PITCH));
+    F.up = norm(rotAxis(F.up, F.right, dy*CFG.DRAG_PITCH));
+  }
+});
+
 function applyGameMode(){
   document.body.classList.toggle('dgame', gameOn);
   btnPilot.classList.toggle('on', gameOn);
@@ -3039,6 +3248,7 @@ function applyGameMode(){
   layer.style.display = gameOn ? '' : 'none';
   hud.style.display = gameOn ? '' : 'none';
   keys = {}; drag = null;
+  if(!gameOn && document.pointerLockElement) document.exitPointerLock();
   if(segPanel){ segPanel.style.display = gameOn ? 'flex' : 'none'; if(gameOn) segUpdate(); }
   if(topPanel) topPanel.style.display = gameOn ? 'block' : 'none';
   if(botPanel) botPanel.style.display = gameOn ? 'flex' : 'none';
@@ -3114,18 +3324,20 @@ function loop(now){
       if(lensEl) lensEl.style.display = (immuneT > 0) ? 'block' : 'none';
       updBottomPanel();
       }
+      OCCL_Y = 0;
       cam = { pos: F.pos, fwd: F.fwd, up: F.up, right: F.right };
       window.__gameState = { active: true, planet: planet,
         pos: F.pos, fwd: F.fwd, up: F.up, right: F.right };
     } else {
       var camA = 2*Math.PI*bgSim/2275.9;
-      var cx = Math.cos(camA)*1.034, cy = Math.sin(camA)*1.034;
+      var cx = Math.cos(camA)*1.034, cy = Math.sin(camA)*1.034 - (window.__splashPlanet === 3 ? 0.14 : 0);
       var f0x = -Math.sin(camA), f0y = Math.cos(camA);
       var u0x = Math.cos(camA), u0y = Math.sin(camA);
       var f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
       var fl = Math.sqrt(f1x*f1x + f1y*f1y) || 1;
       f1x /= fl; f1y /= fl;
       var r1z = f1x*u0y - f1y*u0x;
+      OCCL_Y = (window.__splashPlanet === 3) ? 0.14 : 0;
       cam = { pos: [cx, cy, 0], fwd: [f1x, f1y, 0], right: [0, 0, r1z], up: [-r1z*f1y, r1z*f1x, 0] };
       window.__gameState = { active: false };
     }
