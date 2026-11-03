@@ -23,13 +23,14 @@
     background: var(--bg-panel);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 18px rgba(79,142,233,0.12), 0 0 46px rgba(79,142,233,0.08);
     display: flex;
     flex-direction: column;
     gap: 16px;
     background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgb(0 3 30 / 8%) 0px, #000000ad 2px, #00000087 2px, #00000096 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a000080 0px, #001a00a6 1px, #00002ea8 1px, #000000b8 6px);
     background-size: 2px 1px, 18px 18px;
     border: 4px outset #995500;
+	align-items: stretch;
     }
 
 
@@ -50,6 +51,7 @@
 
 :root{
   --bg: #0f0f1b;
+  --bg-panel: #0b0f16;   /* непрозрачный фон панелей/клавиатур — закрывает фон-звезду, чтобы Keys не просвечивали сквозь звезду */
   --panel: #1a1a2e;
   --gold: #f7cc1d;
   --cyan: #7dff8a;
@@ -115,6 +117,13 @@ button{
   background-size: 2px 2px, 18px 18px;
 }
 
+button:hover{
+  box-shadow:0 0 10px rgba(247,204,29,0.55), 0 0 20px rgba(247,204,29,0.25), 2px 2px 0 #000;
+}
+button:active{
+  transform:translateY(1px);
+}
+
 /* активная кнопка */
 button.on{
   background:#f79e1d;
@@ -124,6 +133,8 @@ button.on{
     repeating-radial-gradient(circle at 50% 50%, #000000 0px, #000000 1px, #1a1a2e 1px, #03000b 6px);
   background-size: 2px 2px, 9px 9px;
   border:4px outset #4f8ee9;
+  box-shadow:0 0 12px rgba(79,142,233,0.65), 0 0 26px rgba(79,142,233,0.35), 2px 2px 0 #000;
+  text-shadow:0 0 6px rgba(153,255,252,0.8);
 }
 
 /* вывеска */
@@ -132,7 +143,7 @@ h1 h2 h3{
   font-size:1.4rem;
   letter-spacing:3px;
   margin-bottom:12px;
-  text-shadow:2px 2px 0 #7a5c00;
+  text-shadow:2px 2px 0 #7a5c00, 0 0 10px rgba(247,204,29,.55);
   border:4px outset #950;
   background:#1a1a2e;
   padding:6px;
@@ -176,7 +187,7 @@ input[type=range]::-webkit-slider-thumb{
   border:2px solid var(--panel);
   border-radius:50%;
   margin-top:-5px;
-  box-shadow:0 0 4px rgba(249,153,0,.6);
+  box-shadow:0 0 6px rgba(249,153,0,.9), 0 0 14px rgba(249,153,0,.5);
 }
 input[type=range]::-moz-range-track{
   height:6px;
@@ -447,6 +458,9 @@ a.btn:active{ border-style:inset; }
   overflow-x:auto;
   overflow-y:hidden;
   scrollbar-width:none;
+  /* OPT: непрозрачная подложка клавиатур — фон-звезда/джет не просвечивает сквозь Keys */
+  background:#0d1119;
+  border:1px solid #1a1a2e;
 }
 .kbd-wrap::-webkit-scrollbar{ display:none; }
 
@@ -564,12 +578,7 @@ html::after{
   background:repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px);
 }
 </style>
-<div class="rack-mount" style="
-    display: flex;
-    overflow: auto;
-    flex-direction: column;
-    align-items: center;
-">
+<div class="rack-mount" style="display: flex;overflow: auto;flex-direction: column;align-items: stretch;">
 <!-- ================= ШАПКА ================= -->
 <header class="panel">
   <h1 class="logotype">🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT 🥈 </h1><br>
@@ -1330,8 +1339,16 @@ if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
     vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
     float cont = fbm5(sp);
     float land = smoothstep(0.46, 0.54, cont);
+    /* ДЕТАЛЬ: волнение береговой линии (турбулентность) — плавнее граница суши/океана */
+    float coast = fbm3(n*8.0 + vec3(0.0, uTime*0.006, 0.0));
+    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
     vec3 ocean = vec3(0.02,0.10,0.22);
     vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
+
+    /* ДЕТАЛЬ: микро-рельеф суши (горы/равнины) — доп. fbm, не меняет границы суши */
+    float mdet = fbm3(n*12.0 + vec3(uTime*0.003, uTime*0.001, 0.0));
+    landc *= 0.85 + 0.30*mdet;
+
     float ice  = smoothstep(0.80, 0.94, abs(n.y));
     vec3 surf  = mix(ocean, landc, land);
     surf = mix(surf, vec3(0.85,0.90,0.95), ice);
@@ -1423,7 +1440,8 @@ if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
   }
 
 
-  /* ДЖЕТТЫ ШИНРАРТА-B: два конуса с полюсов по оси Y */
+  /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
+     тёплое ядро у полюса, холодное свечение на конце, турбулентные завихрения */
   if(uPlanet > 2.5){
     vec3 jC = sC;
     vec3 jW = camPos - jC;
@@ -1436,15 +1454,28 @@ if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
       float tJ = sJ*bJ - dJd;
       if(tJ > 0.0){
         float aJ = abs(sJ);
-        float along = smoothstep(0.92, 1.06, aJ)*(1.0 - smoothstep(1.15, 3.2, aJ));
-        float wJ = 0.02 + 0.06*aJ;
+        /* длинные струи: вдоль оси до 6.5, колокол у полюса */
+        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, 6.5, aJ));
+        /* расширение струи с высотой — конус плазмы */
+        float wJ = 0.04;   /* постоянная ширина струи (не расширяется при отлёте) */
         vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
         float rJ = length(cpt);
-        float jit = 0.72 + 0.28*sin(uTime*3.7 + aJ*2.3);
+        /* турбулентность: закрученные струи — смещение ядра по aJ+second cooperative */
+        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*0.0833);
+        float off = 0.30*(1.0 - exp(-aJ*1.4));
         float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
-        float core = exp(-(rJ*rJ)/(wJ*wJ*0.16)*0.5);
-        col += vec3(0.60,0.78,1.0)*along*prof*jit*1.15;
-        col += vec3(0.92,0.97,1.0)*along*core*jit*0.9;
+        /* тёплое основание / холодная плазма сверху + неоновый обод */
+        float cool = smoothstep(0.8, 4.2, aJ);
+        vec3 jetCol = mix(vec3(1.0,0.55,0.20), vec3(0.45,0.75,1.0), cool);
+        float twinkle = 0.75 + 0.25*sin(uTime*0.0833 + aJ*5.0);
+        /* основной светящийся шлейф */
+        col += jetCol*along*prof*twinkle*1.6;
+        /* яркое ядро */
+        float core = exp(-(rJ*rJ)/(wJ*wJ*0.10)*0.5);
+        col += vec3(0.95,0.97,1.0)*along*core*twinkle*1.1;
+        /* закрутка: лёгкое смещение потока от оси создаёт живой вихрь */
+        float swirl = exp(-( (rJ - off*turb)*(rJ - off*turb) )/(wJ*wJ*0.6)*0.5);
+        col += jetCol*along*swirl*turb*0.6;
       }
     }
   }
@@ -1580,8 +1611,16 @@ void main(){
     vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
     float cont = fbm5(sp);
     float land = smoothstep(0.46, 0.54, cont);
+    /* ДЕТАЛЬ: волнение береговой линии (турбулентность) — плавнее граница суши/океана */
+    float coast = fbm3(n*8.0 + vec3(0.0, uTime*0.006, 0.0));
+    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
     vec3 ocean = vec3(0.02,0.10,0.22);
     vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
+
+    /* ДЕТАЛЬ: микро-рельеф суши (горы/равнины) — доп. fbm, не меняет границы суши */
+    float mdet = fbm3(n*12.0 + vec3(uTime*0.003, uTime*0.001, 0.0));
+    landc *= 0.85 + 0.30*mdet;
+
     float ice  = smoothstep(0.80, 0.94, abs(n.y));
     vec3 surf  = mix(ocean, landc, land);
     surf = mix(surf, vec3(0.85,0.90,0.95), ice);
@@ -1730,7 +1769,7 @@ void main(){
 
 
     /* СЫРНЫЕ ЛУНЫ ШИНРАРТА-B: 8 дисков на скайбоксе, дрейф за солнцем */
-    if(uPlanet > 2.5){
+    if(!hitP && uPlanet > 2.5){
       for(int ci=0; ci<8; ci++){
         float cang = uSunA + 2.1 + 0.55*float(ci);
         vec3 cdir = normalize(vec3(cos(cang), 0.10 + 0.13*float(ci), sin(cang)));
@@ -1749,7 +1788,8 @@ void main(){
       }
     }
   /* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
-  if(uPlanet > 0.5 && uPlanet < 1.5){
+  /* FIX: не рисовать кольца, когда луч попадает в планету — звезда непрозрачна */
+  if(!hitP && uPlanet > 0.5 && uPlanet < 1.5){
     vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
     float denom = dot(rd, nR);
     if(abs(denom) > 0.0035){
@@ -1772,7 +1812,8 @@ void main(){
   }
 
 
-  /* ДЖЕТТЫ ШИНРАРТА-B: два конуса с полюсов по оси Y */
+  /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
+     тёплое ядро у полюса, холодное свечение на конце, турбулентные завихрения */
   if(uPlanet > 2.5){
     vec3 jC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
     vec3 jW = camPos - jC;
@@ -1785,15 +1826,28 @@ void main(){
       float tJ = sJ*bJ - dJd;
       if(tJ > 0.0){
         float aJ = abs(sJ);
-        float along = smoothstep(0.92, 1.06, aJ)*(1.0 - smoothstep(1.15, 3.2, aJ));
-        float wJ = 0.02 + 0.06*aJ;
+        /* длинные струи: вдоль оси до 6.5, колокол у полюса */
+        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, 6.5, aJ));
+        /* расширение струи с высотой — конус плазмы */
+        float wJ = 0.04;   /* постоянная ширина струи (не расширяется при отлёте) */
         vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
         float rJ = length(cpt);
-        float jit = 0.72 + 0.28*sin(uTime*3.7 + aJ*2.3);
+        /* турбулентность: закрученные струи — смещение ядра по aJ */
+        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*0.0833);
+        float off = 0.30*(1.0 - exp(-aJ*1.4));
         float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
-        float core = exp(-(rJ*rJ)/(wJ*wJ*0.16)*0.5);
-        col += vec3(0.60,0.78,1.0)*along*prof*jit*1.15;
-        col += vec3(0.92,0.97,1.0)*along*core*jit*0.9;
+        /* тёплое основание / холодная плазма сверху + неоновый обод */
+        float cool = smoothstep(0.8, 4.2, aJ);
+        vec3 jetCol = mix(vec3(1.0,0.55,0.20), vec3(0.45,0.75,1.0), cool);
+        float twinkle = 0.75 + 0.25*sin(uTime*0.0833 + aJ*5.0);
+        /* основной светящийся шлейф */
+        col += jetCol*along*prof*twinkle*1.6;
+        /* яркое ядро */
+        float core = exp(-(rJ*rJ)/(wJ*wJ*0.10)*0.5);
+        col += vec3(0.95,0.97,1.0)*along*core*twinkle*1.1;
+        /* закрутка: лёгкое смещение потока от оси создаёт живой вихрь */
+        float swirl = exp(-( (rJ - off*turb)*(rJ - off*turb) )/(wJ*wJ*0.6)*0.5);
+        col += jetCol*along*swirl*turb*0.6;
       }
     }
   }
@@ -1883,7 +1937,8 @@ const uPL = gl.getUniformLocation(prog, 'uPlanet');
 const uSP = gl.getUniformLocation(prog, 'uSplash');
 
 function resize(){
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  /* OPT: ограничиваем DPR фона (база только рендер фона, не интерфейса) */
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   const w = Math.max(1, Math.floor(innerWidth  * dpr * RENDER_SCALE));
   const h = Math.max(1, Math.floor(innerHeight * dpr * RENDER_SCALE));
   if(cv.width !== w || cv.height !== h){
@@ -1894,10 +1949,21 @@ function resize(){
 addEventListener('resize', resize);
 resize();
 
+/* OPT: ПАРАЛЛАКС фона — координата курсора (-1..1) с плавным сглаживанием.
+   Используется только для фоновой камеры (стартовая сцена), механики игры не трогает. */
+let _parX = 0, _parY = 0;          /* текущая сглаженная позиция */
+let _parTX = 0, _parTY = 0;        /* целевая (raw) позиция курсора */
+addEventListener('mousemove', function(ev){
+  _parTX = (ev.clientX / Math.max(1, innerWidth)) * 2 - 1;
+  _parTY = (ev.clientY / Math.max(1, innerHeight)) * 2 - 1;
+}, { passive: true });
+const PARALLAX_AMOUNT = 0.008;     /* малый сдвиг, чтобы не ломать картинку */
+
 /* главный цикл: RAF сам замирает в фоновой вкладке, dt зажат сверху.
    Камера: свободный полёт из игрового скрипта (__gameState) либо
    орбитальное зеркало R46 (пилот выключен / игровой шейдер не собрался). */
 let simTime = 0, last = performance.now();
+let _uSP = null; /* OPT: кэш последнего uniform uSplash */
 function frame(now){
   resize();
   const dt = Math.min((now - last)/1000, 0.1);
@@ -1906,6 +1972,9 @@ function frame(now){
   window.__bgSim = simTime;
   const sunA = 2*Math.PI*simTime/DAY_CYCLE_SIM_SEC;
   const g = window.__gameState;
+  /* OPT: плавная интерполяция параллакса (target приближается к курсору) */
+  _parX += (_parTX - _parX) * Math.min(1, dt*6);
+  _parY += (_parTY - _parY) * Math.min(1, dt*6);
 
   if(g && g.active){
     gl.uniform1f(uPL, g.planet);
@@ -1915,7 +1984,9 @@ function frame(now){
     gl.uniform3f(uCF, g.fwd[0], g.fwd[1], g.fwd[2]);
   } else {
     const camA = START_PHASE_RAD + 2*Math.PI*simTime/ORBIT_PERIOD_SIM_SEC;
-    const cx = Math.cos(camA)*CAM_R, cy = Math.sin(camA)*CAM_R - ((!g || !g.active) && window.__splashPlanet === 3 ? 0.14 : 0);
+    /* ПАРАЛЛАКС: лёгкий сдвиг орбитальной камеры за курсором (только фон) */
+    const pxOff = _parX * PARALLAX_AMOUNT, pyOff = _parY * PARALLAX_AMOUNT * 0.6;
+    const cx = Math.cos(camA)*CAM_R + pxOff, cy = Math.sin(camA)*CAM_R - ((!g || !g.active) && window.__splashPlanet === 3 ? 0.14 : 0) + pyOff;
     let f0x = -Math.sin(camA), f0y = Math.cos(camA);
     let u0x = Math.cos(camA), u0y = Math.sin(camA);
     let f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
@@ -1935,7 +2006,9 @@ function frame(now){
   gl.uniform2f(uRes, cv.width, cv.height);
   gl.uniform1f(uT, simTime);
   gl.uniform1f(uSA, sunA);
-  gl.uniform1f(uSP, (g && g.active) ? 0.0 : 1.0);
+  /* OPT: uSplash меняется редко — не шлём одинаковое значение каждый кадр */
+  const spNow = (g && g.active) ? 0.0 : 1.0;
+  if(_uSP !== spNow){ gl.uniform1f(uSP, spNow); _uSP = spNow; }
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 
   requestAnimationFrame(frame);
@@ -2252,8 +2325,11 @@ function updBottomPanel(){
     var blk = hpBarEl.children[k];
     if(blk) blk.style.background = k < hpCur ? '#ff4a3a' : '#3a0d0d';
   }
-  boostFillEl.style.width = boostFuel.toFixed(1) + '%';
-  boostFillEl.style.filter = boostOn ? 'brightness(1.5)' : (boostFuel >= CFG.BOOST_MIN ? 'brightness(1.05)' : 'brightness(0.55) saturate(0.6)');
+  /* OPT: кэш — не перезаписываем style.width/фильтр, если значение прежнее */
+  var bw = boostFuel.toFixed(1) + '%';
+  if(boostFillEl._bw !== bw){ boostFillEl.style.width = bw; boostFillEl._bw = bw; }
+  var bf = boostOn ? 'brightness(1.5)' : (boostFuel >= CFG.BOOST_MIN ? 'brightness(1.05)' : 'brightness(0.55) saturate(0.6)');
+  if(boostFillEl._bf !== bf){ boostFillEl.style.filter = bf; boostFillEl._bf = bf; }
   updHotbar();
   if(expFillEl){
     var TH = CFG.EXP_STEPS.concat([CFG.EXP_WIN]);
@@ -2790,7 +2866,8 @@ function project(p, cam, W, H){
   var v = sub(p, cam.pos);
   var dist = len(v);
   var z = dot(v, cam.fwd);
-  if(z < 0.03) return null;
+  /* OPT: плавнее порог — меньше «прилипания»/рывков спрайтов у камеры */
+  if(z < 0.01) return null;
   var dir = mul(v, 1/(dist||1));
   var tC = -dot(cam.pos, dir) - OCCL_Y*dir[1];
   if(tC > 0 && tC < dist){
@@ -3005,7 +3082,8 @@ function drawSprites(cam, W, H, bgSim, dt){
       if(ringOccl(cam.pos, mul(v2, 1/(d2||1)), d2)){ it.el.style.display = 'none'; continue; }
     }
     var size = Math.max(14, Math.min(H*1.2, ((it.sz || 0.052)/pr.z)*H));
-    var op = Math.min(1, Math.max(0.05, (pr.z - 0.05)/0.08));
+    /* OPT: плавный фейд по дальности — убирает рывки «прилипания» спрайта к камере */
+    var op = Math.min(1, Math.max(0.0, (Math.min(pr.z, 3.0) - 0.03)/0.10));
     var dl = dot(norm(p), sun);
     it.el.style.display = 'block';
     it.el.style.transform = 'translate(' + pr.x.toFixed(1) + 'px,' + pr.y.toFixed(1) + 'px) translate(-50%,-50%)';
@@ -3029,7 +3107,7 @@ function drawSprites(cam, W, H, bgSim, dt){
         bearWrap.style.transform = 'translate(' + bpr.x.toFixed(1) + 'px,' + bpr.y.toFixed(1) + 'px) translate(-50%,-50%) rotate(' + bank.toFixed(1) + 'deg)';
         bearWrap.style.width = bsize.toFixed(1) + 'px';
         bearWrap.style.height = bsize.toFixed(1) + 'px';
-        bearWrap.style.opacity = Math.min(1, Math.max(0.15, (bpr.z - 0.10)/0.10)).toFixed(2);
+        bearWrap.style.opacity = Math.min(1, Math.max(0.15, (Math.min(bpr.z, 3.0) - 0.10)/0.10)).toFixed(2);
         bearWrap.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, bdl)).toFixed(2) + ')';
         bearWrap.style.zIndex = String(5000 - Math.round(bpr.z*100));
         ensureAura();
@@ -3052,7 +3130,10 @@ function updHud(){
   var txt = 'ПЛАНЕТА: ' + PLANET_NAMES[planet] + (planet === 3 ? ' ★ ФИНАЛ' : '')
     + '\nОТКРЫТО: ' + unlocked
     + (mouseCtl ? '\nМЫШЬ: ВКЛ (P — вернуть курсор)' : '');
-  if(hudTxtEl) hudTxtEl.textContent = txt; else hud.textContent = txt;
+  /* OPT: кэш текста — не пишем в DOM, если значение не изменилось */
+  if(hudTxtEl){
+    if(hudTxtEl.__last !== txt){ hudTxtEl.textContent = txt; hudTxtEl.__last = txt; }
+  } else if(hud._last !== txt){ hud.textContent = txt; hud._last = txt; }
   var pct = Math.round(speed/CFG.SPD_MAX*100);
   if(hudThrSegEl) segSetN(hudThrSegEl, Math.max(0, Math.min(250, pct)), 3);
 }
