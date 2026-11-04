@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☩ DIOWKRAD DSP AUDIOFLEX STAND ☩</title>
+<style>
+	:root {
+		--bg: #010;
+		--panel: #020;
+		--panel2: #0d1b0b;
+		--line: #244a0e;
+		--line2: #2f6610;
+		--ink: #90bc0f;
+		--ink2: #e2f77e;
+		--hot: #9bbc0f;
+		--font: 'Courier New', Courier, monospace;
+	}
+	* { box-sizing: border-box; margin: 0; padding: 0; }
+	body {
+		background: var(--bg);
+		color: var(--ink);
+		font-family: var(--font);
+		font-size: 14px;
+		line-height: 1.35;
+		padding: 12px;
+	}
+	h1 { font-size: 1rem; letter-spacing: .12em; color: var(--hot); margin-bottom: 4px; }
+	h2 { font-size: 0.75rem; letter-spacing: .1em; color: var(--ink2); border-bottom: 1px solid var(--line); padding-bottom: 4px; margin: 12px 0 8px; }
+	.panel {
+		background: var(--panel);
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		padding: 10px;
+		box-shadow: inset 0 0 24px rgba(0,0,0,.5);
+		margin-bottom: 10px;
+	}
+	.row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+	.row > .tag { color: var(--ink2); font-size: 0.7rem; letter-spacing: .08em; min-width: 150px; }
+	button {
+		font-family: var(--font);
+		font-size: 0.78rem;
+		letter-spacing: .04em;
+		background: var(--panel2);
+		color: var(--ink);
+		border: 1px solid var(--line2);
+		border-radius: 8px;
+		padding: 9px 14px;
+		cursor: pointer;
+		box-shadow: 0 0 5px 0 rgba(139,172,15,.3);
+		text-shadow: 1px 1px 3px rgba(0,138,20,1);
+	}
+	button.on { background: #244a0e; color: #e2f77e; border-color: var(--ink2); box-shadow: 0 0 8px rgba(139,172,15,.4); }
+	button:disabled { opacity: .45; cursor: default; }
+	.lcd {
+		background: #071207;
+		border: 1px solid var(--line2);
+		border-radius: 4px;
+		color: var(--hot);
+		font-family: var(--font);
+		font-size: 0.8rem;
+		padding: 8px 10px;
+		letter-spacing: .05em;
+		white-space: pre-wrap;
+		text-shadow: 0 0 6px rgba(155,188,15,.55);
+		min-height: 150px;
+	}
+	input[type=range] { accent-color: #9bbc0f; min-width: 220px; }
+	.badge {
+		display: inline-block;
+		background: #071207;
+		border: 1px solid var(--line2);
+		border-radius: 4px;
+		padding: 5px 10px;
+		font-size: 0.8rem;
+		color: var(--hot);
+		min-width: 90px;
+		text-align: center;
+	}
+	.foot { font-size: 0.68rem; color: var(--ink2); opacity: .8; margin-top: 10px; letter-spacing: .05em; }
+</style>
+</head>
+<body>
+<h1>☩ DIOWKRAD DSP CONVEYOR EXPERIMENTAL STAND ☩</h1>
+
+<div class="panel">
+	<div class="row"><span class="tag">СТЕНД:</span><span id="stMsg">Ожидание инициализации Аудио-Контекста... Нажмите ЗАПУСТИТЬ ДВИЖОК для активации фрактального конвейера.</span></div>
+	<div class="row">
+		<button id="btnStart">▶ ЗАПУСТИТЬ ДВИЖОК</button>
+		<button id="btnTone" disabled>♪ ОПОРНЫЙ ТОН: C4</button>
+		<button id="btnChaos" disabled title="Цифровой шторм для проверки лимитера">✶ ЦИФРОВОЙ ШТОРМ</button>
+	</div>
+</div>
+
+<div class="panel">
+	<h2>РУЧКИ</h2>
+	<div class="row"><span class="tag">ГРОМКОСТЬ:</span><input type="range" id="vol" min="0" max="100" value="70"><span class="badge" id="volB">70%</span></div>
+	<div class="row"><span class="tag">ИМИТАЦИЯ FPS:</span><input type="range" id="fps" min="20" max="60" value="60"><span class="badge" id="fpsB">60 Гц</span></div>
+</div>
+
+<div class="panel">
+	<h2>ТЕЛЕМЕТРИЯ</h2>
+	<div class="lcd" id="tel">Тракт молчит.</div>
+</div>
+
+<div class="foot">☩ AUDIOFLEX GUARD · конвейер: AudioFlex - фрактальный фильтр - софт-клип - сатуратор - сглаживание - диэссер - лимитер - mid/side HALO 0.45 - финальный лимитер ☩</div>
+
+<script>
+/* ============ ВОРКЛЕТ: AudioFlex Guard Processor ============ */
+/* Починки против концепта:
+   1. FPS приходит через port.postMessage - в концепте parameters.fps не жил бы, там AudioParams;
+   2. стерео честное: правый канал читается из буфера с задержкой (Хаас) - side не ноль;
+   3. generateVoice заменён реальным синтезом опорного тона;
+   4. AudioFlex - кольцевой буфер с дробным шагом чтения, при нехватке - hold, анти-underflow. */
+var WORKLET_SRC = [
+'class AudioFlexGuardProcessor extends AudioWorkletProcessor {',
+'  constructor(){',
+'    super();',
+'    this.phase = 0; this.freq = 261.63; this.on = false; this.chaos = false;',
+'    this.fps = 60; this.step = 1.0;',
+'    this.N = 8192;',
+'    this.buf = new Float32Array(this.N);',
+'    this.wI = 0; this.rPos = 0;',
+'    this.lastRaw = 0; this.lastDelay = new Float32Array(16); this.dIdx = 0;',
+'    this.hL = new Float32Array(4); this.hR = new Float32Array(4);',
+'    this.limHits = 0; this.underflows = 0; this.overflowDrops = 0; this.frames = 0;',
+'    this.port.onmessage = function(e) {',
+'      var d = e.data || {};',
+'      if (d.fps !== undefined)  { this.fps = d.fps; this.step = Math.max(0.25, Math.min(1.0, d.fps / 60)); }',
+'      if (d.freq !== undefined) { this.freq = d.freq; }',
+'      if (d.on !== undefined)   { this.on = d.on; }',
+'      if (d.chaos !== undefined){ this.chaos = d.chaos; }',
+'    }.bind(this);',
+'  }',
+'  fractalFilter(x, h) {',
+'    for (var i = 0; i < 3; i++) {',
+'      h[i] = Math.sin(x * 12.5663) * 0.5 + h[i] * 0.5;',
+'      x = x * 1.5 - h[i] * 0.35;',
+'    }',
+'    return x;',
+'  }',
+'  textbookA(x) { return x * (1.5 - 0.5 * x * x); }',
+'  textbookB(x) { return Math.atan(x * 1.2) / 1.2; }',
+'  textbookC(x) { return x < 0 ? x * (1.0 + 0.1 * x) : x * (1.0 - 0.1 * x); }',
+'  deEsser(x, h) {',
+'    var diff = x - h[3];',
+'    h[3] = h[3] * 0.85 + x * 0.15;',
+'    if (Math.abs(diff) > 0.42) x = h[3] + diff * 0.35;',
+'    return x;',
+'  }',
+'  hardLimiter(x) {',
+'    var T = 0.98;',
+'    if (x > T) { this.limHits++; return T; }',
+'    if (x < -T) { this.limHits++; return -T; }',
+'    return x;',
+'  }',
+'  hqStereoField(L, R) {',
+'    var W = 0.45;',
+'    var mid = (L + R) * 0.5, side = (L - R) * W;',
+'    return [mid + side, mid - side];',
+'  }',
+'  pipeline(x, h) {',
+'    x = this.fractalFilter(x, h);',
+'    x = this.textbookA(x);',
+'    x = this.textbookB(x);',
+'    x = this.textbookC(x);',
+'    x = x > 1 ? 1 : (x < -1 ? -1 : x);',
+'    x = this.deEsser(x, h);',
+'    return this.hardLimiter(x);',
+'  }',
+'  process(inputs, outputs) {',
+'    var oL = outputs[0][0], oR = outputs[0][1];',
+'    if (!oL) return true;',
+'    var n = oL.length, i;',
+'    for (i = 0; i < n; i++) {',
+'      var raw = 0;',
+'      if (this.on) {',
+'        this.phase += this.freq / sampleRate;',
+'        if (this.phase > 1) this.phase -= 1;',
+'        raw = Math.sin(this.phase * 6.28318530718) * 0.6;',
+'      }',
+'      if (this.chaos) {',
+'        raw = (Math.random() * 2 - 1) * 3.5;',
+'      }',
+'      this.buf[this.wI % this.N] = raw;',
+'      this.wI++;',
+'      if (this.wI - this.rPos >= this.N) { this.rPos = this.wI - this.N + 1; this.overflowDrops++; }',
+'      var out;',
+'      if (this.rPos + this.step > this.wI - 1) {',
+'        out = this.lastRaw; this.underflows++;',
+'      } else {',
+'        this.rPos += this.step;',
+'        var i0 = Math.floor(this.rPos), f = this.rPos - i0;',
+'        var s0 = this.buf[i0 % this.N], s1 = this.buf[(i0 + 1) % this.N];',
+'        out = s0 * (1 - f) + s1 * f;',
+'      }',
+'      this.lastRaw = out;',
+'      var rraw = this.lastDelay[this.dIdx];',
+'      this.lastDelay[this.dIdx] = out;',
+'      this.dIdx = (this.dIdx + 1) % this.lastDelay.length;',
+'      var sL = this.pipeline(out, this.hL);',
+'      var sR = this.pipeline(rraw, this.hR);',
+'      var st = this.hqStereoField(sL, sR);',
+'      oL[i] = this.hardLimiter(st[0]);',
+'      oR[i] = this.hardLimiter(st[1]);',
+'    }',
+'    this.frames += n;',
+'    if (this.frames >= sampleRate) {',
+'      this.port.postMessage({',
+'        step: this.step, fps: this.fps,',
+'        fill: Math.max(0, this.wI - this.rPos), cap: this.N,',
+'        underflows: this.underflows, overflowDrops: this.overflowDrops,',
+'        limHits: this.limHits',
+'      });',
+'      this.underflows = 0; this.overflowDrops = 0; this.limHits = 0; this.frames = 0;',
+'    }',
+'    return true;',
+'  }',
+'}',
+'registerProcessor("audio-flex-guard-processor", AudioFlexGuardProcessor);'
+].join('\n');
+
+/* ============ ОСНОВНОЙ ПОТОК ============ */
+var actx = null, node = null, gain = null, running = false;
+var NOTES = [['C4', 261.63], ['E4', 329.63], ['G4', 392.0], ['A4', 440.0], ['C5', 523.25]];
+var noteIdx = 0, toneOn = false, chaosOn = false;
+function $(id){ return document.getElementById(id); }
+
+function log(msg){
+  var t = $('tel');
+  if (t.getAttribute('data-init') !== '1') { t.textContent = ''; t.setAttribute('data-init', '1'); }
+  t.textContent += msg + '\n';
+  while (t.textContent.split('\n').length > 12) {
+    t.textContent = t.textContent.slice(t.textContent.indexOf('\n') + 1);
+  }
+}
+
+function startEngine(){
+  if (running) return;
+  var url = URL.createObjectURL(new Blob([WORKLET_SRC], { type: 'application/javascript' }));
+  actx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+  actx.audioWorklet.addModule(url).then(function(){
+    node = new AudioWorkletNode(actx, 'audio-flex-guard-processor', { numberOfOutputs: 1, outputChannelCount: [2] });
+    gain = actx.createGain();
+    gain.gain.value = ($('vol').value / 100) * 0.8;
+    node.connect(gain); gain.connect(actx.destination);
+    node.port.onmessage = function(e){
+      var d = e.data;
+      var fillPct = Math.round(d.fill / d.cap * 100);
+      log('ШАГ FLEX: ' + d.step.toFixed(2) + ' | БУФЕР: ' + fillPct + '%' +
+          ' | UNDERFLOW: ' + d.underflows + ' | ПЕРЕЛИВ: ' + d.overflowDrops +
+          ' | ЛИМИТЕР: ' + d.limHits + ' хитов/с');
+    };
+    running = true;
+    $('btnStart').classList.add('on');
+    $('btnStart').textContent = '■ ДВИЖОК АКТИВЕН';
+    $('btnTone').disabled = false;
+    $('btnChaos').disabled = false;
+    $('stMsg').textContent = 'Конвейер активен: AudioFlex - фрактальный фильтр - софт-клип - сатуратор - сглаживание - диэссер - лимитер - HALO.';
+    log('Тракт жив. Ручка FPS крутит AudioFlex: ниже 60 шаг чтения укорачивается, буфер держит тон без разрывов.');
+  }).catch(function(err){
+    $('stMsg').textContent = 'ОШИБКА ВОРКЛЕТА: ' + err.message;
+  });
+}
+
+document.getElementById('btnStart').addEventListener('click', startEngine);
+
+document.getElementById('btnTone').addEventListener('click', function(){
+  if (!running) return;
+  toneOn = !toneOn;
+  if (toneOn) noteIdx = (noteIdx + 1) % NOTES.length;
+  node.port.postMessage({ on: toneOn, freq: NOTES[noteIdx][1] });
+  this.textContent = toneOn ? '♪ ТОН ИГРАЕТ: ' + NOTES[noteIdx][0] : '♪ ОПОРНЫЙ ТОН: ' + NOTES[noteIdx][0];
+  this.classList.toggle('on', toneOn);
+});
+
+document.getElementById('btnChaos').addEventListener('click', function(){
+  if (!running) return;
+  chaosOn = !chaosOn;
+  node.port.postMessage({ chaos: chaosOn });
+  this.textContent = chaosOn ? '✶ ШТОРМ ИДЁТ' : '✶ ЦИФРОВОЙ ШТОРМ';
+  this.classList.toggle('on', chaosOn);
+  log(chaosOn ? 'ШТОРМ: сырые пики до 3.5 — лимитер обязан молчать. Смотри хиты/с.' : 'ШТОРМ выключен.');
+});
+
+document.getElementById('vol').addEventListener('input', function(){
+  var v = +this.value;
+  $('volB').textContent = v + '%';
+  if (gain) gain.gain.value = (v / 100) * 0.8;
+});
+
+document.getElementById('fps').addEventListener('input', function(){
+  var v = +this.value;
+  $('fpsB').textContent = v + ' Гц';
+  if (node) node.port.postMessage({ fps: v });
+});
+</script>
+</body>
+</html>
