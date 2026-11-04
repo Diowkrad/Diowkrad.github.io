@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🧸 ☩ HITOMI OF LEGENDS — v1.7.13 «Quantum Fractal» ☩ 🥈 </title>
+<title>🧸 ☩ Diowkrad Studio ☩ 🥈 </title>
 <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
 <style>
 /* ============================================================
@@ -19,8 +19,8 @@
 
 .rack-mount {
          width: 100%;
-    max-width: 1100px;
-    background: var(--bg-panel);
+    max-width: 920px;
+    
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 18px rgba(79,142,233,0.12), 0 0 46px rgba(79,142,233,0.08);
@@ -89,14 +89,15 @@ html{
 }
 body{
   background:transparent;
-      color: var(--text-main);
-      margin: 0;
-      padding: 25px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      user-select: none;
-      -webkit-user-select: none;
+    background: transparent;
+    color: var(--text-main);
+    margin: 0;
+    padding: 5px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 /* чип-кнопка */
@@ -521,18 +522,36 @@ body.kb-single #keys2{ display:none !important; }
 
 /* текстовые блоки: полный объём вместо узкого 240px */
 .lcd-full{
-        width: 100%;
+    width: 100%;
     height: 420px;
     display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border-radius: 24px;
+    flex-wrap: wrap;
+}
+.lcd-full2{
+	    width: 100%;
+    display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    border-radius: 24px;
+        flex-wrap: nowrap;
+    background: #0e0e2f;
+    align-content: stretch;
     align-items: center;
-    justify-content: flex-start;    border-radius: 24px;
 }
 
 /* подзаголовки внутри LCD */
-.lcd h2{ font-size:0.95rem; color:var(--gold); margin:6px 0 4px; }
-.lcd h3{ font-size:0.85rem; color:#99fffc; margin:6px 0 2px; }
-.lcd p, .lcd li{ margin:2px 0; }
+.lcd h2{ display: flex;
+    font-size: 0.95rem;
+    color: var(--gold);
+    margin: 6px 0 4px;
+    width: 100%;
+	    min-width: 450px;
+    justify-content: center; }
+.lcd h3{ font-size:1.35rem; color:#99fffc; margin:6px 0 2px; }
+.lcd p, .lcd li{ margin:2px 0;     font-size: 1.15rem;}
 
 /* МОБИЛЬНЫЙ РОЛЛ v1.0.37 */
 @media (max-width:768px){
@@ -581,14 +600,21 @@ html::after{
 <div class="rack-mount" style="display: flex;overflow: auto;flex-direction: column;align-items: stretch;">
 <!-- ================= ШАПКА ================= -->
 <header class="panel">
-  <h1 class="logotype">🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT 🥈 </h1><br>
+  <h1 class="logotype">🧸 Diowkrad Studio 🥈 </h1><br>
 </header>
 <div class="panel_2"
 style="
 animation: gradientMove 60s ease infinite;    text-align: center;
 "
 >
- <h3 class="logotype"><div>v1.7.13 «Quantum Fractal»<br>Medverdic-core.js v4.0 «Ultimate»<br>Скачать игру:<br><a class="btn" href="HITOMI OF LEGENDS v1.2.9.3.zip"> HITOMI OF LEGENDS v1.2.9.3</a></h3></div>
+ <h3 class="logotype">
+	<div>
+	<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">DIOWKRAD ENGINE 8BIT</a>
+	<a class="btn" href="HITOMI OF LEGENDS.html">HITOMI OF LEGENDS</a>
+	
+	
+	</div>
+</h3>
  </div>
 <!-- ================= ТАБ-БАР ================= -->
 
@@ -599,17 +625,20 @@ margin: 1px;
 ">
   
     <button class="on" data-view="view-about">О ПРОЕКТЕ</button>
-    <button data-view="view-features">ВОЗМОЖНОСТИ</button>
-    <button data-view="view-controls">УПРАВЛЕНИЕ</button>
-    <button data-view="view-disclaimer">Челенж Лог</button>
+    <button data-view="view-features" style="display:none;">Резерв1</button>
+    <button data-view="view-controls" style="display:none;" >Резерв2</button>
+    <button data-view="view-disclaimer">F.A.Q.</button>
     <button data-view="view-download">СКАЧАТЬ</button>
  
 </nav>
 <main id="app" style="
-    display: flex;
+      display: flex;
     flex-direction: column;
     align-items: center;
-	max-width: 900px;
+    max-width: 900px;
+    background: #ffffff24;
+    padding: 20px;
+    border-radius: 4%;
 ">
 <div class="p_block_flex-wrap" style="
        background-color: #10111dcf;
@@ -621,12 +650,12 @@ margin: 1px;
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
-    align-content: center;    min-width: 440px;
+    align-content: center;    min-width: 240px;
 ">
 <div class="p_block" >
 						<div>
 							<span class="mishka-wrap" style="display:inline-block; text-decoration:none; line-height:0;">
-<svg class="bear" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:380px; height:380px; cursor:pointer;">
+<svg class="bear" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:220px; height:220px; cursor:pointer;">
   <defs>
     <radialGradient id="mgHead" cx="40%" cy="30%" r="85%">
       <stop offset="0%" stop-color="#f2b48c"/><stop offset="55%" stop-color="#e69f70"/><stop offset="100%" stop-color="#c97f4e"/>
@@ -835,26 +864,7 @@ margin: 1px;
   #app .mishka-wrap .body-group{ transform-box:view-box; transform-origin:256px 400px; animation:mg-breathe 4s ease-in-out infinite; }
   @keyframes mg-breathe{ 0%,100%{transform:scale(1,1)} 50%{transform:scale(1.012,.992)} }
 </style>
-<style>
-/* ---------- ИГРА: АНИМАЦИЯ КЛОНА МЕДВЕДЯ (gbear — вне #app) ---------- */
-  .gbear .bear{ animation:zg-bob 3.2s ease-in-out infinite; }
-  .gbear .ear-left{ transform-box:view-box; transform-origin:150px 90px; animation:mg-earL 3.4s ease-in-out infinite; }
-  .gbear .ear-right{ transform-box:view-box; transform-origin:362px 90px; animation:mg-earR 3.4s ease-in-out -1.2s infinite; }
-  .gbear .head{ transform-box:view-box; transform-origin:256px 250px; animation:mg-nod 5.2s ease-in-out infinite; }
-  .gbear .eye{ transform-box:fill-box; transform-origin:center; animation:mg-blink 4.6s infinite; }
-  .gbear .eye.right{ animation-delay:4.4s; }
-  .gbear .star{ transform-box:fill-box; transform-origin:center; opacity:1; animation:mg-twinkle 1.4s ease-in-out infinite; }
-  .gbear .star:nth-of-type(2){ animation-delay:.25s; }
-  .gbear .star:nth-of-type(3){ animation-delay:.5s; }
-  .gbear .star:nth-of-type(4){ animation-delay:.75s; }
-  .gbear .bear.jumping{ animation:mg-jump .55s cubic-bezier(.3,0,.4,1); }
-  .gbear .bear.jumping .shadow{ transform-box:view-box; transform-origin:256px 470px; animation:mg-shadow .55s cubic-bezier(.3,0,.4,1); }
-  @keyframes zg-bob{ 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-7px) rotate(2.5deg)} }
-/* ---------- СЕМИСЕГМЕНТНЫЕ СЧЁТЧИКИ ---------- */
-  .segd div{ position:absolute; background:#a3ff52; box-shadow:0 0 6px rgba(163,255,82,.75); }
-  .segd div.h{ clip-path:polygon(0% 50%,16% 0%,84% 0%,100% 50%,84% 100%,16% 100%); }
-  .segd div.v{ clip-path:polygon(50% 0%,100% 16%,100% 84%,50% 100%,0% 84%,0% 16%); }
-</style>
+
 <script>
 (function(){
   var b=document.querySelector('.mishka-wrap .bear');
@@ -897,161 +907,154 @@ margin: 1px;
     <div class="panel_lcd">
       <div class="lcd lcd-full">
         <h2>О ПРОЕКТЕ</h2>
-        <p>DIOWKRAD SF2 CHIP-TUNE ENGINE — это гибридный звуковой движок в одном HTML-файле:
-        чиптюн-синтез в духе NES и SoundFont-плеер (.sf2) в одной шине.
-        Всё работает локально, в браузере, без сервера и интернета.</p>
-        <p>Проект вырос из простой идеи: сделать «файловый обменник в стиле старых игр
-        для локального сервера» в инструмент, который открывается двойным кликом и просто работает.</p>
-        <h3>Философия и особенности:</h3>
-        <ul>
-          <li>Дизайн в духе NES: минималистичная знакомая многим с детства атмосфера картриджа для Денди.</li>
-          <li>Это просто работает: отладка не ложится на плечи пользователя.</li>
-          <li>Многоэтапная тестировка: отладка производится на месте, а баги устраняются.
-              К вам попадает всегда стабильный билд, с минимумом отладочной информации или без неё.</li>
-          <li>Без интернета: файл просто живёт на диске.</li>
-          <li>Один файл: ни установок, ни зависимостей.</li>
-          <li>Три мира звука: за которые отвечают свои звуковые движки.</li>
-          <li>Чип: [RP2A03G] — им была оснащена каждая Nintendo Famicom {NES},
-              она же наша Русская Денди. Этот звук знает каждый, но мало у кого получалось
-              воссоздать его так, как он звучит в приставке.</li>
-          <li>Контроллер: [soundfonts-2 {.sf2}] — для звуковых банков, которые также используются
-              в небезызвестных Perfect Piano и Walk band на Android,
-              а также в различных VST и VST3-секвенсорах.</li>
-          <li>Микропроцессор: [Midi-GM x 128] и собственный независимый MIDI-банк —
-              как это было реализовано в старых кнопочных телефонах Nokia 6233 или SonyEricsson k750i.
-              Раньше не существовало единого стандарта MIDI-банков, поэтому каждый делал по-своему.
-              От этого одна и та же мелодия могла звучать по-разному.</li>
-          <li>Честное управление с любого устройства.</li>
-          <li>Честная история правок: неважно с компьютера или телефона —
-              один дизайн и один функционал везде, без лишнего адаптива под мобильные устройства.</li>
-        </ul>
-        <p>// (Для удобства в мобильных браузерах рекомендую уменьшить страницу
-        в браузере через настройки до 75%)</p>
+			<div class="lcd lcd-full2">
+				<h3>Что такое: Diowkrad-Studio ?</h3>
+				<p>Проект позиционирует себя как студию одного разработчика.</p> 
+				<p>Который объединяет в себе сразу несколько разных сфер деятельности .</p> 
+					<p>1. Студия профессиональной компьютерной помощи . </p> 
+					<p>2. Студия профессиональной Веб-разработки . </p> 
+					<p>3. Портфолио разработчика.</p> 
+					<p>4. Архив найденных решений.</p>
+					<p>5. Мечту моего детства и мою реальность сейчас .</p> 
+			</div>
+			<div class="lcd lcd-full2">
+				<h3>Кто такой: Diowkrad ?</h3>
+				<p>Я программист с опытом более 15 лет</p> 
+				<p>Первые разработки начал делать будучи еще школьником.</p> 
+				<p>В моем опыте уже</p> 
+					<p>1. Полный стек разработки в сфере WEB </p> 
+						<p>2. Администрирование и обслуживание</p> 
+						<p> дата центров и Серверного оборудования. </p> 
+					<p>3. Самостоятельные 2 инди проекта с полной поддержкой.</p> 
+					<p>4. Аудио дизайн.</p>
+					<p>5. Веб дизайн.</p>
+					<p>6. Левел дизайн в разработки игр и модификаций к ним.</p> 
+					<p>7. Написание с нуля музыкального оформления и саунд треков.</p>
+					<p>8. Тестировка и отладка готовых проектов.</p>
+					<p>9. Создание игровых и веб серверов под ключ.</p>
+			</div>
+			<div class="lcd lcd-full2">
+				<h3>Цикл моих разработок включает в себя.</h3>
+					<p>1. Написание кода первой версии 1.0.0 . </p> 
+					<p>2. Тестировка и если нужен баг фикс. </p> 
+					<p>3. Правки в коде.</p> 
+					<p>4. Добавление новой фичи.</p> 
+					<p>4. Тестировка и если нужен баг фикс.</p>
+					<p>5. Выпуск новой версии .</p>
+					<p>6. И далее по кругу до самого конца начиная с пункта 3-го по 5-й.</p> 
+			</div>
+			<div class="lcd lcd-full2">
+				<h3>Мои: Соц сети</h3>
+					<a class="btn" href="https://vk.ru/diowkrad_nyx" >VK</a>
+					<a class="btn" href="https://www.youtube.com/aezakmi50872" >▼ YouTube </a>
+			</div>
       </div>
     </div>
   </section>
 
-  <!-- ---------- ВКЛАДКА: ВОЗМОЖНОСТИ ---------- -->
-  <section id="view-features" class="view-hidden">
+  <!-- ---------- ВКЛАДКА: Резерв1 ---------- -->
+  <section id="view-features" class="view-hidden" style="display:none;">
+    <div class="panel_lcd">
+      <div class="lcd lcd-full2">
+        <h2>Резерв1</h2>
+			
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- ВКЛАДКА: Резерв2 ---------- -->
+  <section id="view-controls" class="view-hidden" style="display:none;">
     <div class="panel_lcd">
       <div class="lcd lcd-full">
-        <h2>ВОЗМОЖНОСТИ</h2>
-        <h3>Режим: CHIP-TUNE</h3>
-        <ul>
-          <li>11 голосов: ПУЛЬС 50% / 25% / 12,5%, ПИЛА, ТРЕУГ., СИНУС, КВАДРАТ,
-              ПУЛЬС КРУГЛ., N-ВОЛНА, ШУМ ДЛИН./КОРОТ.</li>
-          <li>Полифония, отдельная громкость голоса чипа, режим «квадрат −1 октава».</li>
-        </ul>
-        <h3>Режим: soundfonts-2 {.sf2}</h3>
-        <ul>
-          <li>Загрузка любого банка .sf2, выбор банка → пресета → инструмента.</li>
-          <li>Фолбэк: нота вне зон пресета уходит в CHIP-голос — тишины не бывает.</li>
-        </ul>
-        <h3>Режим: [Midi-GM]</h3>
-        <ul>
-          <li>Загрузка встроенного банка, с выбором инструмента.</li>
-          <li>Для удобства инструменты разбиты по категориям.</li>
-        </ul>
-        <h3>Сустейн</h3>
-        <ul>
-          <li>Три доли: 1/8 (250/900 мс) · 1/4 (500/700) · 1/2 (700/500).</li>
-          <li>Нота звучит после отпускания до границы доли, затем затухание;
-              подсветка гаснет вместе со звуком.</li>
-          <li>Смена режима пересчитывает играющие хвосты — зависшего звука нет.</li>
-        </ul>
-        <h3>Ввод</h3>
-        <ul>
-          <li>ПК-клавиатура: две раскладки — и 2 ряда клавиш.</li>
-        </ul>
+        <h2>Резерв2</h2>
+			<div class="lcd lcd-full2">
+
+			</div>
+        
       </div>
     </div>
   </section>
 
-  <!-- ---------- ВКЛАДКА: УПРАВЛЕНИЕ ---------- -->
-  <section id="view-controls" class="view-hidden">
-    <div class="panel_lcd">
-      <div class="lcd lcd-full">
-        <h2>УПРАВЛЕНИЕ</h2>
-        <p>ИГРА: СТАРТ — W/S тяга, A/D рысканье, ↑/↓ тангаж, Q/E крен, G/J — планеты (вперёд/назад), мышь — взгляд (P — спрятать курсор).</p>
-        <h3>2 ряда — зигзаг на две октавы</h3>
-        <p>Нижний ряд (C4…F5): ZSXDCVGBHNJM,L.;/'// ;=D#5 · /=E5 · '=F5</p>
-        <p>Верхний ряд (C5…F#6, ровно октава выше): Q2W3ER5T6Y7UI9O0P[]//
-        Q=C5 · I=C6 · октавные «до» на одинаковых позициях рядов.</p>
-        <h3>1 ряд — полная хроматика (C4…F#5)</h3>
-        <p>AWSEDFTGYHUJKOLP;']// — 19 клавиш без пропусков и дублей.</p>
-        <h3>Прочее</h3>
-        <ul>
-          <li>←→ — смена октавы.</li>
-          <li>Num7 Num8 Num9 — сустейн 1/8 · 1/4 · 1/2.</li>
-          <li>Раскладка привязана к физическим кодам клавиш — ЙЦУКЕН работает сам собой.</li>
-          <li>ИГРА: кнопка «ИГРА: СТАРТ» — свободный полёт. W/S — тяга, A/D — рысканье, ↑/↓ — тангаж, Q/E — крен, мышь — взгляд, G/J — смена планеты. Кексики 🧁 и сыр 🧀 собирайте пролётом.</li>
-          <li>Тумблер КЛАВИАТУРА глушит только ПК-ряд; MIDI и мышь всегда живые.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ---------- ВКЛАДКА: Челенж Лог ---------- -->
+  <!-- ---------- ВКЛАДКА: F.A.Q. ---------- -->
   <section id="view-disclaimer" class="view-hidden">
     <div class="panel_lcd">
       <div class="lcd lcd-full">
 <!-- ================= ЧЕЛЕНДЖ-ЛОГ v1.7.10 (готовая вставка в #view-disclaimer) ================= -->
-<h2>☩ Челенж Лог ☩</h2>
-
-<h3>🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.12 «Cheesy Teddy Bear»</h3>
-<p>// Каждый пункт подтверждён вхождением в код: константа, имя функции или узел графа звука.</p>
-
-<h3>ЗВУК И ДВИЖКИ</h3>
-<ul>
-  <li>Новый синтезатор <b>Yamaha YM2413</b>: 15 голосов с подписями, панель ymPanel,
-      один источник правды setYmVoice.</li>
-  <li>Три мира звука: CHIP-TUNE (RP2A03G), SoundFont-2 (.sf2) и MIDI-GM — выбор
-      инструментов из всех движков для каждой дорожки MIDI-плеера.</li>
-  <li>MIDI-плеер: до 10 одновременно звучащих нот, защита от обвала кода (HardDeepMidi).</li>
-  <li>RMS-режим матчера крашера: держит громкость ровной при любой динамике игры.</li>
-  <li>Экспоненциальная рампа реаттаки (Stap17) — без микрощелчка при быстрых повторах нот.</li>
-  <li>Циклеры волн: КВАДРАТ ×5 и КРУГ ×2, бас-циклеры ПИЛА/ТРЕУГОЛЬНИК/СИНУС ×2.</li>
-</ul>
-
-<h3>КАЧЕСТВО ЗВУКА — УСТРАНЕНИЕ ТРЕСКА И ПИКОВ</h3>
-<ul>
-  <li>Переписан шов фрактального сита: гладкая стыковка без ступени — щелчок на шве
-      устранён в корне.</li>
-  <li>Передискретизация сита ×4 против алиасинга на верхних нотах — шуршание тише в 3,5 раза.</li>
-  <li>Плоские пики сатуратора устранены: потолок выхода ниже точки включения —
-      сатуратор больше не срезает громкие ноты.</li>
-  <li>Ограничитель скорости волны перенастроен: больше не режет живую волну громких
-      верхних нот.</li>
-  <li>Трёхэтажная защита выхода: мягкий клиппер → лимитер −1 дБ → выход.</li>
-</ul>
-
-<h3>ИНТЕРФЕЙС</h3>
-<ul>
-  <li>Чанки клавиатуры по октавам: честная центровка на нажатую клавишу, уникальные
-      идентификаторы обеих клавиатур, живая диагностика window.__chunks.</li>
-  <li>Режим разработчика: логи открываются кодом «alisatyan» на главной панели;
-      тяжёлая диагностика троттлится по FPS на мобильных (Stap16).</li>
-  <li>Одиннадцать цветовых тем (th2..th12), новый логотип (SVG-глиф).</li>
-  <li>Адаптивный режим для Android (Stap13): детект платформы, фолбэк на резервный
-      тракт, приостановка неактивных движков.</li>
-</ul>
-
-<h3>КОД</h3>
-<ul>
-  <li>Ревизии R17–R36 «СИНХРОН»: честные штампы, синхронизация титула и BUILD-лога,
-      чистка мёртвых веток, восстановление потерянных шапок.</li>
-  <li>Телеметрия звука и конвейер (R17); кроссфейд матчинга 5 мс, бенды и фейзер на рампах.</li>
-  <li>Счётчики кадров: глобальный и локальные для каждого движка.</li>
-  <li>Ворклеты: 5 процессоров (ym2413, chip2413, gm2413, pulse-proc, crusher-proc).
-      Главный DSP-тракт — в onaudioprocess основного потока; полный перенос в ворклет —
-      задача следующей итерации.</li>
-  <li>Неактивные движки не сидят в памяти: выгрузка по suspend, исключение — MIDI-плеер.</li>
-</ul>
-
-<hr>
-<p class="dim">// Печать сборки: sha256(payload), протокол строгий — любой проверяющий
-// подтверждает хеш за один шаг.</p>
-
+	<h2>☩ F.A.Q ☩</h2>
+		<div class="lcd lcd-full2" Style="align-items: stretch;">
+			<h2> 🧸 ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩🥈 </h2>
+					<h2> 🧸 v1.7.13 «Quantum Fractal» 🥈 </h2>
+					<h3>Описание.</h3>
+					<p>Ядро Medvedic-core v4.0 и Monolit-core v1.2.5 </p>
+					<p>Графический дизайн Medvedic-ChipTune</p>
+					<HR>
+					<h3>Звуковые движки .</h3>
+					<p>Процессор на Архитектуре FM и Чипа: YM2413 .</p>
+						<p>Звуковой чип: RP-2A03G</p>
+						<p>Звуковой чип: YM2413</p> 
+						<p>Звуковой чип: Midi GM</p>
+						<p>Технология AudioFlex</p>
+						<p>Технология Фрактальный Страж</p>
+						<p>Технология Полной обвязки звука AudioContext</p>
+						<p>Технология Worklet</p>
+						<p>Технология WebAudioKit для работы на Android</p>
+						<p>Технология изолированного BLoop</p>
+					<HR>
+					<h3>Возможности.</h3>
+					<p>Звуковой движок с функциями Чип-Тюн синтезатора </p> 
+					<p>Тестовый полигон для архитектуры AudioFlex для JS</p>
+					<p>Тестовый полигон для архитектуры Фрактальный Страж для JS</p> 
+					<p>Midi Плеер со своими банками звука</p> 
+					<p>Midi процессор для ПК и смартфонов</p>
+					<p>SoundFont2 и 3 Плеер для использования банков</p>
+					<p>Автономность: всё упаковано в 1 HTML файл и просто работает.</p>
+					<p>Избавление от Веб-привязок. Всё что нужно уже есть в файле.</p>
+					<p>Вы даже не заметите, что это HTML, а не тяжёлая Программа.</p>
+					
+					<h3>Управление.</h3>
+						<p>ПК Клавиатура + Мышь в двух раскладках. </p>
+						<p>1 Раскладка Клавиатура A-\ . </p> 
+						<p>2 раскладки . Верхняя Клавиатура Q-]</p>
+						<p>2 раскладки . Нижняя Клавиатура Z-/</p><BR>
+						<p>Сенсорное управление </p>
+						<p>Режимы 1 клавиатура и 2 клавиатуры</p><BR>
+						<p>Midi Клавиатура</p>
+						<p>4 миди канала возможность подключения до 4-х Midi Клавиатур</p>
+						<p>Вывод нажатий из файла для связки Двух и более HTML Вкладок</p>
+						<p>Обратите внимание на то, что режим HTML в несколько Вкладок доступен только на ПК.</p>
+		</div>
+		<div class="lcd lcd-full2" Style="align-items: stretch;">
+			<h2> 🧸 ☩ HITOMI OF LEGENDS☩ 🥈 </h2>
+					<h2> Alpha v1.2.10 «Shadow of Hitomi» </h2>
+						<h3>Описание.</h3>
+						<p>Космическая аркада в духе Денди:</p>
+						<p>Вас ждёт свободный полёт среди планет. </p> 
+						<p>Гипер-прыжки, кексики 🧁 и сыр 🧀, капризный медведь 🧸.</p>
+						<p>И чиптюн-саундтрек от собственного движка  </p>
+						<p>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩</p>
+						<p>Музыка-саундтрек собственного сочинения.</p>
+						<p>Уникальный саунд Дизайн. В духе Чип-Тюн-NES.</p>
+						<BR>
+						<p>Рейс без конца. 7000 EXP - MAX уровень прокачки </p><BR>
+						<p>3 разных планеты </p>
+						<p>1 Нетронутая звезда.</p>
+						<p>Игра — часть экосистемы DIOWKRAD</p>
+						<p>И мемориал памяти дорогому мне человеку.</p>
+						<p>Игра имеет собственный ЛОР и Музей небесных тел.</p>
+						<HR>
+						<h3>Управление.</h3>
+							<p>ПК Клавиатура + Мышь. В полёте курсор прячется — взгляд управляется мышью.</p>
+							<p>W — разгон, S — тормоз.</p>
+							<p>A / D — рысканье влево / вправо, ↑ / ↓ — тангаж, Q / E — крен.</p>
+							<p>Мышь — взгляд, P — спрятать / показать курсор.</p><BR>
+							<p>G — FSD-прыжок к луне (Y) или к следующей планете, J — к предыдущей.</p>
+							<p>Y — захват планеты в цель: прицел на небе.</p><BR>
+							<p>R — форсаж (×2.5), 1-7 или колесо мыши — хотбар.</p>
+							<p>T — применить предмет, ESC — интерфейс.</p><BR>
+							<p>Гиперпространство</p>
+							<p>Вне зоны планеты — ночное небо и те же рули: крен, тангаж, рысканье и мышь. Курсор скрывается автоматически и возвращается на стыковке или прыжке.</p>
+		</div>
       </div>
 	</div>
   </section>
@@ -1059,126 +1062,28 @@ margin: 1px;
   <!-- ---------- ВКЛАДКА: СКАЧАТЬ ---------- -->
   <section id="view-download" class="view-hidden">
     <div class="panel_lcd">
-      <div class="lcd lcd-full">
-	  
-	    <h2>СКАЧАТЬ</h2>
-	<h2> 🧸 HITOMI OF LEGENDS — v1.7.13 «Quantum Fractal» 🥈 </h2>
-			
-	<p>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ Quantum Fractal ☩.zip" download>▼ СКАЧАТЬ </a>
-		<a class="btn" href="DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT.sf2" download>▼ SaundFont2 </a>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ Quantum Fractal ☩.html">🧸 «Quantum Fractal» 🥈</a>
-	</p>
-	  
-	  
-	  <br><br><br><br><br>
-	  
-	  <h2>СКАЧАТЬ</h2>
-	<h2> 🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» R51 🥈 </h2>
-			<p> Печать Хеш = 68246724741e8729  </p>
-	<p>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» ☩ R51 chanky .zip" download>▼ СКАЧАТЬ </a>
-		
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» ☩ R51 chanky .html">🧸 «Cheesy Teddy Bear» 🥈</a>
-		
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.7.10 «Cheesy Teddy Bear» ☩ R51 chanky Stap15 RD.html">🧸 Выстовачная версия 🥈</a>
-		
-	</p>
-
-		<h2> 🧸 DIOWKRAD SF2 CHIP-TUNE ENGINE - Fraims v1.0.1 🥈 </h2>
-		
-		<p>DIOWKRAD Fraimwork . Посути отдай это ИИ и она сделает тебе сентезатор с моими решениями и баг фиксом. Звуковой баг в JS у меня под пристальным контролем.</p>
-		<p>DIOWKRAD Fraimwork . Не решает баги среды . Он их просто закрывает . Я не разработчик самого JS . Я просто нашел способ как зделать злой стек из решений . 
-		уровень злости:  10🧸/10🧸 Клипенга и крашенга быть не должно .</p>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT v1.6.6 «Ultimate» ☩.zip" download>▼ СКАЧАТЬ</a>
-	</p>
-	 <br><br><br><br><br>
-
-
-
-  <h2>СКАЧАТЬ</h2>
-	<h2> ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ v1.4.37 «This is Rock»  </h2>
-			<p>На базе Движка Medvedic v2.3.js и Monolit v2.4.js v1.3.4 «Experemental»</p>
-		
-		
-		<br>
-		<p>Эксперементальная версия - ведуться работы по баг фиксу . </p>
-		<p>Свежее обновления публикуеться только здесь. Следите за версиями.  </p>
-		
-	<p>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩This is Rock☩.zip" download>▼ СКАЧАТЬ</a>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Medvedic☩.apk" download>▼ Тестовая версия .apk</a>
-		<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩This is Rock☩.html">☩ Medvedic Upgrade ☩</a>
-	</p>
-	 <br><br><br><br><br>
-		<h2>Движок 16 bit - js2413-main от разработчика © UO Soft  </h2>
-		<p> js2413-main Заимствованый рабочий движок как референс. </p>
-		<p>  Оригинального js2413-main по ссылки  </p>
-		<p> Движок 16 bit хоть и писался с референса Однако являеться самостоятельной разработкой . </p>
-		<p> Все сходства с js2413-main являються заимствоваными частями кода оригинала. </p>
-		<p> Однако Движок 16 bit выполняет совсем другую функцию </p>
-		<a class="btn" href=" https://github.com/uosoft/js2413">☩ © UO Soft - GitHub ☩</a>
-  
-  <br><br><br><br><br>
-  <p>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ v1.2.5 «Finale»</p>
-  <p>
-	 <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ RT.zip" download>▼ СКАЧАТЬ</a>
-    <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Remaster☩.html" target="_blank">☩Remaster☩</a>
-    <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩Legacy☩.html" target="_blank">☩Legacy☩</a>
-  </p>
-<br><br><br><br><br>
-<h2>СКАЧАТЬ</h2>
-<p>Банки Sf2 и Midi Chip-tune</p>
-	<p>
-		<a class="btn" href="soundfonts-2.zip" download>▼ СКАЧАТЬ</a>
-		<a class="btn" href="Midi.zip" download>▼ СКАЧАТЬ</a>
-	</p>
-<br><br><br><br><br>
-  <h2>Это прототипы модулей проекта: они могут работать с багами и являются инструментами отстройки.</h2>
-  <h2>Воспринимайте их как этапы разработки.</h2>
-
-  <p>☩ RP2A03C ENGINE-final ☩</p>
-  <p>
-    <a class="btn" href="RP2A03C ENGINE-final.zip" download>▼ СКАЧАТЬ</a>
-    <a class="btn" href="RP2A03C ENGINE-final.html" target="_blank">◄ Онлайн версия</a>
-  </p>
-	
-	 <p> ☩ chip_debug_v14 ☩ </p>
-  <p>
-    <a class="btn" href="chip_debug_v14.zip">▼ СКАЧАТЬ</a>
-    <a class="btn" href="chip_debug_v14.html">◄ Онлайн версия</a>
-  </p>
-  <p> ☩ chip_debug.html ☩ </p>
-  <p>
-    <a class="btn" href="chip_debug.zip">▼ СКАЧАТЬ</a>
-    <a class="btn" href="chip_debug.html">◄ Онлайн версия</a>
-  </p>
-	
-  <p>☩ SF2-ENGINE-final ☩</p>
-  <p>
-    <a class="btn" href="SF2-ENGINE-final.zip" download>▼ СКАЧАТЬ</a>
-    <a class="btn" href="SF2-ENGINE-final.html" target="_blank">◄ Онлайн версия</a>
-  </p>
-
-  <p>☩ piano_RP2A03E ☩</p>
-  <p>
-    <a class="btn" href="piano_RP2A03E.zip" download>▼ СКАЧАТЬ</a>
-    <a class="btn" href="piano_RP2A03E.html" target="_blank">◄ Онлайн версия</a>
-  </p>
-
-  <p>☩ piano_Chip_tune ☩</p>
-  <p>
-    <a class="btn" href="piano_Chip_tune.zip" download>▼ СКАЧАТЬ</a>
-    <a class="btn" href="piano_Chip_tune.html" target="_blank">◄ Онлайн версия</a>
-  </p>
-
-  <p class="dim">// ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩</p>
-  <p class="dim blink">// Внимание: Это демонстрационный стенд.</p>
-  <p class="dim blink">// Внимание: Полная версия защищена авторскими правами.</p>
-  <p class="dim blink">// Внимание: Продукт не для коммерческого использования.</p>
-
-</div>
-    </div>
+		<div class="lcd lcd-full">
+			<h2>☩ СКАЧАТЬ ☩</h2>
+			<div class="lcd lcd-full2">
+				<h2> 🧸 ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩🥈 </h2>
+					<h2> 🧸 v1.7.13 «Quantum Fractal» 🥈 </h2>
+					
+					<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.zip" download>▼ СКАЧАТЬ </a>
+					<a class="btn" href="DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT.sf2" download>▼ SoundFont2 </a>
+					<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">🧸 «Quantum Fractal» 🥈</a>
+				
+				</div>
+				<div class="lcd lcd-full2">
+				  
+				<h2> 🧸 ☩ HITOMI OF LEGENDS☩ 🥈 </h2>
+					<h2> Alpha v1.2.10 «Shadow of Hitomi» </h2>
+				
+					<a class="btn" href="☩ HITOMI OF LEGENDS☩.zip" download>▼ СКАЧАТЬ </a>
+					<a class="btn" href="☩ HITOMI OF LEGENDS☩.html">🧸 «Играть онлайн» 🥈</a>
+				
+			</div>
+		</div>
+	</div>
   </section>
 
 
@@ -1189,7 +1094,7 @@ margin: 1px;
     width: 100%;
     margin: 0px 45px;
    
-">☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ © 2026▮ Diowkrad Studio ® 2011-2026</span>
+">▮Фриланс Студия веб разработки.▮ Diowkrad Studio ® 2011-2026 ▮</span>
 </footer>
 
 <script>
@@ -2016,1438 +1921,6 @@ function frame(now){
 requestAnimationFrame(frame);
 })();
 </script>
-<script>
-/* ═══════════════════════════════════════════════════════════════
-   ☩ ИГРА: СВОБОДНЫЙ ПОЛЁТ — ПЛАНЕТЫ, КОЛЬЦА, КЕКСИКИ И СЫР ☩
-   Камера свободная: позиция + базис (fwd/right/up) честно летят.
-   W/S — тяга, A/D — рысканье, ↑/↓ — тангаж, Q/E — крен, мышь — взгляд,
-   G/J — смена планеты. Кексики 🧁 и сыр 🧀 собираются пролётом.
-   ═══════════════════════════════════════════════════════════════ */
-(function(){
-'use strict';
-function gameErr(msg){
-  var d = document.getElementById('gameErrLine');
-  if(!d){
-    d = document.createElement('div');
-    d.id = 'gameErrLine';
-    d.style.cssText = 'position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:200;background:#2a0808;color:#ff9b9b;border:2px outset #900;font:12px/1.4 monospace;padding:4px 12px;max-width:92vw;';
-    document.body.appendChild(d);
-  }
-  d.textContent = msg;
-  setTimeout(function(){ if(d.parentNode) d.remove(); }, 12000);
-}
-window.addEventListener('error', function(ev){
-  gameErr('ОШИБКА СТРАНИЦЫ: ' + (ev && ev.message ? ev.message : 'unknown'));
-});
 
-try{
-
-/* ---------- КОНФИГ (править здесь) ---------- */
-var CFG = {
-  SPD_MIN: 0.0, SPD_MAX: 0.22, SPD_DEF: 0.055, SPD_RATE: 0.16,  /* скорость, ед./с */
-  YAW_MAX: 0.90, PITCH_MAX: 0.75, ROLL_MAX: 1.30,               /* рули, рад/с */
-  RESP: 11.0,                                                   /* нарастание рулей, 1/с */
-  DRAG_YAW: 0.0030, DRAG_PITCH: 0.0024,                         /* мышь, рад/пиксель */
-  MINR: 1.045,                                                  /* мин. радиус орбиты */
-  PICK_RMIN: 1.16, PICK_RMAX: 1.78, PICK_RAD: 0.075,
-  BUBBLE_R: 1.90, OUT_RMIN: 1.95, OUT_RMAX: 3.20,
-  CAKE_N: 12, CHEESE_N: 18, BIG_CAKE_N: 6, BIG_CHEESE_N: 9,
-  PEPPER_N: 20, PEPPER_RMIN: 1.95, PEPPER_RMAX: 3.20, HEART_N: 3,
-  START_PROV: 10, PEPPER_CK: 5, PEPPER_CH: 3, PEPPER_CD: 1.5,
-  PTS_CAKE: 25, PTS_CHEESE: 50, PTS_MOON: 175,
-  MOON_CAP0: 3, CAP_STEP: 2500, CAP_GOAL: 50, SHIELD_T: 30,
-  HP0: 8, HP_STEPS: [1000,5000,12000,20000,50000,100000,150000,250000,500000,1000000],
-  BOOST_MULT: 2.5, BOOST_MIN: 30, BOOST_DRAIN: 10, BOOST_REGEN: 90,
-  BOOST_CK: 2, BOOST_CH: 1, BOOST_MOON: 5, BOOST_PEPPER: 5,
-  EXP_CAKE: 3, EXP_CHEESE: 5, EXP_MOON: 10, EXP_STEPS: [500, 1500, 2250],
-  EXP_WIN: 7000,
-  MOON_R: [1.70, 2.05, 2.40, 2.75], MOON_SZ: [0.10, 0.12, 0.13, 0.15],
-  FOV_TAN: Math.tan(60.0*0.5*Math.PI/180.0),
-  FLASH_BAN: 10, FREEZE_T: 16
-};
-
-/* ---------- ХОТБАР: определения и состояние ---------- */
-var HOT_DEFS = [
-  { id:'shield', icon:'\u{1F31D}', name:'ЩИТ',    cost:{ck:0,ch:0,mn:1} },
-  { id:'magnet', icon:'\u{1F9F2}', name:'МАГНИТ', cost:{ck:5,ch:5,mn:1} },
-  { id:'volley', icon:'\u{1F9C0}', name:'ЗАЛП',   cost:{ck:0,ch:10,mn:0} },
-  { id:'homing', icon:'\u{1F9C1}', name:'ЦЕЛЬ',   cost:{ck:5,ch:0,mn:0} },
-  { id:'flash',  icon:'\u{1F4A5}', name:'ВСПЫШКА', cost:{ck:0,ch:0,mn:5} },
-  { id:'freeze', icon:'\u2744\uFE0F', name:'ЗАМОРОЗ', cost:{ck:5,ch:0,mn:3} },
-  { id:'exch',   icon:'\u{1F504}', name:'ОБМЕН',  cost:{ck:0,ch:0,mn:0} }
-];
-var hotSel = 0, hotCells = [], hotDenyT = 0;
-var magnetT = 0, freezeT = 0, pepBanT = 0, MAG_T = 12, MAG_R = 0.85;
-var shots = [];
-var auraEl = null, snowEl = null, auraCss = false, magnetSnd = null;
-var shotX = 0, shotY = 0, shotAimX = 0, shotAimY = 0;
-
-/* ---------- ВЕКТОРА ---------- */
-function add(a,b){ return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]; }
-function sub(a,b){ return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
-function mul(a,s){ return [a[0]*s, a[1]*s, a[2]*s]; }
-function dot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
-function cross(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
-function len(a){ return Math.sqrt(dot(a,a)); }
-function norm(a){ var l = len(a)||1; return [a[0]/l, a[1]/l, a[2]/l]; }
-function rotAxis(v, k, ang){
-  var c = Math.cos(ang), s = Math.sin(ang);
-  var kv = cross(k, v);
-  return add(add(mul(v,c), mul(kv,s)), mul(k, dot(k,v)*(1-c)));
-}
-
-/* ---------- ПОЛЁТ: состояние ---------- */
-var CAMR0 = 1.0 + 1000.0/29371.0;
-var A0 = 0.0;
-var F = { pos: [Math.cos(A0)*CAMR0, Math.sin(A0)*CAMR0, 0], fwd: null, up: null, right: null };
-function resetBasis(){
-  var f0 = [-Math.sin(A0), Math.cos(A0), 0];
-  var u0 = norm(F.pos);
-  var f1 = [f0[0]*0.78 - u0[0]*0.22, f0[1]*0.78 - u0[1]*0.22, 0];
-  F.fwd = norm(f1);
-  F.right = norm(cross(F.fwd, u0));
-  F.up = cross(F.right, F.fwd);
-}
-resetBasis();
-var yawV = 0, pitchV = 0, rollV = 0, speed = CFG.SPD_DEF;
-var keys = {}, drag = null, mouseCtl = false;
-/* ---------- НАЗВАНИЯ ПЛАНЕТ ---------- */
-/* ---------- ХИТОМИ: Жизнепригодная планета названая в честь игрока покарившего великий трактор в игре ELITE-DANGEROUS в центре галлактики находящийся под СТРЕЛЕЦ-А* в 460с.г и на 360с.л в сторону нетронног поля где огромное скопление нетронных Звезд , белых карликов и Чёрных дыр. ---------- */
-/* ---------- ЧИЗИЯ : Какой сырный мишка не захочит себе огромнуя планет состоящию из сыра. Планета была притянута Разумными плюшивыми медведями с планеты ХИТОМИ спомощью квантового гравитационного завхвата. И зачем они это сделали ? Теперь по звездной системе летает сыр и остатки когдато пышных колец этой планеты. Говорят они состояли из кексиков.  ---------- */
-/* ---------- НГАЛИН: Гравитационные Эксперементы плюшевых медведий с притяжением ЧИЗИИ закончились притяжением когдато брошенной в сторону Дарк войда старшего брата планеты ХИТОМИ . ХИТОМИ не хотела чтобы НГАЛИН Держался постоянно за нее и жил дальше сам . Однако из за Плюшевых медведей ХИТОМИ некогда не избавится от НГАЛИН. ---------- */
-var planet = 0, PLANET_NAMES = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН', 'ШИНРАРТА-B'];
-var OCCL_Y = 0; /* вертикальный центр окклюзии: звезда опущена на заставке */
-var gameOn = false, switching = false, paused = false, pauseEl = null;
-
-/* ---------- ЗВУК: звук грузится по URL: Music-1.ogg / Music-2.ogg / Music-3.ogg (свой трек на планету), loop1.ogg, loop2.ogg рядом с HTML ---------- */
-var AUDIO_URLS = { music: 'Music-1.ogg', cake: 'loop1.ogg', cheese: 'loop2.ogg', moon: 'moon.ogg', pepper: 'pepper.ogg', heart: 'heart.ogg' };
-var audioWarn = {};
-
-var sfx = { music: null, cake: null, cheese: null, moon: null, pepper: null, heart: null, musicOn: true, started: false };
-function loadAudio(name){
-  try{
-    var a = new Audio(AUDIO_URLS[name]);
-    a.addEventListener('error', function(){
-      if(!audioWarn[name]){ audioWarn[name] = true; console.warn('[ИГРА] Файл ' + AUDIO_URLS[name] + ' не найден рядом с HTML — этот звук не заиграет'); }
-    });
-    return a;
-  }catch(e){ return null; }
-}
-function ensureAudio(){
-  if(sfx.started) return;
-  sfx.music = loadAudio('music');
-  if(sfx.music){ sfx.music.loop = true; sfx.music.volume = 0.45; }
-  sfx.cake = loadAudio('cake');
-  sfx.cheese = loadAudio('cheese');
-  sfx.moon = loadAudio('moon');
-  sfx.pepper = loadAudio('pepper');
-  sfx.heart = loadAudio('heart');
-  sfx.started = true;
-}
-function tryMusic(){
-  ensureAudio();
-  if(!sfx.music || !sfx.musicOn) return;
-  var p = sfx.music.play();
-  if(p && p.catch) p.catch(function(){});
-}
-function playPickup(kind){
-  if(!sfx.musicOn || !sfx.started) return;
-  try{
-    var a = (kind === 'cake' ? sfx.cake : (kind === 'cheese' ? sfx.cheese : sfx.moon)).cloneNode();
-    a.volume = 0.55;
-    var p = a.play();
-    if(p && p.catch) p.catch(function(){});
-  }catch(e){}
-}
-
-/* ---------- DOM: слой спрайтов, HUD, кнопки, фейд ---------- */
-var layer = document.createElement('div');
-layer.style.cssText = 'position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden;';
-document.body.appendChild(layer);
-layer.setAttribute('data-keep','1');
-(function(){
-  var css = document.createElement('style');
-  css.textContent = 'body.dgame > :not(#glbg):not([data-keep]):not(#gameErrLine){display:none !important;}';
-  document.head.appendChild(css);
-})();
-
-/* ---------- УРОН И ЗВУК ПЕРЧИКА ---------- */
-function hurt(n, pr){
-  hpCur = Math.max(0, hpCur - n);
-  var f = document.createElement('div');
-  f.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:6500;background:radial-gradient(circle,rgba(255,60,40,0) 38%,rgba(255,60,40,0.5) 100%);opacity:.9;transition:opacity .5s ease;';
-  layer.appendChild(f);
-  requestAnimationFrame(function(){ f.style.opacity = '0'; });
-  setTimeout(function(){ if(f.parentNode) f.parentNode.removeChild(f); }, 650);
-  updBottomPanel();
-}
-function playPepper(){
-  if(!sfx.musicOn || !sfx.started) return;
-  try{
-    if(!sfx.pepper) return;
-    var a = sfx.pepper.cloneNode();
-    a.volume = 0.6;
-    var p = a.play();
-    if(p && p.catch) p.catch(function(){});
-  }catch(e){}
-}
-function playHeart(){
-  if(!sfx.musicOn || !sfx.started) return;
-  try{
-    if(!sfx.heart) return;
-    var a = sfx.heart.cloneNode();
-    a.volume = 0.6;
-    var p = a.play();
-    if(p && p.catch) p.catch(function(){});
-  }catch(e){}
-}
-
-/* ---------- N-РАЗРЯДНЫЕ СЕГМЕНТНЫЕ ДИСПЛЕИ ---------- */
-function segRowHtmlN(id, label, n){
-  var s2 = '<div style="display:flex;align-items:center;gap:8px;">'
-    + '<span style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;">' + label + '</span>'
-    + '<div id="' + id + '" style="display:flex;gap:3px;padding:2px 2px;">';
-  for(var d = 0; d < n; d++){
-    s2 += '<div class="segd" style="position:relative;width:20px;height:37px;">';
-    for(var i2 = 0; i2 < 7; i2++){
-      var p2 = SEG_GEO[i2];
-      s2 += '<div class="' + p2[0] + '" style="left:' + p2[1] + 'px;'
-        + (p2[2] < 0 ? 'bottom:' + (-p2[2]) + 'px;' : 'top:' + p2[2] + 'px;')
-        + 'width:' + p2[3] + 'px;height:' + p2[4] + 'px;opacity:.13;"></div>';
-    }
-    s2 += '</div>';
-  }
-  return s2 + '</div></div>';
-}
-function segSetN(row, val, n){
-  if(!row) return;
-  var mx = Math.pow(10, n) - 1;
-  var v = Math.max(0, Math.min(mx, Math.floor(val)));
-  var str = ('0000000000' + v).slice(-n);
-  for(var i = 0; i < n; i++){
-    var cell = row.children[i];
-    if(!cell) continue;
-    var on = SEG_ON[+str.charAt(i)] || '';
-    for(var j = 0; j < 7; j++){
-      var seg = cell.children[j];
-      if(seg) seg.style.opacity = on.indexOf('abcdefg'.charAt(j)) >= 0 ? '1' : '.13';
-    }
-  }
-}
-
-/* ---------- ВЕРХНЯЯ ПАНЕЛЬ ОЧКОВ (10 разрядов) ---------- */
-function initTopPanel(){
-  if(topPanel) return;
-  topPanel = document.createElement('div');
-  topPanel.setAttribute('data-keep', '1');
-  topPanel.style.cssText = 'position:fixed;top:8px;left:50%;transform:translateX(-50%) scale(0.59);transform-origin:top center;z-index:70;display:none;background:#0c150c;border:4px inset #1a1a2e;border-radius:8px;padding:6px 14px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
-  topPanel.innerHTML = segRowHtmlN('segPtsEl', '\u{1F31F} ОЧКИ', 10);
-  document.body.appendChild(topPanel);
-  segPtsEl = document.getElementById('segPtsEl');
-  updTopScore();
-}
-function updTopScore(){ segSetN(segPtsEl, pts, 10); }
-
-/* ---------- НИЖНЯЯ ПАНЕЛЬ: HP, ФОРСАЖ, PowerUp ---------- */
-function initBottomPanel(){
-  if(botPanel) return;
-  botPanel = document.createElement('div');
-  botPanel.setAttribute('data-keep', '1');
-  botPanel.style.cssText = 'position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:70;display:none;flex-direction:column;gap:6px;background:#0c150c;border:4px inset #1a1a2e;border-radius:8px;padding:8px 13px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
-  var hpRow = document.createElement('div');
-  hpRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
-  hpRow.innerHTML = '<span style="font:700 9px/1 monospace;letter-spacing:2px;color:#ff8a8a;white-space:nowrap;">\u2764\uFE0F HP</span>';
-  hpBarEl = document.createElement('div');
-  hpBarEl.style.cssText = 'display:flex;gap:3px;';
-  hpRow.appendChild(hpBarEl);
-  botPanel.appendChild(hpRow);
-  var bRow = document.createElement('div');
-  bRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
-  bRow.innerHTML = '<span style="font:700 9px/1 monospace;letter-spacing:2px;color:#ffb35c;white-space:nowrap;">\u{1F525} ФОРСАЖ</span>';
-  var bWrap = document.createElement('div');
-  bWrap.style.cssText = 'position:relative;width:224px;height:11px;background:#050b05;border:2px solid #950;border-radius:7px;overflow:hidden;';
-  boostFillEl = document.createElement('div');
-  boostFillEl.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#7a3c00,#ffb35c,#ffe08a);transition:width .2s linear;';
-  bWrap.appendChild(boostFillEl);
-  bRow.appendChild(bWrap);
-  botPanel.appendChild(bRow);
-  var eRow = document.createElement('div');
-  eRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
-  eRow.innerHTML = '<span style="font:700 9px/1 monospace;letter-spacing:2px;color:#7dff8a;white-space:nowrap;">\u2728 EXP</span>';
-  var eWrap = document.createElement('div');
-  eWrap.style.cssText = 'position:relative;width:224px;height:11px;background:#050b05;border:2px solid #950;border-radius:6px;overflow:hidden;';
-  expFillEl = document.createElement('div');
-  expFillEl.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#0b4d1f,#7dff8a,#d6ffb0);transition:width .2s linear;';
-  eWrap.appendChild(expFillEl);
-  expLabelEl = document.createElement('span');
-  expLabelEl.style.cssText = 'font:700 9px/1 monospace;color:#7dff8a;white-space:nowrap;';
-  expLabelEl.textContent = '0/500';
-  eRow.appendChild(eWrap); eRow.appendChild(expLabelEl);
-  botPanel.appendChild(eRow);
-  var cRow = document.createElement('div');
-  cRow.style.cssText = 'display:flex;gap:5px;justify-content:center;margin-top:2px;';
-  botPanel.appendChild(buildHotRow());
-  document.body.appendChild(botPanel);
-}
-function buildHotRow(){
-  var cRow = document.createElement('div');
-  cRow.style.cssText = 'display:flex;align-items:center;gap:6px;';
-  for(var i = 0; i < HOT_DEFS.length; i++){
-    var d = HOT_DEFS[i];
-    var cell = document.createElement('div');
-    cell.style.cssText = 'position:relative;width:42px;height:42px;border:2px solid #333;border-radius:8px;background:#0a0a12;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 2px 0 #000;transition:box-shadow .15s,border-color .15s;';
-    cell.innerHTML = '<div style="font-size:13px;line-height:1;">' + d.icon + '</div>'
-      + '<div style="font:700 7px/1 monospace;letter-spacing:1px;color:#9fd9a0;margin-top:3px;">' + d.name + '</div>'
-      + '<div class="hotSt" style="font:700 7px/1 monospace;color:#7dff8a;margin-top:2px;"></div>'
-      + '<div style="position:absolute;right:2px;top:1px;font:700 6px/1 monospace;color:#666;">' + (i+1) + '</div>';
-    cell.dataset.hot = String(i);
-    cell.addEventListener('click', function(ev){
-      var idx = parseInt(ev.currentTarget.dataset.hot, 10);
-      if(hotSel === idx) useHot(idx); else hotSelect(idx);
-    });
-    hotCells.push(cell);
-    cRow.appendChild(cell);
-  }
-  return cRow;
-}
-function updBottomPanel(){
-  if(!botPanel || !hpBarEl || !boostFillEl) return;
-  if(lastHpMax !== hpMax){
-    lastHpMax = hpMax;
-    hpBarEl.innerHTML = '';
-    for(var i = 0; i < hpMax; i++){
-      var b = document.createElement('div');
-      b.style.cssText = 'width:10px;height:11px;border:1px solid #5a1a1a;border-radius:3px;background:#3a0d0d;';
-      hpBarEl.appendChild(b);
-    }
-  }
-  for(var k = 0; k < hpMax; k++){
-    var blk = hpBarEl.children[k];
-    if(blk) blk.style.background = k < hpCur ? '#ff4a3a' : '#3a0d0d';
-  }
-  /* OPT: кэш — не перезаписываем style.width/фильтр, если значение прежнее */
-  var bw = boostFuel.toFixed(1) + '%';
-  if(boostFillEl._bw !== bw){ boostFillEl.style.width = bw; boostFillEl._bw = bw; }
-  var bf = boostOn ? 'brightness(1.5)' : (boostFuel >= CFG.BOOST_MIN ? 'brightness(1.05)' : 'brightness(0.55) saturate(0.6)');
-  if(boostFillEl._bf !== bf){ boostFillEl.style.filter = bf; boostFillEl._bf = bf; }
-  updHotbar();
-  if(expFillEl){
-    var TH = CFG.EXP_STEPS.concat([CFG.EXP_WIN]);
-    var lvl = 0; while(lvl < TH.length && expTotal >= TH[lvl]) lvl++;
-    var lo = (lvl === 0) ? 0 : TH[lvl - 1];
-    var hi = TH[Math.min(lvl, TH.length - 1)];
-    var pct = (lvl >= TH.length) ? 100 : Math.max(0, Math.min(100, (expTotal - lo)/(hi - lo)*100));
-    expFillEl.style.width = pct.toFixed(1) + '%';
-    if(expLabelEl) expLabelEl.textContent = (lvl >= TH.length) ? (expTotal + ' ПРОЙДЕНО') : (Math.min(expTotal, hi) + '/' + hi);
-  }
-}
-
-/* ---------- ЩИТ И ЛИНЗА ---------- */
-function ensureLens(){
-  if(lensEl || !bearWrap) return;
-  lensEl = document.createElement('div');
-  lensEl.className = 'mglens';
-  bearWrap.appendChild(lensEl);
-}
-function useImmunity(){
-  if(!gameOn || gameOver || immuneT > 0) return;
-  if(moonStock < 1) return;
-  moonStock--;
-  immuneT = CFG.SHIELD_T;
-  ensureLens();
-  segUpdate();
-  saveScore();
-  playPickup('moon');
-}
-
-/* ---------- POWERUP: магнит, залп, самонаводка, вспышка, заморозка, обмен ---------- */
-function playMagnet(){
-  try{
-    if(!magnetSnd) magnetSnd = new Audio('magnet.ogg');
-    var a = magnetSnd.cloneNode(); a.volume = 0.6;
-    var p = a.play(); if(p && p.catch) p.catch(function(){});
-  }catch(e){}
-}
-function hotSelect(i){
-  if(i < 0 || i >= HOT_DEFS.length) return;
-  hotSel = i;
-  updHotbar();
-}
-function costTxt(c){
-  var parts = [];
-  if(c.ck) parts.push(c.ck + '\u{1F9C1}');
-  if(c.ch) parts.push(c.ch + '\u{1F9C0}');
-  if(c.mn) parts.push(c.mn + '\u{1F31D}');
-  return parts.join(' ') || '\u2014';
-}
-function canPay(c){
-  return (c.ck || 0) <= provCk && (c.ch || 0) <= provCh && (c.mn || 0) <= moonStock;
-}
-function payCost(c){
-  if(!canPay(c)) return false;
-  provCk -= (c.ck || 0); provCh -= (c.ch || 0); moonStock -= (c.mn || 0);
-  segUpdate(); saveScore();
-  return true;
-}
-function hotDeny(i){
-  hotDenyT = 0.6;
-  if(hotCells[i]) hotCells[i].style.borderColor = '#ff5a4a';
-}
-function updHotbar(){
-  for(var i = 0; i < hotCells.length; i++){
-    var cell = hotCells[i], d = HOT_DEFS[i];
-    if(!cell || !d) continue;
-    var st = cell.querySelector('.hotSt');
-    var sel = (i === hotSel);
-    cell.style.borderColor = sel ? ((hotDenyT > 0) ? '#ff5a4a' : '#f79e1d') : '#333';
-    cell.style.boxShadow = sel ? '0 0 8px rgba(247,158,29,.7),2px 2px 0 #000' : '2px 2px 0 #000';
-    if(st){
-      if(d.id === 'shield') st.textContent = (immuneT > 0) ? (Math.ceil(immuneT) + 'с') : ('\u00D7' + moonStock);
-      else if(d.id === 'magnet') st.textContent = (magnetT > 0) ? (Math.ceil(magnetT) + 'с') : costTxt(d.cost);
-      else if(d.id === 'freeze') st.textContent = (freezeT > 0) ? (Math.ceil(freezeT) + 'с') : costTxt(d.cost);
-      else if(d.id === 'flash') st.textContent = (pepBanT > 0) ? (Math.ceil(pepBanT) + 'с') : costTxt(d.cost);
-      else st.textContent = costTxt(d.cost);
-    }
-    var busy = (d.id === 'magnet' && magnetT > 0) || (d.id === 'freeze' && freezeT > 0) || (d.id === 'flash' && pepBanT > 0);
-    var can = d.id === 'exch' || busy || (d.id === 'shield' ? moonStock > 0 : canPay(d.cost));
-    cell.style.opacity = (sel || can) ? '1' : '0.55';
-  }
-}
-function useHot(i){
-  if(!gameOn || gameOver) return;
-  var d = HOT_DEFS[i];
-  if(!d) return;
-  if(d.id === 'shield'){
-    if(immuneT > 0) return;
-    if(moonStock < 1){ hotDeny(i); return; }
-    useImmunity();
-    return;
-  }
-  if(d.id === 'magnet'){
-    if(magnetT > 0) return;
-    if(!payCost(d.cost)){ hotDeny(i); return; }
-    magnetT = MAG_T;
-    playMagnet();
-    return;
-  }
-  if(d.id === 'volley'){
-    if(!payCost(d.cost)){ hotDeny(i); return; }
-    fireVolley();
-    return;
-  }
-  if(d.id === 'homing'){
-    if(!payCost(d.cost)){ hotDeny(i); return; }
-    fireHoming();
-    return;
-  }
-  if(d.id === 'flash'){
-    if(pepBanT > 0) return;
-    if(!payCost(d.cost)){ hotDeny(i); return; }
-    doFlash();
-    return;
-  }
-  if(d.id === 'freeze'){
-    if(freezeT > 0) return;
-    if(!payCost(d.cost)){ hotDeny(i); return; }
-    freezeT = CFG.FREEZE_T;
-    playMagnet();
-    return;
-  }
-  if(d.id === 'exch') doExchange();
-}
-function doFlash(){
-  pepBanT = CFG.FLASH_BAN;
-  var f = document.createElement('div');
-  f.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:6400;background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,240,180,.35) 55%,rgba(255,255,255,0) 100%);opacity:1;transition:opacity .8s ease;';
-  layer.appendChild(f);
-  requestAnimationFrame(function(){ f.style.opacity = '0'; });
-  setTimeout(function(){ if(f.parentNode) f.parentNode.removeChild(f); }, 900);
-  for(var i = 0; i < ITEMS.length; i++){
-    var it = ITEMS[i];
-    if(it && it.kind === 'pepper'){ respawn(it); it.dead = true; }
-  }
-  playPickup('moon');
-}
-function doExchange(){
-  if(provCk > 0){
-    provCh += provCk;
-    provCk = 0;
-  } else if(provCh >= 2){
-    var n = Math.floor(provCh / 2);
-    provCk += n;
-    provCh -= n * 2;
-  } else {
-    hotDeny(6);
-    return;
-  }
-  segUpdate();
-  saveScore();
-  playPickup('cake');
-}
-function killPepper(it){
-  pts += 25;
-  respawn(it);
-  playPepper();
-  segUpdate();
-  saveScore();
-}
-function spawnShot(type, ang, spd, life){
-  var el = document.createElement('div');
-  el.textContent = (type === 'ch') ? '\u{1F9C0}' : '\u{1F9C1}';
-  el.style.cssText = 'position:absolute;font-size:18px;line-height:1;pointer-events:none;z-index:5200;will-change:transform;';
-  layer.appendChild(el);
-  shots.push({ type: type, x: shotX, y: shotY, a: ang, v: spd, life: life, hits: (type === 'ch' ? 2 : 99), el: el });
-}
-function fireVolley(){
-  var base = Math.atan2(shotAimY - shotY, shotAimX - shotX) || 0;
-  for(var i = 0; i < 10; i++) spawnShot('ch', base + (-0.55 + 1.1*i/9), 980, 1.4);
-  playPickup('cheese');
-}
-function fireHoming(){
-  for(var i = 0; i < 5; i++) spawnShot('ck', -Math.PI/2 + (Math.random()-0.5)*0.8, 820, 3.0);
-  playPickup('cake');
-}
-function tickShots(dt){
-  for(var i = shots.length - 1; i >= 0; i--){
-    var sh = shots[i];
-    if(sh.type === 'ck'){
-      var best = null, bd = 1e18;
-      for(var k = 0; k < ITEMS.length; k++){
-        var it = ITEMS[k];
-        if(!it || it.kind !== 'pepper' || it.dead || it.planet !== planet || it._sx == null) continue;
-        var dx = it._sx - sh.x, dy = it._sy - sh.y, dd = dx*dx + dy*dy;
-        if(dd < bd){ bd = dd; best = Math.atan2(dy, dx); }
-      }
-      if(best != null){
-        var diff = best - sh.a;
-        while(diff > Math.PI) diff -= 2*Math.PI;
-        while(diff < -Math.PI) diff += 2*Math.PI;
-        sh.a += Math.max(-6*dt, Math.min(6*dt, diff));
-      }
-    }
-    sh.x += Math.cos(sh.a)*sh.v*dt;
-    sh.y += Math.sin(sh.a)*sh.v*dt;
-    sh.life -= dt;
-    var dead = sh.life <= 0 || sh.x < -60 || sh.x > innerWidth + 60 || sh.y < -60 || sh.y > innerHeight + 60;
-    if(!dead){
-      for(var k2 = 0; k2 < ITEMS.length && sh.hits > 0; k2++){
-        var it2 = ITEMS[k2];
-        if(!it2 || it2.kind !== 'pepper' || it2.dead || it2.planet !== planet || it2._sx == null) continue;
-        var dx2 = it2._sx - sh.x, dy2 = it2._sy - sh.y;
-        if(dx2*dx2 + dy2*dy2 < 48*48){
-          sh.hits--;
-          killPepper(it2);
-          if(sh.type === 'ck') dead = true;
-        }
-      }
-    }
-    if(dead){
-      if(sh.el && sh.el.parentNode) sh.el.parentNode.removeChild(sh.el);
-      shots.splice(i, 1);
-    } else {
-      sh.el.style.transform = 'translate(' + sh.x.toFixed(1) + 'px,' + sh.y.toFixed(1) + 'px)';
-    }
-  }
-}
-function ensureAura(){
-  if(auraEl || !bearWrap) return;
-  if(!auraCss){
-    auraCss = true;
-    var st = document.createElement('style');
-    st.textContent = '@keyframes auraPulse{0%,100%{transform:scale(.92);opacity:.75}50%{transform:scale(1.08);opacity:1}}';
-    document.head.appendChild(st);
-  }
-  auraEl = document.createElement('div');
-  auraEl.style.cssText = 'position:absolute;left:50%;top:50%;width:150%;height:150%;margin:-75% 0 0 -75%;border:3px solid rgba(255,196,60,.85);border-radius:50%;pointer-events:none;box-shadow:0 0 14px rgba(255,196,60,.8);animation:auraPulse 1.2s ease-in-out infinite;display:none;';
-  bearWrap.appendChild(auraEl);
-}
-function ensureSnow(){
-  if(snowEl) return;
-  snowEl = document.createElement('div');
-  snowEl.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:5900;background:radial-gradient(circle,rgba(140,210,255,0) 30%,rgba(140,210,255,.35) 100%);opacity:0;transition:opacity .4s ease;';
-  layer.appendChild(snowEl);
-}
-
-/* ---------- ФОРСАЖ ---------- */
-function tryBoost(){
-  if(!gameOn || gameOver || boostOn) return;
-  if(boostFuel < CFG.BOOST_MIN){
-    if(boostFillEl){
-      boostFillEl.style.background = '#ff5a4a';
-      setTimeout(function(){ if(boostFillEl) boostFillEl.style.background = 'linear-gradient(90deg,#7a3c00,#ffb35c,#ffe08a)'; }, 300);
-    }
-    return;
-  }
-  boostOn = true;
-  boostLeft = boostFuel/CFG.BOOST_DRAIN;
-}
-
-/* ---------- GAME OVER И СБРОС ---------- */
-function initGoPanel(){
-  if(goPanel) return;
-  goPanel = document.createElement('div');
-  goPanel.setAttribute('data-keep', '1');
-  goPanel.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:90;display:none;flex-direction:column;align-items:center;gap:11px;background:#0c150c;border:6px outset #950;border-radius:10px;padding:19px 24px;box-shadow:0 20px 40px rgba(0,0,0,.7);';
-  goPanel.innerHTML = '<div id="goTitleEl" style="font:900 21px/1 monospace;letter-spacing:4px;color:#ff5a4a;text-shadow:2px 2px 0 #3a0000;">GAME OVER</div>'
-    + segRowHtmlN('goPtsEl', '\u{1F31F} ОЧКИ', 10)
-    + '<div id="goMoonEl" style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;"></div>'
-    + '<button id="goBtn" style="width:192px;">НАЧАТЬ СНАЧАЛА</button>';
-  document.body.appendChild(goPanel);
-  goPtsEl = document.getElementById('goPtsEl');
-  goMoonEl = document.getElementById('goMoonEl');
-  goTitleEl = document.getElementById('goTitleEl');
-  document.getElementById('goBtn').addEventListener('click', function(){
-    resetGame();
-    gameOver = false;
-    gameOn = true;
-    paused = false;
-    if(pauseEl) pauseEl.style.display = 'none';
-    applyGameMode();
-  });
-}
-function showGameOver(){
-  if(!goPanel) initGoPanel();
-  segSetN(goPtsEl, pts, 10);
-  if(goMoonEl) goMoonEl.textContent = '\u{1F31D} ЛУН СОБРАНО: ' + moonTot;
-  goPanel.style.display = 'flex';
-}
-function hideGameOver(){ if(goPanel) goPanel.style.display = 'none'; }
-function doGameOver(){
-  if(gameOver) return;
-  gameOver = true;
-  gameOn = false;
-  boostOn = false;
-  showGameOver();
-  applyGameMode();
-}
-function doWin(){
-  if(gameOver) return;
-  gameOver = true;
-  gameOn = false;
-  boostOn = false;
-  if(goTitleEl){
-    goTitleEl.textContent = '★ 7000 EXP — ИГРА ПРОЙДЕНА ★';
-    goTitleEl.style.color = '#7dff8a';
-    goTitleEl.style.textShadow = '2px 2px 0 #0a3a10';
-  }
-  showGameOver();
-  applyGameMode();
-}
-function resetGame(){
-  score.cake = 0; score.cheese = 0; score.moon = 0;
-  provCk = CFG.START_PROV; provCh = CFG.START_PROV;
-  pts = 0; moonTot = 0;
-  moonStock = 0; moonCap = CFG.MOON_CAP0;
-  immuneT = 0; pepperCd = 0;
-  hpMax = CFG.HP0; hpCur = CFG.HP0;
-  boostFuel = 0; boostOn = false; boostMul = 1; boostLeft = 0;
-  magnetT = 0; freezeT = 0; pepBanT = 0; hotSel = 0; hotDenyT = 0;
-  for(var si = shots.length - 1; si >= 0; si--){ if(shots[si].el && shots[si].el.parentNode) shots[si].el.parentNode.removeChild(shots[si].el); }
-  shots.length = 0;
-  keys = {};
-  for(var i = 0; i < ITEMS.length; i++){
-    if(ITEMS[i] && ITEMS[i].el && ITEMS[i].el.parentNode) ITEMS[i].el.parentNode.removeChild(ITEMS[i].el);
-  }
-  ITEMS.length = 0;
-  genWorld();
-  lastHpMax = -1;
-  if(goTitleEl){ goTitleEl.textContent = 'GAME OVER'; goTitleEl.style.color = '#ff5a4a'; goTitleEl.style.textShadow = '2px 2px 0 #3a0000'; }
-  expTotal = 0;
-  saveScore();
-  segUpdate();
-  updBottomPanel();
-  hideGameOver();
-}
-
-/* ---------- CSS ЛИНЗЫ ---------- */
-(function(){
-  var css = document.createElement('style');
-  css.textContent = '.mglens{position:absolute;left:50%;top:50%;width:340px;height:340px;margin:-170px 0 0 -170px;border-radius:50%;pointer-events:none;display:none;border:3px solid rgba(125,210,255,.9);box-shadow:0 0 26px rgba(125,210,255,.55),inset 0 0 42px rgba(125,210,255,.28);background:radial-gradient(circle,rgba(125,210,255,.10) 0%,rgba(125,210,255,.03) 58%,transparent 72%);animation:mglensPulse 1.6s ease-in-out infinite;}'
-    + '@keyframes mglensPulse{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.09);opacity:1;}}';
-  document.head.appendChild(css);
-})();
-var fadeEl = document.createElement('div');
-fadeEl.style.cssText = 'position:fixed;inset:0;z-index:45;pointer-events:none;background:#000;opacity:0;transition:opacity .28s linear;';
-document.body.appendChild(fadeEl);
-fadeEl.setAttribute('data-keep','1');
-var hud = document.createElement('div');
-hud.style.cssText = 'position:fixed;left:10px;top:10px;z-index:50;background:rgba(3,8,13,.8);border:2px inset #950;color:#7dff8a;font:10px/1.5 monospace;padding:5px 8px;pointer-events:none;white-space:pre;';
-document.body.appendChild(hud);
-hud.setAttribute('data-keep','1');
-var SEG_ON = {0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg'};
-var SEG_GEO = [
-  ['h', 4, 0, 12, 4],
-  ['v', 16, 4.8, 4, 11.2],
-  ['v', 16, -4.8, 4, 11.2],
-  ['h', 4, 32.8, 12, 4],
-  ['v', 0, -4.8, 4, 11.2],
-  ['v', 0, 4.8, 4, 11.2],
-  ['h', 4, 16.4, 12, 4]
-];
-var hudTxtEl = null, hudThrEl = null, hudThrSegEl = null;
-hudTxtEl = document.createElement('div');
-hudThrEl = document.createElement('div');
-hudThrEl.innerHTML = segRowHtmlN('hudThrSeg', '\u00D7\u0422\u042F\u0413\u0410', 3);
-hudThrEl.style.cssText = 'margin-top:4px;';
-hud.appendChild(hudTxtEl);
-hud.appendChild(hudThrEl);
-hudThrSegEl = document.getElementById('hudThrSeg');
-var ctl = document.createElement('div');
-ctl.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:50;display:flex;flex-direction:column-reverse;align-items:center;gap:6px;';
-var btnPilot = document.createElement('button');
-btnPilot.textContent = 'ИГРА: СТАРТ';
-var btnMusic = document.createElement('button');
-btnMusic.textContent = 'МУЗЫКА';
-ctl.appendChild(btnPilot); ctl.appendChild(btnMusic);
-var btnShelf = document.createElement('a');
-btnShelf.href = 'hitomi.html'; btnShelf.textContent = '🪐 ПОЛКА ПЛАНЕТ';
-btnShelf.style.cssText = 'display:block;font-family:inherit;background:#222;color:#f7cc1d;border:4px outset #950;padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 #000;font-size:0.85rem;width:180px;height:40px;line-height:26px;text-align:center;text-decoration:none;';
-var btnLore = document.createElement('a');
-btnLore.href = 'hitomi_of_legends.html'; btnLore.textContent = '📖 ЛОР';
-btnLore.style.cssText = btnShelf.style.cssText;
-ctl.appendChild(btnShelf); ctl.appendChild(btnLore);
-document.body.appendChild(ctl);
-ctl.setAttribute('data-keep','1');
-
-/* ---------- СЕМИСЕГМЕНТНЫЕ СЧЁТЧИКИ (кекс/сыр) ---------- */
-var segPanel = null, segCakeEl = null, segCheeseEl = null, segMoonEl = null;
-var segStockEl = null, segStockCapEl = null;
-var topPanel = null, segPtsEl = null;
-var botPanel = null, hpBarEl = null, boostFillEl = null;
-var expFillEl = null, expLabelEl = null;
-var goPanel = null, goPtsEl = null, goMoonEl, goTitleEl = null;
-var lensEl = null, lastHpMax = -1;
-function segRowHtml(id, label){
-  var s = '<div style="display:flex;align-items:center;gap:8px;">'
-    + '<span style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;">' + label + '</span>'
-    + '<div id="' + id + '" style="display:flex;gap:3px;padding:2px 2px;">';
-  for(var d=0; d<3; d++){
-    s += '<div class="segd" style="position:relative;width:20px;height:37px;">';
-    for(var i=0; i<7; i++){
-      var p = SEG_GEO[i];
-      s += '<div class="' + p[0] + '" style="left:' + p[1] + 'px;'
-        + (p[2] < 0 ? 'bottom:' + (-p[2]) + 'px;' : 'top:' + p[2] + 'px;')
-        + 'width:' + p[3] + 'px;height:' + p[4] + 'px;opacity:.13;"></div>';
-    }
-    s += '</div>';
-  }
-  return s + '</div></div>';
-}
-function segSet(row, val){
-  var n = Math.max(0, Math.min(999, Math.floor(val)));
-  var str = ('00' + n).slice(-3);
-  for(var i=0; i<3; i++){
-    var cell = row.children[i];
-    if(!cell) continue;
-    var on = SEG_ON[+str.charAt(i)] || '';
-    for(var j=0; j<7; j++){
-      var seg = cell.children[j];
-      if(seg) seg.style.opacity = on.indexOf('abcdefg'.charAt(j)) >= 0 ? '1' : '.13';
-    }
-  }
-}
-function segUpdate(){
-  if(!segPanel || !score) return;
-  if(segCakeEl) segSet(segCakeEl, provCk);
-  if(segCheeseEl) segSet(segCheeseEl, provCh);
-  if(segStockEl) segSet(segStockEl, moonStock);
-  if(segStockCapEl) segStockCapEl.textContent = '/' + moonCap;
-  updTopScore();
-}
-function segBump(kind){
-  if(!segPanel) return;
-  segUpdate();
-  var row = kind === 'moon' ? segStockEl : (kind === 'cheese' ? segCheeseEl : segCakeEl);
-  if(!row) return;
-  try{
-    row.style.transition = 'none';
-    row.style.transform = 'scale(1.2)';
-    setTimeout(function(){ row.style.transition = 'transform .18s ease'; row.style.transform = 'scale(1)'; }, 40);
-  }catch(e){}
-}
-function initSegPanel(){
-  if(segPanel) return;
-  segPanel = document.createElement('div');
-  segPanel.setAttribute('data-keep', '1');
-  segPanel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:60;display:none;flex-direction:column;gap:6px;background:#0c150c;border:4px inset #1a1a2e;border-radius:6px;padding:10px 11px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
-  segPanel.innerHTML = segRowHtml('segCakeEl','\u{1F9C1} КЕКС') + segRowHtml('segCheeseEl','\u{1F9C0} СЫР') + segRowHtml('segStockEl','\u{1F31D} ЗАПАС');
-  document.body.appendChild(segPanel);
-  segCakeEl = document.getElementById('segCakeEl');
-  segCheeseEl = document.getElementById('segCheeseEl');
-  segStockEl = document.getElementById('segStockEl');
-  segStockCapEl = document.createElement('span');
-  segStockCapEl.style.cssText = 'font:700 9px/1 monospace;color:#9fd9a0;padding-left:3px;';
-  if(segStockEl && segStockEl.parentNode) segStockEl.parentNode.appendChild(segStockCapEl);
-  segUpdate();
-}
-
-
-function makeSprite(ch){
-  var d = document.createElement('div');
-  d.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;user-select:none;will-change:transform;display:none;';
-  d.textContent = ch;
-  layer.appendChild(d);
-  return d;
-}
-
-/* ---------- МИР: предметы и луны ---------- */
-var ITEMS = [];
-function rndDir(){
-  var a = Math.random()*Math.PI*2, z = Math.random()*1.6 - 0.8;
-  var r = Math.sqrt(Math.max(0, 1 - z*z));
-  return [r*Math.cos(a), z, r*Math.sin(a)];
-}
-function spawnOrbit(kind, glyph, rmin, rmax, sz, wbase, pi){
-  var dir = rndDir();
-  var r = rmin + Math.random()*(rmax - rmin);
-  var ax = cross(dir, rndDir());
-  if(len(ax) < 0.05) ax = [0,1,0];
-  ITEMS.push({ el: makeSprite(glyph), kind: kind, p0: mul(dir, r),
-    axis: norm(ax), w: wbase + Math.random()*0.10, planet: pi, angle: 0, sz: sz });
-}
-function genWorld(){
-  for(var pi = 0; pi < 4; pi++){
-    for(var ci = 0; ci < CFG.CAKE_N; ci++) spawnOrbit('cake', '🧁', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
-    for(var hi = 0; hi < CFG.CHEESE_N; hi++) spawnOrbit('cheese', '🧀', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
-    for(var bj = 0; bj < CFG.BIG_CAKE_N; bj++) spawnOrbit('cake', '🧁', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
-    for(var bk = 0; bk < CFG.BIG_CHEESE_N; bk++) spawnOrbit('cheese', '🧀', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
-    for(var pj = 0; pj < CFG.PEPPER_N; pj++) spawnOrbit('pepper', '🌶️', CFG.PEPPER_RMIN, CFG.PEPPER_RMAX, 0.075, 0.45, pi);
-    for(var hj = 0; hj < CFG.HEART_N; hj++) spawnOrbit('heart', '❤️', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
-    if(pi === 1 || pi === 3){
-      var mN = (pi === 3) ? 8 : 4;
-      for(var m = 0; m < mN; m++){
-        var md = rndDir();
-        var mAx = cross(md, rndDir());
-        if(len(mAx) < 0.05) mAx = [0,1,0];
-        var mR = (pi === 3) ? (1.85 + 1.12*m/7) : CFG.MOON_R[m];
-        var mS = (pi === 3) ? (0.045 + 0.006*(m % 4)) : CFG.MOON_SZ[m];
-        ITEMS.push({ el: makeSprite('🌕'), p0: mul(md, mR),
-          axis: norm(mAx), w: 0.04 + 0.03*(m % 5), planet: pi, sz: mS, angle: 0, kind: 'moon', mi: m });
-      }
-    }
-    if(pi === 3){
-      /* ШИНРАРТА-B: двойной запас предметов */
-      for(var c3 = 0; c3 < CFG.CAKE_N; c3++) spawnOrbit('cake', '🧁', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
-      for(var h3 = 0; h3 < CFG.CHEESE_N; h3++) spawnOrbit('cheese', '🧀', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
-      for(var b3 = 0; b3 < CFG.BIG_CAKE_N; b3++) spawnOrbit('cake', '🧁', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
-      for(var k3 = 0; k3 < CFG.BIG_CHEESE_N; k3++) spawnOrbit('cheese', '🧀', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
-      for(var p3 = 0; p3 < CFG.PEPPER_N; p3++) spawnOrbit('pepper', '🌶️', CFG.PEPPER_RMIN, CFG.PEPPER_RMAX, 0.075, 0.45, pi);
-      for(var j3 = 0; j3 < CFG.HEART_N; j3++) spawnOrbit('heart', '❤️', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
-    }
-  }
-}
-genWorld();
-
-/* ---------- МЕДВЕДЬ-ПИЛОТ ---------- */
-var BEAR_D = 0.35, BEAR_SZ = 0.05;
-var bearWrap = null;
-(function(){
-  try{
-    var g = document.getElementById('mgHead');
-    var svg = g ? g.ownerSVGElement : null;
-    if(!svg) return;
-    bearWrap = document.createElement('div');
-    bearWrap.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;will-change:transform;transform-origin:50% 50%;display:none;';
-    var html = svg.outerHTML
-      .replace(/mg([A-Za-z]+)/g, 'zg$1')
-      .replace('width:380px; height:380px; cursor:pointer;', 'width:100%;height:100%;display:block;');
-    bearWrap.innerHTML = html;
-    bearWrap.classList.add('gbear');
-    layer.appendChild(bearWrap);
-  }catch(e){ bearWrap = null; }
-})();
-
-/* ---------- ПРОЕКЦИЯ И ПЕРЕКРЫТИЯ ---------- */
-var RING_N = norm([0.22, 1.0, 0.18]);
-var RING_IN = 1.45, RING_OUT = 2.35, GAP_IN = 1.76, GAP_OUT = 1.86;
-function ringOccl(camPos, dir, dist){
-  var denom = dot(dir, RING_N);
-  if(Math.abs(denom) < 1e-4) return false;
-  var t = -dot(camPos, RING_N)/denom;
-  if(t <= 0 || t >= dist) return false;
-  var q = add(camPos, mul(dir, t));
-  var r = len(q);
-  return (r > RING_IN && r < RING_OUT && !(r > GAP_IN && r < GAP_OUT));
-}
-function project(p, cam, W, H){
-  var v = sub(p, cam.pos);
-  var dist = len(v);
-  var z = dot(v, cam.fwd);
-  /* OPT: плавнее порог — меньше «прилипания»/рывков спрайтов у камеры */
-  if(z < 0.01) return null;
-  var dir = mul(v, 1/(dist||1));
-  var tC = -dot(cam.pos, dir) - OCCL_Y*dir[1];
-  if(tC > 0 && tC < dist){
-    var q = add(cam.pos, mul(dir, tC));
-    if(dot(q,q) + OCCL_Y*(2.0*q[1] + OCCL_Y) < 1.0) return { occl: true };
-  }
-  var ux = dot(v, cam.right)/(z*CFG.FOV_TAN);
-  var uy = dot(v, cam.up)/(z*CFG.FOV_TAN);
-  var sx = (ux*H + W)/2;
-  var sy = (H - uy*H)/2;
-  if(sx < -90 || sx > W + 90 || sy < -90 || sy > H + 90) return null;
-  return { x: sx, y: sy, z: z };
-}
-function sunDirNow(simT){
-  var sa = 2*Math.PI*simT/3600.0;
-  return norm([Math.cos(sa), 0.22*Math.sin(sa), Math.sin(sa)]);
-}
-
-/* ---------- СБОР И ЭФФЕКТЫ ---------- */
-var score = { cake: 0, cheese: 0, moon: 0 };
-var provCk = CFG.START_PROV, provCh = CFG.START_PROV;
-var pts = 0, moonTot = 0;
-var moonStock = 0, moonCap = CFG.MOON_CAP0;
-var immuneT = 0, pepperCd = 0;
-var hpCur = CFG.HP0, hpMax = CFG.HP0;
-var boostFuel = 0, boostOn = false, boostMul = 1, boostLeft = 0;
-var expTotal = 0;
-var gameOver = false;
-try{
-  var saved = JSON.parse(localStorage.getItem('diowkrad_game_score') || 'null');
-  if(saved){
-    score.cake = saved.cake || 0; score.cheese = saved.cheese || 0; score.moon = saved.moon || 0;
-    pts = saved.pts || 0;
-    expTotal = saved.exp || 0; moonTot = saved.moonTot || 0;
-    moonStock = Math.min(CFG.MOON_CAP0 + Math.floor(pts/CFG.CAP_STEP), saved.stock || 0);
-  }
-}catch(e){}
-applyMilestones();
-function saveScore(){
-  try{ localStorage.setItem('diowkrad_game_score', JSON.stringify({ cake: score.cake, cheese: score.cheese, moon: score.moon, pts: pts, moonTot: moonTot, stock: moonStock, exp: expTotal })); }catch(e){}
-}
-function applyMilestones(){
-  var nc = CFG.MOON_CAP0 + Math.floor(pts/CFG.CAP_STEP);
-  if(nc > moonCap) moonCap = nc;
-  var nm = CFG.HP0;
-  for(var i = 0; i < CFG.HP_STEPS.length; i++){ if(pts >= CFG.HP_STEPS[i]) nm++; }
-  if(nm > hpMax){ hpMax = nm; hpCur = Math.min(hpCur + 1, hpMax); }
-}
-function flash(x, y, kind){
-  var col = kind === 'cake' ? '#ffd9f0' : (kind === 'cheese' ? '#ffe97d' : (kind === 'pepper' ? '#ff5a4a' : (kind === 'heart' ? '#ffb3d9' : '#cfe0ff')));
-  var f = document.createElement('div');
-  f.style.cssText = 'position:absolute;left:0;top:0;width:60px;height:60px;margin:-30px 0 0 -30px;'
-    + 'border:3px solid ' + col + ';border-radius:50%;pointer-events:none;z-index:6000;'
-    + 'transform:translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(0.3);'
-    + 'transition:transform .5s ease-out, opacity .5s ease-out;';
-  layer.appendChild(f);
-  requestAnimationFrame(function(){
-    f.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(2.6)';
-    f.style.opacity = '0';
-  });
-  setTimeout(function(){ if(f.parentNode) f.remove(); }, 550);
-}
-function respawn(it){
-  if(it.kind === 'moon'){
-    it.p0 = mul(rndDir(), (it.mi < 4 ? CFG.MOON_R[it.mi] : (1.85 + 1.12*it.mi/7)));
-    it.angle = 0;
-    return;
-  }
-  var zone = (it.kind === 'pepper' || (it.sz || 0) > 0.09);
-  var rmin = zone ? CFG.OUT_RMIN : CFG.PICK_RMIN;
-  var rmax = zone ? CFG.OUT_RMAX : CFG.PICK_RMAX;
-  var d, guard = 0;
-  do{ d = rndDir(); guard++; } while(dot(d, F.fwd) > -0.25 && guard < 40);
-  var r = rmin + Math.random()*(rmax - rmin);
-  it.p0 = mul(d, r);
-  var ax = cross(d, rndDir());
-  it.axis = len(ax) < 0.05 ? [0,1,0] : norm(ax);
-  it.w = (it.kind === 'pepper' ? 0.45 : 0.05) + Math.random()*0.10;
-  it.angle = 0;
-}
-function collect(it, pr){
-  var big = (it.sz || 0.052) > 0.09;
-  var mult = big ? 2 : 1;
-  if(it.kind === 'pepper'){
-    if(pepperCd > 0) return;
-    if(freezeT > 0 || pepBanT > 0) return;
-    pepperCd = CFG.PEPPER_CD;
-    provCk = Math.max(0, provCk - CFG.PEPPER_CK);
-    provCh = Math.max(0, provCh - CFG.PEPPER_CH);
-    boostFuel = Math.max(0, boostFuel - CFG.BOOST_PEPPER);
-    hurt(1, pr);
-    playPepper();
-    segUpdate();
-    saveScore();
-    if(hpCur <= 0) doGameOver();
-    respawn(it);
-    return;
-  }
-  if(it.kind === 'heart'){
-    hpCur = Math.min(hpMax, hpCur + 1);
-    playHeart();
-    flash(pr.x, pr.y, 'heart');
-    updBottomPanel();
-    saveScore();
-    respawn(it);
-    return;
-  }
-  score[it.kind]++;
-  if(it.kind === 'cake'){
-    provCk += mult;
-    pts += mult*CFG.PTS_CAKE;
-    boostFuel = Math.min(100, boostFuel + CFG.BOOST_CK*mult);
-    expTotal += CFG.EXP_CAKE*mult;
-  } else if(it.kind === 'cheese'){
-    provCh += mult;
-    pts += mult*CFG.PTS_CHEESE;
-    boostFuel = Math.min(100, boostFuel + CFG.BOOST_CH*mult);
-    expTotal += CFG.EXP_CHEESE*mult;
-  } else {
-    pts += CFG.PTS_MOON;
-    moonTot++;
-    if(moonStock < moonCap) moonStock++;
-    boostFuel = Math.min(100, boostFuel + CFG.BOOST_MOON);
-    expTotal += CFG.EXP_MOON;
-  }
-  applyMilestones();
-  saveScore();
-  if(expTotal >= CFG.EXP_WIN) doWin();
-  playPickup(it.kind);
-  flash(pr.x, pr.y, it.kind);
-  segBump(it.kind);
-  if(bearWrap){
-    var jb = bearWrap.querySelector('.bear');
-    if(jb){
-      jb.classList.remove('jumping');
-      void jb.offsetWidth;
-      jb.classList.add('jumping');
-      clearTimeout(collect._jt);
-      collect._jt = setTimeout(function(){ jb.classList.remove('jumping'); }, 700);
-    }
-  }
-  respawn(it);
-}
-
-/* ---------- ФИЗИКА ПОЛЁТА ---------- */
-function physics(dt){
-  var ty = 0, tp = 0, tr = 0;
-  if(keys.KeyD) ty += 1;
-  if(keys.KeyA) ty -= 1;
-  if(keys.ArrowUp) tp += 1;
-  if(keys.ArrowDown) tp -= 1;
-  if(keys.KeyE) tr += 1;
-  if(keys.KeyQ) tr -= 1;
-  var k = Math.min(1, dt*CFG.RESP);
-  yawV   += (ty*CFG.YAW_MAX   - yawV)*k;
-  if(!drag) pitchV += (tp*CFG.PITCH_MAX - pitchV)*k;
-  rollV  += (tr*CFG.ROLL_MAX  - rollV)*k;
-  if(keys.KeyW) speed += CFG.SPD_RATE*boostMul*dt;
-  if(keys.KeyS) speed -= CFG.SPD_RATE*dt;
-  speed = Math.max(CFG.SPD_MIN, Math.min(CFG.SPD_MAX*boostMul, speed));
-  if(Math.abs(rollV) > 1e-6){
-    F.right = rotAxis(F.right, F.fwd, rollV*dt);
-    F.up    = rotAxis(F.up,    F.fwd, rollV*dt);
-  }
-  if(Math.abs(pitchV) > 1e-6){
-    F.fwd = rotAxis(F.fwd, F.right, pitchV*dt);
-    F.up  = rotAxis(F.up,  F.right, pitchV*dt);
-  }
-  if(Math.abs(yawV) > 1e-6){
-    F.fwd   = rotAxis(F.fwd,   F.up, yawV*dt);
-    F.right = rotAxis(F.right, F.up, yawV*dt);
-  }
-  F.fwd = norm(F.fwd);
-  F.right = norm(sub(F.right, mul(F.fwd, dot(F.right, F.fwd))));
-  F.up = cross(F.right, F.fwd);
-  var finChk = F.fwd[0]+F.fwd[1]+F.fwd[2]+F.right[0]+F.right[1]+F.right[2]+F.up[0]+F.up[1]+F.up[2]+F.pos[0]+F.pos[1]+F.pos[2];
-  if(!isFinite(finChk)){ resetBasis(); }
-  F.pos = add(F.pos, mul(F.fwd, speed*dt));
-  var r = len(F.pos);
-  if(r < CFG.MINR){
-    var nrm = mul(F.pos, 1/(r||1));
-    F.pos = mul(nrm, CFG.MINR);
-    var inw = dot(F.fwd, nrm);
-    if(inw < 0) F.fwd = norm(sub(F.fwd, mul(nrm, inw)));
-  }
-}
-
-/* ---------- ОТРИСОВКА СПРАЙТОВ ---------- */
-function drawSprites(cam, W, H, bgSim, dt){
-  var sun = sunDirNow(bgSim), i, it, pr, p;
-  var bearWp = add(cam.pos, mul(cam.fwd, BEAR_D));
-  for(i = 0; i < ITEMS.length; i++){
-    it = ITEMS[i];
-    if(it.planet !== planet){ it.el.style.display = 'none'; continue; }
-    if(it.dead){ it.el.style.display = 'none'; continue; }
-    if(freezeT <= 0) it.angle += it.w*dt;
-    p = rotAxis(it.p0, it.axis, it.angle);
-    if(magnetT > 0 && gameOn && (it.kind === 'cake' || it.kind === 'cheese')){
-      var mr = MAG_R * (((it.sz || 0.052) > 0.09) ? 1.6 : 1);
-      var dv = sub(p, bearWp), dl3 = len(dv);
-      if(dl3 < mr && dl3 > 0.001){
-        var kp = Math.min(1, (1 - dl3/mr) * 3.0 + 0.4);
-        var np2 = sub(p, mul(dv, kp*dt*4));
-        it.p0 = rotAxis(np2, it.axis, -it.angle);
-        p = np2;
-      }
-    }
-    pr = project(p, cam, W, H);
-    if(!pr || pr.occl){ it.el.style.display = 'none'; continue; }
-    if(planet === 1){
-      var v2 = sub(p, cam.pos), d2 = len(v2);
-      if(ringOccl(cam.pos, mul(v2, 1/(d2||1)), d2)){ it.el.style.display = 'none'; continue; }
-    }
-    var size = Math.max(14, Math.min(H*1.2, ((it.sz || 0.052)/pr.z)*H));
-    /* OPT: плавный фейд по дальности — убирает рывки «прилипания» спрайта к камере */
-    var op = Math.min(1, Math.max(0.0, (Math.min(pr.z, 3.0) - 0.03)/0.10));
-    var dl = dot(norm(p), sun);
-    it.el.style.display = 'block';
-    it.el.style.transform = 'translate(' + pr.x.toFixed(1) + 'px,' + pr.y.toFixed(1) + 'px) translate(-50%,-50%)';
-    it.el.style.fontSize = size.toFixed(1) + 'px';
-    it.el.style.opacity = op.toFixed(2);
-    it.el.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, dl)).toFixed(2) + ')';
-    it.el.style.zIndex = String(5000 - Math.round(pr.z*100));
-    if(it.kind === 'pepper'){ it._sx = pr.x; it._sy = pr.y; }
-    if(gameOn && !(it.kind === 'pepper' && (immuneT > 0 || freezeT > 0 || pepBanT > 0)) && len(sub(p, bearWp)) < CFG.PICK_RAD*(it.kind === 'moon' ? 1.5 : ((it.sz || 0.052) > 0.09 ? 2 : 1))) collect(it, pr);
-  }
-  if(bearWrap && gameOn){
-    var bpr = project(bearWp, cam, W, H);
-    if(bpr && !bpr.occl){
-      var bv = sub(bearWp, cam.pos), bd = len(bv);
-      var bo = (planet === 1) ? ringOccl(cam.pos, mul(bv, 1/(bd||1)), bd) : false;
-      if(!bo){
-        var bdl = dot(norm(bearWp), sun);
-        var bsize = Math.max(28, Math.min(H*0.9, (BEAR_SZ/bpr.z)*H));
-        var bank = Math.max(-28, Math.min(28, rollV/(CFG.ROLL_MAX||1)*28));
-        bearWrap.style.display = 'block';
-        bearWrap.style.transform = 'translate(' + bpr.x.toFixed(1) + 'px,' + bpr.y.toFixed(1) + 'px) translate(-50%,-50%) rotate(' + bank.toFixed(1) + 'deg)';
-        bearWrap.style.width = bsize.toFixed(1) + 'px';
-        bearWrap.style.height = bsize.toFixed(1) + 'px';
-        bearWrap.style.opacity = Math.min(1, Math.max(0.15, (Math.min(bpr.z, 3.0) - 0.10)/0.10)).toFixed(2);
-        bearWrap.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, bdl)).toFixed(2) + ')';
-        bearWrap.style.zIndex = String(5000 - Math.round(bpr.z*100));
-        ensureAura();
-        if(auraEl) auraEl.style.display = (magnetT > 0) ? 'block' : 'none';
-        shotX = bpr.x; shotY = bpr.y;
-        var aimW = add(cam.pos, mul(F.fwd, 5.0));
-        var apr = project(aimW, cam, W, H);
-        if(apr){ shotAimX = apr.x; shotAimY = apr.y; }
-      } else bearWrap.style.display = 'none';
-    } else bearWrap.style.display = 'none';
-  } else if(bearWrap) bearWrap.style.display = 'none';
-}
-
-/* ---------- HUD И ПЕРЕКЛЮЧЕНИЕ ПЛАНЕТ ---------- */
-function updHud(){
-  var unlocked = PLANET_NAMES[0]
-    + (expTotal >= CFG.EXP_STEPS[0] ? ', ' + PLANET_NAMES[1] : '')
-    + (expTotal >= CFG.EXP_STEPS[1] ? ', ' + PLANET_NAMES[2] : '')
-    + (expTotal >= CFG.EXP_STEPS[2] ? ', ' + PLANET_NAMES[3] : '');
-  var txt = 'ПЛАНЕТА: ' + PLANET_NAMES[planet] + (planet === 3 ? ' ★ ФИНАЛ' : '')
-    + '\nОТКРЫТО: ' + unlocked
-    + (mouseCtl ? '\nМЫШЬ: ВКЛ (P — вернуть курсор)' : '');
-  /* OPT: кэш текста — не пишем в DOM, если значение не изменилось */
-  if(hudTxtEl){
-    if(hudTxtEl.__last !== txt){ hudTxtEl.textContent = txt; hudTxtEl.__last = txt; }
-  } else if(hud._last !== txt){ hud.textContent = txt; hud._last = txt; }
-  var pct = Math.round(speed/CFG.SPD_MAX*100);
-  if(hudThrSegEl) segSetN(hudThrSegEl, Math.max(0, Math.min(250, pct)), 3);
-}
-function trackFor(p){ return (p === 3) ? 'Star-1.ogg' : 'Music-' + (p + 1) + '.ogg'; }
-function switchPlanet(dir){
-  if(switching) return;
-  var target = -1;
-  if(dir > 0){
-    if(planet >= 3) return;
-    var need = CFG.EXP_STEPS[planet];
-    if(expTotal < need){
-      if(expFillEl){
-        expFillEl.style.background = '#ff5a4a';
-        setTimeout(function(){ if(expFillEl) expFillEl.style.background = 'linear-gradient(90deg,#0b4d1f,#7dff8a,#d6ffb0)'; }, 300);
-      }
-      return;
-    }
-    target = planet + 1;
-  } else {
-    if(planet === 0){
-      /* назад с ХИТОМИ — только к уже открытой звезде: раньше времени не переключит */
-      if(expTotal < CFG.EXP_STEPS[2]) return;
-      target = 3;
-    } else {
-      target = planet - 1;
-    }
-  }
-  switching = true;
-  magnetT = 0; freezeT = 0;
-  for(var swi = shots.length - 1; swi >= 0; swi--){ if(shots[swi].el && shots[swi].el.parentNode) shots[swi].el.parentNode.removeChild(shots[swi].el); }
-  shots.length = 0;
-  fadeEl.style.opacity = '1';
-  setTimeout(function(){
-    planet = target;
-    if(sfx.music && sfx.started){
-      try{ sfx.music.pause(); sfx.music.src = trackFor(planet); }catch(e){}
-    }
-    updHud();
-    fadeEl.style.opacity = '0';
-    if(sfx.musicOn) tryMusic();
-    setTimeout(function(){ switching = false; }, 300);
-  }, 300);
-}
-
-/* ---------- ПАУЗА: панель Управление / Механики / Правила ---------- */
-function setPaused(v){
-  if(paused === v) return;
-  paused = v;
-  if(v && document.pointerLockElement) document.exitPointerLock();
-  if(pauseEl) pauseEl.style.display = v ? 'flex' : 'none';
-  if(sfx.music){
-    if(v) sfx.music.pause();
-    else if(sfx.musicOn && sfx.started) tryMusic();
-  }
-}
-function initPausePanel(){
-  if(pauseEl) return;
-  pauseEl = document.createElement('div');
-  pauseEl.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:92;display:none;flex-direction:column;align-items:center;gap:9px;background:#0c150c;border:6px outset #950;border-radius:10px;padding:18px 26px;box-shadow:0 20px 40px rgba(0,0,0,.7);max-width:min(600px,92vw);max-height:86vh;overflow:auto;';
-  pauseEl.innerHTML =
-    '<div style="font:900 20px/1 monospace;letter-spacing:5px;color:#f7cc1d;text-shadow:2px 2px 0 #7a5c00;">ПАУЗА</div>'
-    + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#7dff8a;">УПРАВЛЕНИЕ</div>'
-    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G / J — следующая / предыдущая планета<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
-    + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#f7cc1d;">МЕХАНИКИ</div>'
-    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Кексик +3 EXP, сыр +5 EXP, луна +10 EXP (крупные — вдвое)<br>500 EXP — ЧИЗИЯ, 1500 EXP — НГАЛИН, 2250 EXP — ШИНРАРТА-B<br>7000 EXP — ИГРА ПРОЙДЕНА<br>Добыча наполняет Форсаж: кексик +2%, сыр +1%, луна +5%<br>Форсаж — разгон до ×2.5, тает за 10 с, реген 100% за 90 с<br>Магнит — 12 с притяжения, Залп — 10 снарядов, Цель — 5 самонаводящихся<br>Вспышка — перчики исчезают на 10 с, Заморозка — стоп на 16 с<br>Обменник — кексики ↔ сыр 1:1, обратно 1 кексик = 2 сыра</div>'
-    + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#ff5a4a;">ПРАВИЛА</div>'
-    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Собирайте кексики и сыр, открывайте планеты за EXP<br>Перчик отнимает 1 HP и опустошает шкалу Форсажа на 5%<br>Аптечка восстанавливает 1 HP (максимум 8)<br>Нулевая провизия игру не завершает — опасен только ноль HP<br>HP = 0 — Game Over</div>'
-    + '<button id="pauseBtn" style="width:192px;">ПРОДОЛЖИТЬ</button>';
-  document.body.appendChild(pauseEl);
-  document.getElementById('pauseBtn').addEventListener('click', function(){ setPaused(false); });
-}
-
-/* ---------- ВВОД ---------- */
-var KEYSET = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, KeyQ:1, KeyE:1, KeyG:1, KeyJ:1, KeyP:1, ArrowUp:1, ArrowDown:1 };
-window.__splashPlanet = 0;
-var SPLASH_TOAST = null;
-function cycleSplash(){
-  window.__splashPlanet = ((window.__splashPlanet || 0) + 1) % 4;
-  var nm = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН', 'ШИНРАРТА-B'][window.__splashPlanet];
-  try{
-    if(sfx.music && sfx.musicOn){
-      sfx.music.pause();
-      sfx.music.src = trackFor(window.__splashPlanet);
-      sfx.music.play().catch(function(){});
-    }
-  }catch(e){}
-  if(SPLASH_TOAST && SPLASH_TOAST.parentNode) SPLASH_TOAST.remove();
-  SPLASH_TOAST = document.createElement('div');
-  SPLASH_TOAST.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:120;font:700 12px/1 monospace;letter-spacing:2px;color:#7dff8a;background:#0c150cdd;border:3px outset #950;border-radius:8px;padding:9px 16px;pointer-events:none;';
-  SPLASH_TOAST.textContent = 'ЗАСТАВКА: ' + nm;
-  document.body.appendChild(SPLASH_TOAST);
-  setTimeout(function(){ if(SPLASH_TOAST && SPLASH_TOAST.parentNode) SPLASH_TOAST.remove(); }, 1800);
-}
-window.addEventListener('keydown', function(e){
-  if(e.code === 'KeyZ' && !e.repeat && !gameOn){
-    e.preventDefault(); e.stopPropagation();
-    cycleSplash();
-    return;
-  }
-  if(gameOn && e.code === 'Escape' && !e.repeat){
-    e.preventDefault(); e.stopPropagation();
-    document.body.classList.toggle('dgame');
-    return;
-  }
-  if(gameOn && e.code === 'KeyO' && !e.repeat){
-    e.preventDefault(); e.stopPropagation();
-    setPaused(!paused);
-    return;
-  }
-  if(gameOn && !paused && e.code === 'KeyR' && !e.repeat){
-    e.preventDefault(); e.stopPropagation();
-    tryBoost();
-    return;
-  }
-  if(gameOn && !paused && e.code === 'KeyT' && !e.repeat){
-    e.preventDefault(); e.stopPropagation();
-    useHot(hotSel);
-    return;
-  }
-  if(gameOn && !paused && /^Digit[1-7]$/.test(e.code) && !e.repeat){
-    e.preventDefault(); e.stopPropagation();
-    hotSelect(parseInt(e.code.slice(5), 10) - 1);
-    return;
-  }
-  if(!gameOn || paused || !KEYSET[e.code]) return;
-  e.preventDefault(); e.stopPropagation();
-  if(e.code === 'KeyG' && !e.repeat) switchPlanet(1);
-  else if(e.code === 'KeyJ' && !e.repeat) switchPlanet(-1);
-  else if(e.code === 'KeyP' && !e.repeat) toggleMouse();
-  else keys[e.code] = 1;
-  tryMusic();
-}, true);
-window.addEventListener('wheel', function(e){
-  if(!gameOn || paused || switching) return;
-  e.preventDefault();
-  hotSelect((hotSel + (e.deltaY > 0 ? 1 : HOT_DEFS.length - 1)) % HOT_DEFS.length);
-}, { passive: false });
-window.addEventListener('keyup', function(e){
-  if(!gameOn || paused || !KEYSET[e.code]) return;
-  e.preventDefault(); e.stopPropagation();
-  keys[e.code] = 0;
-}, true);
-addEventListener('blur', function(){ keys = {}; drag = null; });
-window.addEventListener('pointerdown', function(e){
-  if(!gameOn || mouseCtl) return;
-  var t = e.target;
-  if(t && t.closest && t.closest('button,input,select,a,.panel,.lcd,.kbd-wrap,#keys,#keys2')) return;
-  drag = { x: e.clientX, y: e.clientY };
-  tryMusic();
-});
-window.addEventListener('pointermove', function(e){
-  if(!drag || !gameOn) return;
-  var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-  drag.x = e.clientX; drag.y = e.clientY;
-  if(dx){
-    F.fwd = norm(rotAxis(F.fwd, F.up, -dx*CFG.DRAG_YAW));
-    F.right = norm(rotAxis(F.right, F.up, -dx*CFG.DRAG_YAW));
-  }
-  if(dy){
-    F.fwd = norm(rotAxis(F.fwd, F.right, dy*CFG.DRAG_PITCH));
-    F.up = norm(rotAxis(F.up, F.right, dy*CFG.DRAG_PITCH));
-  }
-});
-window.addEventListener('pointerup', function(){ drag = null; });
-
-/* ---------- МЫШЬ: СКРЫТИЕ КУРСОРА (P) ---------- */
-function toggleMouse(){
-  if(!gameOn) return;
-  if(document.pointerLockElement){ document.exitPointerLock(); }
-  else { tryMusic(); document.body.requestPointerLock(); }
-}
-document.addEventListener('pointerlockchange', function(){
-  mouseCtl = !!document.pointerLockElement;
-});
-document.addEventListener('pointerlockerror', function(){ mouseCtl = false; });
-window.addEventListener('mousemove', function(e){
-  if(!mouseCtl || !gameOn || paused) return;
-  var dx = e.movementX || 0, dy = e.movementY || 0;
-  if(dx){
-    F.fwd = norm(rotAxis(F.fwd, F.up, -dx*CFG.DRAG_YAW));
-    F.right = norm(rotAxis(F.right, F.up, -dx*CFG.DRAG_YAW));
-  }
-  if(dy){
-    F.fwd = norm(rotAxis(F.fwd, F.right, dy*CFG.DRAG_PITCH));
-    F.up = norm(rotAxis(F.up, F.right, dy*CFG.DRAG_PITCH));
-  }
-});
-
-function applyGameMode(){
-  document.body.classList.toggle('dgame', gameOn);
-  btnPilot.classList.toggle('on', gameOn);
-  if(!btnPilot.disabled) btnPilot.textContent = gameOn ? 'ИГРА: СТОП' : 'ИГРА: СТАРТ';
-  layer.style.display = gameOn ? '' : 'none';
-  hud.style.display = gameOn ? '' : 'none';
-  keys = {}; drag = null;
-  if(!gameOn && document.pointerLockElement) document.exitPointerLock();
-  if(segPanel){ segPanel.style.display = gameOn ? 'flex' : 'none'; if(gameOn) segUpdate(); }
-  if(topPanel) topPanel.style.display = gameOn ? 'block' : 'none';
-  if(botPanel) botPanel.style.display = gameOn ? 'flex' : 'none';
-  if(lensEl) lensEl.style.display = 'none';
-  if(gameOn){ tryMusic(); }
-  else if(sfx.music){ sfx.music.pause(); }
-}
-btnPilot.addEventListener('click', function(){
-  if(gameOver){ gameOver = false; resetGame(); gameOn = true; }
-  else gameOn = !gameOn;
-  if(!gameOn) setPaused(false);
-  applyGameMode();
-});
-btnMusic.addEventListener('click', function(){
-  sfx.musicOn = !sfx.musicOn;
-  btnMusic.classList.toggle('on', sfx.musicOn);
-  btnMusic.textContent = sfx.musicOn ? 'МУЗЫКА' : 'МУЗЫКА (выкл)';
-  if(sfx.musicOn){ tryMusic(); }
-  else if(sfx.music){ sfx.music.pause(); }
-});
-
-/* ---------- ПРОВЕРКА ОКРУЖЕНИЯ ---------- */
-var bgInfo = window.__bgInfo || {};
-if(bgInfo.fallback){
-  gameOn = false;
-  applyGameMode();
-  btnPilot.disabled = true;
-  btnPilot.textContent = 'ИГРА: БАЗОВЫЙ';
-  gameErr('ФОН: игровой шейдер не собрался — включён базовый R46, игра ждёт починки. Ошибка компиляции в консоли (F12).');
-}
-
-/* ---------- ГЛАВНЫЙ ЦИКЛ ИГРЫ ---------- */
-var simT = 0, lastT = performance.now();
-function loop(now){
-  requestAnimationFrame(loop);
-  try{
-    var dt = Math.min((now - lastT)/1000, 0.1);
-    lastT = now;
-    if(paused) dt = 0;
-    if(!paused) simT += dt;
-    var bgSim = (typeof window.__bgSim === 'number') ? window.__bgSim : simT*60.0;
-    var W = window.innerWidth, H = window.innerHeight;
-    var cam;
-    if(gameOn){
-      if(!paused){
-      physics(dt);
-      if(pepperCd > 0) pepperCd = Math.max(0, pepperCd - dt);
-      if(immuneT > 0) immuneT = Math.max(0, immuneT - dt);
-      if(boostOn){
-        boostLeft -= dt;
-        boostFuel = Math.max(0, boostFuel - CFG.BOOST_DRAIN*dt);
-        if(boostLeft <= 0 || boostFuel <= 0) boostOn = false;
-      } else if(boostFuel < 100){
-        boostFuel = Math.min(100, boostFuel + dt/CFG.BOOST_REGEN);
-      }
-      boostMul += ((boostOn ? CFG.BOOST_MULT : 1) - boostMul)*Math.min(1, dt*1.6);
-      if(magnetT > 0) magnetT = Math.max(0, magnetT - dt);
-      if(freezeT > 0) freezeT = Math.max(0, freezeT - dt);
-      if(hotDenyT > 0) hotDenyT = Math.max(0, hotDenyT - dt);
-      if(pepBanT > 0){
-        pepBanT -= dt;
-        if(pepBanT <= 0){
-          pepBanT = 0;
-          for(var pi = 0; pi < ITEMS.length; pi++){
-            var pit = ITEMS[pi];
-            if(pit && pit.kind === 'pepper'){ pit.dead = false; respawn(pit); }
-          }
-        }
-      }
-      ensureSnow();
-      if(snowEl) snowEl.style.opacity = (freezeT > 0) ? '1' : '0';
-      tickShots(dt);
-      if(lensEl) lensEl.style.display = (immuneT > 0) ? 'block' : 'none';
-      updBottomPanel();
-      }
-      OCCL_Y = 0;
-      cam = { pos: F.pos, fwd: F.fwd, up: F.up, right: F.right };
-      window.__gameState = { active: true, planet: planet,
-        pos: F.pos, fwd: F.fwd, up: F.up, right: F.right };
-    } else {
-      var camA = 2*Math.PI*bgSim/2275.9;
-      var cx = Math.cos(camA)*1.034, cy = Math.sin(camA)*1.034 - (window.__splashPlanet === 3 ? 0.14 : 0);
-      var f0x = -Math.sin(camA), f0y = Math.cos(camA);
-      var u0x = Math.cos(camA), u0y = Math.sin(camA);
-      var f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
-      var fl = Math.sqrt(f1x*f1x + f1y*f1y) || 1;
-      f1x /= fl; f1y /= fl;
-      var r1z = f1x*u0y - f1y*u0x;
-      OCCL_Y = (window.__splashPlanet === 3) ? 0.14 : 0;
-      cam = { pos: [cx, cy, 0], fwd: [f1x, f1y, 0], right: [0, 0, r1z], up: [-r1z*f1y, r1z*f1x, 0] };
-      window.__gameState = { active: false };
-    }
-    drawSprites(cam, W, H, bgSim, dt);
-    updHud();
-  }catch(e){
-    gameErr('ИГРА: ошибка кадра — ' + (e && e.message ? e.message : e));
-  }
-}
-initSegPanel();
-initTopPanel();
-initBottomPanel();
-initGoPanel();
-initPausePanel();
-applyGameMode();
-updHud();
-requestAnimationFrame(loop);
-
-}catch(e){
-  gameErr('ИГРА: ошибка запуска — ' + (e && e.message ? e.message : e));
-}
-})();
-</script>
 </body>
 </html>
