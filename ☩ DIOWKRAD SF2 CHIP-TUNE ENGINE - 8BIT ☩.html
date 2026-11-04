@@ -1800,6 +1800,7 @@
 				</div>
 				<div class="p_block">
 					<div><span class="tag">КЛАВИАТУРА:</span><button id="kbToggle">КЛАВИАТУРА: ВКЛ</button><button id="rollLock">🔒 ЛОК ПИАОЛРОЛЛА</button></div>
+     <div><span class="tag">AUDIOFLEX:</span><button id="flexToggle" class="on" title="DIOWKRAD AudioFlex — резиновый буфер, привязка шага чтения к FPS. Клик — вкл/выкл">FLEX: ВКЛ</button></div>
 					<div><span class="tag">КЛАВИАТУРА :</span><button id="layCycler" class="on" title="Клик — цикл рядов 1/2">РЯД: 2</button><button id="kbCycler" class="on" title="Клик — цикл пиано-ролла 1/2">РОЛЛ: 2</button></div>
 					<div><span class="tag">ОКТАВА:</span><button id="octDn">СДВИГ −</button><button id="octUp">СДВИГ +</button></div><button id="panicBtn" style="color:#00FF00;">■ ЗАГЛУШИТЬ ВСЁ</button>
 					<div><span class="tag">КОТРОЛЛЕРС: C0/D0</span><button id="pmToggle" class="on">🔇 PM: ВКЛ</button><button id="chrToggle" class="on">♯ CHR: ВКЛ</button></div>
@@ -8911,6 +8912,16 @@
 		    } catch (_) {}
 		}
 		window.__diowkFlexSet = __diowkFlexSet;
+		window.addEventListener('DOMContentLoaded', function() {
+		 var fb = document.getElementById('flexToggle');
+		 if (fb) fb.addEventListener('click', function() {
+		  var on = !fb.classList.contains('on');
+		  fb.classList.toggle('on', on);
+		  fb.textContent = 'FLEX: ' + (on ? 'ВКЛ' : 'ВЫКЛ');
+		  try { window.__diowkFlexSet(on); } catch (_) {}
+		  if (typeof lcd === 'function') try { lcd('AUDIOFLEX: ' + (on ? 'ВКЛ — звук тянется за кадром' : 'ВЫКЛ — чистый кламп')); } catch (_) {}
+		 });
+		});
 		function updateFPS() {
 			const now = performance.now();
 			frameCount++;
