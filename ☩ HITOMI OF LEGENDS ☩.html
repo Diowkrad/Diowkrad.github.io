@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🧸 ☩ HITOMI OF LEGENDS Alpha 1.2.10 ☩ «Shadow of Hitomi» ☩🥈 </title>
+<title>🧸 ☩ HITOMI OF LEGENDS Alpha 1.2.11 ☩ «Shadow of Hitomi» ☩🥈 </title>
 <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
 <style>
 /* ============================================================
@@ -13,7 +13,7 @@
    2) ID;
    3) КЛАССЫ;
    4) АНИМАЦИЯ.
-   BUILD Alpha 1.2.10 «Deep Sky»
+   BUILD Alpha 1.2.11 «Deep Sky»
    База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»
    ============================================================ */
 
@@ -575,7 +575,7 @@ html::after{
 <div class="rack-mount" style="display: flex;overflow: auto;flex-direction: column;align-items: stretch;">
 <!-- ================= ШАПКА ================= -->
 <header class="panel">
-  <h1 class="logotype">🧸 HITOMI OF LEGENDS Alpha 1.2.10 ☩ «Shadow of Hitomi» ☩ 🥈 </h1><br>
+  <h1 class="logotype">🧸 HITOMI OF LEGENDS Alpha 1.2.11 ☩ «Shadow of Hitomi» ☩ 🥈 </h1><br>
 </header>
 <div class="panel_2"
 style="
@@ -2756,6 +2756,19 @@ function physics(dt){
     var ceil = CFG.SPD_MAX*(1 + Math.max(0, dd - 2)*FSD_SC_GAIN);
     ceil = Math.min(ceil, CFG.SPD_MAX*FSD_SC_CAP)*boostMul;
     speed = Math.max(CFG.SPD_MIN, Math.min(ceil, speed));
+    /* перегон по синусоиде: общее пространство, планеты в один ряд.
+       Путь = дуга синусоиды, его длина зависит от крутизны SIN_AMP */
+    var segA = 0, segB = 0;
+    if(dn === 0){ segA = PW[0][0]; segB = PW[1][0]; }
+    else if(dn === PW.length - 1){ segA = PW[PW.length-2][0]; segB = PW[PW.length-1][0]; }
+    else if(FT.pos[0] < PW[dn][0]){ segA = PW[dn-1][0]; segB = PW[dn][0]; }
+    else { segA = PW[dn][0]; segB = PW[dn+1][0]; }
+    var sT = (FT.pos[0] - segA)/((segB - segA) || 1);
+    sT = Math.max(0, Math.min(1, sT));
+    var laneY = SIN_AMP*Math.sin(Math.PI*sT);
+    var laneK = Math.min(1, 2.2*dt);
+    FT.pos[1] += (laneY - FT.pos[1])*laneK;
+    FT.pos[2] += (0 - FT.pos[2])*laneK;
   } else {
     speed = Math.max(CFG.SPD_MIN, Math.min(CFG.SPD_MAX*boostMul, speed));
   }
@@ -2781,26 +2794,8 @@ function physics(dt){
   }
   P.pos = add(P.pos, mul(P.fwd, speed*dt));
   if(inTransit){
-    /* стена закрытых планет */
-    for(var wj = 0; wj < PW.length; wj++){
-      if(unlockedIdx(wj)) continue;
-      var dv = sub(FT.pos, PW[wj]);
-      var dw = len(dv);
-      if(dw < FSD_WALL){
-        var nw = mul(dv, 1/(dw||1));
-        FT.pos = add(PW[wj], mul(nw, FSD_WALL));
-        var inw2 = dot(P.fwd, nw);
-        if(inw2 > 0) P.fwd = norm(sub(P.fwd, mul(nw, inw2)));
-        speed *= 0.45;
-        var nowMs = Date.now();
-        if(!wallToastT[wj] || (nowMs - wallToastT[wj]) > 2000){
-          wallToastT[wj] = nowMs;
-          toastFx('\u{1F512} ' + PLANET_NAMES[wj] + ': НУЖНО ' + expNeed(wj) + ' EXP', '#ff5a4a');
-        }
-      }
-    }
-    /* стыковка с открытой планетой: дальняя граница суперкруиза — прилетаешь сам, оказываешься далеко */
-    if(dn >= 0 && dd < FSD_SOI && unlockedIdx(dn)){
+    /* стыковка с любой планетой: дальняя граница гиперпространства */
+    if(dn >= 0 && dd < FSD_SOI){ /* стыковка с любой планетой: влет из гиперпространства открыт */
       planet = dn;
       inTransit = false;
       F.pos = sub(FT.pos, PW[dn]);
@@ -2825,7 +2820,7 @@ function physics(dt){
       FT = { pos: add(PW[planet], F.pos), fwd: F.fwd, up: F.up, right: F.right };
       inTransit = true;
       setSpaceMode();
-      toastFx('СУПЕРКРУИЗ: ПЛАНЕТЫ ВИДНЫ НА НЕБЕ', '#7dff8a');
+      toastFx('ГИПЕРПРОСТРАНСТВО: ПЛАНЕТЫ ВИДНЫ НА НЕБЕ', '#7dff8a');
     }
   }
 }
@@ -2920,7 +2915,7 @@ function updHud(){
     + '\nОТКРЫТО: ' + unlocked
     + (mouseCtl ? '\nМЫШЬ: ВКЛ (P — вернуть курсор)' : '');
   /* OPT: кэш текста — не пишем в DOM, если значение не изменилось */
-  if(inTransit) txt += '\nРЕЖИМ: СУПЕРКРУИЗ';
+  if(inTransit) txt += '\nРЕЖИМ: ГИПЕРПРОСТРАНСТВО';
   if(targetIdx >= 0){
     var dtgt = inTransit ? len(sub(FT.pos, PW[targetIdx])) : len(sub(PW[targetIdx], PW[planet]));
     txt += '\nЦЕЛЬ: ' + PLANET_NAMES[targetIdx] + ' — ' + dtgt.toFixed(1) + ' а.е. — '
@@ -2995,7 +2990,7 @@ function initPausePanel(){
   pauseEl.innerHTML =
     '<div style="font:900 20px/1 monospace;letter-spacing:5px;color:#f7cc1d;text-shadow:2px 2px 0 #7a5c00;">ПАУЗА</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#7dff8a;">УПРАВЛЕНИЕ</div>'
-    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G — FSD-прыжок к цели (Y), J — к предыдущей планете<br>Y — захват планеты в цель: прицел на небе<br>Вне зоны планеты — суперкруиз: скорость растёт с удалением<br>Подлёт к открытой планете — стыковка, к закрытой — стена<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
+    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G — FSD-прыжок к цели (Y), J — к предыдущей планете<br>Y — захват планеты в цель: прицел на небе<br>Вне зоны планеты (11 а.е.) — гиперпространство: перегон по синусоиде, скорость растёт с удалением<br>Подлёт к любой планете — стыковка: влет из гиперпространства открыт<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#f7cc1d;">МЕХАНИКИ</div>'
     + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Кексик +3 EXP, сыр +5 EXP, луна +10 EXP (крупные — вдвое)<br>500 EXP — ЧИЗИЯ, 1500 EXP — НГАЛИН, 2250 EXP — ШИНРАРТА-B<br>7000 EXP — РЕЙС ПРОЙДЕН: ПРОДОЛЖИТЬ ИЛИ СНАЧАЛА<br>Добыча наполняет Форсаж: кексик +2%, сыр +1%, луна +5%<br>Форсаж — разгон до ×2.5, тает за 10 с, реген 100% за 90 с<br>Магнит — 12 с притяжения, Залп — 10 снарядов, Цель — 5 самонаводящихся<br>Вспышка — перчики исчезают на 10 с, Заморозка — стоп на 16 с<br>Обменник — кексики ↔ сыр 1:1, обратно 1 кексик = 2 сыра</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#ff5a4a;">ПРАВИЛА</div>'
@@ -3010,22 +3005,16 @@ function initPausePanel(){
 /* константы FSD (править здесь) */
 var FSD_CHARGE = 2.6, FSD_TUNNEL = 1.2, FSD_EXIT = 1.5;   /* фазы прыжка, с */
 var FSD_SC_GAIN = 0.3, FSD_SC_CAP = 24;   /* потолок суперкруиза = SPD_MAX*(1+(d-2)*GAIN), не выше SPD_MAX*CAP */
-var FSD_DOCK = 2.4, FSD_WALL = 2.1, FSD_SOI = 10.4; /* стыковка / стена закрытых / ГИПЕРПРОСТРАНСТВО начинается здесь (диск планеты на небе ~ как на скриншоте), а.е. */
+var FSD_DOCK = 2.4, FSD_SOI = 11.0, SIN_AMP = 7.5; /* SIN_AMP — крутизна синусоиды перегона */ /* стыковка / стена закрытых / ГИПЕРПРОСТРАНСТВО начинается здесь (диск планеты на небе ~ как на скриншоте), а.е. */
 var WARP_SND = 'warp.ogg'; /* URL-ссылки отключены: локальный файл warp.ogg рядом с HTML */
 /* мировые позиции планет (радиус планеты = 1): ХИТОМИ, ЧИЗИЯ, НГАЛИН, ШИНРАРТА-B */
-var PW = [ [0,0,0], [-8,30,12], [40,-12,30], [12,8,70] ];
-var PDISC_GRAD = [
-  'radial-gradient(circle at 32% 30%, #d6ffb0 0%, #7dff8a 38%, #0b4d1f 78%, #031a0b 100%)',
-  'radial-gradient(circle at 32% 30%, #ffe9a8 0%, #f7cc1d 40%, #8a5c00 80%, #2a1c00 100%)',
-  'radial-gradient(circle at 32% 30%, #ecd8ff 0%, #b06ff0 40%, #4a1d78 80%, #170527 100%)',
-  'radial-gradient(circle at 34% 30%, #eaffff 0%, #7ddfff 42%, #0a5c8a 80%, #021b2a 100%)'
-];
+var PW = [ [0,0,0], [33.2866,0,0], [99.5588,0,0], [152.3225,0,0] ]; /* один ряд по оси X: соседние расстояния как в 1.2.10 */
+/* градиентные заглушки планет удалены: тела рисуются процедурно (модуль ниже) */
 var inTransit = false;
 var FT = { pos: [0,0,0], fwd: [0,0,1], up: [0,1,0], right: [1,0,0] };
 var targetIdx = -1;
 var warp = null;
-var wallToastT = {};
-var skyWrap = null, skyWrapEls = [], skyDiscEls = [], skyLblEls = [], skyRet = null;
+var skyWrap = null, skyWrapEls = [], skyCvEls = [], skyLblEls = [], skyRet = null;
 var fsdAudio = null;
 var warpCv = null, warpCtx = null, warpStreaks = null;
 
@@ -3170,6 +3159,215 @@ function setSpaceMode(){
   var bg = document.getElementById('glbg');
   if(bg) bg.style.opacity = (inTransit || warp) ? '0' : '';
 }
+/* ================= ☩ ПРОЦЕДУРНЫЕ НЕБЕСНЫЕ ТЕЛА ☩ =================
+   Рендер 1:1: разрешение канвы равно размеру тела на экране, перерисовка
+   каждый кадр. Без LOD и троттлинга. Текстуры суши/облаков/сыра
+   предрассчитаны один раз (512x256), пульсар рисуется градиентами. */
+var PB_TEX = null, PB_HOLES = null, PB_RB = null, PB_RF = null;
+function pbHash(x, y, z, sd){
+  var n = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1274126177) ^ Math.imul(sd|0, 974711);
+  n = Math.imul(n ^ (n >>> 13), 1103515245);
+  return ((n ^ (n >>> 16)) >>> 0)/4294967296;
+}
+function pbVn(px, py, pz, sd){
+  var xi = Math.floor(px), yi = Math.floor(py), zi = Math.floor(pz);
+  var xf = px - xi, yf = py - yi, zf = pz - zi;
+  var sx = xf*xf*(3-2*xf), sy = yf*yf*(3-2*yf), sz = zf*zf*(3-2*zf);
+  var c000 = pbHash(xi,yi,zi,sd), c100 = pbHash(xi+1,yi,zi,sd);
+  var c010 = pbHash(xi,yi+1,zi,sd), c110 = pbHash(xi+1,yi+1,zi,sd);
+  var c001 = pbHash(xi,yi,zi+1,sd), c101 = pbHash(xi+1,yi,zi+1,sd);
+  var c011 = pbHash(xi,yi+1,zi+1,sd), c111 = pbHash(xi+1,yi+1,zi+1,sd);
+  var x00 = c000+(c100-c000)*sx, x10 = c010+(c110-c010)*sx;
+  var x01 = c001+(c101-c001)*sx, x11 = c011+(c111-c011)*sx;
+  var y0 = x00+(x10-x00)*sy, y1 = x01+(x11-x01)*sy;
+  return y0+(y1-y0)*sz;
+}
+function pbFbm(px, py, pz, sd){
+  var v = 0.55*pbVn(px, py, pz, sd);
+  v += 0.275*pbVn(px*2.07, py*2.07, pz*2.07, sd+11);
+  v += 0.1375*pbVn(px*4.28, py*4.28, pz*4.28, sd+23);
+  return v/0.9625;
+}
+function pbInitTex(){
+  if(PB_TEX) return;
+  var TW = 512, TH = 256;
+  PB_HOLES = [];
+  for(var h = 0; h < 16; h++){
+    var ta = pbHash(h,1,2,7)*Math.PI*2, pa = Math.acos(2*pbHash(h,3,4,9)-1);
+    PB_HOLES.push({ d: [Math.sin(pa)*Math.cos(ta), Math.cos(pa), Math.sin(pa)*Math.sin(ta)], r: 0.07 + 0.07*pbHash(h,5,6,3) });
+  }
+  PB_TEX = [];
+  for(var k = 0; k < PLANET_NAMES.length; k++){
+    if(k === 3){ PB_TEX.push(null); continue; } /* пульсар: без текстуры */
+    var terr = new Uint8ClampedArray(TW*TH*3), cloud = new Uint8ClampedArray(TW*TH);
+    for(var y = 0; y < TH; y++){
+      var lat = (0.5 - y/(TH-1))*Math.PI;
+      var cl_ = Math.cos(lat), sl_ = Math.sin(lat);
+      for(var x = 0; x < TW; x++){
+        var lon = x/TW*Math.PI*2;
+        var vx = cl_*Math.cos(lon), vy = sl_, vz = cl_*Math.sin(lon);
+        var i3 = (y*TW+x)*3, r1, g1, b1;
+        if(k === 1){ /* ЧИЗИЯ: сыр */
+          var chN = pbFbm(vx*2.3, vy*2.3, vz*2.3, 41);
+          r1 = Math.round(255*(0.72+0.28*chN)); g1 = Math.round(233*(0.7+0.3*chN)); b1 = Math.round(40+120*chN);
+          var rind = Math.min(1, Math.max(0, (Math.abs(lat)-0.95)/0.5));
+          r1 = Math.round(r1*(1-rind)+138*rind); g1 = Math.round(g1*(1-rind)+92*rind); b1 = Math.round(b1*(1-rind));
+          for(var h2 = 0; h2 < 16; h2++){
+            var dd2 = vx*PB_HOLES[h2].d[0] + vy*PB_HOLES[h2].d[1] + vz*PB_HOLES[h2].d[2];
+            if(dd2 > Math.cos(PB_HOLES[h2].r)){ r1 = 92; g1 = 58; b1 = 0; }
+            else if(dd2 > Math.cos(PB_HOLES[h2].r*1.25)){
+              r1 = Math.round(r1*0.6+37); g1 = Math.round(g1*0.6+23); b1 = Math.round(b1*0.4);
+            }
+          }
+        } else {
+          var e2 = pbFbm(vx*2.1, vy*2.1, vz*2.1, 3+k*17);
+          var grn = (k === 0);
+          if(e2 > 0.52){
+            var lm = Math.min(1, (e2-0.52)/0.3);
+            r1 = grn ? Math.round(214-89*lm) : Math.round(236-60*lm);
+            g1 = grn ? 255 : Math.round(216-105*lm);
+            b1 = grn ? Math.round(176-38*lm) : 255;
+          } else {
+            var om = Math.max(0, (e2-0.3)/0.22);
+            r1 = grn ? Math.round(3+8*om) : Math.round(23+51*om);
+            g1 = grn ? Math.round(26+51*om) : Math.round(5+24*om);
+            b1 = grn ? Math.round(11+20*om) : Math.round(39+81*om);
+          }
+        }
+        terr[i3] = r1; terr[i3+1] = g1; terr[i3+2] = b1;
+        cloud[y*TW+x] = Math.round(255*pbFbm(vx*3.1+7.3, vy*3.1, vz*3.1+2.2, 61+k*7));
+      }
+    }
+    PB_TEX.push({ tw: TW, th: TH, terr: terr, cloud: cloud });
+  }
+}
+function renderPlanetBody(k, cv, size, L, simT){
+  pbInitTex();
+  var cw, ch;
+  if(k === 1){ cw = Math.ceil(size*2.6); ch = Math.ceil(size*1.4); }
+  else if(k === 3){ cw = Math.ceil(size*2.4); ch = Math.ceil(size*2.4); }
+  else { cw = Math.ceil(size); ch = Math.ceil(size); }
+  if(cv.width !== cw || cv.height !== ch){ cv.width = cw; cv.height = ch; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  cv.style.transform = 'translate(' + (-cw*0.5) + 'px,' + (-ch*0.5) + 'px)';
+  if(k === 3){ pbPulsar(cv.getContext('2d'), cw, ch, simT); return; }
+  if(k === 1){ pbCheese(cv.getContext('2d'), cw, ch, simT, L); return; }
+  pbPlanetBody(k, cv.getContext('2d'), cw, ch, simT, L);
+}
+function pbSample(tex, u, v){
+  var xi = Math.min(tex.tw-1, Math.floor(u*tex.tw)), yi = Math.min(tex.th-1, Math.floor(v*tex.th));
+  var ci = (yi*tex.tw + xi)*3;
+  return [tex.terr[ci], tex.terr[ci+1], tex.terr[ci+2], tex.cloud[yi*tex.tw + xi]];
+}
+function pbSpherePixel(tex, nx, ny, spin, drift, L, out){
+  var r2 = nx*nx + ny*ny;
+  if(r2 > 1) return false;
+  var nz = Math.sqrt(1-r2);
+  var cA = Math.cos(spin), sA = Math.sin(spin);
+  var rx = nx*cA + nz*sA, rz = -nx*sA + nz*cA;
+  var uT = Math.atan2(rz, rx)/(Math.PI*2) - spin; uT -= Math.floor(uT);
+  var uC = Math.atan2(rz, rx)/(Math.PI*2) - drift; uC -= Math.floor(uC);
+  var vv = 0.5 - Math.asin(ny)/Math.PI;
+  var c = pbSample(tex, uT, vv);
+  var cA2 = c[3]*0.00075*255/100*0.0; /* облака: доля 0..1 */
+  cA2 = (c[3]/255)*0.75;
+  var diff = Math.max(0, nx*L[0] - ny*L[1] + nz*L[2]);
+  var sh = (0.25 + 0.75*diff)*(0.6 + 0.4*nz);
+  out[0] = (c[0]*(1-cA2) + 255*cA2)*sh;
+  out[1] = (c[1]*(1-cA2) + 255*cA2)*sh;
+  out[2] = (c[2]*(1-cA2) + 255*cA2)*sh;
+  out[3] = 255;
+  return true;
+}
+function pbPlanetBody(k, ctx, S, simT, L){
+  var tex = PB_TEX[k];
+  var img = ctx.createImageData(S, S);
+  var d = img.data, out = [0,0,0,0];
+  var spin = simT*0.05, drift = simT*0.09;
+  for(var py = 0; py < S; py++){
+    var ny = 2*(py+0.5)/S - 1;
+    for(var px = 0; px < S; px++){
+      if(pbSpherePixel(tex, 2*(px+0.5)/S - 1, ny, spin, drift, L, out)){
+        var o = (py*S+px)*4;
+        d[o] = out[0]; d[o+1] = out[1]; d[o+2] = out[2]; d[o+3] = 255;
+      }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+function pbRings(ctx, cx, cy, R, front){
+  var bands = ['#f7cc1d','#fff0a0','#d9a80e','#f7cc1d','#8a5c00','#ffe9a8','#c98f0a'];
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.35);
+  ctx.scale(1, 0.32);
+  for(var i = 0; i < 7; i++){
+    var rr = (1.08 + i*0.128)*R;
+    ctx.strokeStyle = bands[i];
+    ctx.lineWidth = R*0.055;
+    ctx.globalAlpha = (i === 4) ? 0.35 : 0.85;
+    ctx.beginPath();
+    ctx.arc(0, 0, rr, front ? 0 : Math.PI, front ? Math.PI : Math.PI*2);
+    ctx.stroke();
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+function pbCheese(ctx, cw, ch, simT, L){
+  ctx.clearRect(0, 0, cw, ch);
+  var R = ch/2.8, cx = cw*0.5, cy = ch*0.5;
+  if(!PB_RB){ PB_RB = document.createElement('canvas'); PB_RF = document.createElement('canvas'); }
+  if(PB_RB.width !== cw || PB_RB.height !== ch){ PB_RB.width = cw; PB_RB.height = ch; PB_RF.width = cw; PB_RF.height = ch; }
+  var cb = PB_RB.getContext('2d'), cf = PB_RF.getContext('2d');
+  cb.clearRect(0, 0, cw, ch); cf.clearRect(0, 0, cw, ch);
+  pbRings(cb, cx, cy, R, false);
+  pbRings(cf, cx, cy, R, true);
+  ctx.drawImage(PB_RB, 0, 0);
+  var tex = PB_TEX[1];
+  var x0 = Math.max(0, Math.floor(cx-R)), x1 = Math.min(cw, Math.ceil(cx+R));
+  var y0 = Math.max(0, Math.floor(cy-R)), y1 = Math.min(ch, Math.ceil(cy+R));
+  var img = ctx.createImageData(x1-x0, y1-y0);
+  var d = img.data, out = [0,0,0,0];
+  var spin = simT*0.05, drift = simT*0.09;
+  for(var py = y0; py < y1; py++){
+    var ny = 2*(py+0.5-cy)/(R*2);
+    for(var px = x0; px < x1; px++){
+      if(pbSpherePixel(tex, 2*(px+0.5-cx)/(R*2), ny, spin, drift, L, out)){
+        var o = ((py-y0)*(x1-x0) + (px-x0))*4;
+        d[o] = out[0]; d[o+1] = out[1]; d[o+2] = out[2]; d[o+3] = 255;
+      }
+    }
+  }
+  ctx.putImageData(img, x0, y0);
+  ctx.drawImage(PB_RF, 0, 0);
+}
+function pbPulsar(ctx, cw, ch, simT){
+  ctx.clearRect(0, 0, cw, ch);
+  var cx = cw*0.5, cy = ch*0.5, R = cw/4.8;
+  var pulse = 0.15 + 0.85*(0.5 + 0.5*Math.sin(Math.PI*2*simT/0.8));
+  var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R*2.15);
+  g.addColorStop(0, 'rgba(255,255,255,' + (0.95*pulse).toFixed(3) + ')');
+  g.addColorStop(0.25, 'rgba(190,225,255,' + (0.55*pulse).toFixed(3) + ')');
+  g.addColorStop(1, 'rgba(120,170,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, cw, ch);
+  var ax = simT*0.35;
+  for(var sgn = -1; sgn <= 1; sgn += 2){
+    var dx = Math.cos(ax)*sgn, dy = Math.sin(ax)*sgn;
+    for(var seg = 0; seg < 3; seg++){
+      var L2 = R*(1.4 + seg*0.35);
+      var flick = 0.5 + 0.5*pbHash(Math.floor(simT*13), seg, sgn, 5);
+      ctx.strokeStyle = 'rgba(200,225,255,' + (0.32*pulse*flick/(seg+1)).toFixed(3) + ')';
+      ctx.lineWidth = Math.max(1, R*(0.34 - seg*0.09));
+      ctx.beginPath();
+      ctx.moveTo(cx + dx*R*0.4, cy + dy*R*0.4);
+      ctx.lineTo(cx + dx*L2, cy + dy*L2);
+      ctx.stroke();
+    }
+  }
+  ctx.fillStyle = 'rgba(255,255,255,' + (0.9*pulse).toFixed(3) + ')';
+  ctx.beginPath(); ctx.arc(cx, cy, R*0.55, 0, Math.PI*2); ctx.fill();
+}
 function initSky(){
   if(skyWrap) return;
   skyWrap = document.createElement('div');
@@ -3178,17 +3376,16 @@ function initSky(){
   for(var k = 0; k < PLANET_NAMES.length; k++){
     var w = document.createElement('div');
     w.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;display:none;pointer-events:none;z-index:5;';
-    var disc = document.createElement('div');
-    disc.style.cssText = 'position:absolute;left:0;top:0;border-radius:50%;display:none;box-shadow:0 0 22px rgba(255,255,255,.25), inset -6px -8px 18px rgba(0,0,0,.55);';
-    disc.style.background = PDISC_GRAD[k];
-    w.appendChild(disc);
+    var cv = document.createElement('canvas');
+    cv.style.cssText = 'position:absolute;left:0;top:0;display:none;';
+    w.appendChild(cv);
     var lbl = document.createElement('div');
     lbl.style.cssText = 'position:absolute;left:50%;top:12px;transform:translateX(-50%);font:700 10px/1 monospace;letter-spacing:1px;white-space:nowrap;text-shadow:1px 1px 2px #000;display:none;';
     lbl.textContent = PLANET_NAMES[k];
     w.appendChild(lbl);
     skyWrap.appendChild(w);
     skyWrapEls.push(w);
-    skyDiscEls.push(disc);
+    skyCvEls.push(cv);
     skyLblEls.push(lbl);
   }
   skyRet = document.createElement('div');
@@ -3210,6 +3407,7 @@ function projectW(p, cam, W, H){
   if(sx < -140 || sx > W + 140 || sy < -140 || sy > H + 140) return null;
   return { x: sx, y: sy, z: z };
 }
+/* ☩ НЕБО: тела сортируются по дальности, рендер канвой 1:1 (без LOD), каждый кадр ☩ */
 function drawPlanetsSky(cam, W, H, bgSim){
   initSky();
   var retDrawn = false;
@@ -3219,34 +3417,43 @@ function drawPlanetsSky(cam, W, H, bgSim){
     return;
   }
   var sun = sunDirNow(bgSim);
-  for(var k = 0; k < skyWrapEls.length; k++){
-    var w = skyWrapEls[k], disc = skyDiscEls[k], lbl = skyLblEls[k];
-    if(k === planet && !inTransit){ w.style.display = 'none'; continue; }
+  /* свет в экранных координатах: [вправо, вниз, вглубь] */
+  var L = [dot(sun, cam.right), -dot(sun, cam.up), dot(sun, cam.fwd)];
+  var order = [];
+  for(var k = 0; k < PLANET_NAMES.length; k++){
+    if(k === planet && !inTransit) continue;
     var wp = inTransit ? PW[k] : sub(PW[k], PW[planet]);
     var pr = inTransit ? projectW(wp, cam, W, H) : project(wp, cam, W, H);
-    if(!pr || pr.occl){ w.style.display = 'none'; continue; }
-    var size = Math.max(3, Math.min(H*2.2, (1/pr.z)*H));
-    var dl = dot(norm(wp), sun);
-    w.style.display = 'block';
-    w.style.transform = 'translate(' + pr.x.toFixed(1) + 'px,' + pr.y.toFixed(1) + 'px)';
-    disc.style.display = 'block';
-    disc.style.width = disc.style.height = size.toFixed(1) + 'px';
-    disc.style.transform = 'translate(-50%,-50%)';
-    disc.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, dl)).toFixed(2) + ')';
+    if(!pr || pr.occl) continue;
+    order.push({ k: k, pr: pr, wp: wp });
+  }
+  order.sort(function(a, b){ return b.pr.z - a.pr.z; }); /* дальние раньше, ближние поверх */
+  var drawn = {};
+  for(var o = 0; o < order.length; o++){
+    var k2 = order[o].k, pr2 = order[o].pr, wp2 = order[o].wp;
+    drawn[k2] = true;
+    var size = Math.max(3, Math.min(H*2.2, (1/pr2.z)*H));
+    var w2 = skyWrapEls[k2], cv = skyCvEls[k2], lbl = skyLblEls[k2];
+    w2.style.display = 'block';
+    w2.style.transform = 'translate(' + pr2.x.toFixed(1) + 'px,' + pr2.y.toFixed(1) + 'px)';
+    renderPlanetBody(k2, cv, size, L, bgSim);
+    cv.style.display = 'block';
     lbl.style.display = 'block';
     lbl.style.top = (size*0.5 + 7).toFixed(1) + 'px';
-    var un = unlockedIdx(k);
+    var un = unlockedIdx(k2);
     lbl.style.color = un ? '#7dff8a' : '#ff5a4a';
-    lbl.textContent = un ? PLANET_NAMES[k] : '\u{1F512} ' + PLANET_NAMES[k];
-    if(targetIdx === k){
+    lbl.textContent = un ? PLANET_NAMES[k2] : '\u{1F512} ' + PLANET_NAMES[k2];
+    if(targetIdx === k2){
       retDrawn = true;
       skyRet.style.display = 'block';
       var rs = size*1.8 + 14;
-      skyRet.style.transform = 'translate(' + pr.x.toFixed(1) + 'px,' + pr.y.toFixed(1) + 'px)';
+      skyRet.style.transform = 'translate(' + pr2.x.toFixed(1) + 'px,' + pr2.y.toFixed(1) + 'px)';
       skyRet.firstChild.style.width = skyRet.firstChild.style.height = rs.toFixed(1) + 'px';
     }
   }
   if(!retDrawn) skyRet.style.display = 'none';
+  /* канвы-призраки: всё, что не попало в кадр, прячем */
+  for(var k3 = 0; k3 < skyWrapEls.length; k3++) if(!drawn[k3]) skyWrapEls[k3].style.display = 'none';
 }
 function fsdInitSound(){
   if(fsdAudio) return fsdAudio;
