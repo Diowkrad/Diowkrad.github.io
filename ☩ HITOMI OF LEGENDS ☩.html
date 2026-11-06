@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🧸 ☩ HITOMI OF LEGENDS Alpha 1.2.11 ☩ «Shadow of Hitomi» ☩🥈 </title>
+<title>🧸 ☩ HITOMI OF LEGENDS Alpha 1.2.15 ☩ «Shadow of Hitomi» ☩🥈 </title>
 <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
 <style>
 /* ============================================================
@@ -13,7 +13,7 @@
    2) ID;
    3) КЛАССЫ;
    4) АНИМАЦИЯ.
-   BUILD Alpha 1.2.11 «Deep Sky»
+   BUILD Alpha 1.2.15 «Deep Sky»
    База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»
    ============================================================ */
 
@@ -575,7 +575,7 @@ html::after{
 <div class="rack-mount" style="display: flex;overflow: auto;flex-direction: column;align-items: stretch;">
 <!-- ================= ШАПКА ================= -->
 <header class="panel">
-  <h1 class="logotype">🧸 HITOMI OF LEGENDS Alpha 1.2.11 ☩ «Shadow of Hitomi» ☩ 🥈 </h1><br>
+  <h1 class="logotype">🧸 HITOMI OF LEGENDS Alpha 1.2.15 ☩ «Shadow of Hitomi» ☩ 🥈 </h1><br>
 </header>
 <div class="panel_2"
 style="
@@ -892,6 +892,29 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
 </div>
 </main>
 <script>
+/* ===== PLANETS_DB — реестр планет (генератор PLANETFORGE, приёмка численная) =====
+   Добавление планеты = одна запись в PLANETS_DB.planets.
+   kind: terrestrial | gas | pulsar | cheese; unlock — EXP для разблокировки.
+   Блок объявлен ДО R46-фона: шейдер дотягивается до реестра в кадре — исключён доступ до инициализации. */
+var PLANETS_DB = {
+  soi: 11,
+  planets: [
+    { name:'ХИТОМИ', pos:[-19.15,0,3.66], kind:'terrestrial', palette:'#3fa9f5', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#114d78","glow":0.83,"size":1.305,"spin":4,"pulse":0.7,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#d9e6f2","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"}} },
+    { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#cbb69a' }, { d:3.1, s:0.3, c:'#b7a184' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#995400","glow":1.31,"size":1.25,"spin":0.15,"pulse":2.8,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.076,"in":1.22,"out":3.4},"surf":{"scale":1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"}} },
+    { name:'НГАЛИН', pos:[-18.43,32,59.08], kind:'gas', palette:'#300090', rings:false, moons:[], jets:false, unlock:500, track:'Music-3.ogg', fx:{"atm":"#300090","glow":2,"size":1.17,"spin":0.45,"pulse":2.5,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#4c00ff","r2":"#25007a","lava":"#fb00ff","fres":"#1e0042"}} },
+    { name:'ШИНРАРТА-B', pos:[21.95,36,-15.57], kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#ffffff","c2":"#00eeff","sp":0.158,"len":9.55},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#0d0b0d","r2":"#29211f","river":"#eff5f9","fres":"#99ccff"}} },
+    { name:'Элизия', pos:[61.26,0,61], kind:'terrestrial', palette:'#d400ff', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }], jets:false, unlock:2200, track:'Bonus-1.ogg', fx:{"atm":"#d400ff","glow":0.4,"size":1.09,"spin":0.15,"pulse":4.15,"jets":{"on":0,"c1":"#ff00c8","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#c800ff","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":1,"icecov":0.29,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"ocean":"#9d12c4","land1":"#943696","land2":"#685a37","ice":"#0054db","cloud":"#2c74e8","city":"#ffbf59","aur":"#1dd76e"}} },
+    { name:'Брэстла', pos:[96.48,0,29.95], kind:'gas', palette:'#eeff00', rings:true, moons:[], jets:false, unlock:2800, track:'Bonus-2.ogg', fx:{"atm":"#969696","glow":1.01,"size":1.065,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#8c7340","sp":0.04,"in":1.15,"out":2.26},"surf":{"scale":1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#0d0b0d","r2":"#29211f","lava":"#00394d","fres":"#ff0000"}} },
+    { name:'Шинрарта-С', pos:[85.58,0,-66.13], kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":0.85,"size":1.6,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff"}} },
+    { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#005eff","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#ad0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#ff0000","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"}} },
+    { name:'Диовкрад', pos:[-106.98,0,24.9], kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:6300, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":2,"size":1.375,"spin":2.1,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":2.8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#0400ff","r2":"#4c00ff","lava":"#ff0000","fres":"#ff0000"}} }
+  ]
+};
+var PKIND = { terrestrial:0, cheese:1, gas:2, pulsar:3 };
+function pKind(k){ var e = PLANETS_DB.planets[k]; return e ? (PKIND[e.kind] || 0) : 0; }
+var FIN = PLANETS_DB.planets.length - 1; /* финальная планета маршрута */
+</script>
+<script>
 /* ═══════════════ КОНСТАНТЫ СИМУЛЯЦИИ ФОНА (править здесь) ═══════════════ */
 /* Графика перенесена из GLSL-стенда R46 «ГРАНЬ» без изменений шейдера.      */
 const PLANET_RADIUS_KM  = 29371.0;   /* радиус планеты, км                    */
@@ -1084,16 +1107,18 @@ if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
     float daySky = smoothstep(-0.15, 0.35, dayLocal);
 
     /* ночь: база + звёзды + млечный путь */
-    vec3 night = vec3(0.004,0.006,0.013);
-    night += stars(rd)*1.15;
+    vec3 night = vec3(0.003,0.005,0.011);
+    night += stars(rd)*1.3;
     float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
-    night += vec3(0.5,0.55,0.75)*bandW*fbm3(rd*4.0)*0.35;
+    night += vec3(0.45,0.5,0.7)*bandW*fbm3(rd*4.0)*0.42;
+    night += vec3(0.8,0.75,0.6)*bandW*bandW*0.12; /* тёплая центральная полоса млечного пути */
 
     /* день: градиент к горизонту, зарево у солнца, облака на куполе */
     float horiz = 1.0 - abs(dot(rd, up0));
-    vec3 day = mix(vec3(0.25,0.45,0.85), vec3(0.55,0.75,1.0), horiz*0.85);
+    vec3 day = mix(vec3(0.22,0.42,0.82), vec3(0.60,0.80,1.0), horiz*0.85);
     float sunAmt = max(dot(rd, sunDir), 0.0);
-    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.40;
+    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.50;
+    day += vec3(1.0,0.62,0.32)*pow(sunAmt, 3.0)*0.18; /* тёплый aëreол к горизонту */
     float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
     skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
     day = mix(day, vec3(1.0), skycl*0.75);
@@ -1107,7 +1132,11 @@ if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
 
     /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
     float closest = length(camPos - rd*b);
-    float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
+    /* Гасим ореол, когда луч уходит ОТ планеты (b>0 — ближайшая к центру точка
+       луча позади камеры): при развороте камеры на 180° не должно быть засветки.
+       Атмосфера планеты остаётся при взгляде на неё (b<0). */
+    float atmFwd = 1.0 - smoothstep(-0.2, 0.4, b);
+    float atmo = (1.0 - smoothstep(1.0, 1.22, closest))*atmFwd;
     if(uPlanet < 2.5){ col += vec3(0.30,0.55,1.0)*atmo*dayness*0.85; } else { col += vec3(0.05,0.10,0.24)*atmo; }
 
     /* луна: диск с кратерами, свечение */
@@ -1164,11 +1193,15 @@ if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
       }
     }
   }
-  /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
+  /* дизеринг против бандинга */
   col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
-  col = col/(1.0 + col*0.30);
-  col = pow(col, vec3(0.92));
-  float vig = 1.0 - 0.22*dot(uv*0.55, uv*0.55);
+  /* PBR-тонмаппинг: white-preserving Reinhard (SuperDuperVanilla) + гамма 2.2 */
+  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  float wpres = 1.5; /* WHITE_PRESERVATION */
+  float tm = (luma * (1.0 + luma / (wpres*wpres))) / (1.0 + luma);
+  col = pow(max(col * (tm / max(luma, 1e-6)), 0.0), vec3(1.0 / 2.2));
+  /* мягкая виньетка */
+  float vig = 1.0 - 0.16*dot(uv*0.6, uv*0.6);
   col *= max(vig, 0.0);
   gl_FragColor = vec4(col, 1.0);
 }`;
@@ -1184,6 +1217,40 @@ uniform vec3  uCamU;
 uniform vec3  uCamF;
 uniform float uPlanet;
 uniform float uSplash;
+uniform vec3  uP[8];   /* дальние планеты — позиции относительно текущей (или мировые в гипер) */
+uniform float uPKa[8]; /* индексы дальних планет (тип поверхности 0..3) */
+uniform float uPCount; /* сколько дальних планет передано в кадре */
+uniform float uHyper;  /* 1 = гиперпространство: небо Нгалин, 4 сферы, солнце стоит */
+uniform vec3  uP4;     /* гиперпространство: позиция 4-й планеты (текущей), мировые координаты */
+uniform float uPK4;
+/* ==== FX/SURF-ЮНИФОРМЫ EFFECTFORGE (дефолты = константы игры) ==== */
+uniform vec3  uAtmC; uniform float uAtmGlow; uniform float uAtmSize;
+uniform float uJetsOn; uniform vec3 uJetsC1; uniform vec3 uJetsC2; uniform float uJetsSp; uniform float uJetsLen;
+uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float uRingIn; uniform float uRingOut;
+uniform float uSpin; uniform float uPulseR;
+uniform float uSurfScale;
+uniform sampler2D uPal;   /* палитра лодов: 16x9, строка = планета */
+uniform float uPIa[8];    /* строка палитры каждой дальней планеты */
+uniform float uPIcur;     /* строка палитры текущей планеты */
+uniform vec3  uOceanC; uniform vec3 uLand1C; uniform vec3 uLand2C; uniform vec3 uIceC; uniform float uIceCov;
+uniform vec3  uCloudC; uniform float uCloudCov; uniform vec3 uCityC; uniform float uCityK;
+uniform vec3  uAurC; uniform float uAurK;
+uniform vec3  uBand1C; uniform vec3 uBand2C; uniform vec3 uBand3C; uniform vec3 uStormC; uniform float uStormK;
+uniform vec3  uHazeC; uniform vec3 uFogC;
+uniform vec3  uRock1C; uniform vec3 uRock2C; uniform vec3 uLavaC; uniform vec3 uFresC; uniform vec3 uRiverC; uniform vec3 uFres2C;
+/* CUR-страж: 1 = рисуется текущая планета (живые настройки), 0 = дальние (константы игры) */
+float gCur = 0.0;
+#define CURE(u, d) ((gCur > 0.5) ? (u) : (d))
+#define SPIN ((gCur > 0.5) ? uSpin : (paln(9.0, 0.0)*8.0))
+#define SCL  ((gCur > 0.5) ? uSurfScale : (paln(7.0, 0.0)*8.0))
+float gRow = 0.0;
+vec4 palV(float slot){ return texture2D(uPal, vec2((slot + 0.5)/16.0, (clamp(gRow, 0.0, 8.0) + 0.5)/9.0)); }
+vec3 palc(float slot){ return palV(slot).rgb; }
+float paln(float slot, float ch){
+  vec4 v = palV(slot);
+  return (ch < 0.5) ? v.r : (ch < 1.5) ? v.g : (ch < 2.5) ? v.b : v.a;
+}
+    /* гиперпространство: тип (индекс) 4-й планеты */
 
 #define R    1.0
 #define CAMR __CAMR__
@@ -1244,6 +1311,95 @@ vec3 stars(vec3 rd){
   return c;
 }
 
+/* ОСВЕЩЁННАЯ ПОВЕРХНОСТЬ ПЛАНЕТЫ: единый источник истины — близкая и дальние
+   планеты рисуются одной функцией, поэтому ЛОД 1-в-1 повторяет анимацию реальной. */
+vec3 shadeSurface(int k, vec3 n, float lit, vec3 rd, vec3 sunDir){
+  vec3 r = vec3(0.0);
+  if(k == 0){
+    vec3  sp   = n*(2.6*SCL) + vec3(0.0, 0.0, uTime*0.004*SPIN);
+    float cont = fbm5(sp);
+    float land = smoothstep(0.46, 0.54, cont);
+    float coast = fbm3(n*(8.0*SCL) + vec3(0.0, uTime*0.006*SPIN, 0.0));
+    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
+    vec3 ocean = palc(0.0);
+    vec3 landc = mix(palc(1.0), palc(2.0), smoothstep(0.52,0.78,cont));
+    float mdet = fbm3(n*(12.0*SCL) + vec3(uTime*0.003*SPIN, uTime*0.001*SPIN, 0.0));
+    landc *= 0.85 + 0.30*mdet;
+    float ice  = smoothstep(0.94 - 0.28*paln(7.0, 1.0), 0.94, abs(n.y));
+    vec3 surf  = mix(ocean, landc, land);
+    surf = mix(surf, palc(3.0), ice);
+    float cl = fbm5(n*(4.2*SCL) + vec3(uTime*0.010*SPIN, 0.0, -uTime*0.006*SPIN));
+    cl = smoothstep(0.62 - (0.12 + 0.24*paln(7.0, 2.0)), 0.62 + (0.12 + 0.24*paln(7.0, 2.0)), cl);
+    surf = mix(surf, palc(4.0), cl*0.9);
+    vec3 colDay = surf*(0.15 + 1.05*lit);
+    vec3 hv = normalize(sunDir - rd);
+    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
+    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+    float cellH = hash13(floor(n*90.0));
+    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
+    vec3 colNight = surf*0.03 + palc(5.0)*city*paln(8.0, 0.0)*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+    r = mix(colNight, colDay, lit);
+    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
+    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
+    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
+    r += palc(6.0)*aurZ*smoothstep(0.45,0.75,aur)*paln(8.0, 1.0);
+  } else if(k == 1){
+    float lat = n.y;
+    float warp = fbm3(n*(2.6*SCL) + vec3(uTime*0.008*SPIN, 0.0, 0.0));
+    float bands = sin(lat*16.0 + warp*3.2);
+    float bands2 = sin(lat*34.0 + 1.7);
+    vec3 band1 = palc(0.0);
+    vec3 band2 = palc(1.0);
+    vec3 band3 = palc(2.0);
+    vec3 surf = mix(band1, band2, smoothstep(-0.6, 0.6, bands));
+    surf = mix(surf, band3, 0.5 + 0.5*sin(lat*7.0 + 1.0));
+    surf = mix(surf, band2*0.92, 0.25*smoothstep(0.3, 0.9, bands2));
+    vec3 sdir = normalize(vec3(cos(uTime*0.02*SPIN + 2.0), -0.30, sin(uTime*0.02*SPIN + 2.0)));
+    float angS = acos(clamp(dot(n, sdir), -1.0, 1.0));
+    float storm = 1.0 - smoothstep(0.05, 0.16, angS);
+    surf = mix(surf, palc(3.0), storm*paln(7.0, 3.0));
+    surf *= 0.92 + 0.16*fbm3(n*(9.0*SCL) + vec3(uTime*0.05*SPIN, 0.0, 0.0));
+    r = surf*(0.06 + 1.05*lit);
+    float fresA = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += palc(4.0)*fresA*(0.2 + 0.8*lit)*0.8;
+    float azi = dot(n, rd);
+    float entry = smoothstep(-0.20, 0.05, azi);
+    float blurAtm = entry*0.50;
+    r = mix(r, palc(5.0)*(0.5 + 0.6*lit), blurAtm);
+    float fogT = fbm3(n*6.0 + vec3(uTime*0.02, 0.0, uTime*0.011))-0.5;
+    float fogB = smoothstep(-0.10, 0.30, fogT);
+    float fogWide = 0.5 + 0.5*sin(lat*20.0 + fogT*7.0 + uTime*0.03);
+    float fogAmt = fogB*(0.30 + 0.70*fogWide)*(0.55 + 0.45*entry)*(0.75 + 0.25*lit);
+    r = mix(r, palc(6.0), clamp(fogAmt, 0.0, 1.0)*0.55);
+  } else if(k == 2){
+    float rock = fbm5(n*3.2);
+    vec3 surf = mix(palc(0.0), palc(1.0), rock);
+    float riv1 = fbm3(n*(3.5*SCL) + vec3(0.0, uTime*0.02*SPIN, uTime*0.013*SPIN));
+    float riv2 = fbm3(n*(7.0*SCL) - vec3(uTime*0.015*SPIN, 0.0, 0.0));
+    float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+               + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+    lava = min(lava, 1.0);
+    float pulse = 0.75 + 0.25*sin(uTime*1.5*(paln(8.0, 2.0)*8.0) + riv1*40.0);
+    r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
+    float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += palc(3.0)*fresP*0.25;
+  } else {
+    float rock = fbm5(n*3.2);
+    vec3 surf = mix(palc(0.0), palc(1.0), rock);
+    float riv1 = fbm3(n*(3.5*SCL) + vec3(0.0, uTime*0.02*SPIN, uTime*0.013*SPIN));
+    float riv2 = fbm3(n*(7.0*SCL) - vec3(uTime*0.015*SPIN, 0.0, 0.0));
+    float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+               + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+    lava = min(lava, 1.0);
+    float pulse = 0.75 + 0.25*sin(uTime*1.5*(paln(8.0, 2.0)*8.0) + riv1*40.0);
+    r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
+    float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += palc(3.0)*fresP*0.45;
+  }
+  return r;
+}
+
 void main(){
   vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
 
@@ -1267,7 +1423,7 @@ void main(){
   float cc   = dot(wC, wC) - R*R;
   float disc = b*b - cc;
   float tHit = -b - sqrt(max(disc, 0.0));
-  bool hitP  = (disc > 0.0) && (tHit > 0.0);
+  bool hitP  = (uHyper < 0.5) && (disc > 0.0) && (tHit > 0.0); /* PHANTOM-GATE: в гипере/суперкруизе сфера текущей планеты не существует — её место занимает дальний цикл реестра */
 
   float dayLocal = dot(normalize(camPos), sunDir);
   float dayness  = smoothstep(-0.25, 0.30, dayLocal);
@@ -1277,129 +1433,39 @@ void main(){
   float atmIn = 1.0 - smoothstep(1.786, 1.90, camR);
 
   /* цвет атмосферы по планете: ХИТОМИ голубая, ЧИЗИЯ #905000, НГАЛИН #300090 */
-  vec3 atmC = vec3(0.30,0.55,1.0);
-  if(uPlanet > 0.5 && uPlanet < 1.5){ atmC = vec3(0.565,0.314,0.0); }
-  else if(uPlanet > 1.5 && uPlanet < 2.5){ atmC = vec3(0.188,0.0,0.565); }
-  else if(uPlanet > 2.5){ atmC = vec3(0.039,0.118,0.302); }
+  vec3 atmC = uAtmC;
 
   vec3 col = vec3(0.0);
 
   if(hitP){
-    /* ---- ПЛАНЕТА ---- */
+    /* ---- ПЛАНЕТА (ЛОД 1-в-1: единая функция поверхности) ---- */
     vec3 p = camPos + rd*tHit;
     vec3 n = normalize(p - sC);
     float nl  = dot(n, sunDir);
     float lit = smoothstep(-0.06, 0.18, nl);
-
-    if(uPlanet < 0.5){
-    /* континенты: тяжёлый fbm по нормали, планета медленно вращается */
-    vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
-    float cont = fbm5(sp);
-    float land = smoothstep(0.46, 0.54, cont);
-    /* ДЕТАЛЬ: волнение береговой линии (турбулентность) — плавнее граница суши/океана */
-    float coast = fbm3(n*8.0 + vec3(0.0, uTime*0.006, 0.0));
-    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
-    vec3 ocean = vec3(0.02,0.10,0.22);
-    vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
-
-    /* ДЕТАЛЬ: микро-рельеф суши (горы/равнины) — доп. fbm, не меняет границы суши */
-    float mdet = fbm3(n*12.0 + vec3(uTime*0.003, uTime*0.001, 0.0));
-    landc *= 0.85 + 0.30*mdet;
-
-    float ice  = smoothstep(0.80, 0.94, abs(n.y));
-    vec3 surf  = mix(ocean, landc, land);
-    surf = mix(surf, vec3(0.85,0.90,0.95), ice);
-
-    /* облака: второй тяжёлый слой, свой дрейф */
-    float cl = fbm5(n*4.2 + vec3(uTime*0.010, 0.0, -uTime*0.006));
-    cl = smoothstep(0.50, 0.74, cl);
-    surf = mix(surf, vec3(0.95,0.97,1.0), cl*0.9);
-
-    vec3 colDay = surf*(0.15 + 1.05*lit);
-    /* блик океана */
-    vec3 hv = normalize(sunDir - rd);
-    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
-    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
-
-    /* ночь: огни городов на суше, мерцание */
-    float cellH = hash13(floor(n*90.0));
-    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
-    vec3 colNight = surf*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
-
-    col = mix(colNight, colDay, lit);
-
-    /* атмосферный ободок на лимбе */
-    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-    col += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
-
-    /* полярные сияния на ночном полюсе */
-    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
-    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
-    col += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
-    }
-    else if(uPlanet < 1.5){
-      /* ---- ЧИЗИЯ: газовый гигант с полосами и штормом ---- */
-      float lat = n.y;
-      float warp = fbm3(n*2.6 + vec3(uTime*0.008, 0.0, 0.0));
-      float bands = sin(lat*16.0 + warp*3.2);
-      float bands2 = sin(lat*34.0 + 1.7);
-      vec3 band1 = vec3(0.87, 0.80, 0.62);
-      vec3 band2 = vec3(0.72, 0.55, 0.34);
-      vec3 band3 = vec3(0.93, 0.88, 0.74);
-      vec3 surf = mix(band1, band2, smoothstep(-0.6, 0.6, bands));
-      surf = mix(surf, band3, 0.5 + 0.5*sin(lat*7.0 + 1.0));
-      surf = mix(surf, band2*0.92, 0.25*smoothstep(0.3, 0.9, bands2));
-      vec3 sdir = normalize(vec3(cos(uTime*0.02 + 2.0), -0.30, sin(uTime*0.02 + 2.0)));
-      float angS = acos(clamp(dot(n, sdir), -1.0, 1.0));
-      float storm = 1.0 - smoothstep(0.05, 0.16, angS);
-      surf = mix(surf, vec3(0.80, 0.42, 0.22), storm*0.85);
-      surf *= 0.92 + 0.16*fbm3(n*9.0 + vec3(uTime*0.05, 0.0, 0.0));
-      col = surf*(0.06 + 1.05*lit);
-      float fresA = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-      col += vec3(0.90, 0.75, 0.50)*fresA*(0.2 + 0.8*lit)*0.8;
-    }
-    else if(uPlanet < 2.5) {
-      /* ---- НГАЛИН: магматический мир с реками лавы ---- */
-      float rock = fbm5(n*3.2);
-      vec3 surf = mix(vec3(0.05, 0.045, 0.05), vec3(0.16, 0.13, 0.12), rock);
-      float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
-      float riv2 = fbm3(n*7.0 - vec3(uTime*0.015, 0.0, 0.0));
-      float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
-                 + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
-      lava = min(lava, 1.0);
-      float pulse = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
-      col = surf*(0.05 + 0.9*lit) + vec3(1.0, 0.38, 0.06)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
-      float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-      col += vec3(1.0, 0.45, 0.10)*fresP*0.25;
-    } else {
-      /* ---- ШИНРАРТА-B: нейтронная звезда — поверхность как у НГАЛИН, эффект голубой #eff5f9 ---- */
-      float rock = fbm5(n*3.2);
-      vec3 surf = mix(vec3(0.05,0.045,0.05), vec3(0.16,0.13,0.12), rock);
-      float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
-      float riv2 = fbm3(n*7.0 - vec3(uTime*0.015, 0.0, 0.0));
-      float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
-                 + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
-      lava = min(lava, 1.0);
-      float pulse = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
-      col = surf*(0.05 + 0.9*lit) + vec3(0.937,0.961,0.976)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
-      float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-      col += vec3(0.60,0.80,1.0)*fresP*0.45;
-    }
+    int ki = (uPlanet < 0.5) ? 0 : ((uPlanet < 1.5) ? 1 : ((uPlanet < 2.5) ? 2 : 3));
+    gRow = uPIcur;
+    gCur = 1.0;
+    col = shadeSurface(ki, n, lit, rd, sunDir);
   } else {
     /* ---- НЕБО ---- */
+    /* ГИПЕРПРОСТРАНСТВО = готовое небо планеты ХИТОМИ (без магмы/градиентов),
+       солнце заморожено в одной точке (см. uSunA при hypOn), луны выкинуты. */
     float daySky = smoothstep(-0.15, 0.35, dayLocal);
 
     /* ночь: база + звёзды + млечный путь */
-    vec3 night = vec3(0.004,0.006,0.013);
-    night += stars(rd)*1.15;
+    vec3 night = vec3(0.003,0.005,0.011);
+    night += stars(rd)*1.3;
     float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
-    night += vec3(0.5,0.55,0.75)*bandW*fbm3(rd*4.0)*0.35;
+    night += vec3(0.45,0.5,0.7)*bandW*fbm3(rd*4.0)*0.42;
+    night += vec3(0.8,0.75,0.6)*bandW*bandW*0.12; /* тёплая центральная полоса млечного пути */
 
     /* день: градиент к горизонту, зарево у солнца, облака на куполе */
     float horiz = 1.0 - abs(dot(rd, up0));
     vec3 day = mix(atmC*0.83, mix(atmC, vec3(1.0), 0.42), horiz*0.85);
     float sunAmt = max(dot(rd, sunDir), 0.0);
-    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.40;
+    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.50;
+    day += vec3(1.0,0.62,0.32)*pow(sunAmt, 3.0)*0.18; /* тёплый aëreол к горизонту */
     float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
     skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
     day = mix(day, vec3(1.0), skycl*0.75);
@@ -1412,15 +1478,27 @@ void main(){
     col += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
     }
 
-    /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
+    /* ореол атмосферы у лимба (лучи мимо планеты) */
     float closest = length(camPos - rd*b);
-    float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
-    if(uPlanet < 2.5){ col += atmC*atmo*dayness*atmIn*0.85; } else { col += vec3(0.05,0.10,0.24)*atmo; }
+    /* Гасим ореол, когда луч уходит ОТ планеты (b>0 — ближайшая к центру точка
+       луча позади камеры): при развороте камеры на 180° не должно быть засветки.
+       Атмосфера планеты остаётся при взгляде на неё (b<0). */
+    float atmFwd = 1.0 - smoothstep(-0.2, 0.4, b);
+    float atmo = (1.0 - smoothstep(1.0, uAtmSize, closest))*atmFwd;
+    if(uPlanet < 2.5){
+      col += atmC*atmo*dayness*atmIn*uAtmGlow;
+      /* ЧИЗИЯ: анизотропное размытие входа в атмосферу — внешний ореол шире и мягче,
+         по мере входа в толщу атмосферы (atmo 0→1) добавляется туманное свечение до 50% */
+      if(uPlanet > 0.5 && uPlanet < 1.5){
+        float atmoIn = smoothstep(0.15, 1.0, atmo);
+        col = mix(col, vec3(0.88, 0.70, 0.42)*(0.5 + 0.5*dayness), atmoIn*0.5);
+      }
+    } else { col += CURE(uAtmC, vec3(0.05,0.10,0.24))*atmo; }
 
-    /* луна: диск с кратерами, свечение */
+    /* луна: диск с кратерами, свечение (в ГИПЕРПРОСТРАНСТВЕ луны выброшены) */
     float dM = dot(rd, moonDir);
     float mdisc = smoothstep(0.99950, 0.99980, dM);
-    if(uPlanet < 0.5 && mdisc > 0.0){
+    if(uHyper <= 0.5 && uPlanet < 0.5 && mdisc > 0.0){
       vec3 lp = rd - moonDir*dM;
       float cr = fbm3(lp*260.0);
       vec3 mc = vec3(0.78,0.78,0.74)*(0.55 + 0.45*cr);
@@ -1429,8 +1507,8 @@ void main(){
       col = mix(col, mc2, mdisc);
       col += vec3(0.60,0.65,0.85)*pow(max(dM,0.0), 900.0)*0.30;
     }
-    /* СЫРНЫЕ ЛУНЫ ЧИЗИИ: 4 диска на скайбоксе, дрейф за солнцем */
-    if(uPlanet > 0.5 && uPlanet < 1.5){
+    /* СЫРНЫЕ ЛУНЫ ЧИЗИИ: 4 диска на скайбоксе, дрейф за солнцем (в hyper выброшены) */
+    if(uHyper <= 0.5 && uPlanet > 0.5 && uPlanet < 1.5){
       for(int ci=0; ci<4; ci++){
         float cang = uSunA + 2.1 + 0.77*float(ci);
         vec3 cdir = normalize(vec3(cos(cang), 0.15 + 0.18*float(ci), sin(cang)));
@@ -1450,11 +1528,9 @@ void main(){
         }
       }
     }
-  }
-
 
     /* СЫРНЫЕ ЛУНЫ ШИНРАРТА-B: 8 дисков на скайбоксе, дрейф за солнцем */
-    if(!hitP && uPlanet > 2.5){
+    if(uHyper <= 0.5 && !hitP && uPlanet > 2.5){
       for(int ci=0; ci<8; ci++){
         float cang = uSunA + 2.1 + 0.55*float(ci);
         vec3 cdir = normalize(vec3(cos(cang), 0.10 + 0.13*float(ci), sin(cang)));
@@ -1472,34 +1548,13 @@ void main(){
         }
       }
     }
-  /* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
-  /* FIX: не рисовать кольца, когда луч попадает в планету — звезда непрозрачна */
-  if(!hitP && uPlanet > 0.5 && uPlanet < 1.5){
-    vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
-    float denom = dot(rd, nR);
-    if(abs(denom) > 0.0035){
-      float tR = -dot(camPos, nR)/denom;
-      if(tR > 0.05 && (!hitP || tR < tHit)){
-        vec3 q = camPos + rd*tR;
-        float rr = length(q);
-        if(rr > 1.45 && rr < 2.35){
-          float gap = smoothstep(1.76, 1.78, rr)*(1.0 - smoothstep(1.84, 1.86, rr));
-          float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
-          float edge = smoothstep(1.45, 1.52, rr)*(1.0 - smoothstep(2.28, 2.35, rr));
-          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
-          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
-          float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
-          alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
-          col = mix(col, vec3(0.85, 0.76, 0.58)*bright, alpha*0.9);
-        }
-      }
-    }
   }
+  
 
 
   /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
      тёплое ядро у полюса, холодное свечение на конце, турбулентные завихрения */
-  if(uPlanet > 2.5){
+  if(uHyper <= 0.5 && (uPlanet > 2.5 || uJetsOn > 0.5)){
     vec3 jC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
     vec3 jW = camPos - jC;
     float bJ = rd.y;
@@ -1512,19 +1567,19 @@ void main(){
       if(tJ > 0.0){
         float aJ = abs(sJ);
         /* длинные струи: вдоль оси до 6.5, колокол у полюса */
-        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, 6.5, aJ));
+        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, uJetsLen, aJ));
         /* расширение струи с высотой — конус плазмы */
         float wJ = 0.04;   /* постоянная ширина струи (не расширяется при отлёте) */
         vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
         float rJ = length(cpt);
         /* турбулентность: закрученные струи — смещение ядра по aJ */
-        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*0.0833);
+        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*uJetsSp);
         float off = 0.30*(1.0 - exp(-aJ*1.4));
         float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
         /* тёплое основание / холодная плазма сверху + неоновый обод */
         float cool = smoothstep(0.8, 4.2, aJ);
-        vec3 jetCol = mix(vec3(1.0,0.55,0.20), vec3(0.45,0.75,1.0), cool);
-        float twinkle = 0.75 + 0.25*sin(uTime*0.0833 + aJ*5.0);
+        vec3 jetCol = mix(uJetsC1, uJetsC2, cool);
+        float twinkle = 0.75 + 0.25*sin(uTime*uJetsSp + aJ*5.0);
         /* основной светящийся шлейф */
         col += jetCol*along*prof*twinkle*1.6;
         /* яркое ядро */
@@ -1536,11 +1591,114 @@ void main(){
       }
     }
   }
-  /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
+  /* ---- ДАЛЬНИЕ ПЛАНЕТЫ (3D-ЛОД) + ГИПЕР 4-я: корректное перекрытие без z-буфера.
+       Ищем ближайшую по лучу сферу (минимальный t) среди всех кандидатов и рисуем
+       только её — это убирает просвечивание/наложение планет сквозь планеты. ---- */
+  float bestT = 1.0e9;
+  vec3 sphCol = vec3(0.0);
+  bool haveSph = false;
+  for(int di = 0; di < 8; di++){
+    if(di >= int(uPCount + 0.5)) break;
+    vec3 pc = uP[di];
+    int dk = int(uPKa[di] + 0.5);
+    if(di < int(uPCount + 0.5)){
+      vec3 wc = camPos - pc;
+      float bb = dot(wc, rd);
+      float cc2 = dot(wc, wc) - R*R;
+      float dsc = bb*bb - cc2;
+      if(dsc > 0.0){
+        float th = -bb - sqrt(dsc);
+        if(th > 0.0 && th < bestT && (!hitP || th < tHit)){
+          vec3 pp = camPos + rd*th;
+          vec3 nn = normalize(pp - pc);
+          float dnl  = dot(nn, sunDir);
+          float dlit = smoothstep(-0.02, 0.10, dnl);
+          gRow = uPIa[di];
+          gCur = 0.0;
+          sphCol = shadeSurface(dk, nn, dlit, rd, sunDir);
+          float muL = clamp(dot(nn, -rd), 0.0, 1.0);
+          sphCol *= (0.38 + 0.62*pow(muL, 0.55));
+          float bt2 = (dnl - 0.015)/0.085;
+          float bandT = exp(-bt2*bt2);
+          sphCol += vec3(1.0, 0.44, 0.20)*bandT*0.30*max(dlit, 0.12);
+          bestT = th; haveSph = true;
+        }
+      }
+    }
+  }
+  /* гиперпространство: 4-я сфера (текущая планета, мировые координаты) — тоже кандидат */
+  if(uHyper > 0.5){
+    vec3 wc4 = camPos - uP4;
+    float bb4 = dot(wc4, rd);
+    float cc4 = dot(wc4, wc4) - R*R;
+    float ds4 = bb4*bb4 - cc4;
+    if(ds4 > 0.0){
+      float th4 = -bb4 - sqrt(ds4);
+      if(uHyper > 0.5 && th4 > 0.0 && th4 < bestT && (!hitP || th4 < tHit)){
+        vec3 pp4 = camPos + rd*th4;
+        vec3 nn4 = normalize(pp4 - uP4);
+        float nl4  = dot(nn4, sunDir);
+        float lit4 = smoothstep(-0.02, 0.10, nl4);
+        gRow = uPIcur;
+        gCur = 1.0;
+        sphCol = shadeSurface(int(uPK4 + 0.5), nn4, lit4, rd, sunDir);
+        float muL4 = clamp(dot(nn4, -rd), 0.0, 1.0);
+        sphCol *= (0.38 + 0.62*pow(muL4, 0.55));
+        float bt24 = (nl4 - 0.015)/0.085;
+        float bandT4 = exp(-bt24*bt24);
+        sphCol += vec3(1.0, 0.44, 0.20)*bandT4*0.30*max(lit4, 0.12);
+        bestT = th4; haveSph = true;
+      }
+    }
+    /* солнце гиперпространства — диск и ореол в замороженной точке sunDir */
+    float hSun = dot(rd, sunDir);
+    col += vec3(1.0,0.72,0.40)*pow(max(hSun,0.0), 8.0)*0.50;
+    col += vec3(1.0,0.80,0.50)*pow(max(hSun,0.0), 350.0)*0.9;
+    col += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, hSun)*3.0;
+  }
+  if(haveSph){ col = sphCol; }
+/* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
+  /* RING-DEPTH: кольца — последний слой глубины (после планет); окклюзия на пиксель */
+  if(uHyper <= 0.5 && uRingOn > 0.5){
+    vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
+    float denom = dot(rd, nR);
+    if(abs(denom) > 0.0035){
+      float tR = -dot(camPos, nR)/denom;
+      if(tR > 0.05 && (!hitP || tR < tHit) && (!haveSph || tR < bestT)){
+        vec3 q = camPos + rd*tR;
+        float rr = length(q);
+        if(rr > uRingIn && rr < uRingOut){
+          float gap = smoothstep(mix(uRingIn,uRingOut,0.3444), mix(uRingIn,uRingOut,0.3667), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.4333), mix(uRingIn,uRingOut,0.4556), rr));
+          float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
+          float edge = smoothstep(uRingIn, mix(uRingIn,uRingOut,0.0778), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.9222), uRingOut, rr));
+          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
+          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
+          float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
+          alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
+          /* Убрать дальнюю дугу колец (за планетой от камеры): оставить только
+             полукольцо на ближней стороне. dot(q,camPos)>0 — та же сторона, что камера. */
+          float nearHalf = step(0.0, dot(q, camPos));
+          alpha *= nearHalf;
+          col = mix(col, uRingC*bright, alpha*0.9);
+          /* ТУМАН В КОЛЬЦАХ (ЧИЗИЯ): лёгкая слоистая дымка, гуще у внутреннего края
+             и на ночной стороне — как застывший туман диска кол. */
+          float rngFog = fbm3(q*3.5 + vec3(uTime*0.015, 0.0, 0.0));
+          float fogR = smoothstep(1.45, 1.55, rr)*(1.0 - smoothstep(1.9, 2.2, rr));
+          float fogRing = clamp((0.35 + 0.65*rngFog)*fogR*(0.6 + 0.4*shadow)*abs(denom)*20.0, 0.0, 1.0);
+          col = mix(col, uRingC*bright, fogRing*0.35);
+        }
+      }
+    }
+  }
+  /* дизеринг против бандинга */
   col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
-  col = col/(1.0 + col*0.30);
-  col = pow(col, vec3(0.92));
-  float vig = 1.0 - 0.22*dot(uv*0.55, uv*0.55);
+  /* PBR-тонмаппинг: white-preserving Reinhard (SuperDuperVanilla) + гамма 2.2 */
+  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  float wpres = 1.5; /* WHITE_PRESERVATION */
+  float tm = (luma * (1.0 + luma / (wpres*wpres))) / (1.0 + luma);
+  col = pow(max(col * (tm / max(luma, 1e-6)), 0.0), vec3(1.0 / 2.2));
+  /* мягкая виньетка */
+  float vig = 1.0 - 0.16*dot(uv*0.6, uv*0.6);
   col *= max(vig, 0.0);
   gl_FragColor = vec4(col, 1.0);
 }`;
@@ -1620,6 +1778,201 @@ const uCU = gl.getUniformLocation(prog, 'uCamU');
 const uCF = gl.getUniformLocation(prog, 'uCamF');
 const uPL = gl.getUniformLocation(prog, 'uPlanet');
 const uSP = gl.getUniformLocation(prog, 'uSplash');
+const uP  = gl.getUniformLocation(prog, 'uP');
+const uPKa = gl.getUniformLocation(prog, 'uPKa');
+const uPC = gl.getUniformLocation(prog, 'uPCount');
+const uHY = gl.getUniformLocation(prog, 'uHyper');
+const uP4 = gl.getUniformLocation(prog, 'uP4');
+const uK4 = gl.getUniformLocation(prog, 'uPK4');
+/* ==== FX/SURF-локации EFFECTFORGE ==== */
+const uAtmC = gl.getUniformLocation(prog, 'uAtmC');
+const uAtmGlow = gl.getUniformLocation(prog, 'uAtmGlow');
+const uAtmSize = gl.getUniformLocation(prog, 'uAtmSize');
+const uJetsOn = gl.getUniformLocation(prog, 'uJetsOn');
+const uJetsC1 = gl.getUniformLocation(prog, 'uJetsC1');
+const uJetsC2 = gl.getUniformLocation(prog, 'uJetsC2');
+const uJetsSp = gl.getUniformLocation(prog, 'uJetsSp');
+const uJetsLen = gl.getUniformLocation(prog, 'uJetsLen');
+const uRingOn = gl.getUniformLocation(prog, 'uRingOn');
+const uRingC = gl.getUniformLocation(prog, 'uRingC');
+const uRingSp = gl.getUniformLocation(prog, 'uRingSp');
+const uRingIn = gl.getUniformLocation(prog, 'uRingIn');
+const uRingOut = gl.getUniformLocation(prog, 'uRingOut');
+const uSpin = gl.getUniformLocation(prog, 'uSpin');
+const uPulseR = gl.getUniformLocation(prog, 'uPulseR');
+const uSurfScale = gl.getUniformLocation(prog, 'uSurfScale');
+const uOceanC = gl.getUniformLocation(prog, 'uOceanC');
+const uLand1C = gl.getUniformLocation(prog, 'uLand1C');
+const uLand2C = gl.getUniformLocation(prog, 'uLand2C');
+const uIceC = gl.getUniformLocation(prog, 'uIceC');
+const uIceCov = gl.getUniformLocation(prog, 'uIceCov');
+const uCloudC = gl.getUniformLocation(prog, 'uCloudC');
+const uCloudCov = gl.getUniformLocation(prog, 'uCloudCov');
+const uCityC = gl.getUniformLocation(prog, 'uCityC');
+const uCityK = gl.getUniformLocation(prog, 'uCityK');
+const uAurC = gl.getUniformLocation(prog, 'uAurC');
+const uAurK = gl.getUniformLocation(prog, 'uAurK');
+const uBand1C = gl.getUniformLocation(prog, 'uBand1C');
+const uBand2C = gl.getUniformLocation(prog, 'uBand2C');
+const uBand3C = gl.getUniformLocation(prog, 'uBand3C');
+const uStormC = gl.getUniformLocation(prog, 'uStormC');
+const uStormK = gl.getUniformLocation(prog, 'uStormK');
+const uHazeC = gl.getUniformLocation(prog, 'uHazeC');
+const uFogC = gl.getUniformLocation(prog, 'uFogC');
+const uRock1C = gl.getUniformLocation(prog, 'uRock1C');
+const uRock2C = gl.getUniformLocation(prog, 'uRock2C');
+const uLavaC = gl.getUniformLocation(prog, 'uLavaC');
+const uFresC = gl.getUniformLocation(prog, 'uFresC');
+const uRiverC = gl.getUniformLocation(prog, 'uRiverC');
+const uFres2C = gl.getUniformLocation(prog, 'uFres2C');
+const uPal = gl.getUniformLocation(prog, 'uPal');
+const uPIa = gl.getUniformLocation(prog, 'uPIa');
+const uPIcur = gl.getUniformLocation(prog, 'uPIcur');
+/* ==== EFFECTFORGE: дефолты по типам (= константы игры) и заливка fx текущей планеты ==== */
+function fxHex(h, d){
+  if(typeof h !== 'string'){ return d; }
+  var m = /^#?([0-9a-fA-F]{6})$/.exec(h.trim());
+  if(!m){ return d; }
+  var v = parseInt(m[1], 16);
+  return [((v>>16)&255)/255, ((v>>8)&255)/255, (v&255)/255];
+}
+function fxNum(v, d){ return (typeof v === 'number' && isFinite(v)) ? v : d; }
+/* ==== ПАЛИТРА ЛОДОВ: текстура 16x9 из PLANETS_DB (строка = планета) ====
+   колонки 0..6 — surf-цвета по типу, 7 — (scale/8, icecov, cloudcov, stormk),
+   8 — (cityk, aurk, pulse/8), 9 — (spin/8). NEAREST+CLAMP, юнит 0. ==== */
+var PAL_TEX = null, PAL_SIG = '';
+function palBuildUpload(){
+  if(!gl || !uPal) return;
+  var pl = (PLANETS_DB && PLANETS_DB.planets) ? PLANETS_DB.planets : [];
+  var sig = JSON.stringify(pl);
+  if(PAL_TEX && sig === PAL_SIG) return;
+  PAL_SIG = sig;
+  var W = 16, H = 9;
+  var data = new Uint8Array(W*H*4);
+  function pc(h, dh){
+    var r = fxHex(h, null);
+    if(!r) r = fxHex(dh, null);
+    return r || [1, 1, 1];
+  }
+  function put(row, col, rgb, a){
+    var o = ((row*W) + col)*4;
+    data[o] = Math.round(Math.max(0, Math.min(1, rgb[0]))*255);
+    data[o+1] = Math.round(Math.max(0, Math.min(1, rgb[1]))*255);
+    data[o+2] = Math.round(Math.max(0, Math.min(1, rgb[2]))*255);
+    data[o+3] = Math.round(Math.max(0, Math.min(1, a || 0))*255);
+  }
+  for(var i = 0; i < H; i++){
+    var e = pl[i] || {};
+    var f = e.fx || {};
+    var d = FXDEF[pKind(i)] || FXDEF[0];
+    var surf = f.surf || d.surf;
+    var kind = pKind(i);
+    var s = kind === 1
+      ? [surf.b1, surf.b2, surf.b3, surf.storm, surf.fres, surf.haze, surf.fog]
+      : kind === 2
+      ? [surf.r1, surf.r2, surf.lava, surf.fres, surf.r1, surf.r1, surf.r1]
+      : kind === 3
+      ? [surf.r1, surf.r2, surf.river, surf.fres, surf.r1, surf.r1, surf.r1]
+      : [surf.ocean, surf.land1, surf.land2, surf.ice, surf.cloud, surf.city, surf.aur];
+    for(var c2 = 0; c2 < 7; c2++) put(i, c2, pc(s[c2], d.surf[['ocean','land1','land2','ice','cloud','city','aur'][c2]] || d.surf.r1), 0);
+    put(i, 7, [fxNum(surf.scale, d.surf.scale)/8, fxNum(surf.icecov, d.surf.icecov), fxNum(surf.cloudcov, d.surf.cloudcov), fxNum(surf.stormk, d.surf.stormk)], 0);
+    put(i, 8, [fxNum(surf.cityk, d.surf.cityk), fxNum(surf.aurk, d.surf.aurk), fxNum(f.pulse, d.pulse)/8, 0], 0);
+    put(i, 9, [fxNum(f.spin, d.spin)/8, 0, 0, 0], 0);
+  }
+  if(!PAL_TEX) PAL_TEX = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, PAL_TEX);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(uPal, 0);
+}
+var FXDEF = {
+  0: { atm:'#4d8cff', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:0, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              ocean:'#051a38', land1:'#14421a', land2:'#6b5c33', ice:'#d9e6f2', cloud:'#f2f7ff', city:'#ffbf59', aur:'#1ae673' } },
+  1: { atm:'#905000', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:0, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:1, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              b1:'#decca0', b2:'#b88c57', b3:'#ede0bd', storm:'#cc6b38', fres:'#e6bf80', haze:'#e6b873', fog:'#ebcc94' } },
+  2: { atm:'#300090', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:0, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              r1:'#0d0b0d', r2:'#29211f', lava:'#ff610f', fres:'#ff731a' } },
+  3: { atm:'#0a1e4d', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:1, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              r1:'#0d0b0d', r2:'#29211f', river:'#eff5f9', fres:'#99ccff' } }
+};
+function fxPush(pi){
+  var d = FXDEF[pKind(pi)] || FXDEF[0];
+  var e = (PLANETS_DB && PLANETS_DB.planets && PLANETS_DB.planets[pi]) || {};
+  var f = e.fx || {};
+  var jets = f.jets || d.jets, ring = f.ring || d.ring, surf = f.surf || d.surf;
+  var atm = fxHex(f.atm, fxHex(d.atm, [0.30,0.55,1.0]));
+  gl.uniform3f(uAtmC, atm[0], atm[1], atm[2]);
+  gl.uniform1f(uAtmGlow, fxNum(f.glow, d.glow));
+  gl.uniform1f(uAtmSize, fxNum(f.size, d.size));
+  gl.uniform1f(uSpin, fxNum(f.spin, d.spin));
+  gl.uniform1f(uPulseR, fxNum(f.pulse, d.pulse));
+  gl.uniform1f(uJetsOn, fxNum(jets.on, d.jets.on));
+  var jc1 = fxHex(jets.c1, fxHex(d.jets.c1, [1,0.55,0.2]));
+  var jc2 = fxHex(jets.c2, fxHex(d.jets.c2, [0.45,0.75,1.0]));
+  gl.uniform3f(uJetsC1, jc1[0], jc1[1], jc1[2]);
+  gl.uniform3f(uJetsC2, jc2[0], jc2[1], jc2[2]);
+  gl.uniform1f(uJetsSp, fxNum(jets.sp, d.jets.sp));
+  gl.uniform1f(uJetsLen, fxNum(jets.len, d.jets.len));
+  gl.uniform1f(uRingOn, fxNum(ring.on, d.ring.on));
+  var rc = fxHex(ring.c, fxHex(d.ring.c, [0.85,0.76,0.58]));
+  gl.uniform3f(uRingC, rc[0], rc[1], rc[2]);
+  gl.uniform1f(uRingSp, fxNum(ring.sp, d.ring.sp));
+  gl.uniform1f(uRingIn, fxNum(ring.in, d.ring.in));
+  gl.uniform1f(uRingOut, fxNum(ring.out, d.ring.out));
+  gl.uniform1f(uSurfScale, fxNum(surf.scale, d.surf.scale));
+  gl.uniform1f(uIceCov, fxNum(surf.icecov, d.surf.icecov));
+  gl.uniform1f(uCloudCov, fxNum(surf.cloudcov, d.surf.cloudcov));
+  gl.uniform1f(uCityK, fxNum(surf.cityk, d.surf.cityk));
+  gl.uniform1f(uAurK, fxNum(surf.aurk, d.surf.aurk));
+  gl.uniform1f(uStormK, fxNum(surf.stormk, d.surf.stormk));
+  var cols = [['uOceanC', surf.ocean, d.surf.ocean], ['uLand1C', surf.land1, d.surf.land1],
+    ['uLand2C', surf.land2, d.surf.land2], ['uIceC', surf.ice, d.surf.ice],
+    ['uCloudC', surf.cloud, d.surf.cloud], ['uCityC', surf.city, d.surf.city],
+    ['uAurC', surf.aur, d.surf.aur], ['uBand1C', surf.b1, d.surf.b1],
+    ['uBand2C', surf.b2, d.surf.b2], ['uBand3C', surf.b3, d.surf.b3],
+    ['uStormC', surf.storm, d.surf.storm], ['uHazeC', surf.haze, d.surf.haze],
+    ['uFogC', surf.fog, d.surf.fog], ['uRock1C', surf.r1, d.surf.r1],
+    ['uRock2C', surf.r2, d.surf.r2], ['uLavaC', surf.lava, d.surf.lava],
+    ['uFresC', surf.fres, d.surf.fres], ['uRiverC', surf.river, d.surf.river],
+    ['uFres2C', surf.fres, d.surf.fres]];
+  var colDefs = [
+    ['uOceanC', surf.ocean, d.surf.ocean], ['uLand1C', surf.land1, d.surf.land1],
+    ['uLand2C', surf.land2, d.surf.land2], ['uIceC', surf.ice, d.surf.ice],
+    ['uCloudC', surf.cloud, d.surf.cloud], ['uCityC', surf.city, d.surf.city],
+    ['uAurC', surf.aur, d.surf.aur], ['uBand1C', surf.b1, d.surf.b1],
+    ['uBand2C', surf.b2, d.surf.b2], ['uBand3C', surf.b3, d.surf.b3],
+    ['uStormC', surf.storm, d.surf.storm], ['uHazeC', surf.haze, d.surf.haze],
+    ['uFogC', surf.fog, d.surf.fog], ['uRock1C', surf.r1, d.surf.r1],
+    ['uRock2C', surf.r2, d.surf.r2], ['uLavaC', surf.lava, d.surf.lava],
+    ['uFresC', surf.fres, d.surf.fres], ['uRiverC', surf.river, d.surf.river],
+    ['uFres2C', surf.fres, d.surf.fres]];
+  var UNIMAP = { uOceanC:uOceanC, uLand1C:uLand1C, uLand2C:uLand2C, uIceC:uIceC,
+    uCloudC:uCloudC, uCityC:uCityC, uAurC:uAurC, uBand1C:uBand1C, uBand2C:uBand2C,
+    uBand3C:uBand3C, uStormC:uStormC, uHazeC:uHazeC, uFogC:uFogC, uRock1C:uRock1C,
+    uRock2C:uRock2C, uLavaC:uLavaC, uFresC:uFresC, uRiverC:uRiverC, uFres2C:uFres2C };
+  for(var ci = 0; ci < colDefs.length; ci++){
+    var cv = fxHex(colDefs[ci][1], fxHex(colDefs[ci][2], [1,1,1]));
+    gl.uniform3f(UNIMAP[colDefs[ci][0]], cv[0], cv[1], cv[2]);
+  }
+  palBuildUpload(); /* палитра лодов: пересборка при изменении реестра (импорт fx) */
+}
+
 
 function resize(){
   /* OPT: ограничиваем DPR фона (база только рендер фона, не интерфейса) */
@@ -1653,16 +2006,19 @@ function frame(now){
   resize();
   const dt = Math.min((now - last)/1000, 0.1);
   last = now;
-  simTime += dt*SIM_TIME_SCALE;
+  const g = window.__gameState;
+  /* В ГИПЕРКРУИЗЕ солнце не движется: замораживаем simTime (и __bgSim/sunA),
+     чтобы освещение и положение солнца стояли, как просил пользователь. */
+  const hypOn = !!(g && g.active && (window.inTransit || window.warp));
+  if(!hypOn){ simTime += dt*SIM_TIME_SCALE; }
   window.__bgSim = simTime;
   const sunA = 2*Math.PI*simTime/DAY_CYCLE_SIM_SEC;
-  const g = window.__gameState;
   /* OPT: плавная интерполяция параллакса (target приближается к курсору) */
   _parX += (_parTX - _parX) * Math.min(1, dt*6);
   _parY += (_parTY - _parY) * Math.min(1, dt*6);
 
   if(g && g.active){
-    gl.uniform1f(uPL, g.planet);
+    gl.uniform1f(uPL, pKind(g.planet));
     gl.uniform3f(uCP, g.pos[0], g.pos[1], g.pos[2]);
     gl.uniform3f(uCR, g.right[0], g.right[1], g.right[2]);
     gl.uniform3f(uCU, g.up[0], g.up[1], g.up[2]);
@@ -1671,7 +2027,7 @@ function frame(now){
     const camA = START_PHASE_RAD + 2*Math.PI*simTime/ORBIT_PERIOD_SIM_SEC;
     /* ПАРАЛЛАКС: лёгкий сдвиг орбитальной камеры за курсором (только фон) */
     const pxOff = _parX * PARALLAX_AMOUNT, pyOff = _parY * PARALLAX_AMOUNT * 0.6;
-    const cx = Math.cos(camA)*CAM_R + pxOff, cy = Math.sin(camA)*CAM_R - ((!g || !g.active) && window.__splashPlanet === 3 ? 0.14 : 0) + pyOff;
+    const cx = Math.cos(camA)*CAM_R + pxOff, cy = Math.sin(camA)*CAM_R - ((!g || !g.active) && pKind(window.__splashPlanet || 0) === 3 ? 0.14 : 0) + pyOff;
     let f0x = -Math.sin(camA), f0y = Math.cos(camA);
     let u0x = Math.cos(camA), u0y = Math.sin(camA);
     let f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
@@ -1681,7 +2037,7 @@ function frame(now){
     const r1z = f1x*u0y - f1y*u0x;
     /* upv = right x fwd */
     const p1x = -r1z*f1y, p1y = r1z*f1x;
-    gl.uniform1f(uPL, window.__splashPlanet || 0);
+    gl.uniform1f(uPL, (g && g.active) ? pKind(g.planet) : pKind(window.__splashPlanet || 0));
     gl.uniform3f(uCP, cx, cy, 0);
     gl.uniform3f(uCF, f1x, f1y, 0);
     gl.uniform3f(uCR, 0, 0, r1z);
@@ -1691,6 +2047,47 @@ function frame(now){
   gl.uniform2f(uRes, cv.width, cv.height);
   gl.uniform1f(uT, simTime);
   gl.uniform1f(uSA, sunA);
+  fxPush((g && g.active) ? g.planet : (window.__splashPlanet || 0));
+  /* hyper: в гиперпространстве шейдер рисует небо Нгалин + 4 сферы + солнце */
+  gl.uniform1f(uHY, hypOn ? 1.0 : 0.0);
+  /* 3D-ЛОД: передаём мировые позиции дальних планет (в кадре текущего игрока).
+     Камера в этом шейдере — относительная к текущей планете (position близко к 0),
+     поэтому позиция планеты k = PW[k] - PW[current]. Маска uPActive в битах. */
+  {
+    var cur = (g && g.active) ? g.planet : (window.__splashPlanet || 0);
+    var list = [], klist = [], pilist = [];
+    var WPSRC = window.PW;
+    if(Array.isArray(WPSRC) && Array.isArray(WPSRC[cur]) && typeof PKIND !== 'undefined'){
+      for(var pp = 0; pp < WPSRC.length; pp++){
+        if(pp === cur) continue;
+        /* hyper: камера в мировых координатах → позиции планет тоже мировые.
+           normal: камера относительно текущей планеты → позиции PW[pp]-PW[cur]. */
+        var off = hypOn
+          ? [WPSRC[pp][0], WPSRC[pp][1], WPSRC[pp][2]]
+          : [WPSRC[pp][0]-WPSRC[cur][0], WPSRC[pp][1]-WPSRC[cur][1], WPSRC[pp][2]-WPSRC[cur][2]];
+        list.push(off); klist.push(pKind(pp));   /* шейдеру нужен ТИП поверхности (0..3) */
+        pilist.push(pp);                         /* и СТРОКА палитры (индекс планеты) */
+      }
+    }
+    if(uP && uPC && list.length){
+      var flat = new Float32Array(24), kf = new Float32Array(8), pf = new Float32Array(8);
+      for(var f2 = 0; f2 < list.length && f2 < 8; f2++){
+        flat[f2*3] = list[f2][0]; flat[f2*3+1] = list[f2][1]; flat[f2*3+2] = list[f2][2];
+        kf[f2] = klist[f2];
+        pf[f2] = pilist[f2];
+      }
+      gl.uniform3fv(uP, flat);
+      gl.uniform1fv(uPKa, kf);
+      gl.uniform1fv(uPIa, pf);
+      gl.uniform1f(uPC, Math.min(list.length, 8));
+    }
+    /* ГИПЕРПРОСТРАНСТВО: 4-я сфера = текущая планета (в мировых координатах,
+       камера гиперкруиза уже в мире). Позиция PW[cur] и ТИП её поверхности. */
+    if(uP4 && window.PW && window.PW[cur]) gl.uniform3f(uP4, window.PW[cur][0], window.PW[cur][1], window.PW[cur][2]);
+    if(uK4 && window.PW && window.PW[cur]) gl.uniform1f(uK4, pKind(cur));
+    if(uPIcur) gl.uniform1f(uPIcur, cur);
+    if(window.DIAG_DUMP){ window.__diagP = { cur: cur, list: list, klist: klist }; }
+  }
   /* OPT: uSplash меняется редко — не шлём одинаковое значение каждый кадр */
   const spNow = (g && g.active) ? 0.0 : 1.0;
   if(_uSP !== spNow){ gl.uniform1f(uSP, spNow); _uSP = spNow; }
@@ -1800,27 +2197,66 @@ var keys = {}, drag = null, mouseCtl = false;
 /* ---------- ХИТОМИ: Жизнепригодная планета названая в честь игрока покарившего великий трактор в игре ELITE-DANGEROUS в центре галлактики находящийся под СТРЕЛЕЦ-А* в 460с.г и на 360с.л в сторону нетронног поля где огромное скопление нетронных Звезд , белых карликов и Чёрных дыр. ---------- */
 /* ---------- ЧИЗИЯ : Какой сырный мишка не захочит себе огромнуя планет состоящию из сыра. Планета была притянута Разумными плюшивыми медведями с планеты ХИТОМИ спомощью квантового гравитационного завхвата. И зачем они это сделали ? Теперь по звездной системе летает сыр и остатки когдато пышных колец этой планеты. Говорят они состояли из кексиков.  ---------- */
 /* ---------- НГАЛИН: Гравитационные Эксперементы плюшевых медведий с притяжением ЧИЗИИ закончились притяжением когдато брошенной в сторону Дарк войда старшего брата планеты ХИТОМИ . ХИТОМИ не хотела чтобы НГАЛИН Держался постоянно за нее и жил дальше сам . Однако из за Плюшевых медведей ХИТОМИ некогда не избавится от НГАЛИН. ---------- */
-var planet = 0, PLANET_NAMES = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН', 'ШИНРАРТА-B'];
+/* ===== PLANETS_DB — объявлена в отдельном блоке до R46-фона (см. выше) ===== */
+var planet = 0, PLANET_NAMES = PLANETS_DB.planets.map(function(p){ return p.name; });
 var OCCL_Y = 0; /* вертикальный центр окклюзии: звезда опущена на заставке */
 var gameOn = false, switching = false, paused = false, pauseEl = null;
 
 /* ---------- ЗВУК: звук грузится по URL: Music-1.ogg / Music-2.ogg / Music-3.ogg (свой трек на планету), loop1.ogg, loop2.ogg рядом с HTML ---------- */
 var AUDIO_URLS = { music: 'Music-1.ogg', cake: 'loop1.ogg', cheese: 'loop2.ogg', moon: 'moon.ogg', pepper: 'pepper.ogg', heart: 'heart.ogg' };
+if(typeof PLANETS_DB !== 'undefined' && PLANETS_DB.planets && PLANETS_DB.planets[0] && PLANETS_DB.planets[0].track){
+  AUDIO_URLS.music = PLANETS_DB.planets[0].track; /* старт — трек первой планеты из реестра */
+}
 var audioWarn = {};
 
 var sfx = { music: null, cake: null, cheese: null, moon: null, pepper: null, heart: null, musicOn: true, started: false };
+/* file:// CORS: при открытии .html двойным кликом относительные URL не грузятся.
+   Превращаем их в абсолютные file:/// ссылки на тот же файл. */
+function relURL(p){
+  if(p && typeof p === 'string'){
+    if(/^(https?:|file:|data:)/.test(p)) return p;
+    try{
+      if(window.location && window.location.protocol === 'file:'){
+        var base = window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/') + 1);
+        return 'file:///' + base.replace(/^\//, '') + p;
+      }
+    }catch(e){}
+  }
+  return p;
+}
 function loadAudio(name){
   try{
-    var a = new Audio(AUDIO_URLS[name]);
+    var a = new Audio(relURL(AUDIO_URLS[name]));
     a.addEventListener('error', function(){
       if(!audioWarn[name]){ audioWarn[name] = true; console.warn('[ИГРА] Файл ' + AUDIO_URLS[name] + ' не найден рядом с HTML — этот звук не заиграет'); }
     });
     return a;
   }catch(e){ return null; }
 }
+var __preloaded = false;
+function preloadAllTracks(){
+  if(__preloaded) return;
+  __preloaded = true;
+  var names = {};
+  names['Star-1.ogg'] = 1;
+  for(var mi = 1; mi <= 3; mi++) names['Music-' + mi + '.ogg'] = 1;
+  var arr = (window.PLANETS_DB && PLANETS_DB.planets) || [];
+  for(var pj = 0; pj < arr.length; pj++){
+    if(arr[pj] && arr[pj].track) names[arr[pj].track] = 1;
+  }
+  for(var k in names){
+    try{
+      var a = new Audio(relURL(k));
+      a.preload = 'auto';
+      a.addEventListener('error', function(){ console.warn('[ИГРА] Трек не найден рядом с HTML: ' + k); });
+    }catch(e){}
+  }
+}
+
 function ensureAudio(){
   if(sfx.started) return;
   sfx.music = loadAudio('music');
+  try{ preloadAllTracks(); }catch(e){}
   if(sfx.music){ sfx.music.loop = true; sfx.music.volume = 0.45; }
   sfx.cake = loadAudio('cake');
   sfx.cheese = loadAudio('cheese');
@@ -2017,7 +2453,7 @@ function updBottomPanel(){
   if(boostFillEl._bf !== bf){ boostFillEl.style.filter = bf; boostFillEl._bf = bf; }
   updHotbar();
   if(expFillEl){
-    var TH = CFG.EXP_STEPS.concat([CFG.EXP_WIN]);
+    var TH = []; for(var ti = 1; ti < PLANETS_DB.planets.length; ti++) TH.push(PLANETS_DB.planets[ti].unlock); TH.push(CFG.EXP_WIN);
     var lvl = 0; while(lvl < TH.length && expTotal >= TH[lvl]) lvl++;
     var lo = (lvl === 0) ? 0 : TH[lvl - 1];
     var hi = TH[Math.min(lvl, TH.length - 1)];
@@ -2048,7 +2484,7 @@ function useImmunity(){
 /* ---------- POWERUP: магнит, залп, самонаводка, вспышка, заморозка, обмен ---------- */
 function playMagnet(){
   try{
-    if(!magnetSnd) magnetSnd = new Audio('magnet.ogg');
+    if(!magnetSnd) magnetSnd = new Audio(relURL('magnet.ogg'));
     var a = magnetSnd.cloneNode(); a.volume = 0.6;
     var p = a.play(); if(p && p.catch) p.catch(function(){});
   }catch(e){}
@@ -2102,6 +2538,9 @@ function useHot(i){
   if(!gameOn || gameOver) return;
   var d = HOT_DEFS[i];
   if(!d) return;
+  if(inTransit && (d.id === 'volley' || d.id === 'homing' || d.id === 'flash')){
+    hotDeny(i); return; /* фантом-фикс: выстрелы не летают в гиперпространстве */
+  }
   if(d.id === 'shield'){
     if(immuneT > 0) return;
     if(moonStock < 1){ hotDeny(i); return; }
@@ -2193,6 +2632,14 @@ function fireHoming(){
   playPickup('cake');
 }
 function tickShots(dt){
+  if(inTransit){
+    for(var si = shots.length - 1; si >= 0; si--){
+      var sh0 = shots[si];
+      if(sh0.el && sh0.el.parentNode) sh0.el.parentNode.removeChild(sh0.el);
+    }
+    shots.length = 0;
+    return;
+  }
   for(var i = shots.length - 1; i >= 0; i--){
     var sh = shots[i];
     if(sh.type === 'ck'){
@@ -2517,7 +2964,7 @@ function spawnOrbit(kind, glyph, rmin, rmax, sz, wbase, pi){
     axis: norm(ax), w: wbase + Math.random()*0.10, planet: pi, angle: 0, sz: sz });
 }
 function genWorld(){
-  for(var pi = 0; pi < 4; pi++){
+  for(var pi = 0; pi < PLANET_NAMES.length; pi++){
     for(var ci = 0; ci < CFG.CAKE_N; ci++) spawnOrbit('cake', '🧁', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
     for(var hi = 0; hi < CFG.CHEESE_N; hi++) spawnOrbit('cheese', '🧀', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, pi);
     for(var bj = 0; bj < CFG.BIG_CAKE_N; bj++) spawnOrbit('cake', '🧁', CFG.OUT_RMIN, CFG.OUT_RMAX, CFG.PICK_RAD*2, 0.05, pi);
@@ -2590,7 +3037,13 @@ function project(p, cam, W, H){
   var tC = -dot(cam.pos, dir) - OCCL_Y*dir[1];
   if(tC > 0 && tC < dist){
     var q = add(cam.pos, mul(dir, tC));
-    if(dot(q,q) + OCCL_Y*(2.0*q[1] + OCCL_Y) < 1.0) return { occl: true };
+    if(dot(q,q) + OCCL_Y*(2.0*q[1] + OCCL_Y) < 1.0){
+      var ox = dot(v, cam.right)/(z*CFG.FOV_TAN);
+      var oy = dot(v, cam.up)/(z*CFG.FOV_TAN);
+      var osx = (ox*H + W)/2;
+      var osy = (H - oy*H)/2;
+      return { occl: true, x: osx, y: osy, z: z };
+    }
   }
   var ux = dot(v, cam.right)/(z*CFG.FOV_TAN);
   var uy = dot(v, cam.up)/(z*CFG.FOV_TAN);
@@ -2756,19 +3209,9 @@ function physics(dt){
     var ceil = CFG.SPD_MAX*(1 + Math.max(0, dd - 2)*FSD_SC_GAIN);
     ceil = Math.min(ceil, CFG.SPD_MAX*FSD_SC_CAP)*boostMul;
     speed = Math.max(CFG.SPD_MIN, Math.min(ceil, speed));
-    /* перегон по синусоиде: общее пространство, планеты в один ряд.
-       Путь = дуга синусоиды, его длина зависит от крутизны SIN_AMP */
-    var segA = 0, segB = 0;
-    if(dn === 0){ segA = PW[0][0]; segB = PW[1][0]; }
-    else if(dn === PW.length - 1){ segA = PW[PW.length-2][0]; segB = PW[PW.length-1][0]; }
-    else if(FT.pos[0] < PW[dn][0]){ segA = PW[dn-1][0]; segB = PW[dn][0]; }
-    else { segA = PW[dn][0]; segB = PW[dn+1][0]; }
-    var sT = (FT.pos[0] - segA)/((segB - segA) || 1);
-    sT = Math.max(0, Math.min(1, sT));
-    var laneY = SIN_AMP*Math.sin(Math.PI*sT);
-    var laneK = Math.min(1, 2.2*dt);
-    FT.pos[1] += (laneY - FT.pos[1])*laneK;
-    FT.pos[2] += (0 - FT.pos[2])*laneK;
+    /* ГИПЕРПРОСТРАНСТВО = свободный 3D-полёт во все стороны, как вокруг планеты,
+       только в мировых координатах: без принудительного коридора/перегона.
+       FT.pos двигается по направлению взгляда (ниже: P.pos += P.fwd*speed*dt). */
   } else {
     speed = Math.max(CFG.SPD_MIN, Math.min(CFG.SPD_MAX*boostMul, speed));
   }
@@ -2845,23 +3288,10 @@ function drawSprites(cam, W, H, bgSim, dt){
         p = np2;
       }
     }
-    if(inTransit){
-      /* ЛОД ПЛАНЕТЫ: в гиперпространстве предметы — проекция вокруг лода, сбор отключён */
-      var pw2 = add(PW[planet], p);
-      var pr2 = projectW(pw2, cam, W, H);
-      if(!pr2){ it.el.style.display = 'none'; continue; }
-      var sz2 = Math.max(14, Math.min(H*0.5, ((it.sz || 0.052)/pr2.z)*H*3));
-      it.el.style.display = 'block';
-      it.el.style.transform = 'translate(' + pr2.x.toFixed(1) + 'px,' + pr2.y.toFixed(1) + 'px) translate(-50%,-50%)';
-      it.el.style.fontSize = sz2.toFixed(1) + 'px';
-      it.el.style.opacity = '0.95';
-      it.el.style.filter = 'brightness(0.8)';
-      it.el.style.zIndex = '4010';
-      continue;
-    }
+    
     pr = project(p, cam, W, H);
     if(!pr || pr.occl){ it.el.style.display = 'none'; continue; }
-    if(planet === 1){
+    if(PLANETS_DB.planets[planet].rings){
       var v2 = sub(p, cam.pos), d2 = len(v2);
       if(ringOccl(cam.pos, mul(v2, 1/(d2||1)), d2)){ it.el.style.display = 'none'; continue; }
     }
@@ -2878,11 +3308,11 @@ function drawSprites(cam, W, H, bgSim, dt){
     if(it.kind === 'pepper'){ it._sx = pr.x; it._sy = pr.y; }
     if(gameOn && !(it.kind === 'pepper' && (immuneT > 0 || freezeT > 0 || pepBanT > 0)) && len(sub(p, bearWp)) < CFG.PICK_RAD*(it.kind === 'moon' ? 1.5 : ((it.sz || 0.052) > 0.09 ? 2 : 1))) collect(it, pr);
   }
-  if(bearWrap && gameOn && !inTransit){
+  if(bearWrap && gameOn && !paused){
     var bpr = project(bearWp, cam, W, H);
     if(bpr && !bpr.occl){
       var bv = sub(bearWp, cam.pos), bd = len(bv);
-      var bo = (planet === 1) ? ringOccl(cam.pos, mul(bv, 1/(bd||1)), bd) : false;
+      var bo = (PLANETS_DB.planets[planet].rings) ? ringOccl(cam.pos, mul(bv, 1/(bd||1)), bd) : false;
       if(!bo){
         var bdl = dot(norm(bearWp), sun);
         var bsize = Math.max(28, Math.min(H*0.9, (BEAR_SZ/bpr.z)*H));
@@ -2907,11 +3337,9 @@ function drawSprites(cam, W, H, bgSim, dt){
 
 /* ---------- HUD И ПЕРЕКЛЮЧЕНИЕ ПЛАНЕТ ---------- */
 function updHud(){
-  var unlocked = PLANET_NAMES[0]
-    + (expTotal >= CFG.EXP_STEPS[0] ? ', ' + PLANET_NAMES[1] : '')
-    + (expTotal >= CFG.EXP_STEPS[1] ? ', ' + PLANET_NAMES[2] : '')
-    + (expTotal >= CFG.EXP_STEPS[2] ? ', ' + PLANET_NAMES[3] : '');
-  var txt = 'ПЛАНЕТА: ' + PLANET_NAMES[planet] + (planet === 3 ? ' ★ ФИНАЛ' : '')
+  var unlocked = PLANET_NAMES[0];
+  for(var ui = 1; ui < PLANET_NAMES.length; ui++) if(expTotal >= expNeed(ui)) unlocked += ', ' + PLANET_NAMES[ui];
+  var txt = 'ПЛАНЕТА: ' + PLANET_NAMES[planet] + (planet === FIN ? ' ★ ФИНАЛ' : '')
     + '\nОТКРЫТО: ' + unlocked
     + (mouseCtl ? '\nМЫШЬ: ВКЛ (P — вернуть курсор)' : '');
   /* OPT: кэш текста — не пишем в DOM, если значение не изменилось */
@@ -2927,13 +3355,19 @@ function updHud(){
   var pct = Math.round(speed/CFG.SPD_MAX*100);
   if(hudThrSegEl) segSetN(hudThrSegEl, Math.max(0, Math.min(250, pct)), 3);
 }
-function trackFor(p){ return (p === 3) ? 'Star-1.ogg' : 'Music-' + (p + 1) + '.ogg'; }
+
+function trackFor(p){
+  var e = (window.PLANETS_DB && PLANETS_DB.planets && PLANETS_DB.planets[p]) || null;
+  if(e && e.track) return e.track;
+  return (pKind(p) === 3) ? 'Star-1.ogg' : 'Music-' + (p % 3 + 1) + '.ogg';
+}
+
 function switchPlanet(dir){
   if(switching) return;
   var target = -1;
   if(dir > 0){
-    if(planet >= 3) return;
-    var need = CFG.EXP_STEPS[planet];
+    if(planet >= FIN) return;
+    var need = expNeed(planet + 1);
     if(expTotal < need){
       if(expFillEl){
         expFillEl.style.background = '#ff5a4a';
@@ -2945,8 +3379,8 @@ function switchPlanet(dir){
   } else {
     if(planet === 0){
       /* назад с ХИТОМИ — только к уже открытой звезде: раньше времени не переключит */
-      if(expTotal < CFG.EXP_STEPS[2]) return;
-      target = 3;
+      if(expTotal < expNeed(FIN)) return;
+      target = FIN;
     } else {
       target = planet - 1;
     }
@@ -3008,18 +3442,25 @@ var FSD_SC_GAIN = 0.3, FSD_SC_CAP = 24;   /* потолок суперкруиз
 var FSD_DOCK = 2.4, FSD_SOI = 11.0, SIN_AMP = 7.5; /* SIN_AMP — крутизна синусоиды перегона */ /* стыковка / стена закрытых / ГИПЕРПРОСТРАНСТВО начинается здесь (диск планеты на небе ~ как на скриншоте), а.е. */
 var WARP_SND = 'warp.ogg'; /* URL-ссылки отключены: локальный файл warp.ogg рядом с HTML */
 /* мировые позиции планет (радиус планеты = 1): ХИТОМИ, ЧИЗИЯ, НГАЛИН, ШИНРАРТА-B */
-var PW = [ [0,0,0], [33.2866,0,0], [99.5588,0,0], [152.3225,0,0] ]; /* один ряд по оси X: соседние расстояния как в 1.2.10 */
+var PW = PLANETS_DB.planets.map(function(p){ return p.pos.slice(); }); /* из реестра */
 /* градиентные заглушки планет удалены: тела рисуются процедурно (модуль ниже) */
 var inTransit = false;
 var FT = { pos: [0,0,0], fwd: [0,0,1], up: [0,1,0], right: [1,0,0] };
 var targetIdx = -1;
 var warp = null;
+/* Выставляем inTransit/warp в window через getter, чтобы webGL-фон (#glbg, отдельный IIFE)
+   читал их актуальное значение каждый кадр и включал uHyper (гипер-рендер). */
+try{
+  Object.defineProperty(window, 'inTransit', { get: function(){ return inTransit; }, configurable: true });
+  Object.defineProperty(window, 'warp', { get: function(){ return warp; }, configurable: true });
+}catch(e){}
+Object.defineProperty(window, 'PW', { get: function(){ return PW; }, configurable: true });
 var skyWrap = null, skyWrapEls = [], skyCvEls = [], skyLblEls = [], skyRet = null;
 var fsdAudio = null;
 var warpCv = null, warpCtx = null, warpStreaks = null;
 
-function unlockedIdx(k){ return (k <= 0) ? true : (expTotal >= CFG.EXP_STEPS[k-1]); }
-function expNeed(k){ return (k > 0) ? CFG.EXP_STEPS[k-1] : 0; }
+function unlockedIdx(k){ return (k <= 0) ? true : (expTotal >= PLANETS_DB.planets[k].unlock); }
+function expNeed(k){ return (k > 0) ? PLANETS_DB.planets[k].unlock : 0; }
 function toastFx(msg, col){
   var t = document.createElement('div');
   t.style.cssText = 'position:fixed;left:50%;bottom:56px;transform:translateX(-50%);z-index:120;font:700 12px/1 monospace;letter-spacing:2px;color:' + (col || '#7dff8a') + ';background:#0c150cdd;border:3px outset #950;border-radius:8px;padding:9px 16px;pointer-events:none;';
@@ -3078,31 +3519,31 @@ function hypGenStars(){
     }
     hypConst.push(pts);
   }
-  hypNeb = [                                       /* 3 туманности в цветах гиперпространства */
+  hypNeb = [                                       /* туманности холодные космические */
     { d: norm([0.7, 0.25, 0.6]),   r: 210, a: 0.085, col: '123,92,255' },
     { d: norm([-0.6, 0.4, 0.5]),  r: 170, a: 0.07,  col: '72,140,255' },
-    { d: norm([0.2, -0.65, -0.6]), r: 190, a: 0.06,  col: '255,92,208' }
+    { d: norm([0.2, -0.65, -0.6]), r: 190, a: 0.06,  col: '96,120,255' }
   ];
 }
 function drawHypSky(dt, cam){
   if(!hypCv) initHypSky();
   var on = gameOn && !!(inTransit || warp);
-  if(hypCv.style.display !== (on ? 'block' : 'none')) hypCv.style.display = on ? 'block' : 'none';
   /* курсор: прячем в суперкруизе и варпе, показываем у планеты и на паузе */
   var cur = (on && !paused) ? 'none' : '';
   if(document.documentElement.style.cursor !== cur) document.documentElement.style.cursor = cur;
   var bg0 = document.getElementById('glbg');
-  if(bg0) bg0.style.opacity = on ? '0' : '';
+  /* ГИПЕРПРОСТРАНСТВО рендерит webGL-фон(#glbg, uHyper=1) — готовый рендер ХИТОМИ.
+     2D-канвас hypCv не нужен и скрыт. */
+  if(bg0) bg0.style.opacity = '';
+  if(hypCv) hypCv.style.display = 'none';
   if(!on){ hypOnLast = false; return; }
+  hypOnLast = true;
+  return; /* гиперпространство = webGL-шейдер (#glbg), 2D-канвас отключён */
   hypOnLast = true;
   var W = window.innerWidth, H = window.innerHeight;
   if(hypCv.width !== W || hypCv.height !== H){ hypCv.width = W; hypCv.height = H; }
   var ctx = hypCtx;
   hypT += (dt || 0.016);
-  var g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, '#04050d'); g.addColorStop(0.55, '#050713'); g.addColorStop(1, '#070a18');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
   if(!hypStars) hypGenStars();
   var BIG = 1e6, i, pr;
   for(i = 0; i < hypNeb.length; i++){              /* туманности — под звёздами */
@@ -3121,8 +3562,8 @@ function drawHypSky(dt, cam){
     pr = project(mul(bd.d, BIG), cam, W, H);
     if(pr && !pr.occl){
       var gb2 = ctx.createRadialGradient(pr.x, pr.y, 0, pr.x, pr.y, bd.r);
-      gb2.addColorStop(0, 'rgba(96,110,150,' + bd.a.toFixed(3) + ')');
-      gb2.addColorStop(1, 'rgba(96,110,150,0)');
+      gb2.addColorStop(0, 'rgba(110,125,175,' + bd.a.toFixed(3) + ')');
+      gb2.addColorStop(1, 'rgba(110,125,175,0)');
       ctx.fillStyle = gb2;
       ctx.fillRect(pr.x - bd.r, pr.y - bd.r, bd.r*2, bd.r*2);
     }
@@ -3157,7 +3598,9 @@ function drawHypSky(dt, cam){
 }
 function setSpaceMode(){
   var bg = document.getElementById('glbg');
-  if(bg) bg.style.opacity = (inTransit || warp) ? '0' : '';
+  /* В гиперпространстве webGL-фон (#glbg, uHyper=1) рендерит готовое небо ХИТОМИ,
+     поэтому НЕ скрываем его в гиперперелёте. */
+  if(bg) bg.style.opacity = '';
 }
 /* ================= ☩ ПРОЦЕДУРНЫЕ НЕБЕСНЫЕ ТЕЛА ☩ =================
    Рендер 1:1: разрешение канвы равно размеру тела на экране, перерисовка
@@ -3198,7 +3641,7 @@ function pbInitTex(){
   }
   PB_TEX = [];
   for(var k = 0; k < PLANET_NAMES.length; k++){
-    if(k === 3){ PB_TEX.push(null); continue; } /* пульсар: без текстуры */
+    if(pKind(k) === 3){ PB_TEX.push(null); continue; } /* пульсар: без текстуры */
     var terr = new Uint8ClampedArray(TW*TH*3), cloud = new Uint8ClampedArray(TW*TH);
     for(var y = 0; y < TH; y++){
       var lat = (0.5 - y/(TH-1))*Math.PI;
@@ -3244,14 +3687,14 @@ function pbInitTex(){
 function renderPlanetBody(k, cv, size, L, simT){
   pbInitTex();
   var cw, ch;
-  if(k === 1){ cw = Math.ceil(size*2.6); ch = Math.ceil(size*1.4); }
-  else if(k === 3){ cw = Math.ceil(size*2.4); ch = Math.ceil(size*2.4); }
+  if(pKind(k) === 1){ cw = Math.ceil(size*2.6); ch = Math.ceil(size*1.4); }
+  else if(pKind(k) === 3){ cw = Math.ceil(size*2.4); ch = Math.ceil(size*2.4); }
   else { cw = Math.ceil(size); ch = Math.ceil(size); }
   if(cv.width !== cw || cv.height !== ch){ cv.width = cw; cv.height = ch; }
   cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
   cv.style.transform = 'translate(' + (-cw*0.5) + 'px,' + (-ch*0.5) + 'px)';
-  if(k === 3){ pbPulsar(cv.getContext('2d'), cw, ch, simT); return; }
-  if(k === 1){ pbCheese(cv.getContext('2d'), cw, ch, simT, L); return; }
+  if(pKind(k) === 3){ pbPulsar(cv.getContext('2d'), cw, ch, simT); return; }
+  if(pKind(k) === 1){ pbCheese(cv.getContext('2d'), cw, ch, simT, L); return; }
   pbPlanetBody(k, cv.getContext('2d'), cw, ch, simT, L);
 }
 function pbSample(tex, u, v){
@@ -3272,7 +3715,9 @@ function pbSpherePixel(tex, nx, ny, spin, drift, L, out){
   var cA2 = c[3]*0.00075*255/100*0.0; /* облака: доля 0..1 */
   cA2 = (c[3]/255)*0.75;
   var diff = Math.max(0, nx*L[0] - ny*L[1] + nz*L[2]);
-  var sh = (0.25 + 0.75*diff)*(0.6 + 0.4*nz);
+  /* ЛОД убран: планета показывается «как есть» — текстура поверхности всегда
+     различима, без чёрной ночной стороны. Объём оставляет мягкий терминатор. */
+  var sh = (0.62 + 0.38*diff)*(0.72 + 0.28*nz);
   out[0] = (c[0]*(1-cA2) + 255*cA2)*sh;
   out[1] = (c[1]*(1-cA2) + 255*cA2)*sh;
   out[2] = (c[2]*(1-cA2) + 255*cA2)*sh;
@@ -3424,26 +3869,62 @@ function drawPlanetsSky(cam, W, H, bgSim){
     if(k === planet && !inTransit) continue;
     var wp = inTransit ? PW[k] : sub(PW[k], PW[planet]);
     var pr = inTransit ? projectW(wp, cam, W, H) : project(wp, cam, W, H);
-    if(!pr || pr.occl) continue;
-    order.push({ k: k, pr: pr, wp: wp });
+    var edgeLbl = false;
+    if(!pr){
+      /* LBL-EDGE: центр сферы за кадром, но силуэт касается экрана —
+         считаем проекцию без отсечения и зажимаем метку в кадр */
+      var vF = sub(wp, cam.pos), zF = dot(vF, cam.fwd);
+      if(zF > 0.01){
+        var fux = dot(vF, cam.right)/(zF*CFG.FOV_TAN), fuy = dot(vF, cam.up)/(zF*CFG.FOV_TAN);
+        var fx = (fux*H + W)/2, fy = (H - fuy*H)/2;
+        var frad = Math.min(H*2.2, (1/zF)*H)*0.5;
+        var hidden = false;
+        if(!inTransit){
+          var dP2 = len(cam.pos), dF2 = len(vF);
+          var dirP2 = mul(cam.pos, -1/(dP2||1)), dirF2 = mul(vF, 1/(dF2||1));
+          var sepA2 = Math.acos(Math.max(-1, Math.min(1, dot(dirP2, dirF2))));
+          hidden = (sepA2 + Math.asin(Math.min(1, 1/(dF2||1))) <= Math.asin(Math.min(1, 1/(dP2||1))));
+        }
+        if(!hidden && fx > -frad && fx < W + frad && fy > -frad && fy < H + frad){
+          pr = { x: Math.max(26, Math.min(W - 26, fx)), y: Math.max(20, Math.min(H - 30, fy)), z: zF };
+          edgeLbl = true;
+        }
+      }
+    }
+    if(pr && pr.occl){
+      /* occl = луч к ЦЕНТРУ задет текущей планетой; подпись прячем только если
+         скрыт ВЕСЬ силуэт: sep + asin(1/dF) <= asin(1/dP) (обе сферы R=1). */
+      var dP = len(cam.pos), dvF = sub(wp, cam.pos), dF = len(dvF);
+      var dirP = mul(cam.pos, -1/(dP||1));
+      var dirF = mul(dvF, 1/(dF||1));
+      var sepA = Math.acos(Math.max(-1, Math.min(1, dot(dirP, dirF))));
+      var rP = Math.asin(Math.min(1, 1/(dP||1)));
+      var rF = Math.asin(Math.min(1, 1/(dF||1)));
+      if(sepA + rF <= rP) continue;
+      /* виден хотя бы край силуэта — подпись оставляем (координаты уже в pr) */
+    }
+    if(!pr) continue;
+    order.push({ k: k, pr: pr, wp: wp, edge: edgeLbl });
   }
   order.sort(function(a, b){ return b.pr.z - a.pr.z; }); /* дальние раньше, ближние поверх */
   var drawn = {};
   for(var o = 0; o < order.length; o++){
     var k2 = order[o].k, pr2 = order[o].pr, wp2 = order[o].wp;
+    var isEdge = order[o].edge;
     drawn[k2] = true;
+    /* 3D-ЛОД вынесен в WebGL-шейдер (#glbg) — 2D-канвас дальних планет скрываем.
+       Оставляем только мишень-ретикл и метку, чтобы цели/коллайдеры работали как раньше. */
     var size = Math.max(3, Math.min(H*2.2, (1/pr2.z)*H));
     var w2 = skyWrapEls[k2], cv = skyCvEls[k2], lbl = skyLblEls[k2];
     w2.style.display = 'block';
     w2.style.transform = 'translate(' + pr2.x.toFixed(1) + 'px,' + pr2.y.toFixed(1) + 'px)';
-    renderPlanetBody(k2, cv, size, L, bgSim);
-    cv.style.display = 'block';
+    if(cv) cv.style.display = 'none';
     lbl.style.display = 'block';
-    lbl.style.top = (size*0.5 + 7).toFixed(1) + 'px';
+    lbl.style.top = (isEdge ? 10 : size*0.5 + 7).toFixed(1) + 'px';
     var un = unlockedIdx(k2);
     lbl.style.color = un ? '#7dff8a' : '#ff5a4a';
     lbl.textContent = un ? PLANET_NAMES[k2] : '\u{1F512} ' + PLANET_NAMES[k2];
-    if(targetIdx === k2){
+    if(targetIdx === k2 && !isEdge){
       retDrawn = true;
       skyRet.style.display = 'block';
       var rs = size*1.8 + 14;
@@ -3457,7 +3938,7 @@ function drawPlanetsSky(cam, W, H, bgSim){
 }
 function fsdInitSound(){
   if(fsdAudio) return fsdAudio;
-  var a = new Audio(WARP_SND);
+  var a = new Audio(relURL(WARP_SND));
   a.addEventListener('error', function(){
     console.warn('[ИГРА] ' + WARP_SND + ' не найден рядом с HTML — прыжок пройдёт без звука');
   });
@@ -3584,11 +4065,11 @@ function fsdJump(dir){
   if(dir > 0){
     if(targetIdx >= 0){ target = targetIdx; }
     else {
-      if(planet >= 3){ toastFx('ФИНАЛ ДОСТИГНУТ — ПРЫЖОК НЕВОЗМОЖЕН', '#ff5a4a'); return; }
+      if(planet >= FIN){ toastFx('ФИНАЛ ДОСТИГНУТ — ПРЫЖОК НЕВОЗМОЖЕН', '#ff5a4a'); return; }
       target = planet + 1;
     }
   } else {
-    target = (planet === 0) ? 3 : planet - 1;
+    target = (planet === 0) ? FIN : planet - 1;
   }
   if(target === planet) return;
   if(expTotal < expNeed(target)){ denyExp(expNeed(target)); return; }
@@ -3814,7 +4295,7 @@ function loop(now){
         pos: CP.pos, fwd: CP.fwd, up: CP.up, right: CP.right };
     } else {
       var camA = 2*Math.PI*bgSim/2275.9;
-      var cx = Math.cos(camA)*1.034, cy = Math.sin(camA)*1.034 - (window.__splashPlanet === 3 ? 0.14 : 0);
+      var cx = Math.cos(camA)*1.034, cy = Math.sin(camA)*1.034 - (pKind(window.__splashPlanet || 0) === 3 ? 0.14 : 0);
       var f0x = -Math.sin(camA), f0y = Math.cos(camA);
       var u0x = Math.cos(camA), u0y = Math.sin(camA);
       var f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
