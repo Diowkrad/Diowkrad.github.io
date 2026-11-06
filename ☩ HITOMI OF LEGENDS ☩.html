@@ -1223,6 +1223,11 @@ uniform float uPCount; /* сколько дальних планет перед�
 uniform float uHyper;  /* 1 = гиперпространство: небо Нгалин, 4 сферы, солнце стоит */
 uniform vec3  uP4;     /* гиперпространство: позиция 4-й планеты (текущей), мировые координаты */
 uniform float uPK4;
+uniform vec3  uLensPos;
+uniform float uLensStr;
+uniform float uLensRad;
+uniform float uLensDopp;
+uniform float uLensActive;
 /* ==== FX/SURF-ЮНИФОРМЫ EFFECTFORGE (дефолты = константы игры) ==== */
 uniform vec3  uAtmC; uniform float uAtmGlow; uniform float uAtmSize;
 uniform float uJetsOn; uniform vec3 uJetsC1; uniform vec3 uJetsC2; uniform float uJetsSp; uniform float uJetsLen;
@@ -1309,6 +1314,32 @@ vec3 stars(vec3 rd){
     }
   }
   return c;
+}
+
+/* ГРАВИТАЦИОННАЯ ЛИНЗА ПУЛЬСАРОВ B/C: изгибает лучи вокруг массивного тела */
+vec3 lensBend(vec3 ro, vec3 rd){
+  vec3 center = uLensPos;
+  vec3 oc = ro - center;
+  float bL = dot(oc, rd);
+  vec3 closest = ro - rd*bL;
+  float impact = length(closest - center);
+  /* Внутренний радиус линзы всегда = радиусу пульсара; внешний = uLensRad.
+     Изгиб максимален сразу у края пульсара и спадает к внешнему радиусу. */
+  float rIn = R;
+  float rOut = max(uLensRad, rIn*1.05);
+  float band = clamp((rOut - impact) / (rOut - rIn), 0.0, 1.0);
+  float bend = uLensStr * band*band * 2.5;
+  bend = clamp(bend, 0.0, 2.5);
+  vec3 toC = normalize(center - closest + 1e-4);
+  return normalize(rd + toC*bend);
+}
+/* Доплеровское смещение фонового неба у пульсаров */
+vec3 dopplerShift(vec3 c, float impact){
+  float zone = uLensRad;
+  float tD = clamp(1.0 - impact/zone, 0.0, 1.0);
+  float d = mix(0.1, uLensDopp, tD);
+  vec3 shift = vec3(0.7, 0.85, 1.2) + d*vec3(0.0, 0.0, 0.25);
+  return c * shift;
 }
 
 /* ОСВЕЩЁННАЯ ПОВЕРХНОСТЬ ПЛАНЕТЫ: единый источник истины — близкая и дальние
@@ -1408,22 +1439,40 @@ void main(){
   vec3 fwd    = normalize(uCamF);
   vec3 right  = normalize(uCamR);
   vec3 upv    = normalize(uCamU);
-  vec3 rd     = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
+  vec3 rd0    = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
+  vec3 rd     = rd0;
   vec3 up0    = normalize(camPos);
+
+  /* ГРАВИТАЦИОННАЯ ЛИНЗА ПУЛЬСАРОВ B/C: сначала проверяем попадание в пульсар
+     ПО ИСХОДНОМУ лучу rd0 (неискривлённому), чтобы лучи, идущие прямо в пульсар,
+     НЕ изгибались и не выдалбливали дыру (фикс дырки в планете). */
+  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+  vec3 wC0 = camPos - sC;
+  float b0 = dot(wC0, rd0);
+  float cc0 = dot(wC0, wC0) - R*R;
+  float disc0 = b0*b0 - cc0;
+  float tHit0 = -b0 - sqrt(max(disc0, 0.0));
+  bool hitP  = (uHyper < 0.5) && (disc0 > 0.0) && (tHit0 > 0.0); /* PHANTOM-GATE: в гипере/суперкруизе сфера текущей планеты не существует — её место занимает дальний цикл реестра */
 
   /* солнце — экваториальный круг с лёгким наклоном; луна — отстает на 0.9 рад */
   float st = sin(uSunA), ct = cos(uSunA);
   vec3 sunDir  = normalize(vec3(ct, 0.22*st, st));
   vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
 
-  /* пересечение луча со сферой планеты */
-  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+  /* ГРАВИТАЦИОННАЯ ЛИНЗА применяется ТОЛЬКО к лучам, промахнувшимся мимо пульсара:
+     искривляем rd (фон искажается кольцом Эйнштейна), пульсар остаётся цельным. */
+  float tHit = tHit0;
+  if(hitP){
+    rd = rd0;
+  } else if(uLensActive > 0.5){
+    rd = lensBend(camPos, rd0);
+  } else {
+    rd = rd0;
+  }
+  /* проекция на выбранный луч — для ореола атмосферы/колец */
   vec3 wC = camPos - sC;
-  float b    = dot(wC, rd);
-  float cc   = dot(wC, wC) - R*R;
-  float disc = b*b - cc;
-  float tHit = -b - sqrt(max(disc, 0.0));
-  bool hitP  = (uHyper < 0.5) && (disc > 0.0) && (tHit > 0.0); /* PHANTOM-GATE: в гипере/суперкруизе сфера текущей планеты не существует — её место занимает дальний цикл реестра */
+  float b = dot(wC, rd);
+  float disc = b*b - dot(wC, wC) + R*R;
 
   float dayLocal = dot(normalize(camPos), sunDir);
   float dayness  = smoothstep(-0.25, 0.30, dayLocal);
@@ -1550,6 +1599,14 @@ void main(){
     }
   }
   
+  /* Доплеровское смещение фонового неба у пульсаров B/C (ветка неба) */
+  if(!hitP && uLensActive > 0.5){
+    vec3 ocL = camPos - uLensPos;
+    float bDL = dot(ocL, rd);
+    vec3 cDL   = camPos - rd*bDL;
+    float imp = length(cDL - uLensPos);
+    col = dopplerShift(col, imp);
+  }
 
 
   /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
@@ -1784,6 +1841,12 @@ const uPC = gl.getUniformLocation(prog, 'uPCount');
 const uHY = gl.getUniformLocation(prog, 'uHyper');
 const uP4 = gl.getUniformLocation(prog, 'uP4');
 const uK4 = gl.getUniformLocation(prog, 'uPK4');
+/* ==== ЛОКАЦИИ ЛИНЗЫ ПУЛЬСАРОВ B/C ==== */
+const uLensPos = gl.getUniformLocation(prog, 'uLensPos');
+const uLensStr = gl.getUniformLocation(prog, 'uLensStr');
+const uLensRad = gl.getUniformLocation(prog, 'uLensRad');
+const uLensDopp = gl.getUniformLocation(prog, 'uLensDopp');
+const uLensActive = gl.getUniformLocation(prog, 'uLensActive');
 /* ==== FX/SURF-локации EFFECTFORGE ==== */
 const uAtmC = gl.getUniformLocation(prog, 'uAtmC');
 const uAtmGlow = gl.getUniformLocation(prog, 'uAtmGlow');
@@ -2087,6 +2150,31 @@ function frame(now){
     if(uK4 && window.PW && window.PW[cur]) gl.uniform1f(uK4, pKind(cur));
     if(uPIcur) gl.uniform1f(uPIcur, cur);
     if(window.DIAG_DUMP){ window.__diagP = { cur: cur, list: list, klist: klist }; }
+  }
+  /* ==== ГРАВИТАЦИОННАЯ ЛИНЗА ПУЛЬСАРОВ B/C (в полёте у пульсара, не в гипере) ==== */
+  if(uLensPos && uLensStr && uLensRad && uLensDopp && uLensActive && window.PW && !hypOn){
+    var PWarr = window.PW;
+    var curRef = (PWarr[cur]) ? PWarr[cur] : [0,0,0];
+    var camF = (g && g.active && g.pos) ? [g.pos[0], g.pos[1], g.pos[2]] : [0,0,0];
+    var bp = (PWarr && PWarr[3]) ? PWarr[3] : null, cp6 = (PWarr && PWarr[6]) ? PWarr[6] : null;
+    var bestL = 1.0e12, bestPos = [0,0,0], bestDopp = 0.0, lensOn = 0.0;
+    var cands = [];
+    if(bp) cands.push([bp[0]-curRef[0], bp[1]-curRef[1], bp[2]-curRef[2]]);
+    if(cp6) cands.push([cp6[0]-curRef[0], cp6[1]-curRef[1], cp6[2]-curRef[2]]);
+    for(var li = 0; li < cands.length; li++){
+      var dx = camF[0]-cands[li][0], dy = camF[1]-cands[li][1], dz = camF[2]-cands[li][2];
+      var d = Math.sqrt(dx*dx+dy*dy+dz*dz);
+      if(d <= 10.0 && d < bestL){ bestL = d; bestPos = cands[li];
+        var t2 = Math.min(Math.max((10.0 - d) / (10.0 - 1.1), 0.0), 1.0);
+        bestDopp = 0.1 + (2.0 - 0.1) * t2;
+      }
+    }
+    if(bestL <= 10.0){ lensOn = 1.0; }
+    gl.uniform3f(uLensPos, bestPos[0], bestPos[1], bestPos[2]);
+    gl.uniform1f(uLensStr, 1.2);
+    gl.uniform1f(uLensRad, 3.0);
+    gl.uniform1f(uLensDopp, bestDopp);
+    gl.uniform1f(uLensActive, lensOn);
   }
   /* OPT: uSplash меняется редко — не шлём одинаковое значение каждый кадр */
   const spNow = (g && g.active) ? 0.0 : 1.0;
