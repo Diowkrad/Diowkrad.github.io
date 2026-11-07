@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☩ HITOMI ORBIT STAND v1 ☩ — тестовый стенд орбит системы Шинрарты</title>
+<style>
+  html,body{margin:0;height:100%;background:#05060d;overflow:hidden;font-family:'Courier New',monospace;}
+  #cv{display:block;width:100vw;height:100vh;cursor:grab;}
+  #cv.drag{cursor:grabbing;}
+  .panel{position:fixed;background:rgba(11,15,22,.88);border:3px outset #950;color:#cfd2e8;font-size:11px;padding:8px 10px;z-index:5;}
+  #hud{top:10px;left:10px;line-height:1.5;}
+  #hud .big{color:#a3ff52;font-size:15px;letter-spacing:1px;text-shadow:0 0 6px rgba(163,255,82,.6);}
+  #hud .lbl{color:#9fd8ff;font-size:9px;letter-spacing:2px;}
+  #hud .ddate{color:#f7cc1d;font-size:13px;}
+  #ctrl{bottom:10px;left:10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .btn{background:#111a2e;color:#f7cc1d;border:2px outset #950;padding:4px 9px;cursor:pointer;font:11px 'Courier New',monospace;}
+  .btn:hover{box-shadow:0 0 8px rgba(247,204,29,.5);}
+  .btn.on{background:#f79e1d;color:#99fffc;border:2px outset #4f8ee9;}
+  #legend{top:10px;right:10px;max-height:calc(100vh - 30px);overflow:auto;width:238px;line-height:1.45;}
+  #legend h3{margin:2px 0 6px;font-size:12px;color:#f7cc1d;letter-spacing:1px;}
+  #legend .row{display:flex;justify-content:space-between;gap:6px;border-bottom:1px solid #232a3d;padding:2px 0;}
+  #legend .nm{display:flex;gap:6px;align-items:center;overflow:hidden;white-space:nowrap;}
+  #legend .dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px;}
+  #legend .val{color:#a3ff52;white-space:nowrap;}
+  #info{bottom:10px;right:10px;width:250px;display:none;line-height:1.5;}
+  #info h3{margin:0 0 6px;font-size:12px;color:#f7cc1d;}
+  #info .k{color:#9fd8ff;} #info .v{color:#a3ff52;}
+  #hint{bottom:10px;left:50%;transform:translateX(-50%);color:#6c7594;font-size:10px;pointer-events:none;}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div class="panel" id="hud">
+  <div class="lbl"> sim-time </div>
+  <div class="big" id="ticks">0000000000</div>
+  <div class="lbl"> сутки Хитоми / дата Шинрарты </div>
+  <div class="big" id="days">0.0</div>
+  <div class="ddate" id="ddate">D1 · 01 · 01</div>
+</div>
+
+<div class="panel" id="legend">
+  <h3>☩ СИСТЕМА ШИНРАРТЫ ☩</h3>
+  <div id="lgrows"></div>
+</div>
+
+<div class="panel" id="info"></div>
+
+<div class="panel" id="ctrl">
+  <button class="btn" id="bpause">ПАУЗА</button>
+  <button class="btn spd" data-v="15">×¼</button>
+  <button class="btn spd on" data-v="60">×1</button>
+  <button class="btn spd" data-v="240">×4</button>
+  <button class="btn spd" data-v="720">×12</button>
+  <button class="btn spd" data-v="3600">×60</button>
+  <button class="btn" id="btop">СВЕРХУ</button>
+  <button class="btn" id="bcam">СБРОС КАМЕРЫ</button>
+</div>
+<div class="panel" id="hint">ЛКМ — вращение · колесо — зум · клик по шарику — данные · ×1 = 1 сутки/мин</div>
+
+<script>
+"use strict";
+/* ============ КОНСТАНТЫ КАЛЕНДАРЯ ШИНРАРТЫ ============ */
+const TICK_DAY = 36;            // тиков в сутках Хитоми (1 сим-час = сутки)
+const YEAR_HIT = 27.2;            // сут Хитоми в году Хитоми (Кеплер, a=0.118 а.е., M=0.3)
+const YEAR_D   = 364;             // сут в году Диовкрада — эталон системы
+const TICK_YEAR = TICK_DAY*YEAR_D;
+const UNIT_AE  = 19.5/0.118;      // игровых единиц в а.е. (по Хитоми в обитаемой зоне)
+const MSTAR    = 0.3;             // массы Солнца (красный карлик)
+
+/* ============ РЕЕСТР (pos — из PLANETS_DB v11) ============ */
+const PL = [
+ {name:'ХИТОМИ',      pos:[-19.15,0,3.66],    col:'#1e64ff', sz:1.75},
+ {name:'ШИНРАРТА-B',  pos:[ 21.95,36,-15.57], col:'#bfe8ff', sz:1.52},
+ {name:'ЧИЗИЯ',       pos:[-41.32,0,18.44],   col:'#905000', sz:1.61},
+ {name:'НГАЛИН',      pos:[-18.43,32,59.08],  col:'#300090', sz:1.17},
+ {name:'НЕМЕЗИДА',    pos:[ -1.95,0,-71.58],  col:'#005eff', sz:1.22},
+ {name:'Элизия',      pos:[ 61.26,0,61],      col:'#d400ff', sz:2.19},
+ {name:'Брэстла',     pos:[ 96.48,0,29.95],   col:'#eeff00', sz:1.02},
+ {name:'Шинрарта-С',  pos:[ 85.58,0,-66.13],  col:'#969696', sz:3.00},
+ {name:'Диовкрад',    pos:[-106.98,0,24.9],   col:'#ff0000', sz:1.145},
+];
+const STAR = {name:'Шинрарта-A', col:'#ff2a1a', sz:2.6};
+
+/* ============ КЕПЛЕР ДЛЯ КАЖДОЙ ПЛАНЕТЫ ============ */
+const vlen = v=>Math.hypot(v[0],v[1],v[2]);
+const norm = v=>{const l=vlen(v);return [v[0]/l,v[1]/l,v[2]/l];};
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+
+PL.forEach(p=>{
+  p.r  = vlen(p.pos);
+  p.rx = Math.hypot(p.pos[0],p.pos[2]);
+  p.aAE= p.r/UNIT_AE;
+  p.Pd = YEAR_HIT*Math.pow(p.r/19.5,1.5);      // год в сутках Хитоми
+  p.Pt = p.Pd*TICK_DAY;                         // тиков на оборот
+  p.om = 2*Math.PI/p.Pt;                        // рад/тик
+  p.inc= Math.asin(p.pos[1]/p.r);               // наклонение из реальных pos
+  const u = norm([p.pos[0],0,p.pos[2]]);        // узел = XZ-направление pos
+  const si=Math.sin(p.inc), ci=Math.cos(p.inc);
+  p.n  = norm([-si*u[0], ci, -si*u[2]]);        // нормаль орбитальной плоскости
+  p.A  = norm(p.pos);                           // радиус-вектор при t=0
+  p.B  = norm(cross(p.n,p.A));                  // касательная при t=0
+  p.th = 0;                                     // текущая фаза
+});
+
+/* ============ КАМЕРА ============ */
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let W=0,H=0;
+function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
+addEventListener('resize',resize);resize();
+
+let yaw=0.7, pitch=0.55, dist=300;
+const DEF={yaw:0.7,pitch:0.55,dist:300};
+let drag=null;
+
+cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,moved:false};cv.classList.add('drag');cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',e=>{
+  if(drag){
+    const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+    if(Math.abs(dx)+Math.abs(dy)>3)drag.moved=true;
+    yaw += dx*0.006; pitch = Math.min(1.45,Math.max(0.05,pitch+dy*0.006));
+    drag.x=e.clientX;drag.y=e.clientY;
+  } else hover(e);
+});
+cv.addEventListener('pointerup',e=>{
+  if(drag&&!drag.moved)pick(e);
+  drag=null;cv.classList.remove('drag');
+});
+cv.addEventListener('wheel',e=>{e.preventDefault();dist=Math.min(900,Math.max(60,dist*(e.deltaY>0?1.1:0.9)));},{passive:false});
+
+/* ============ СИМУЛЯЦИЯ ============ */
+let T=0, speed=60, paused=false;
+const SPEEDS=[15,60,240,720,3600];
+
+/* фон-звёзды (детерминированный) */
+const BG=[];let seed=42;const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};
+for(let i=0;i<260;i++)BG.push([rnd()*1,rnd(),rnd()*0.8+0.2]);
+
+/* ============ ПРОЕКЦИЯ ============ */
+let cy_,sy_,cp_,sp_,foc;
+function camUpdate(){cy_=Math.cos(yaw);sy_=Math.sin(yaw);cp_=Math.cos(pitch);sp_=Math.sin(pitch);foc=Math.min(W,H)*1.15;}
+function proj(p){
+  const x1=p[0]*cy_-p[2]*sy_, z1=p[0]*sy_+p[2]*cy_;
+  const y2=p[1]*cp_-z1*sp_,   z2=p[1]*sp_+z1*cp_;
+  const zc=z2+dist; if(zc<8)return null;
+  const s=foc/zc;
+  return [W/2+x1*s, H/2-y2*s, zc, s];
+}
+function posOf(p,t){
+  const th=p.om*t, c=Math.cos(th), s=Math.sin(th);
+  return [p.r*(c*p.A[0]+s*p.B[0]), p.r*(c*p.A[1]+s*p.B[1]), p.r*(c*p.A[2]+s*p.B[2])];
+}
+
+/* ============ РЕНДЕР ============ */
+let hovered=null, selected=null;
+function ballR(zc,sz){return Math.max(2.2, 850/zc*sz*0.55);}
+function drawBall(pr,col,r,name,glow){
+  const [x,y]=pr;
+  if(glow){
+    const g=ctx.createRadialGradient(x,y,r*0.3,x,y,r*5);
+    g.addColorStop(0,'rgba(255,120,60,.55)');g.addColorStop(0.4,'rgba(255,60,30,.18)');g.addColorStop(1,'rgba(255,40,20,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r*5,0,7);ctx.fill();
+  }
+  const g2=ctx.createRadialGradient(x-r*0.35,y-r*0.35,r*0.15,x,y,r);
+  g2.addColorStop(0,'#ffffff');g2.addColorStop(0.25,col);g2.addColorStop(1,'#05070c');
+  ctx.fillStyle=g2;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  if(hovered===name||selected===name){
+    ctx.strokeStyle='#f7cc1d';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.arc(x,y,r+6,0,7);ctx.stroke();ctx.setLineDash([]);
+  }
+  ctx.font='10px Courier New';ctx.textAlign='center';
+  ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillText(name,x+1,y+r+13);
+  ctx.fillStyle='#f7cc1d';ctx.fillText(name,x,y+r+12);
+}
+function drawOrbit(p){
+  ctx.strokeStyle=p.col+'38';ctx.lineWidth=1;ctx.beginPath();
+  let started=false;
+  for(let k=0;k<=96;k++){
+    const th=k/96*2*Math.PI, c=Math.cos(th), s=Math.sin(th);
+    const pr=proj([p.r*(c*p.A[0]+s*p.B[0]),p.r*(c*p.A[1]+s*p.B[1]),p.r*(c*p.A[2]+s*p.B[2])]);
+    if(!pr){started=false;continue;}
+    if(!started){ctx.moveTo(pr[0],pr[1]);started=true;}else ctx.lineTo(pr[0],pr[1]);
+  }
+  ctx.stroke();
+}
+function frame(now){
+  const dt=Math.min(0.05,(now-(frame.t||now))/1000);frame.t=now;
+  if(!paused)T+=dt*speed;
+  camUpdate();
+  ctx.fillStyle='#05060d';ctx.fillRect(0,0,W,H);
+  /* звёзды фона */
+  for(const s of BG){const pr=proj([(s[0]-0.5)*2200,(s[1]-0.5)*1400,-1400]);if(!pr)continue;
+    ctx.fillStyle='rgba(255,255,255,'+(0.25+s[2]*0.5)+')';ctx.fillRect(pr[0],pr[1],1.4,1.4);}
+  /* орбиты */
+  for(const p of PL)drawOrbit(p);
+  /* тела: дальние раньше */
+  const items=[];
+  for(const p of PL){const pr=proj(posOf(p,T));if(pr)items.push({pr,p,name:p.name});}
+  const st=proj([0,0,0]);if(st)items.push({pr:st,p:STAR,name:STAR.name,star:true});
+  items.sort((a,b)=>b.pr[2]-a.pr[2]);
+  for(const it of items){
+    const r=it.star? Math.max(4,1100/it.pr[2]*STAR.sz*0.55) : ballR(it.pr[2],it.p.sz);
+    drawBall([it.pr[0],it.pr[1]],it.p.col,r,it.name,it.star);
+  }
+  hud();
+  requestAnimationFrame(frame);
+}
+
+/* ============ HUD ============ */
+const el=id=>document.getElementById(id);
+function hud(){
+  el('ticks').textContent=String(Math.floor(T)).padStart(10,'0');
+  const day=Math.floor(T/TICK_DAY);
+  el('days').textContent=day+' сут';
+  const y=Math.floor(day/YEAR_D)+1, mo=Math.floor(day%YEAR_D/28)+1, dd=day%28+1;
+  el('ddate').textContent='D'+y+' · '+String(mo).padStart(2,'0')+' · '+String(dd).padStart(2,'0');
+}
+/* легенда */
+el('lgrows').innerHTML =
+ '<div class="row"><span class="nm"><span class="dot" style="background:#ff2a1a"></span>Шинрарта-A</span><span class="val">звезда</span></div>'+
+ PL.map(p=>'<div class="row"><span class="nm"><span class="dot" style="background:'+p.col+'"></span>'+p.name+'</span><span class="val">'+
+   p.Pd.toFixed(1)+' сут / '+Math.round(p.Pd*TICK_DAY/3600)+' мин</span></div>').join('');
+
+/* инфо по планете */
+function pick(e){
+  const items=PL.map(p=>({p,pr:proj(posOf(p,T))})).filter(i=>i.pr);
+  let best=null,bd=1e9;
+  for(const it of items){
+    const d=Math.hypot(e.clientX-it.pr[0],e.clientY-it.pr[1]);
+    if(d<ballR(it.pr[2],it.p.sz)+10&&d<bd){bd=d;best=it;}
+  }
+  selected=best?best.p.name:null;
+  const inf=el('info');
+  if(!selected){inf.style.display='none';return;}
+  const p=best.p, cph=(p.om*T%(2*Math.PI));
+  inf.style.display='block';
+  inf.innerHTML='<h3>'+p.name+'</h3>'+
+   '<div><span class="k">радиус орбиты: </span><span class="v">'+p.r.toFixed(1)+' ед ('+p.aAE.toFixed(3)+' а.е.)</span></div>'+
+   '<div><span class="k">наклонение: </span><span class="v">'+(p.inc*180/Math.PI).toFixed(1)+'°</span></div>'+
+   '<div><span class="k">год: </span><span class="v">'+p.Pd.toFixed(1)+' сут Хитоми</span></div>'+
+   '<div><span class="k">оборот в реале: </span><span class="v">'+Math.round(p.Pd*TICK_DAY/3600)+' мин (×1)</span></div>'+
+   '<div><span class="k">фаза: </span><span class="v">'+(cph*180/Math.PI).toFixed(0)+'°</span></div>';
+}
+function hover(e){
+  const items=PL.map(p=>({p,pr:proj(posOf(p,T))})).filter(i=>i.pr);
+  hovered=null;
+  for(const it of items){
+    if(Math.hypot(e.clientX-it.pr[0],e.clientY-it.pr[1])<ballR(it.pr[2],it.p.sz)+8){hovered=it.p.name;break;}
+  }
+}
+
+/* ============ КНОПКИ ============ */
+el('bpause').onclick=()=>{paused=!paused;el('bpause').classList.toggle('on',paused);el('bpause').textContent=paused?'ПУСК':'ПАУЗА';};
+document.querySelectorAll('.spd').forEach(b=>b.onclick=()=>{
+  speed=+b.dataset.v;
+  document.querySelectorAll('.spd').forEach(x=>x.classList.toggle('on',x===b));
+});
+el('btop').onclick=()=>{pitch=1.45;yaw=0;};
+el('bcam').onclick=()=>{yaw=DEF.yaw;pitch=DEF.pitch;dist=DEF.dist;};
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

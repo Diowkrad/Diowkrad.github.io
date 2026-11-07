@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>🧸 ☩ HITOMI OF LEGENDS Alpha 1.2.15 ☩ «Shadow of Hitomi» ☩🥈 </title>
 <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
+
+<!--
+ХИТОМИ	27 суток.г
+ЧИЗИЯ	96 суток.г
+ШИНРАРТА-B	95 суток.г
+НГАЛИН	184 суток.г
+НЕМЕЗИДА	192 суток.г
+Элизия	254 суток.г
+Брэстла	321 суток.г
+Шинрарта-С	356 суток.г
+Диовкрад	364 суток.г
+/-->
+
+
 <style>
 /* ============================================================
    ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS - ☩
@@ -899,21 +913,28 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
 var PLANETS_DB = {
   soi: 11,
   planets: [
-    { name:'ХИТОМИ', pos:[-19.15,0,3.66], kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#c17b86","sunB":4.55,"sunR":0.0023} },
-    { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#c17b86","sunB":3.05,"sunR":0.0025} },
-    { name:'НГАЛИН', pos:[-18.43,32,59.08], kind:'gas', palette:'#300090', rings:false, moons:[], jets:false, unlock:500, track:'Music-3.ogg', fx:{"atm":"#3600a3","glow":2.89,"size":1.17,"spin":2.75,"pulse":2.5,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":4.8,"icecov":0.21,"cloudcov":0.12,"cityk":0.9,"aurk":0.35,"stormk":1,"r1":"#4c00ff","r2":"#25007a","lava":"#ff4000","fres":"#1e0042"},"sun":"#c17b90","sunB":2.85,"sunR":0.0016} },
-    { name:'ШИНРАРТА-B', pos:[21.95,36,-15.57], kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff"},"sun":"#de7b85","sunB":2.2,"sunR":0.0013} },
-    { name:'Элизия', pos:[61.26,0,61], kind:'terrestrial', palette:'#d400ff', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }], jets:false, unlock:2200, track:'Bonus-1.ogg', fx:{"atm":"#773a83","glow":3.56,"size":2.19,"spin":4.45,"pulse":4.15,"jets":{"on":0,"c1":"#ff00c8","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#c800ff","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.25,"icecov":0.75,"cloudcov":0.62,"cityk":0.9,"aurk":0.1,"stormk":1.85,"ocean":"#30003d","land1":"#9a4b9b","land2":"#685a37","ice":"#6e00db","cloud":"#8a2ce8","city":"#4d3c00","aur":"#040042"},"sun":"#62283c","sunB":1.8,"sunR":0.0014} },
-    { name:'Брэстла', pos:[96.48,0,29.95], kind:'gas', palette:'#eeff00', rings:true, moons:[], jets:false, unlock:2800, track:'Bonus-2.ogg', fx:{"atm":"#292929","glow":1.6,"size":1.02,"spin":0.55,"pulse":1.05,"jets":{"on":false,"c1":"#ff8c33","c2":"#73bfff","sp":0.618,"len":6.5},"ring":{"on":1,"c":"#8c7340","sp":0.04,"in":1.15,"out":2.26},"surf":{"scale":1.45,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#422000","r2":"#0f0300","lava":"#4d2d00","fres":"#4d0000"},"sun":"#e83030","sunB":1.35,"sunR":0.0008} },
-    { name:'Шинрарта-С', pos:[85.58,0,-66.13], kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff"},"sun":"#e82b2b","sunB":0.95,"sunR":0.0005} },
-    { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#e83030","sunB":1.1,"sunR":0.0006} },
-    { name:'Диовкрад', pos:[-106.98,0,24.9], kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#ff1e14","sunB":0.35,"sunR":0.0002} },
-    { name:'Шинрарта-A', pos:[0,0,0], kind:'pulsar', palette:'#fff4c0', rings:false, moons:[], jets:true, unlock:6500, track:'Star-0.ogg', fx:{"sun":"#ffef9e","sunB":1,"sunR":0.0008,"atm":"#ffe680","glow":1.6,"size":1.7,"spin":0.6,"pulse":1.2,"jets":{"on":0,"c1":"#ffffff","c2":"#ffb84d","sp":0.12,"len":8},"ring":{"on":0,"c":"#ffe680","sp":0.02,"in":1.3,"out":2.8},"surf":{"scale":1.5,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#fff4c0","r2":"#ffcf7a","river":"#fffbe0","fres":"#ffd27a"}} }
+    { name:'ХИТОМИ', pos:[-19.15,0,3.66], kind:'terrestrial', kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#c94112","sunB":4.05,"sunR":0.003} },
+    { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], kind:'cheese', kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#2f0f04","sunB":3.05,"sunR":0.002} },
+    { name:'НГАЛИН', pos:[-18.43,32,59.08], kind:'gas', kind:'gas', palette:'#300090', rings:false, moons:[], jets:false, unlock:500, track:'Music-3.ogg', fx:{"atm":"#3600a3","glow":2.89,"size":1.17,"spin":2.75,"pulse":2.5,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":4.8,"icecov":0.21,"cloudcov":0.12,"cityk":0.9,"aurk":0.35,"stormk":1,"r1":"#4c00ff","r2":"#25007a","lava":"#ff4000","fres":"#1e0042"},"sun":"#320b03","sunB":2.1,"sunR":0.0011} },
+    { name:'ШИНРАРТА-B', pos:[21.95,36,-15.57], kind:'pulsar', kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#a01f19","sunB":2.55,"sunR":0.0004} },
+    { name:'Элизия', pos:[61.26,0,61], kind:'terrestrial', kind:'terrestrial', palette:'#d400ff', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }], jets:false, unlock:2200, track:'Bonus-1.ogg', fx:{"atm":"#773a83","glow":0.67,"size":2.19,"spin":4.45,"pulse":4.15,"jets":{"on":0,"c1":"#ff00c8","c2":"#73bfff","sp":0.087,"len":6.5},"ring":{"on":0,"c":"#c800ff","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.25,"icecov":0.75,"cloudcov":0.62,"cityk":0.9,"aurk":0.1,"stormk":1.85,"ocean":"#30003d","land1":"#9a4b9b","land2":"#685a37","ice":"#6e00db","cloud":"#8a2ce8","city":"#4d3c00","aur":"#040042"},"sun":"#621400","sunB":0.9,"sunR":0.0006} },
+    { name:'Брэстла', pos:[96.48,0,29.95], kind:'gas', kind:'gas', palette:'#eeff00', rings:true, moons:[], jets:false, unlock:2800, track:'Bonus-2.ogg', fx:{"atm":"#292929","glow":1.6,"size":1.02,"spin":0.55,"pulse":1.05,"jets":{"on":false,"c1":"#ff8c33","c2":"#73bfff","sp":0.618,"len":6.5},"ring":{"on":1,"c":"#8c7340","sp":0.04,"in":1.15,"out":2.26},"surf":{"scale":1.45,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#422000","r2":"#0f0300","lava":"#4d2d00","fres":"#4d0000"},"sun":"#641e0f","sunB":1,"sunR":0.0003} },
+    { name:'Шинрарта-С', pos:[85.58,0,-66.13], kind:'pulsar', kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#e82b2b","sunB":1.55,"sunR":0.0002} },
+    { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], kind:'cheese', kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#963030","sunB":0.6,"sunR":0.0002} },
+    { name:'Диовкрад', pos:[-106.98,0,24.9], kind:'gas', kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#640000","sunB":0.3,"sunR":0.0002} },
+    { name:'Шинрарта-A', pos:[0,0,0], kind:'star-gl', kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ff0000","ln1":"#fbff00","ln2":"#ffbb00","sp1":"#9e0000","sp2":"#2e0e00","pr":"#fe9090"},"sun":"#ff8f4d","sunB":0.6,"sunR":0.0012} }
   ]
 };
-
-
-var PKIND = { terrestrial:0, cheese:1, gas:2, pulsar:3 };
+var PKIND = {
+  /* ветка 0 — живая планета (fbm-континенты) */
+  terrestrial:0, ocean:0, stone:0, energy:0,
+  /* ветка 1 — сыр (Чизия) */
+  cheese:1,
+  /* ветка 2 — газовый гигант */
+  gas:2,
+  /* ветка 3 — светящееся тело */
+  pulsar:3, neutron:3, star:3, 'star-gl':4
+};
 function pKind(k){ var e = PLANETS_DB.planets[k]; return e ? (PKIND[e.kind] || 0) : 0; }
 var FIN = PLANETS_DB.planets.length - 1; /* финальная планета маршрута */
 </script>
@@ -1090,15 +1111,15 @@ if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
     if(uPlanet > 2.5){
       vec3 nS = normalize(p - sC);
       float rock = fbm5(nS*3.2);
-      vec3 surfS = mix(vec3(0.05,0.045,0.05), vec3(0.16,0.13,0.12), rock);
+      vec3 surfS = mix(palc(0.0), palc(1.0), rock); /* КЛАСС O/G/M: база = палитра r1/r2 */
       float riv1 = fbm3(nS*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
       float riv2 = fbm3(nS*7.0 - vec3(uTime*0.015, 0.0, 0.0));
       float lavS = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5))) + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
       lavS = min(lavS, 1.0);
       float pulS = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
-      col = surfS*(0.05 + 0.9*lit) + vec3(0.937,0.961,0.976)*lavS*pulS*(1.6 + (1.0 - lit)*2.6);
+      col = surfS*(0.45 + 0.55*lit) + palc(2.0)*lavS*pulS*(1.6 + (1.0 - lit)*2.6); /* КЛАСС: прожилки = палитра river; звезда самосветится */
       float fresS = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-      col += vec3(0.60,0.80,1.0)*fresS*0.45;
+      col += palc(3.0)*fresS*0.45; /* КЛАСС: лимб = палитра fres */
     }
 
     /* атмосферный ободок на лимбе */
@@ -1245,7 +1266,7 @@ uniform float uSunR;
 uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float uRingIn; uniform float uRingOut;
 uniform float uSpin; uniform float uPulseR;
 uniform float uSurfScale;
-uniform sampler2D uPal;   /* палитра лодов: 16x9, строка = планета */
+uniform sampler2D uPal;   /* палитра лодов: 16x10, строка = планета */
 uniform float uPIa[8];    /* строка палитры каждой дальней планеты */
 uniform float uPIcur;     /* строка палитры текущей планеты */
 uniform vec3  uOceanC; uniform vec3 uLand1C; uniform vec3 uLand2C; uniform vec3 uIceC; uniform float uIceCov;
@@ -1260,7 +1281,7 @@ float gCur = 0.0;
 #define SPIN ((gCur > 0.5) ? uSpin : (paln(9.0, 0.0)*8.0))
 #define SCL  ((gCur > 0.5) ? uSurfScale : (paln(7.0, 0.0)*8.0))
 float gRow = 0.0;
-vec4 palV(float slot){ return texture2D(uPal, vec2((slot + 0.5)/16.0, (clamp(gRow, 0.0, 8.0) + 0.5)/9.0)); }
+vec4 palV(float slot){ return texture2D(uPal, vec2((slot + 0.5)/16.0, (clamp(gRow, 0.0, 9.0) + 0.5)/10.0)); }
 vec3 palc(float slot){ return palV(slot).rgb; }
 float paln(float slot, float ch){
   vec4 v = palV(slot);
@@ -1453,7 +1474,7 @@ vec3 shadeSurface(int k, vec3 n, float lit, vec3 rd, vec3 sunDir){
     r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
     float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
     r += palc(3.0)*fresP*0.25;
-  } else {
+  } else if(k == 3) {
     float rock = fbm5(n*3.2);
     vec3 surf = mix(palc(0.0), palc(1.0), rock);
     float riv1 = fbm3(n*(3.5*SCL) + vec3(0.0, uTime*0.02*SPIN, uTime*0.013*SPIN));
@@ -1465,6 +1486,32 @@ vec3 shadeSurface(int k, vec3 n, float lit, vec3 rd, vec3 sunDir){
     r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
     float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
     r += palc(3.0)*fresP*0.45;
+  } else {
+    /* ---- STAR-GL: независимая звёздная ветка (kind 4) ----
+       слой 1: основной цвет palc(0.0)
+       слой 2: тёмные линии 1 palc(1.0) — техника нейтронных линий
+       слой 3: тёмные линии 2 palc(2.0)
+       слой 4: солнечные пятна 1 palc(3.0)
+       слой 5: солнечные пятна 2 palc(4.0) — крупные области
+       слой 6: протуберанцы palc(5.0) — языки пламени у лимба */
+    vec3 sq = n*(3.0*SCL);
+    float f1 = fbm3(sq*2.2 + vec3(0.0, uTime*0.02*SPIN, uTime*0.012*SPIN));
+    float f2 = fbm3(sq*4.6 - vec3(uTime*0.015*SPIN, 0.0, 0.0));
+    float ln1 = 1.0 - smoothstep(0.0, 0.022, abs(f1 - 0.5));
+    float ln2 = 1.0 - smoothstep(0.0, 0.014, abs(f2 - 0.5));
+    float sp1 = smoothstep(0.58, 0.75, fbm5(sq*1.15 + 7.7));
+    float sp2 = smoothstep(0.52, 0.72, fbm5(sq*0.45 + 3.3));
+    float prF = smoothstep(0.55, 0.85, fbm3(n*2.6 + vec3(0.0, uTime*0.05*SPIN, 0.0)));
+    vec3 sgl = palc(0.0);
+    sgl = mix(sgl, palc(1.0), ln1);
+    sgl = mix(sgl, palc(2.0), ln2*0.85);
+    sgl = mix(sgl, palc(3.0), sp1);
+    sgl = mix(sgl, palc(4.0), sp2*0.8);
+    r = sgl*(0.4 + 0.6*lit); /* самосветящаяся: ночная сторона почти не гаснет */
+    float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += palc(0.0)*fresP*0.3;
+    /* слой 6: протуберанцы — языки пламени у лимба, дышат по времени */
+    r += palc(5.0)*smoothstep(0.35, 0.9, fresP)*prF*(0.55 + 0.45*sin(uTime*0.7));
   }
   return r;
 }
@@ -1532,7 +1579,7 @@ void main(){
     float lit = smoothstep(-0.06, 0.18, nl);
     /* мягкая тень от Шинрарта-A (SDF ray-march) */
     lit *= softShadowSDF(p + n*0.02, Lp, sC);
-    int ki = (uPlanet < 0.5) ? 0 : ((uPlanet < 1.5) ? 1 : ((uPlanet < 2.5) ? 2 : 3));
+    int ki = (uPlanet < 0.5) ? 0 : ((uPlanet < 1.5) ? 1 : ((uPlanet < 2.5) ? 2 : ((uPlanet < 3.5) ? 3 : 4)));
     gRow = uPIcur;
     gCur = 1.0;
     col = shadeSurface(ki, n, lit, rd, sunDir);
@@ -1962,7 +2009,7 @@ function fxHex(h, d){
   return [((v>>16)&255)/255, ((v>>8)&255)/255, (v&255)/255];
 }
 function fxNum(v, d){ return (typeof v === 'number' && isFinite(v)) ? v : d; }
-/* ==== ПАЛИТРА ЛОДОВ: текстура 16x9 из PLANETS_DB (строка = планета) ====
+/* ==== ПАЛИТРА ЛОДОВ: текстура 16x10 из PLANETS_DB (строка = планета) ====
    колонки 0..6 — surf-цвета по типу, 7 — (scale/8, icecov, cloudcov, stormk),
    8 — (cityk, aurk, pulse/8), 9 — (spin/8). NEAREST+CLAMP, юнит 0. ==== */
 var PAL_TEX = null, PAL_SIG = '';
@@ -1972,7 +2019,7 @@ function palBuildUpload(){
   var sig = JSON.stringify(pl);
   if(PAL_TEX && sig === PAL_SIG) return;
   PAL_SIG = sig;
-  var W = 16, H = 9;
+  var W = 16, H = 10;
   var data = new Uint8Array(W*H*4);
   function pc(h, dh){
     var r = fxHex(h, null);
@@ -1988,18 +2035,29 @@ function palBuildUpload(){
   }
   for(var i = 0; i < H; i++){
     var e = pl[i] || {};
-    var f = e.fx || {};
+    var f = pfxOf(e);
     var d = FXDEF[pKind(i)] || FXDEF[0];
     var surf = f.surf || d.surf;
     var kind = pKind(i);
+    var dk = kind === 1
+      ? ['b1','b2','b3','storm','fres','haze','fog']
+      : kind === 2
+      ? ['r1','r2','lava','fres','r1','r1','r1']
+      : kind === 3
+      ? ['r1','r2','river','fres','r1','r1','r1']
+      : kind === 4
+      ? ['c1','ln1','ln2','sp1','sp2','pr','c1']
+      : ['ocean','land1','land2','ice','cloud','city','aur'];
     var s = kind === 1
       ? [surf.b1, surf.b2, surf.b3, surf.storm, surf.fres, surf.haze, surf.fog]
       : kind === 2
       ? [surf.r1, surf.r2, surf.lava, surf.fres, surf.r1, surf.r1, surf.r1]
       : kind === 3
-      ? [surf.r1, surf.r2, surf.river, surf.fres, surf.r1, surf.r1, surf.r1]
+      ? [surf.r1, surf.r2, (surf.river || surf.lava), surf.fres, surf.r1, surf.r1, surf.r1]
+      : kind === 4
+      ? [surf.c1, surf.ln1, surf.ln2, surf.sp1, surf.sp2, surf.pr, surf.c1]
       : [surf.ocean, surf.land1, surf.land2, surf.ice, surf.cloud, surf.city, surf.aur];
-    for(var c2 = 0; c2 < 7; c2++) put(i, c2, pc(s[c2], d.surf[['ocean','land1','land2','ice','cloud','city','aur'][c2]] || d.surf.r1), 0);
+    for(var c2 = 0; c2 < 7; c2++) put(i, c2, pc(s[c2], d.surf[dk[c2]] || d.surf.r1), 0);
     put(i, 7, [fxNum(surf.scale, d.surf.scale)/8, fxNum(surf.icecov, d.surf.icecov), fxNum(surf.cloudcov, d.surf.cloudcov), fxNum(surf.stormk, d.surf.stormk)], 0);
     put(i, 8, [fxNum(surf.cityk, d.surf.cityk), fxNum(surf.aurk, d.surf.aurk), fxNum(f.pulse, d.pulse)/8, 0], 0);
     put(i, 9, [fxNum(f.spin, d.spin)/8, 0, 0, 0], 0);
@@ -2014,6 +2072,30 @@ function palBuildUpload(){
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.uniform1i(uPal, 0);
 }
+var PLANET_PRESETS = {"terr_meadow":{"label":"ЛУГ","kind":"terrestrial","fx":{"atm":"#4d8cff","glow":0.9,"size":1.25,"spin":1.2,"pulse":0.8,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":2.6,"icecov":0.35,"cloudcov":0.45,"cityk":0.5,"aurk":0.6,"stormk":0.5,"ocean":"#0a3d7a","land1":"#2d7a2d","land2":"#6b8c3a","ice":"#e8f2fa","cloud":"#f2f7ff","city":"#c9b458","aur":"#3ae6a0","b1":"#2d7a2d","b2":"#6b8c3a","b3":"#e8f2fa","storm":"#f2f7ff","fres":"#f2f7ff","haze":"#f2f7ff","fog":"#f2f7ff","r1":"#6b8c3a","r2":"#0a3d7a","lava":"#c9b458","river":"#e8f2fa"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"terr_desert":{"label":"ПУСТЫНЬ","kind":"terrestrial","fx":{"atm":"#c87a3a","glow":0.8,"size":1.3,"spin":1.0,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.4,"icecov":0.06,"cloudcov":0.12,"cityk":0.4,"aurk":0.25,"stormk":0.9,"ocean":"#5a2f10","land1":"#c98d4e","land2":"#8a5a2b","ice":"#f0e0c8","cloud":"#e8d8c0","city":"#8c6a3a","aur":"#d98c4a","b1":"#c98d4e","b2":"#8a5a2b","b3":"#f0e0c8","storm":"#e8d8c0","fres":"#e8d8c0","haze":"#e8d8c0","fog":"#e8d8c0","r1":"#8a5a2b","r2":"#5a2f10","lava":"#8c6a3a","river":"#f0e0c8"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"ocean_world":{"label":"ОКЕАН","kind":"terrestrial","fx":{"atm":"#1e6dd0","glow":1.4,"size":1.35,"spin":1.1,"pulse":0.7,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.0,"icecov":0.55,"cloudcov":0.5,"cityk":0.7,"aurk":1.1,"stormk":0.4,"ocean":"#04264f","land1":"#0a3a6e","land2":"#0d4a80","ice":"#eaf4ff","cloud":"#ffffff","city":"#3ad2c0","aur":"#1ae6d2","b1":"#0a3a6e","b2":"#0d4a80","b3":"#eaf4ff","storm":"#ffffff","fres":"#ffffff","haze":"#ffffff","fog":"#ffffff","r1":"#0d4a80","r2":"#04264f","lava":"#3ad2c0","river":"#eaf4ff"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"stone_mars":{"label":"МАРС","kind":"gas","fx":{"atm":"#b0502a","glow":0.5,"size":1.2,"spin":0.9,"pulse":0.6,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.2,"icecov":0.12,"cloudcov":0.06,"cityk":0.2,"aurk":0.2,"stormk":0.7,"r1":"#b55a2c","r2":"#7a3517","lava":"#e07038","fres":"#d98a58","ocean":"#7a3517","land1":"#b55a2c","land2":"#7a3517","ice":"#d98a58","cloud":"#d98a58","city":"#e07038","aur":"#d98a58","b1":"#b55a2c","b2":"#7a3517","b3":"#d98a58","storm":"#e07038","haze":"#d98a58","fog":"#d98a58","river":"#d98a58"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"stone_lunar":{"label":"ЛУННЫЙ","kind":"pulsar","fx":{"atm":"#3a3f4a","glow":0.15,"size":1.15,"spin":0.5,"pulse":0.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.8,"icecov":0.1,"cloudcov":0.0,"cityk":0.1,"aurk":0.1,"stormk":0.3,"r1":"#9a9a9a","r2":"#5c5c60","river":"#c8c8cc","fres":"#b0b0b6","ocean":"#5c5c60","land1":"#9a9a9a","land2":"#5c5c60","ice":"#b0b0b6","cloud":"#b0b0b6","city":"#ff610f","aur":"#b0b0b6","b1":"#9a9a9a","b2":"#5c5c60","b3":"#b0b0b6","storm":"#ff610f","haze":"#b0b0b6","fog":"#b0b0b6","lava":"#5c5c60"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"gas_jupiter":{"label":"ЮПИТЕР","kind":"gas","fx":{"atm":"#c8a06a","glow":1.0,"size":1.8,"spin":2.2,"pulse":1.1,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#c8b088","sp":0.03,"in":1.6,"out":2.9},"surf":{"scale":4.2,"icecov":0.3,"cloudcov":0.25,"cityk":0.3,"aurk":0.5,"stormk":1.6,"r1":"#c89058","r2":"#8a5c30","lava":"#e8d0a8","fres":"#f0e0c0","ocean":"#8a5c30","land1":"#c89058","land2":"#8a5c30","ice":"#f0e0c0","cloud":"#f0e0c0","city":"#e8d0a8","aur":"#f0e0c0","b1":"#c89058","b2":"#8a5c30","b3":"#f0e0c0","storm":"#e8d0a8","haze":"#f0e0c0","fog":"#f0e0c0","river":"#f0e0c0"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"gas_neptune":{"label":"НЕПТУН","kind":"gas","fx":{"atm":"#3050d0","glow":1.2,"size":1.7,"spin":1.8,"pulse":1.0,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#8aa8e0","sp":0.05,"in":1.7,"out":3.0},"surf":{"scale":3.6,"icecov":0.45,"cloudcov":0.2,"cityk":0.2,"aurk":0.9,"stormk":1.2,"r1":"#2850c8","r2":"#102878","lava":"#48b8f0","fres":"#88c8f8","ocean":"#102878","land1":"#2850c8","land2":"#102878","ice":"#88c8f8","cloud":"#88c8f8","city":"#48b8f0","aur":"#88c8f8","b1":"#2850c8","b2":"#102878","b3":"#88c8f8","storm":"#48b8f0","haze":"#88c8f8","fog":"#88c8f8","river":"#88c8f8"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"gas_venus":{"label":"ВЕНЕРА","kind":"gas","fx":{"atm":"#c8b050","glow":1.6,"size":1.5,"spin":1.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":2.4,"icecov":0.05,"cloudcov":0.95,"cityk":0.1,"aurk":0.2,"stormk":0.8,"r1":"#d8b868","r2":"#a88838","lava":"#f0e0a0","fres":"#f8ecb8","ocean":"#a88838","land1":"#d8b868","land2":"#a88838","ice":"#f8ecb8","cloud":"#f8ecb8","city":"#f0e0a0","aur":"#f8ecb8","b1":"#d8b868","b2":"#a88838","b3":"#f8ecb8","storm":"#f0e0a0","haze":"#f8ecb8","fog":"#f8ecb8","river":"#f8ecb8"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"gas_exotic":{"label":"ЭКЗОТИКА","kind":"gas","fx":{"atm":"#20a068","glow":1.5,"size":1.75,"spin":2.6,"pulse":1.6,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#4ae08a","sp":0.08,"in":1.5,"out":3.2},"surf":{"scale":4.0,"icecov":0.25,"cloudcov":0.35,"cityk":0.35,"aurk":1.4,"stormk":1.8,"r1":"#1a8c58","r2":"#0a4a30","lava":"#5cf0a0","fres":"#8af0b8","ocean":"#0a4a30","land1":"#1a8c58","land2":"#0a4a30","ice":"#8af0b8","cloud":"#8af0b8","city":"#5cf0a0","aur":"#8af0b8","b1":"#1a8c58","b2":"#0a4a30","b3":"#8af0b8","storm":"#5cf0a0","haze":"#8af0b8","fog":"#8af0b8","river":"#8af0b8"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"energy_magnetic":{"label":"МАГНИТНАЯ","kind":"terrestrial","fx":{"atm":"#2a48c8","glow":2.2,"size":1.45,"spin":3.0,"pulse":2.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":2.8,"icecov":0.4,"cloudcov":0.3,"cityk":0.6,"aurk":2.0,"stormk":1.1,"ocean":"#0a1a5c","land1":"#1a3a8c","land2":"#2a5aac","ice":"#c8e0ff","cloud":"#b8d0ff","city":"#7ac8ff","aur":"#38e8ff","b1":"#1a3a8c","b2":"#2a5aac","b3":"#c8e0ff","storm":"#b8d0ff","fres":"#b8d0ff","haze":"#b8d0ff","fog":"#b8d0ff","r1":"#2a5aac","r2":"#0a1a5c","lava":"#7ac8ff","river":"#c8e0ff"},"sun":"#bfd8ff","sunB":1.4,"sunR":0.0008}},"energy_ash":{"label":"ПЕПЕЛ","kind":"terrestrial","fx":{"atm":"#4a2020","glow":0.7,"size":1.3,"spin":0.8,"pulse":1.2,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.0,"icecov":0.05,"cloudcov":0.2,"cityk":0.9,"aurk":0.5,"stormk":1.5,"ocean":"#2a0f0f","land1":"#4a2626","land2":"#2e1a1a","ice":"#a09090","cloud":"#705858","city":"#ff6a2a","aur":"#ff4a1a","b1":"#4a2626","b2":"#2e1a1a","b3":"#a09090","storm":"#705858","fres":"#705858","haze":"#705858","fog":"#705858","r1":"#2e1a1a","r2":"#2a0f0f","lava":"#ff6a2a","river":"#a09090"},"sun":"#fff4c0","sunB":1.0,"sunR":0.0008}},"pulsar_classic":{"label":"ПУЛЬСАР","kind":"pulsar","fx":{"atm":"#9ab8ff","glow":1.6,"size":1.35,"spin":1.0,"pulse":3.0,"jets":{"on":1,"c1":"#8ac8ff","c2":"#e0f0ff","sp":0.45,"len":14},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":2.2,"icecov":0.5,"cloudcov":0.5,"cityk":0.3,"aurk":0.8,"stormk":0.6,"r1":"#c8d8f0","r2":"#7890b8","river":"#f0f6ff","fres":"#a8c8f0","ocean":"#7890b8","land1":"#c8d8f0","land2":"#7890b8","ice":"#a8c8f0","cloud":"#a8c8f0","city":"#ff610f","aur":"#a8c8f0","b1":"#c8d8f0","b2":"#7890b8","b3":"#a8c8f0","storm":"#ff610f","haze":"#a8c8f0","fog":"#a8c8f0","lava":"#a8c8f0"},"sun":"#cfe0ff","sunB":1.6,"sunR":0.0006}},"pulsar_magnetar":{"label":"МАГНИТАР","kind":"pulsar","fx":{"atm":"#c0a8ff","glow":2.4,"size":1.7,"spin":1.0,"pulse":3.8,"jets":{"on":1,"c1":"#a060ff","c2":"#ff9a4a","sp":0.55,"len":20},"ring":{"on":1,"c":"#8a5cff","sp":0.12,"in":1.5,"out":3.4},"surf":{"scale":2.6,"icecov":0.5,"cloudcov":0.5,"cityk":0.4,"aurk":1.6,"stormk":1.2,"r1":"#d8ccff","r2":"#8878c8","river":"#f4eeff","fres":"#b8a0f0","ocean":"#8878c8","land1":"#d8ccff","land2":"#8878c8","ice":"#b8a0f0","cloud":"#b8a0f0","city":"#ff610f","aur":"#b8a0f0","b1":"#d8ccff","b2":"#8878c8","b3":"#b8a0f0","storm":"#ff610f","haze":"#b8a0f0","fog":"#b8a0f0","lava":"#b8a0f0"},"sun":"#d8c8ff","sunB":2.2,"sunR":0.0008}},"star_O":{"label":"КЛАСС O","kind":"pulsar","fx":{"atm":"#5a7aff","glow":2.6,"size":2.4,"spin":0.8,"pulse":2.0,"jets":{"on":1,"c1":"#7a9aff","c2":"#c8d8ff","sp":0.3,"len":12},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":1.8,"icecov":0.5,"cloudcov":0.5,"cityk":0.2,"aurk":0.6,"stormk":0.8,"r1":"#9db4ff","r2":"#5a78e0","river":"#e0ecff","fres":"#b8ccff","ocean":"#5a78e0","land1":"#9db4ff","land2":"#5a78e0","ice":"#b8ccff","cloud":"#b8ccff","city":"#ff610f","aur":"#b8ccff","b1":"#9db4ff","b2":"#5a78e0","b3":"#b8ccff","storm":"#ff610f","haze":"#b8ccff","fog":"#b8ccff","lava":"#b8ccff"},"sun":"#9db4ff","sunB":2.2,"sunR":0.0022}},"star_G":{"label":"КЛАСС G","kind":"pulsar","fx":{"atm":"#ffe680","glow":2.0,"size":1.7,"spin":0.6,"pulse":1.2,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":1.5,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#fff4c0","r2":"#ffcf7a","river":"#fffbe0","fres":"#fff2b0","ocean":"#ffcf7a","land1":"#fff4c0","land2":"#ffcf7a","ice":"#ffd27a","cloud":"#ffd27a","city":"#ff610f","aur":"#ffd27a","b1":"#fff4c0","b2":"#ffcf7a","b3":"#ffd27a","storm":"#ff610f","haze":"#ffd27a","fog":"#ffd27a","lava":"#ffd27a"},"sun":"#ffef9e","sunB":1.0,"sunR":0.0008}},"star_M":{"label":"КЛАСС M","kind":"pulsar","fx":{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":0.5,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":1.6,"icecov":0.5,"cloudcov":0.5,"cityk":0.8,"aurk":0.4,"stormk":0.7,"r1":"#ff9a5c","r2":"#c85a28","river":"#ffd8b0","fres":"#ff9a5c","ocean":"#c85a28","land1":"#ff9a5c","land2":"#c85a28","ice":"#ff9a5c","cloud":"#ff9a5c","city":"#ff610f","aur":"#ff9a5c","b1":"#ff9a5c","b2":"#c85a28","b3":"#ff9a5c","storm":"#ff610f","haze":"#ff9a5c","fog":"#ff9a5c","lava":"#ff9a5c"},"sun":"#ff8f4d","sunB":0.6,"sunR":0.0012}}};
+/* ===== EDIT: PRESETS — библиотека 16 пресетов =====
+   Слой подстановки: явные поля fx > пресет (type) > FXDEF.
+   Супермножество surf: один пресет работает на любом kind. */
+function pfxApply(pr, f){
+  var o = {}, k;
+  for(k in pr) if(f[k] == null) o[k] = pr[k];
+  for(k in f) o[k] = f[k];
+  var deep = ['jets','ring','surf'];
+  for(var i = 0; i < deep.length; i++){
+    var key = deep[i], a = pr[key] || {}, b = f[key] || {}, m = {}, kk;
+    for(kk in a) m[kk] = a[kk];
+    for(kk in b) m[kk] = b[kk];
+    o[key] = m;
+  }
+  return o;
+}
+function pfxOf(e){
+  var f = e.fx || {};
+  var pr = (e.type && PLANET_PRESETS) ? PLANET_PRESETS[e.type] : null;
+  if (pr && pr.fx) f = pfxApply(pr.fx, f);
+  return f;
+}
+/* EDIT: PRESETS конец */
 var FXDEF = {
   0: { atm:'#4d8cff', glow:0.85, size:1.22, spin:1, pulse:1.5,
        jets:{ on:0, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
@@ -2034,12 +2116,19 @@ var FXDEF = {
        jets:{ on:1, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
        ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
        surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
-              r1:'#0d0b0d', r2:'#29211f', river:'#eff5f9', fres:'#99ccff' } }
+              r1:'#0d0b0d', r2:'#29211f', river:'#eff5f9', fres:'#99ccff', lava:'#ffd8b0' } },
+  4: { atm:'#0a1e4d', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:1, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              c1:'#ffcf5c', ln1:'#7a3c08', ln2:'#a35a10', sp1:'#5a2400', sp2:'#3d1802', pr:'#ff9a3c',
+              r1:'#ffcf5c', r2:'#ffcf5c', river:'#7a3c08', fres:'#ffcf5c' } }
 };
+window.FXDEF = FXDEF; /* EDIT: экспорт в глобальную область — панель живёт в другом script-блоке */
 function fxPush(pi){
   var d = FXDEF[pKind(pi)] || FXDEF[0];
   var e = (PLANETS_DB && PLANETS_DB.planets && PLANETS_DB.planets[pi]) || {};
-  var f = e.fx || {};
+  var f = pfxOf(e);
   var jets = f.jets || d.jets, ring = f.ring || d.ring, surf = f.surf || d.surf;
   var atm = fxHex(f.atm, fxHex(d.atm, [0.30,0.55,1.0]));
   gl.uniform3f(uAtmC, atm[0], atm[1], atm[2]);
