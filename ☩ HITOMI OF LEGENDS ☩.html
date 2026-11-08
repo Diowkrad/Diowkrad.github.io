@@ -3630,6 +3630,9 @@ function updHud(){
   var txt = 'ПЛАНЕТА: ' + PLANET_NAMES[planet] + (planet === FIN ? ' ★ ФИНАЛ' : '')
     + '\nОТКРЫТО: ' + unlocked
     + (mouseCtl ? '\nМЫШЬ: ВКЛ (P — вернуть курсор)' : '');
+  txt += '\nD-ДАТА: ' + shinrartaDDate();
+  var _app = shinrartaApproach();
+  if(_app !== null) txt += '\nПРИШЕСТВИЕ: через ' + (_app/364).toFixed(1) + ' D-лет';
   /* OPT: кэш текста — не пишем в DOM, если значение не изменилось */
   if(inTransit) txt += '\nРЕЖИМ: ГИПЕРПРОСТРАНСТВО';
   if(targetIdx >= 0){
@@ -3731,6 +3734,72 @@ var FSD_DOCK = 2.4, FSD_SOI = 11.0, SIN_AMP = 7.5; /* SIN_AMP — крутизн
 var WARP_SND = 'warp.ogg'; /* URL-ссылки отключены: локальный файл warp.ogg рядом с HTML */
 /* мировые позиции планет (радиус планеты = 1): ХИТОМИ, ЧИЗИЯ, НГАЛИН, ШИНРАРТА-B */
 var PW = PLANETS_DB.planets.map(function(p){ return p.pos.slice(); }); /* из реестра */
+
+/* ===== ГЛОБАЛЬНЫЙ ТАЙМЕР: СИНХРОНИЗАЦИЯ ПО ДАТЕ КОМПЬЮТЕРА =====
+   Эпо́ха (константа ниже) — момент, когда планеты стоят в позициях реестра.
+   t = (сейчас − эпо́ха) в D-сутках. Режим 1:1: 1 реальный день = 1 D-сутка.
+   Орбиты круговые: радиус и наклонение берутся из pos реестра, период — Кеплер:
+   P = 27.2·(r/19.5)^1.5 D-суток. Шинрарта-A — якорь (0,0,0), не движется.
+   Пересчёт векторов — раз в ORBIT_SYNC_MS (минута), между обновлениями позиции стоят. */
+var SHINRARTA_EPOCH = new Date('2026-01-01T00:00:00Z');
+var ORBIT_SYNC_MS = 60000;
+function shinrartaDays(){
+  if(!SHINRARTA_EPOCH || !SHINRARTA_EPOCH.getTime()) return 0;
+  return (Date.now() - SHINRARTA_EPOCH.getTime())/86400000;
+}
+function shinrartaDDate(){
+  var d = Math.max(0, Math.floor(shinrartaDays()));
+  return 'D' + Math.floor(d/364) + ' · мес ' + (Math.floor((d%364)/28)+1) + ' · день ' + ((d%28)+1);
+}
+function shinrartaApproach(){
+  /* D-суток до ближайшего пришествия (соединение Шинрарта-С ↔ Диовкрад) */
+  var f = -1, s = -1;
+  for(var i=0;i<PLANETS_DB.planets.length;i++){
+    if(PLANETS_DB.planets[i].name === 'Шинрарта-С') f = i;
+    if(PLANETS_DB.planets[i].name === 'Диовкрад') s = i;
+  }
+  if(f < 0 || s < 0) return null;
+  var pf = PLANETS_DB.planets[f], ps = PLANETS_DB.planets[s];
+  if(!pf.orbP || !ps.orbP) return null;
+  var phiF = Math.atan2(pf.pos[2], pf.pos[0]), phiS = Math.atan2(ps.pos[2], ps.pos[0]);
+  var om = 2*Math.PI*(1/pf.orbP - 1/ps.orbP); /* рад/D-сутку: внутренняя догоняет */
+  if(om <= 0) return null;
+  var d = ((phiF - phiS) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+  return (d > 1e-9) ? (2*Math.PI - d)/om : 0;
+}
+function orbitalInit(){
+  for(var i=0;i<PLANETS_DB.planets.length;i++){
+    var e = PLANETS_DB.planets[i];
+    var x=e.pos[0], y=e.pos[1], z=e.pos[2];
+    var r = Math.sqrt(x*x+y*y+z*z);
+    if(r < 0.001){ e.orbR=0; e.orbP=0; e.orbRW=null; continue; } /* Шинрарта-A — якорь */
+    var hl = Math.sqrt(x*x+z*z);
+    e.orbR = r;
+    e.orbP = 27.2*Math.pow(r/19.5, 1.5);                /* период, D-суток */
+    e.orbRW = (hl>1e-9) ? [-z*r/hl, 0, x*r/hl] : null;  /* поперечник r·w (CCW) */
+  }
+}
+function orbitalApply(){
+  var arrs = [];
+  if(typeof PW !== 'undefined' && PW && PW.length) arrs.push(PW);
+  if(window.PW && arrs.indexOf(window.PW) < 0) arrs.push(window.PW);
+  var days = shinrartaDays();
+  for(var a=0;a<arrs.length;a++){
+    var A = arrs[a];
+    for(var i=0;i<A.length && i<PLANETS_DB.planets.length;i++){
+      var e = PLANETS_DB.planets[i];
+      if(!e.orbRW) continue;
+      var dA = 2*Math.PI*days/e.orbP, c = Math.cos(dA), s = Math.sin(dA), p = e.pos, w = e.orbRW;
+      A[i][0] = p[0]*c + w[0]*s;
+      A[i][1] = p[1]*c;
+      A[i][2] = p[2]*c + w[2]*s;
+    }
+  }
+}
+orbitalInit();
+orbitalApply();
+setInterval(orbitalApply, ORBIT_SYNC_MS);
+
 /* градиентные заглушки планет удалены: тела рисуются процедурно (модуль ниже) */
 var inTransit = false;
 var FT = { pos: [0,0,0], fwd: [0,0,1], up: [0,1,0], right: [1,0,0] };
