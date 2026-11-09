@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>☩ HITOMI OF LEGENDS ☩ TOOLS ☩</title>
+<title>☩ HITOMI OF LEGENDS ☩ TOOLS v2 ☩</title>
 <style>
 /* ---------- РЕДАКТОР ВСЕЛЕННОЙ HITOMI ---------- */
 canvas#glbg{position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none; display:block;}
@@ -659,8 +659,8 @@ uniform float uSplash;
 uniform vec3  uSunC;
 uniform float uSunB;
 uniform float uSunR;
-uniform vec3  uP[8];   /* дальние планеты — позиции относительно текущей (или мировые в гипер) */
-uniform float uPKa[8]; /* индексы дальних планет (тип поверхности 0..3) */
+uniform vec3  uP[10];   /* дальние планеты — позиции относительно текущей (или мировые в гипер) */
+uniform float uPKa[10]; /* индексы дальних планет (тип поверхности 0..3) */
 uniform float uPCount; /* сколько дальних планет передано в кадре */
 uniform float uHyper;  /* 1 = гиперпространство: небо Нгалин, 4 сферы, солнце стоит */
 uniform vec3  uP4;     /* гиперпространство: позиция 4-й планеты (текущей), мировые координаты */
@@ -679,7 +679,7 @@ uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float
 uniform float uSpin; uniform float uPulseR;
 uniform float uSurfScale;
 uniform sampler2D uPal;   /* палитра лодов: 16x10, строка = планета */
-uniform float uPIa[8];    /* строка палитры каждой дальней планеты */
+uniform float uPIa[10];    /* строка палитры каждой дальней планеты */
 uniform float uPIcur;     /* строка палитры текущей планеты */
 uniform vec3  uOceanC; uniform vec3 uLand1C; uniform vec3 uLand2C; uniform vec3 uIceC; uniform float uIceCov;
 uniform vec3  uCloudC; uniform float uCloudCov; uniform vec3 uCityC; uniform float uCityK;
@@ -797,7 +797,7 @@ vec3 dopplerShift(vec3 c, float impact){
 /* Расстояние до ближайшей сферы-планеты (текущая центр sC + дальние + гипер-4-я) */
 float mapSDF(vec3 p, vec3 sC){
   float d = length(p - sC) - R;
-  for(int di = 0; di < 8; di++){
+  for(int di = 0; di < 10; di++){
     if(di >= int(uPCount + 0.5)) break;
     d = min(d, length(p - uP[di]) - R);
   }
@@ -827,7 +827,10 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
   float lodRspd = paln(11.0, 0.0)*32.0; /* град/сим-сек (кодировка /32) */
   float sphA = (gCur > 0.5) ? uRotC : mod(paln(10.0, 0.0)*6.2831853 + lodRspd*uTime*0.0174532925, 6.2831853);
   mat3 axm = (gCur > 0.5) ? uAxM : eulM((vec3(paln(10.0, 1.0), paln(10.0, 2.0), paln(10.0, 3.0))*360.0 - vec3(180.0))*0.0174532925);
-  vec3 n = axm*(rotYm(sphA)*(trn3(axm)*n0)); /* вращение вокруг НАКЛОНЁННОЙ оси */
+  vec3 n = axm*(rotYm(sphA)*(trn3(axm)*n0)); /* ОТЛИП СВЕТА ОТ ВРАЩЕНИЯ: свет и широта — по геометрии */
+  vec3 nG = n0;                     /* геометрическая нормаль (мир, не вращается) */
+  vec3 axW = axm*vec3(0.0,1.0,0.0); /* ось вращения в мире */
+  float latAx = dot(nG, axW);       /* широта по оси — стабильна при спине */ /* вращение вокруг НАКЛОНЁННОЙ оси */
   vec3 r = vec3(0.0);
   if(k == 0){
     vec3  sp   = n*(2.6*SCL) + vec3(0.0, 0.0, uTime*0.004*SPIN);
@@ -839,7 +842,7 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
     vec3 landc = mix(palc(1.0), palc(2.0), smoothstep(0.52,0.78,cont));
     float mdet = fbm3(n*(12.0*SCL) + vec3(uTime*0.003*SPIN, uTime*0.001*SPIN, 0.0));
     landc *= 0.85 + 0.30*mdet;
-    float ice  = smoothstep(0.94 - 0.28*paln(7.0, 1.0), 0.94, abs(n.y));
+    float ice  = smoothstep(0.94 - 0.28*paln(7.0, 1.0), 0.94, abs(latAx));
     vec3 surf  = mix(ocean, landc, land);
     surf = mix(surf, palc(3.0), ice);
     float cl = fbm5(n*(4.2*SCL) + vec3(uTime*0.010*SPIN, 0.0, -uTime*0.006*SPIN));
@@ -847,19 +850,19 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
     surf = mix(surf, palc(4.0), cl*0.9);
     vec3 colDay = surf*(0.15 + 1.05*lit);
     vec3 hv = normalize(sunDir - rd);
-    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
+    float spec = pow(max(dot(nG,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
     colDay += vec3(0.9,0.95,1.0)*spec*0.6;
     float cellH = hash13(floor(n*90.0));
     float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
     vec3 colNight = surf*0.03 + palc(5.0)*city*paln(8.0, 0.0)*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
     r = mix(colNight, colDay, lit);
-    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    float fres = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
     r += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
-    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
+    float aurZ = smoothstep(0.72, 0.92, abs(latAx))*(1.0-lit);
     float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
     r += palc(6.0)*aurZ*smoothstep(0.45,0.75,aur)*paln(8.0, 1.0);
   } else if(k == 1){
-    float lat = n.y;
+    float lat = latAx;
     float warp = fbm3(n*(2.6*SCL) + vec3(uTime*0.008*SPIN, 0.0, 0.0));
     float bands = sin(lat*16.0 + warp*3.2);
     float bands2 = sin(lat*34.0 + 1.7);
@@ -875,9 +878,9 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
     surf = mix(surf, palc(3.0), storm*paln(7.0, 3.0));
     surf *= 0.92 + 0.16*fbm3(n*(9.0*SCL) + vec3(uTime*0.05*SPIN, 0.0, 0.0));
     r = surf*(0.06 + 1.05*lit);
-    float fresA = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    float fresA = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
     r += palc(4.0)*fresA*(0.2 + 0.8*lit)*0.8;
-    float azi = dot(n, rd);
+    float azi = dot(nG, rd);
     float entry = smoothstep(-0.20, 0.05, azi);
     float blurAtm = entry*0.50;
     r = mix(r, palc(5.0)*(0.5 + 0.6*lit), blurAtm);
@@ -896,7 +899,7 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
     lava = min(lava, 1.0);
     float pulse = 0.75 + 0.25*sin(uTime*1.5*(paln(8.0, 2.0)*8.0) + riv1*40.0);
     r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
-    float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    float fresP = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
     r += palc(3.0)*fresP*0.25;
   } else if(k == 3) {
     float rock = fbm5(n*3.2);
@@ -908,7 +911,7 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
     lava = min(lava, 1.0);
     float pulse = 0.75 + 0.25*sin(uTime*1.5*(paln(8.0, 2.0)*8.0) + riv1*40.0);
     r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
-    float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    float fresP = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
     r += palc(3.0)*fresP*0.45;
   } else {
     /* ---- STAR-GL: независимая звёздная ветка (kind 4) ----
@@ -932,7 +935,7 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
     sgl = mix(sgl, palc(3.0), sp1);
     sgl = mix(sgl, palc(4.0), sp2*0.8);
     r = sgl*(0.4 + 0.6*lit); /* самосветящаяся: ночная сторона почти не гаснет */
-    float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    float fresP = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
     r += palc(0.0)*fresP*0.3;
     /* слой 6: протуберанцы — языки пламени у лимба, дышат по времени */
     r += palc(5.0)*smoothstep(0.35, 0.9, fresP)*prF*(0.55 + 0.45*sin(uTime*0.7));
@@ -965,6 +968,8 @@ void main(){
 
   /* свет — направление от Шинрарта-A (0,0,0) к текущей планете (точка света) */
   vec3 sunDir  = normalize(uStarPos - sC);
+  float dStar = max(length(uStarPos - camPos), R*1.05);
+  float sunR_eff = max(uSunR, 0.5*R*R/(dStar*dStar));
   vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
 
   /* ГРАВИТАЦИОННАЯ ЛИНЗА применяется ТОЛЬКО к лучам, промахнувшимся мимо пульсара:
@@ -1035,14 +1040,14 @@ void main(){
     col = mix(night, day, daySky*atmIn);
     if(uPlanet > 2.5){ col = night; } else {
     /* СОЛНЦЕ ВНЕ ПУЗЫРЯ: диск и ореол светят всегда — и внутри пузыря, и в ночи */
-    col += uSunC*smoothstep(1.0-uSunR, 1.0-uSunR*0.4375, dSun)*3.0*uSunB;
+    col += uSunC*smoothstep(1.0-sunR_eff, 1.0-sunR_eff*0.4375, dSun)*3.0*uSunB;
     col += uSunC*pow(sunAmt, 350.0)*0.9*uSunB;
     }
 
     /* ЛОД СОЛНЦА ШИНРАРТА-A НА НЕБЕ: диск + ореол направлены на звезду в (0,0,0) */
     vec3 starDir = normalize(uStarPos - camPos);
     float dSt = dot(rd, starDir);
-    col += uSunC*smoothstep(1.0-uSunR*1.25, 1.0-uSunR*0.5625, dSt)*4.0*uSunB;
+    col += uSunC*smoothstep(1.0-sunR_eff*1.25, 1.0-sunR_eff*0.5625, dSt)*4.0*uSunB;
     col += uSunC*pow(max(dSt,0.0), 120.0)*0.8*uSunB;
 
     /* ореол атмосферы у лимба (лучи мимо планеты) */
@@ -1181,7 +1186,7 @@ void main(){
   float bestT = 1.0e9;
   vec3 sphCol = vec3(0.0);
   bool haveSph = false;
-  for(int di = 0; di < 8; di++){
+  for(int di = 0; di < 10; di++){
     if(di >= int(uPCount + 0.5)) break;
     vec3 pc = uP[di];
     int dk = int(uPKa[di] + 0.5);
@@ -1196,15 +1201,18 @@ void main(){
           vec3 pp = camPos + rd*th;
           vec3 nn = normalize(pp - pc);
           float dnl  = dot(nn, normalize(uStarPos - pp));
-          float dlit = smoothstep(-0.02, 0.10, dnl);
-          dlit *= softShadowSDF(pp + nn*0.02, normalize(uStarPos - pp), sC);
+          float isStar = (dk == 4) ? 1.0 : 0.0;
+          float dlit = mix(smoothstep(-0.02, 0.10, dnl), 1.0, isStar);
+          if(isStar < 0.5){
+            dlit *= softShadowSDF(pp + nn*0.02, normalize(uStarPos - pp), sC);
+          }
           gRow = uPIa[di];
           gCur = 0.0;
           sphCol = shadeSurface(dk, nn, dlit, rd, normalize(uStarPos - pp));
           float muL = clamp(dot(nn, -rd), 0.0, 1.0);
           sphCol *= (0.38 + 0.62*pow(muL, 0.55));
           float bt2 = (dnl - 0.015)/0.085;
-          float bandT = exp(-bt2*bt2);
+          float bandT = exp(-bt2*bt2)*(1.0 - isStar);
           sphCol += vec3(1.0, 0.44, 0.20)*bandT*0.30*max(dlit, 0.12);
           bestT = th; haveSph = true;
         }
@@ -1240,7 +1248,7 @@ void main(){
     float hSun = dot(rd, normalize(uStarPos - camPos));
     col += uSunC*pow(max(hSun,0.0), 8.0)*0.50*uSunB;
     col += uSunC*pow(max(hSun,0.0), 350.0)*0.9*uSunB;
-    col += uSunC*smoothstep(1.0-uSunR, 1.0-uSunR*0.4375, hSun)*3.0*uSunB;
+    col += uSunC*smoothstep(1.0-sunR_eff, 1.0-sunR_eff*0.4375, hSun)*3.0*uSunB;
   }
   if(haveSph){ col = sphCol; }
 /* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
@@ -1699,8 +1707,8 @@ function frame(now){
       }
     }
     if(uP && uPC && list.length){
-      var flat = new Float32Array(24), kf = new Float32Array(8), pf = new Float32Array(8);
-      for(var f2 = 0; f2 < list.length && f2 < 8; f2++){
+      var flat = new Float32Array(30), kf = new Float32Array(10), pf = new Float32Array(10);
+      for(var f2 = 0; f2 < list.length && f2 < 10; f2++){
         flat[f2*3] = list[f2][0]; flat[f2*3+1] = list[f2][1]; flat[f2*3+2] = list[f2][2];
         kf[f2] = klist[f2];
         pf[f2] = pilist[f2];
@@ -1708,7 +1716,7 @@ function frame(now){
       gl.uniform3fv(uP, flat);
       gl.uniform1fv(uPKa, kf);
       gl.uniform1fv(uPIa, pf);
-      gl.uniform1f(uPC, Math.min(list.length, 8));
+      gl.uniform1f(uPC, Math.min(list.length, 10));
     }
     /* ГИПЕРПРОСТРАНСТВО: 4-я сфера = текущая планета (в мировых координатах,
        камера гиперкруиза уже в мире). Позиция PW[cur] и ТИП её поверхности. */
@@ -4273,12 +4281,22 @@ function importDB(){
   try {
     var db = (new Function('return (' + t + ')'))();
     if (!db || !db.planets || !db.planets.length) throw new Error('в блоке нет планет');
+    var KINDS = ['terrestrial','ocean','stone','energy','cheese','gas','pulsar','neutron','star_g','star_a','star_m'];
+    db.planets.forEach(function(p, i){
+      var w = 'планета #' + i;
+      if (!p || typeof p.name !== 'string' || !p.name.trim()) throw new Error(w + ': пустое имя');
+      if (!Array.isArray(p.pos) || p.pos.length !== 3 || p.pos.some(function(v){ return !isFinite(+v); })) throw new Error(w + ' (' + p.name + '): pos — ровно 3 конечных числа');
+      if (KINDS.indexOf(p.kind) < 0) throw new Error(w + ' (' + p.name + '): неизвестный kind "' + p.kind + '"');
+      if (p.rkm != null && !(+p.rkm > 0)) throw new Error(w + ' (' + p.name + '): rkm должен быть > 0');
+      if (p.unlock != null && !(+p.unlock >= 0)) throw new Error(w + ' (' + p.name + '): unlock не может быть отрицательным');
+    });
+    htPush(htSnap()); /* шаг истории ДО импорта */
     PLANETS_DB.soi = (db.soi != null) ? db.soi : PLANETS_DB.soi;
     PLANETS_DB.planets = JSON.parse(JSON.stringify(db.planets));
     rebuildPW();
     cur = 0; window.__splashPlanet = 0;
     buildPlanet();
-    toast('Реестр импортирован: планет — ' + db.planets.length);
+    toast('Реестр импортирован: планет — ' + db.planets.length + ' (откат: Alt+Z)');
   } catch(e){ toast('Импорт не удался: ' + e.message); }
 }
 
@@ -4569,6 +4587,148 @@ function buildFlight(){
 buildPlanet();
 setMode('planet');
 toast('Редактор вселенной готов. Tab — скрыть/показать панели');
+
+/* ═════════ TOOLS v2: ИСТОРИЯ ШАГОВ · СЕССИЯ · ДИФФ (паттерн RASTER) ═════════
+   Реестр шагов: каждое устойчивое изменение реестра/CFG — шаг в стеке (глубина 40).
+   Сессия: правки автосохраняются и переживают перезагрузку страницы.
+   ДИФФ: экспорт только изменённого против оригинала + патч CFG. */
+var SKEY_ED = 'hitomi_tools_session_v2';
+function htStrip(o){ return JSON.parse(JSON.stringify(o, function(k, v){ return typeof v === 'function' ? undefined : v; })); }
+function htClone(o){ return JSON.parse(JSON.stringify(o)); }
+function htSnap(){ return JSON.stringify({ db: { soi: PLANETS_DB.soi, planets: PLANETS_DB.planets }, cfg: htStrip(window.CFG || {}) }); }
+var htPristine = htSnap(); /* оригинал для диффа — ДО восстановления сессии */
+var htHist = [htPristine], htIdx = 0, htPend = null, htPendT = 0, htLock = 0;
+
+function htApply(json){
+  try {
+    htLock = 1;
+    var s = JSON.parse(json);
+    PLANETS_DB.soi = s.db.soi;
+    PLANETS_DB.planets = htClone(s.db.planets);
+    var C = window.CFG || {};
+    Object.keys(s.cfg).forEach(function(k){ try { C[k] = htClone(s.cfg[k]); } catch(e){} });
+    window.CFG = C;
+    rebuildPW();
+    try { cur = 0; buildPlanet(); } catch(e){}
+    if (mode === 'flight'){ try { panF.innerHTML = ''; flightBuilt = false; buildFlight(); } catch(e){} }
+  } catch(e) { toast('Откат не удался: ' + e.message); }
+  setTimeout(function(){ htLock = 0; }, 500);
+}
+function htSaveSess(){
+  try { localStorage.setItem(SKEY_ED, JSON.stringify({ t: Date.now(), db: { soi: PLANETS_DB.soi, planets: htClone(PLANETS_DB.planets) }, cfg: htStrip(window.CFG || {}) })); } catch(e){}
+}
+function htPush(json){
+  htHist = htHist.slice(0, htIdx + 1);
+  htHist.push(json);
+  if (htHist.length > 41) htHist.shift();
+  htIdx = htHist.length - 1;
+  htSaveSess();
+  htUndoBtns();
+}
+/* опрос состояния: толкаем шаг только когда значение устоялось (ползунки не заливают историю) */
+setInterval(function(){
+  if (htLock) return;
+  var s = htSnap();
+  if (s === htHist[htIdx]) { htPend = null; return; }
+  if (s === htPend) { if (Date.now() - htPendT > 350) { htPush(s); htPend = null; } }
+  else { htPend = s; htPendT = Date.now(); }
+}, 250);
+function htUndo(){
+  if (htIdx <= 0) { toast('Откатывать нечего — это оригинал'); return; }
+  htIdx--; htApply(htHist[htIdx]); htSaveSess(); htUndoBtns();
+  toast('⟲ Откат: шаг ' + htIdx + ' из ' + (htHist.length - 1));
+}
+function htRedo(){
+  if (htIdx >= htHist.length - 1) { toast('Повторять нечего'); return; }
+  htIdx++; htApply(htHist[htIdx]); htSaveSess(); htUndoBtns();
+  toast('⟳ Повтор: шаг ' + htIdx + ' из ' + (htHist.length - 1));
+}
+function htUndoBtns(){
+  var u = gid('edUndo'), r = gid('edRedo');
+  if (u) u.style.opacity = htIdx > 0 ? '1' : '.35';
+  if (r) r.style.opacity = htIdx < htHist.length - 1 ? '1' : '.35';
+}
+document.addEventListener('keydown', function(e){
+  if (e.altKey && !e.ctrlKey && e.code === 'KeyZ'){ e.preventDefault(); e.shiftKey ? htRedo() : htUndo(); }
+  if (e.altKey && !e.ctrlKey && e.code === 'KeyY'){ e.preventDefault(); htRedo(); }
+});
+var htBUndo = el('button', { id: 'edUndo', 'class': 'edbtn', type: 'button', title: 'Отменить (Alt+Z)' }, '⟲');
+var htBRedo = el('button', { id: 'edRedo', 'class': 'edbtn', type: 'button', title: 'Вернуть (Alt+Y)' }, '⟳');
+htBUndo.addEventListener('click', htUndo);
+htBRedo.addEventListener('click', htRedo);
+bar.insertBefore(htBRedo, gid('edHide'));
+bar.insertBefore(htBUndo, htBRedo);
+
+/* --- панель диффа --- */
+var htPanD = el('div', { 'class': 'edp', 'data-keep': '1' });
+htPanD.style.cssText = 'left:auto;right:10px;top:52px;width:520px;max-height:calc(100vh - 80px);';
+htPanD.innerHTML = '<h3>ДИФФ — только изменения против оригинала</h3>';
+var htTaD = el('textarea', { 'class': 'edTa' });
+htTaD.style.height = '46vh';
+htPanD.appendChild(htTaD);
+var htRowD = el('div', { 'class': 'frow' });
+var htBCopyD = el('button', { 'class': 'edbtn2', type: 'button' }, 'КОПИРОВАТЬ');
+htBCopyD.addEventListener('click', function(){ htTaD.select(); try { document.execCommand('copy'); toast('Скопировано в буфер'); } catch(e){ toast('Не удалось скопировать — Ctrl+C'); } });
+var htBDlD = el('button', { 'class': 'edbtn2', type: 'button' }, 'СКАЧАТЬ');
+htBDlD.addEventListener('click', function(){
+  var a = el('a', { href: URL.createObjectURL(new Blob([htTaD.value], { type: 'text/plain' })), download: 'PLANETS_DB_diff.js' });
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Файл PLANETS_DB_diff.js скачан');
+});
+var htBCloseD = el('button', { 'class': 'edbtn2 del', type: 'button' }, '✕');
+htBCloseD.addEventListener('click', function(){ htPanD.classList.remove('show'); });
+htRowD.appendChild(htBCopyD); htRowD.appendChild(htBDlD); htRowD.appendChild(htBCloseD);
+htPanD.appendChild(htRowD);
+document.body.appendChild(htPanD);
+
+function htDiff(){
+  var p0 = JSON.parse(htPristine);
+  var pmap = {};
+  p0.db.planets.forEach(function(p){ pmap[p.name] = p; });
+  var changed = PLANETS_DB.planets.filter(function(p){ var o = pmap[p.name]; return !o || JSON.stringify(o) !== JSON.stringify(p); });
+  var gone = p0.db.planets.filter(function(p){ return !PLANETS_DB.planets.some(function(c){ return c.name === p.name; }); });
+  var soiDiff = +p0.db.soi !== +PLANETS_DB.soi;
+  if (!changed.length && !gone.length && !soiDiff) { toast('Изменений нет — дифф пуст'); return; }
+  var labels = changed.map(function(p){ return (pmap[p.name] ? 'ПРАВКА: ' : 'НОВАЯ: ') + p.name; })
+    .concat(gone.map(function(p){ return 'УДАЛЕНА: ' + p.name; })).join('; ');
+  var saved = PLANETS_DB.planets, savedSoi = PLANETS_DB.soi;
+  PLANETS_DB.planets = changed; /* форматируем только изменённые — тем же exportDB */
+  var txt = '/* ДИФФ ' + new Date().toLocaleString() + ' — применить ИМПОРТОМ поверх оригинала */\n';
+  txt += '/* ' + labels + (soiDiff ? ' ; soi: ' + savedSoi : '') + ' */\n' + exportDB();
+  PLANETS_DB.planets = saved;
+  var c0 = p0.cfg || {}, c1 = htStrip(window.CFG || {}), cd = {};
+  Object.keys(c1).forEach(function(k){ if (JSON.stringify(c0[k]) !== JSON.stringify(c1[k])) cd[k] = c1[k]; });
+  if (Object.keys(cd).length) txt += '\n\n/* ИЗМЕНЁННЫЕ КЛЮЧИ CFG — перенести в CFG игры */\nvar CFG_PATCH = ' + JSON.stringify(cd).replace(/"([A-Za-z_$][\w$]*)":\s/g, '$1: ') + ';';
+  htTaD.value = txt;
+  htPanD.classList.add('show');
+}
+var htBDiff = el('button', { id: 'edDiff', 'class': 'edbtn', type: 'button', title: 'Дифф против оригинала' }, 'ДИФФ');
+htBDiff.addEventListener('click', htDiff);
+bar.insertBefore(htBDiff, gid('edHide'));
+
+/* --- сброс сессии: стереть и вернуть оригинал --- */
+var htBSess = el('button', { id: 'edSess', 'class': 'edbtn', type: 'button', title: 'Стереть сессию и вернуть оригинал' }, 'СЕСС ✕');
+htBSess.addEventListener('click', function(){
+  try { localStorage.removeItem(SKEY_ED); } catch(e){}
+  htApply(htPristine);
+  htHist = [htPristine]; htIdx = 0; htUndoBtns();
+  toast('Сессия стёрта — реестр возвращён к оригиналу');
+});
+bar.insertBefore(htBSess, gid('edHide'));
+
+/* --- восстановление сессии при старте --- */
+(function htRestore(){
+  try {
+    var raw = localStorage.getItem(SKEY_ED);
+    if (!raw) return;
+    var s = JSON.parse(raw);
+    if (!s || !s.db || !s.db.planets || !s.db.planets.length) return;
+    htApply(JSON.stringify(s));
+    htPush(htSnap());
+    toast('Сессия восстановлена: ' + new Date(s.t).toLocaleTimeString());
+  } catch(e){}
+})();
+htUndoBtns();
 })();
 
 </script>
