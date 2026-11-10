@@ -559,6 +559,61 @@ body.kb-single #keys2{ display:none !important; }
     background-size: 2px 3px, 12px 12px;
 }
 </style>
+<style>
+/* ☩ UI-X: ТЕМЫ (hue-rotate) — приёмы из «☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩» */
+html.th2{ filter:hue-rotate(-18deg); }
+html.th3{ filter:hue-rotate(-33deg); }
+html.th4{ filter:hue-rotate(-45deg); }
+html.th5{ filter:hue-rotate(-73deg); }
+html.th6{ filter:hue-rotate(-103deg); }
+html.th7{ filter:hue-rotate(-133deg); }
+html.th8{ filter:hue-rotate(-158deg); }
+html.th9{ filter:hue-rotate(142deg); }
+html.th10{ filter:hue-rotate(122deg); }
+html.th11{ filter:hue-rotate(107deg); }
+html.th12{ filter:hue-rotate(77deg); }
+/* ☩ UI-X: CRT-оверлей (вкл. классом body.crt) */
+body.crt::after{
+  content:""; position:fixed; inset:0; z-index:9999; pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.14) 0 1px, transparent 1px 3px);
+}
+/* ☩ UI-X: свечение панелей HUD (сегментные счётчики, LCD) */
+.ui-panel{ text-shadow:0 0 6px rgba(163,255,82,.45); }
+.ui-panel .segd div{ box-shadow:0 0 6px rgba(163,255,82,.85); }
+.ui-panel .segd{ text-shadow:0 0 8px rgba(163,255,82,.75); }
+/* ☩ UI-X: стиль блока управления (кнопки) */
+.ui-ctl button,
+.ui-ctl a{
+  border:4px outset #950; background:#16221c; color:#d8ffd0; cursor:pointer;
+  box-shadow:2px 2px 0 #000, inset 0 0 8px rgba(247,204,29,.12);
+  font-family:inherit; transition:background .12s, color .12s;
+}
+.ui-ctl button:hover,
+.ui-ctl a:hover{ background:#1d2b21; color:var(--gold); box-shadow:2px 2px 0 #000, inset 0 0 12px rgba(247,204,29,.3); }
+.ui-ctl button.on,
+.ui-ctl a.on{ background:#3a5a2b; color:#e2f77e; }
+/* ☩ INV: ИНВЕНТАРЬ (Minecraft-сетка) — панель по центру, открывается клавишей I */
+#invPanel{
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  z-index:8000; display:none; flex-direction:column; gap:10px;
+  background:rgba(8,12,18,.94); border:4px inset #1a2a3a; border-radius:10px;
+  padding:14px 16px; box-shadow:0 10px 40px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.07);
+  font-family:inherit; color:#d8ffd0; min-width:340px; user-select:none;
+}
+#invPanel h3{ margin:0 0 8px; font:700 14px/1 monospace; letter-spacing:2px; color:var(--gold); text-align:center; text-shadow:0 0 8px rgba(247,204,29,.5); }
+#invGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:8px; }
+.inv-slot{
+  position:relative; min-height:74px; border:2px solid #333; border-radius:8px;
+  background:#0a0a14; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  cursor:pointer; box-shadow:2px 2px 0 #000; transition:border-color .15s,background .15s,transform .1s;
+}
+.inv-slot:hover{ border-color:#f79e1d; background:#10101e; transform:translateY(-1px); }
+.inv-slot .inv-ico{ font-size:22px; line-height:1; }
+.inv-slot .inv-name{ font:700 8px/1 monospace; letter-spacing:1px; color:#9fd9a0; text-align:center; }
+.inv-slot .inv-cnt{ font:700 13px/1 monospace; color:#7dff8a; }
+.inv-slot .inv-meta{ position:absolute; right:3px; top:2px; font:700 6px/1 monospace; color:#666; }
+#invHint{ font:700 9px/1 monospace; color:#77aaff; letter-spacing:1px; text-align:center; }
+</style>
 </head>
 <body>
 <!-- ☩ ФОН: GLSL-планета R46 «ГРАНЬ» перенесена на задний план. Канва позади интерфейса,
@@ -2773,6 +2828,7 @@ function initTopPanel(){
   if(topPanel) return;
   topPanel = document.createElement('div');
   topPanel.setAttribute('data-keep', '1');
+  topPanel.classList.add('ui-panel');
   topPanel.style.cssText = 'position:fixed;top:8px;left:50%;transform:translateX(-50%) scale(0.59);transform-origin:top center;z-index:70;display:none;background:#0c150c;border:4px inset #1a1a2e;border-radius:8px;padding:6px 14px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
   topPanel.innerHTML = segRowHtmlN('segPtsEl', '\u{1F31F} ОЧКИ', 10);
   document.body.appendChild(topPanel);
@@ -2786,6 +2842,7 @@ function initBottomPanel(){
   if(botPanel) return;
   botPanel = document.createElement('div');
   botPanel.setAttribute('data-keep', '1');
+  botPanel.classList.add('ui-panel');
   botPanel.style.cssText = 'position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:70;display:none;flex-direction:column;gap:6px;background:#0c150c;border:4px inset #1a1a2e;border-radius:8px;padding:8px 13px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
   var hpRow = document.createElement('div');
   hpRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
@@ -3212,6 +3269,7 @@ function resetGame(){
   hpMax = CFG.HP0; hpCur = CFG.HP0;
   boostFuel = 0; boostOn = false; boostMul = 1; boostLeft = 0;
   magnetT = 0; freezeT = 0; pepBanT = 0; hotSel = 0; hotDenyT = 0;
+  totalCollected = 0; diskSpawned = false; diskInv = 0;
   for(var si = shots.length - 1; si >= 0; si--){ if(shots[si].el && shots[si].el.parentNode) shots[si].el.parentNode.removeChild(shots[si].el); }
   shots.length = 0;
   keys = {};
@@ -3243,7 +3301,13 @@ fadeEl.setAttribute('data-keep','1');
 var hud = document.createElement('div');
 hud.style.cssText = 'position:fixed;left:10px;top:10px;z-index:50;background:rgba(3,8,13,.8);border:2px inset #950;color:#7dff8a;font:10px/1.5 monospace;padding:5px 8px;pointer-events:none;white-space:pre;';
 document.body.appendChild(hud);
+hud.classList.add('ui-panel');
 hud.setAttribute('data-keep','1');
+var infoPanel = document.createElement('div');
+infoPanel.style.cssText = 'position:fixed;right:10px;top:10px;z-index:50;background:rgba(3,8,13,.8);border:2px inset #950;color:#7dff8a;font:10px/1.5 monospace;padding:5px 8px;pointer-events:none;white-space:normal;word-wrap:break-word;overflow-wrap:break-word;max-width:400px;';
+document.body.appendChild(infoPanel);
+infoPanel.classList.add('ui-panel');
+infoPanel.setAttribute('data-keep','1');
 var SEG_ON = {0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg'};
 var SEG_GEO = [
   ['h', 4, 0, 12, 4],
@@ -3259,9 +3323,29 @@ hudTxtEl = document.createElement('div');
 hudThrEl = document.createElement('div');
 hudThrEl.innerHTML = segRowHtmlN('hudThrSeg', '\u00D7\u0422\u042F\u0413\u0410', 3);
 hudThrEl.style.cssText = 'margin-top:4px;';
-hud.appendChild(hudTxtEl);
+infoPanel.appendChild(hudTxtEl);
 hud.appendChild(hudThrEl);
 hudThrSegEl = document.getElementById('hudThrSeg');
+var pickTray = document.createElement('div');
+pickTray.style.cssText = 'position:fixed;left:10px;bottom:70px;z-index:60;display:flex;flex-direction:column;gap:4px;pointer-events:none;';
+document.body.appendChild(pickTray);
+pickTray.setAttribute('data-keep','1');
+var PICK_COL = { cake:'#ffd9f0', cheese:'#ffe97d', moon:'#cfe0ff', pepper:'#ff5a4a', heart:'#ffb3d9', disk:'#ffd700' };
+var PICK_NAME = { cake:'КЕКС', cheese:'СЫР', moon:'ЛУНА', pepper:'ПЕРЕЦ', heart:'СЕРДЦЕ', disk:'ДИСК' };
+function addPickToast(kind){
+  var col = PICK_COL[kind] || '#cfe0ff';
+  var nm = PICK_NAME[kind] || kind;
+  var t = document.createElement('div');
+  t.style.cssText = 'background:rgba(3,8,13,.85);border:2px inset ' + col + ';color:' + col + ';'
+    + 'font:700 11px/1.3 monospace;padding:3px 8px;border-radius:4px;opacity:1;'
+    + 'transition:opacity .6s ease;white-space:nowrap;box-shadow:0 0 8px rgba(0,0,0,.5);';
+  t.textContent = '+' + (kind === 'moon' ? '' : '1 ') + ' ' + nm;
+  pickTray.appendChild(t);
+  setTimeout(function(){
+    t.style.opacity = '0';
+    setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 700);
+  }, 3000);
+}
 var ctl = document.createElement('div');
 ctl.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:50;display:flex;flex-direction:column-reverse;align-items:center;gap:6px;';
 var btnPilot = document.createElement('button');
@@ -3276,7 +3360,19 @@ var btnLore = document.createElement('a');
 btnLore.href = 'hitomi_of_legends.html'; btnLore.textContent = '📖Мимуары';
 btnLore.style.cssText = btnShelf.style.cssText;
 ctl.appendChild(btnShelf); ctl.appendChild(btnLore);
+var TH_SEQ = ['th1','th2','th3','th4','th5','th6','th7','th8','th9','th10','th11','th12'];
+var TH_i = 0;
+function cycleTheme(){
+  document.documentElement.classList.remove(TH_SEQ[TH_i]);
+  TH_i = (TH_i + 1) % TH_SEQ.length;
+  document.documentElement.classList.add(TH_SEQ[TH_i]);
+}
+var btnTheme = document.createElement('button');
+btnTheme.textContent = '🎨ТЕМА';
+btnTheme.addEventListener('click', cycleTheme);
+ctl.appendChild(btnTheme);
 document.body.appendChild(ctl);
+ctl.classList.add('ui-ctl');
 ctl.setAttribute('data-keep','1');
 
 /* ---------- СЕМИСЕГМЕНТНЫЕ СЧЁТЧИКИ (кекс/сыр) ---------- */
@@ -3339,6 +3435,7 @@ function initSegPanel(){
   if(segPanel) return;
   segPanel = document.createElement('div');
   segPanel.setAttribute('data-keep', '1');
+  segPanel.classList.add('ui-panel');
   segPanel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:60;display:none;flex-direction:column;gap:6px;background:#0c150c;border:4px inset #1a1a2e;border-radius:6px;padding:10px 11px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
   segPanel.innerHTML = segRowHtml('segCakeEl','\u{1F9C1} КЕКС') + segRowHtml('segCheeseEl','\u{1F9C0} СЫР') + segRowHtml('segStockEl','\u{1F31D} ЗАПАС');
   document.body.appendChild(segPanel);
@@ -3374,6 +3471,15 @@ function spawnOrbit(kind, glyph, rmin, rmax, sz, wbase, pi){
   if(len(ax) < 0.05) ax = [0,1,0];
   ITEMS.push({ el: makeSprite(glyph), kind: kind, p0: mul(dir, r),
     axis: norm(ax), w: wbase + srand()*0.10, planet: pi, angle: 0, sz: sz });
+}
+/* Диск с историей: появляется у планеты после 50 собранных единиц любого предмета.
+   Максимум 1 диск: если он уже в инвентаре или уже на орбите — ничего не спавнится. */
+function maybeSpawnDisk(){
+  if(totalCollected < 50 || diskInv >= 1) return;
+  for(var i=0;i<ITEMS.length;i++) if(ITEMS[i] && ITEMS[i].kind === 'disk') return;
+  diskSpawned = true;
+  spawnOrbit('disk', '\u{1F4C0}', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, planet);
+  if(hudTxtEl) hudTxtEl.textContent += ' 📀 Сигнал: «Забытая запись от 8022 года»';
 }
 function genWorld(){
   for(var pi = 0; pi < PLANET_NAMES.length; pi++){
@@ -3472,6 +3578,9 @@ function sunDirNow(simT){
 /* ---------- СБОР И ЭФФЕКТЫ ---------- */
 var score = { cake: 0, cheese: 0, moon: 0 };
 var provCk = CFG.START_PROV, provCh = CFG.START_PROV;
+var pepperInv = 0;
+var diskInv = 0;
+var totalCollected = 0, diskSpawned = false;
 var pts = 0, moonTot = 0;
 var moonStock = 0, moonCap = CFG.MOON_CAP0;
 var immuneT = 0, pepperCd = 0;
@@ -3542,10 +3651,13 @@ function collect(it, pr){
     provCk = Math.max(0, provCk - CFG.PEPPER_CK);
     provCh = Math.max(0, provCh - CFG.PEPPER_CH);
     boostFuel = Math.max(0, boostFuel - CFG.BOOST_PEPPER);
+    pepperInv++;
     hurt(1, pr);
     playPepper();
+    if(addPickToast) addPickToast('pepper');
     segUpdate();
     saveScore();
+    invUpdateCounts();
     if(hpCur <= 0) doGameOver();
     respawn(it);
     return;
@@ -3554,12 +3666,26 @@ function collect(it, pr){
     hpCur = Math.min(hpMax, hpCur + 1);
     playHeart();
     flash(pr.x, pr.y, 'heart');
+    if(addPickToast) addPickToast('heart');
     updBottomPanel();
     saveScore();
     respawn(it);
     return;
   }
+  if(it.kind === 'disk'){
+    if(diskInv >= 1) return;
+    diskInv = 1;
+    it._dead = true;
+    if(it.el && it.el.parentNode) it.el.parentNode.removeChild(it.el);
+    playPickup('moon');
+    if(addPickToast) addPickToast('disk');
+    invUpdateCounts();
+    saveScore();
+    return;
+  }
   score[it.kind]++;
+  totalCollected++;
+  maybeSpawnDisk();
   if(it.kind === 'cake'){
     provCk += mult;
     pts += mult*CFG.PTS_CAKE;
@@ -3582,6 +3708,7 @@ function collect(it, pr){
   if(!expMax && !winShown && expTotal >= CFG.EXP_WIN) doWin();
   playPickup(it.kind);
   flash(pr.x, pr.y, it.kind);
+  if(addPickToast) addPickToast(it.kind);
   segBump(it.kind);
   if(bearWrap){
     var jb = bearWrap.querySelector('.bear');
@@ -4595,8 +4722,14 @@ window.addEventListener('keydown', function(e){
   }
   if(gameOn && e.code === 'Escape' && !e.repeat){
     e.preventDefault(); e.stopPropagation();
+    if(INV_OPEN){ invToggle(false); return; }
     cancelWarp();
     document.body.classList.toggle('dgame');
+    return;
+  }
+  if(gameOn && e.code === 'KeyI' && !e.repeat){
+    e.preventDefault(); e.stopPropagation();
+    invToggle();
     return;
   }
   if(gameOn && e.code === 'KeyO' && !e.repeat){
@@ -4611,7 +4744,9 @@ window.addEventListener('keydown', function(e){
   }
   if(gameOn && !paused && !warp && e.code === 'KeyT' && !e.repeat){
     e.preventDefault(); e.stopPropagation();
-    useHot(hotSel);
+    var __invRes = invRes(invSel);
+    if(__invRes && __invRes.meta && __invRes.meta.triggers && __invRes.meta.triggers.onT) invFire('onT', __invRes);
+    else useHot(hotSel);
     return;
   }
   if(gameOn && !paused && !warp && /^Digit[1-7]$/.test(e.code) && !e.repeat){
@@ -4619,7 +4754,7 @@ window.addEventListener('keydown', function(e){
     hotSelect(parseInt(e.code.slice(5), 10) - 1);
     return;
   }
-  if(!gameOn || paused || warp || !KEYSET[e.code]) return;
+  if(!gameOn || paused || warp || INV_OPEN || !KEYSET[e.code]) return;
   e.preventDefault(); e.stopPropagation();
   if(e.code === 'KeyY' && !e.repeat) cycleTarget();
   else if(e.code === 'KeyG' && !e.repeat) fsdJump(1);
@@ -4692,9 +4827,11 @@ function applyGameMode(){
   if(!btnPilot.disabled) btnPilot.textContent = gameOn ? '️💠 Пауза ' : '🎮️ Играть ';
   layer.style.display = gameOn ? '' : 'none';
   hud.style.display = gameOn ? '' : 'none';
+  if(infoPanel) infoPanel.style.display = gameOn ? '' : 'none';
   keys = {}; drag = null; if(!gameOn) cancelWarp();
   if(!gameOn && document.pointerLockElement) document.exitPointerLock();
   if(segPanel){ segPanel.style.display = gameOn ? 'flex' : 'none'; if(gameOn) segUpdate(); }
+  if((!gameOn || paused) && INV_OPEN && INV_PANEL){ INV_OPEN = false; INV_PANEL.style.display = 'none'; }
   if(topPanel) topPanel.style.display = gameOn ? 'block' : 'none';
   if(botPanel) botPanel.style.display = gameOn ? 'flex' : 'none';
   if(lensEl) lensEl.style.display = 'none';
@@ -4773,6 +4910,7 @@ function loop(now){
         }
         ensureSnow();
         tickShots(FIX_DT);
+        invTickAll();
       }
       if(simAcc >= FIX_DT*MAX_TICKS) simAcc = 0; /* защита от «лавины» */
       if(snowEl) snowEl.style.opacity = (freezeT > 0) ? '1' : '0';
@@ -4807,7 +4945,236 @@ function loop(now){
   }
 }
 window.__LOAD && __LOAD.mark('ИГРА');
-initSegPanel();
+
+/* ☩ INV: ИНВЕНТАРЬ (Minecraft-сетка). Ресурсы перенесены со счётчика segPanel.
+   У каждого ресурса: id, имя, количество (proxy к провизии), метаданные с триггерами.
+   По умолчанию триггеров в мета нет — они добавляются, когда нужно взаимодействие. */
+var INV_OPEN = false;
+var INV_PANEL = null, INV_GRID = null;
+var invSel = 'cake';
+var INV = [
+  { id:'cake',   name:'КЕКС',  icon:'\u{1F9C1}',
+    get:function(){ return provCk; },
+    set:function(v){ provCk = Math.max(0, v); },
+    meta:{ triggers:{} } },
+  { id:'cheese', name:'СЫР',   icon:'\u{1F9C0}',
+    get:function(){ return provCh; },
+    set:function(v){ provCh = Math.max(0, v); },
+    meta:{ triggers:{} } },
+  { id:'stock',  name:'ЗАПАС', icon:'\u{1F31D}',
+    get:function(){ return moonStock; },
+    set:function(v){ moonStock = Math.max(0, Math.min(moonCap, v)); },
+    meta:{ triggers:{} } },
+  { id:'pepper', name:'ПЕРЦЫ', icon:'\u{1F336}\uFE0F',
+    get:function(){ return pepperInv; },
+    set:function(v){ pepperInv = Math.max(0, v); },
+    meta:{ triggers:{} } },
+  { id:'disk',   name:'ДИСК',  icon:'\u{1F4C0}',
+    get:function(){ return diskInv; },
+    set:function(v){ diskInv = Math.max(0, Math.min(1, v)); },
+    meta:{ triggers:{} } }
+];
+function invRes(id){
+  for(var i=0;i<INV.length;i++) if(INV[i].id === id) return INV[i];
+  return null;
+}
+/* ---------- ДВИЖОК ТРИГГЕРОВ ----------
+   meta.triggers = { onTick: [шаги], onT: [...], onRMB: [...], onLMB: [...] }
+   Шаг: { if:{cond}, then:[..], else:[..] } | { for:{var,from,to}, body:[..] }
+        { while:{cond}, body:[..] } | { switch:{field, case:{v:[..]}}, default }
+        действие: { add/sub/set:{target:кол-во} }, { effect:'shield|magnet|freeze|flash' } */
+function invVal(res, field){
+  if(field === 'count') return res.get();
+  if(field === 'pts') return pts;
+  if(field === 'exp') return expTotal;
+  if(field === 'hp') return hpCur;
+  if(field === 'fuel') return boostFuel;
+  if(field === 'stock') return moonStock;
+  var r = invRes(field);
+  return r ? r.get() : 0;
+}
+function invCond(cond, ctx){
+  if(!cond) return false;
+  if(cond.and){ for(var i=0;i<cond.and.length;i++) if(!invCond(cond.and[i], ctx)) return false; return true; }
+  if(cond.or){ for(var j=0;j<cond.or.length;j++) if(invCond(cond.or[j], ctx)) return true; return false; }
+  var lhs = invVal(ctx.res, cond.field || cond.f || 'count');
+  var op = cond.op || '>=';
+  var rhs = (typeof cond.val === 'number') ? cond.val : invVal(ctx.res, cond.val || 'count');
+  if(op === 'eq') return lhs === rhs;
+  if(op === 'ne') return lhs !== rhs;
+  if(op === '>')  return lhs > rhs;
+  if(op === '>=') return lhs >= rhs;
+  if(op === '<')  return lhs < rhs;
+  if(op === '<=') return lhs <= rhs;
+  return false;
+}
+function invApply(a, ctx){
+  if(!a) return;
+  var res = ctx.res;
+  if(a.add){ for(var k in a.add){ var v=a.add[k];
+    if(k==='count' && res) res.set(res.get()+v);
+    else if(k==='pts') pts+=v;
+    else if(k==='exp') expTotal+=v;
+    else if(k==='hp') hpCur=Math.max(0,Math.min(hpMax,hpCur+v));
+    else if(k==='fuel') boostFuel=Math.min(100,boostFuel+v);
+    else { var r=invRes(k); if(r) r.set(r.get()+v); }
+  } }
+  if(a.sub){ for(var s in a.sub){ var w=a.sub[s];
+    if(s==='count' && res) res.set(res.get()-w);
+    else if(s==='pts') pts-=w;
+    else if(s==='exp') expTotal-=w;
+    else if(s==='hp') hpCur=Math.max(0,hpCur-w);
+    else if(s==='fuel') boostFuel=Math.max(0,boostFuel-w);
+    else { var r2=invRes(s); if(r2) r2.set(r2.get()-w); }
+  } }
+  if(a.set){ for(var t in a.set){ var u=a.set[t];
+    if(t==='count' && res) res.set(u);
+    else if(t==='pts') pts=u;
+    else if(t==='exp') expTotal=u;
+    else if(t==='hp') hpCur=Math.max(0,Math.min(hpMax,u));
+    else if(t==='fuel') boostFuel=Math.max(0,Math.min(100,u));
+    else { var r3=invRes(t); if(r3) r3.set(u); }
+  } }
+  if(a.effect){
+    if(a.effect==='shield'){ immuneT = CFG.SHIELD_T; ensureLens(); }
+    else if(a.effect==='magnet') magnetT = MAG_T;
+    else if(a.effect==='freeze') freezeT = CFG.FREEZE_T;
+    else if(a.effect==='flash') doFlash();
+  }
+}
+function invRun(steps, ctx){
+  if(!steps) return;
+  for(var i=0;i<steps.length;i++){
+    var s = steps[i];
+    if(!s) continue;
+    if(s.if){ if(invCond(s.if, ctx)) invRun(s.then||[], ctx); else invRun(s.else||[], ctx); }
+    else if(s.for){
+      var from = s.for.from||0, to = s.for.to||0;
+      for(var v=from; v<=to; v++){ ctx.loopVar=v; ctx.loopName=s.for.var||'i'; invRun(s.for.body||[], ctx); }
+    }
+    else if(s.while){
+      var g=0;
+      while(invCond(s.while, ctx) && g<1000){ g++; invRun(s.while.body||[], ctx); }
+    }
+    else if(s.switch){
+      var sv = invVal(ctx.res, s.switch.field||s.switch.on||'count');
+      var ca = s.switch.case || {};
+      var key = String(sv);
+      if(ca[key]) invRun(ca[key], ctx);
+      else if(ca['default']) invRun(ca['default'], ctx);
+    }
+    else { invApply(s, ctx); }
+  }
+}
+function invFire(triggerName, res){
+  var tg = res && res.meta && res.meta.triggers ? res.meta.triggers[triggerName] : null;
+  if(!tg) return;
+  invRun(tg, { res: res });
+  invUpdateCounts();
+  saveScore();
+}
+function invTickAll(){
+  if(!gameOn || gameOver) return;
+  for(var i=0;i<INV.length;i++){
+    var tg = INV[i].meta && INV[i].meta.triggers ? INV[i].meta.triggers.onTick : null;
+    if(tg) invRun(tg, { res: INV[i] });
+  }
+  invUpdateCounts();
+  saveScore();
+}
+/* ПКМ по перчику: случайное вознаграждение. Сыр/кекс 40%+40%, запас 20% (пониженный шанс).
+   ПКМ расходует 1 перчик и НЕ наносит урон. */
+function invPepperLuck(){
+  if(!gameOn || gameOver) return;
+  if(pepperInv < 1) return;
+  pepperInv--;
+  var r = Math.random()*100;
+  if(r < 40){ provCh++; }
+  else if(r < 80){ provCk++; }
+  else { if(moonStock < moonCap) moonStock++; }
+  invUpdateCounts();
+  saveScore();
+}
+/* Диск с историей: ПКМ включает/выключает локальный файл Storry-1.mp3.
+   Громкость — как у музыки в игре (0.45). Требуется наличие диска в инвентаре. */
+var diskAudio = null, diskPlaying = false;
+function invDiskToggle(){
+  if(diskInv < 1) return;
+  if(!diskAudio){
+    try{ diskAudio = new Audio(relURL('Storry-1.mp3')); }catch(e){ return; }
+    diskAudio.volume = 0.45;
+    diskAudio.loop = false;
+  }
+  if(diskPlaying){
+    try{ diskAudio.pause(); diskAudio.currentTime = 0; }catch(e){}
+    diskPlaying = false;
+  } else {
+    diskPlaying = true;
+    try{ var p = diskAudio.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
+  }
+}
+/* ---------- UI: ПАНЕЛЬ + СЕТКА + ОТКРЫТИЕ/ЗАКРЫТИЕ (клавиша I) ---------- */
+function initInvPanel(){
+  if(INV_PANEL) return;
+  INV_PANEL = document.createElement('div');
+  INV_PANEL.id = 'invPanel';
+  INV_PANEL.setAttribute('data-keep','1');
+  INV_PANEL.innerHTML = '<h3>\u{1F9F2} ИНВЕНТАРЬ</h3><div id="invGrid"></div><div id="invHint">ЛКМ — выбрать · ПКМ — триггер · T — использовать · I/Esc — закрыть</div>';
+  document.body.appendChild(INV_PANEL);
+  INV_GRID = document.getElementById('invGrid');
+  invRefresh();
+}
+function invRefresh(){
+  if(!INV_GRID) return;
+  INV_GRID.innerHTML = '';
+  for(var i=0;i<INV.length;i++){
+    var r = INV[i];
+    if(r.get() <= 0) continue;
+    var cell = document.createElement('div');
+    cell.className = 'inv-slot' + (invSel === r.id ? ' inv-sel' : '');
+    cell.dataset.id = r.id;
+    var nTrig = 0;
+    if(r.meta && r.meta.triggers){ for(var t in r.meta.triggers) nTrig++; }
+    cell.innerHTML = '<div class="inv-ico">'+r.icon+'</div>'
+      + '<div class="inv-name">'+r.name+'</div>'
+      + '<div class="inv-cnt">'+r.get()+'</div>'
+      + (nTrig ? '<div class="inv-meta">TRG</div>' : '');
+    (function(rid){
+      cell.addEventListener('mousedown', function(ev){
+        if(ev.button === 2){
+          ev.preventDefault();
+          if(rid === 'pepper'){ invPepperLuck(); }
+          if(rid === 'disk'){ invDiskToggle(); }
+          invFire('onRMB', invRes(rid));
+          return;
+        }
+        invSel = rid;
+        invRefresh();
+        invFire('onLMB', invRes(rid));
+      });
+      cell.addEventListener('contextmenu', function(ev){ ev.preventDefault(); });
+    })(r.id);
+    INV_GRID.appendChild(cell);
+  }
+}
+function invUpdateCounts(){
+  if(!INV_GRID) return;
+  var cells = INV_GRID.children;
+  for(var i=0;i<cells.length;i++){
+    var id = cells[i].dataset.id, r = invRes(id);
+    var c = cells[i].querySelector('.inv-cnt');
+    if(r && c){ var v = r.get(); if(c._v !== v){ c.textContent = v; c._v = v; } }
+    if(r) cells[i].style.display = (r.get() <= 0) ? 'none' : '';
+  }
+}
+function invToggle(open){
+  if(open === undefined) open = !INV_OPEN;
+  INV_OPEN = open;
+  if(INV_PANEL) INV_PANEL.style.display = INV_OPEN ? 'flex' : 'none';
+  if(INV_OPEN){ invRefresh(); }
+}
+
+initInvPanel();
 initTopPanel();
 initBottomPanel();
 initGoPanel();
