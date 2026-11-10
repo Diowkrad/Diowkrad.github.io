@@ -799,6 +799,8 @@ float mapSDF(vec3 p, vec3 sC){
   float d = length(p - sC) - R;
   for(int di = 0; di < 10; di++){
     if(di >= int(uPCount + 0.5)) break;
+    /* СТАР-ЛОД: сфера Шинрарта-A не затеняет собственный свет (совпадает с uStarPos) */
+    if(length(uP[di] - uStarPos) < R*1.5) continue;
     d = min(d, length(p - uP[di]) - R);
   }
   if(uHyper > 0.5){
@@ -954,6 +956,10 @@ void main(){
   vec3 rd0    = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
   vec3 rd     = rd0;
   vec3 up0    = normalize(camPos);
+  /* ЛОД-СИНХРОН ШИНРАРТА-A: угловой радиус диска света = угловой радиус сферы;
+     издали диск не меньше сферы (не «пропадает»), при подлёте диск дорастает до сферы */
+  float dStarSync = max(length(uStarPos - camPos), R*1.05);
+  float sunR_eff = max(uSunR, 0.5*R*R/(dStarSync*dStarSync));
 
   /* ГРАВИТАЦИОННАЯ ЛИНЗА ПУЛЬСАРОВ B/C: сначала проверяем попадание в пульсар
      ПО ИСХОДНОМУ лучу rd0 (неискривлённому), чтобы лучи, идущие прямо в пульсар,
@@ -968,8 +974,6 @@ void main(){
 
   /* свет — направление от Шинрарта-A (0,0,0) к текущей планете (точка света) */
   vec3 sunDir  = normalize(uStarPos - sC);
-  float dStar = max(length(uStarPos - camPos), R*1.05);
-  float sunR_eff = max(uSunR, 0.5*R*R/(dStar*dStar));
   vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
 
   /* ГРАВИТАЦИОННАЯ ЛИНЗА применяется ТОЛЬКО к лучам, промахнувшимся мимо пульсара:
@@ -1186,6 +1190,7 @@ void main(){
   float bestT = 1.0e9;
   vec3 sphCol = vec3(0.0);
   bool haveSph = false;
+  bool starHit = false;
   for(int di = 0; di < 10; di++){
     if(di >= int(uPCount + 0.5)) break;
     vec3 pc = uP[di];
@@ -1201,20 +1206,19 @@ void main(){
           vec3 pp = camPos + rd*th;
           vec3 nn = normalize(pp - pc);
           float dnl  = dot(nn, normalize(uStarPos - pp));
+          /* СТАР-ЛОД: звезда самосветится — дневная сторона всегда 1.0 */
           float isStar = (dk == 4) ? 1.0 : 0.0;
           float dlit = mix(smoothstep(-0.02, 0.10, dnl), 1.0, isStar);
-          if(isStar < 0.5){
-            dlit *= softShadowSDF(pp + nn*0.02, normalize(uStarPos - pp), sC);
-          }
+          if(isStar < 0.5){ dlit *= softShadowSDF(pp + nn*0.02, normalize(uStarPos - pp), sC); }
           gRow = uPIa[di];
           gCur = 0.0;
           sphCol = shadeSurface(dk, nn, dlit, rd, normalize(uStarPos - pp));
           float muL = clamp(dot(nn, -rd), 0.0, 1.0);
           sphCol *= (0.38 + 0.62*pow(muL, 0.55));
           float bt2 = (dnl - 0.015)/0.085;
-          float bandT = exp(-bt2*bt2)*(1.0 - isStar);
-          sphCol += vec3(1.0, 0.44, 0.20)*bandT*0.30*max(dlit, 0.12);
-          bestT = th; haveSph = true;
+          float bandT = exp(-bt2*bt2);
+          sphCol += vec3(1.0, 0.44, 0.20)*bandT*0.30*max(dlit, 0.12)*(1.0 - isStar);
+          bestT = th; haveSph = true; starHit = (isStar > 0.5);
         }
       }
     }
@@ -1241,7 +1245,7 @@ void main(){
         float bt24 = (nl4 - 0.015)/0.085;
         float bandT4 = exp(-bt24*bt24);
         sphCol += vec3(1.0, 0.44, 0.20)*bandT4*0.30*max(lit4, 0.12);
-        bestT = th4; haveSph = true;
+        bestT = th4; haveSph = true; starHit = false;
       }
     }
     /* солнце гиперпространства — диск и ореол направлены на Шинрарта-A */
@@ -1251,6 +1255,13 @@ void main(){
     col += uSunC*smoothstep(1.0-sunR_eff, 1.0-sunR_eff*0.4375, hSun)*3.0*uSunB;
   }
   if(haveSph){ col = sphCol; }
+  /* КОРОНА ПОВЕРХ ФОТОСФЕРЫ: если победила сфера звезды — свет ЛОД-1
+     продолжает окружать ЛОД-2 (подсветка за лимбом) */
+  if(haveSph && starHit){
+    vec3 starDirK = normalize(uStarPos - camPos);
+    float dStK = dot(rd, starDirK);
+    col += uSunC*pow(max(dStK,0.0), 6.0)*0.35*uSunB;
+  }
 /* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
   /* RING-DEPTH: кольца — последний слой глубины (после планет); окклюзия на пиксель */
   if(uHyper <= 0.5 && uRingOn > 0.5){
