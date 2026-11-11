@@ -613,6 +613,11 @@ body.crt::after{
 .inv-slot .inv-cnt{ font:700 13px/1 monospace; color:#7dff8a; }
 .inv-slot .inv-meta{ position:absolute; right:3px; top:2px; font:700 6px/1 monospace; color:#666; }
 #invHint{ font:700 9px/1 monospace; color:#77aaff; letter-spacing:1px; text-align:center; }
+#invTabs{ display:flex; gap:6px; margin-bottom:8px; justify-content:center; }
+.inv-tab{ font:700 10px/1 monospace; letter-spacing:1px; color:#9fd9a0; background:#0a0a14; border:2px solid #333; border-radius:6px; padding:5px 12px; cursor:pointer; box-shadow:2px 2px 0 #000; }
+.inv-tab:hover{ border-color:#f79e1d; }
+.inv-tab.on{ background:#3a5a2b; color:#e2f77e; border-color:#f79e1d; }
+.inv-slot.disk-slot{ min-height:84px; }
 </style>
 </head>
 <body>
@@ -1013,6 +1018,36 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
    kind: terrestrial | gas | pulsar | cheese; unlock — EXP для разблокировки.
    Блок объявлен ДО R46-фона: шейдер дотягивается до реестра в кадре — исключён доступ до инициализации. */
 var PLANETS_DB = {
+  soi: 11,
+  planets: [
+    { name:'ХИТОМИ', pos:[-19.15,0,3.66], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], rkm:70000, rot:32, rspd:1.45, axx:-4, axy:0, axz:0, kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'НГАЛИН', pos:[-18.43,32,59.08], rkm:21000, rot:-90, rspd:0.255, axx:90, axy:12, axz:0, kind:'gas', palette:'#300090', rings:false, moons:[], jets:false, unlock:500, track:'Music-3.ogg', fx:{"atm":"#3600a3","glow":2.89,"size":1.17,"spin":2.75,"pulse":2.5,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":4.8,"icecov":0.21,"cloudcov":0.12,"cityk":0.9,"aurk":0.35,"stormk":1,"r1":"#4c00ff","r2":"#25007a","lava":"#ff4000","fres":"#1e0042"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'ШИНРАРТА-B', pos:[21.95,36,-15.57], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'Элизия', pos:[61.26,0,61], rkm:7400, rot:16, rspd:0.035, axx:16, axy:2, axz:0, kind:'terrestrial', palette:'#d400ff', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }], jets:false, unlock:2200, track:'Bonus-1.ogg', fx:{"atm":"#773a83","glow":3.56,"size":2.19,"spin":4.45,"pulse":4.15,"jets":{"on":0,"c1":"#ff00c8","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#c800ff","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.25,"icecov":0.75,"cloudcov":0.62,"cityk":0.9,"aurk":0.1,"stormk":1.85,"ocean":"#30003d","land1":"#9a4b9b","land2":"#685a37","ice":"#6e00db","cloud":"#8a2ce8","city":"#4d3c00","aur":"#040042"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'Брэстла', pos:[96.48,0,29.95], rkm:6800, rot:35, rspd:0.001, axx:45, axy:35, axz:0, kind:'gas', palette:'#eeff00', rings:true, moons:[], jets:false, unlock:2800, track:'Bonus-2.ogg', fx:{"atm":"#292929","glow":1.6,"size":1.02,"spin":0.55,"pulse":1.05,"jets":{"on":false,"c1":"#ff8c33","c2":"#73bfff","sp":0.618,"len":6.5},"ring":{"on":1,"c":"#8c7340","sp":0.04,"in":1.15,"out":2.26},"surf":{"scale":1.45,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#422000","r2":"#0f0300","lava":"#4d2d00","fres":"#4d0000"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'Шинрарта-С', pos:[85.58,0,-66.13], rkm:1400, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], rkm:24000, rot:112, rspd:2, axx:14, axy:0, axz:2, kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'Диовкрад', pos:[-106.98,0,24.9], rkm:26000, rot:0, rspd:0.1, axx:0, axy:0, axz:0, kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#ff1e14","sunB":0.35,"sunR":0.0002} },
+    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ff1e0f","ln1":"#fbff11","ln2":"#ffbb1e","sp1":"#9e0b02","sp2":"#2e0e00","pr":"#ff1e0f"},"sun":"#ff1e0f","sunB":5,"sunR":0.0032} }
+  ]
+};
+var PLANETS_DB2 = {
+  soi: 11,
+  planets: [
+    { name:'ХИТОМИ', pos:[-19.15,0,3.66], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], rkm:70000, rot:32, rspd:1.45, axx:-4, axy:0, axz:0, kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'НГАЛИН', pos:[-18.43,32,59.08], rkm:21000, rot:-90, rspd:0.255, axx:90, axy:12, axz:0, kind:'gas', palette:'#300090', rings:false, moons:[], jets:false, unlock:500, track:'Music-3.ogg', fx:{"atm":"#3600a3","glow":2.89,"size":1.17,"spin":2.75,"pulse":2.5,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":4.8,"icecov":0.21,"cloudcov":0.12,"cityk":0.9,"aurk":0.35,"stormk":1,"r1":"#4c00ff","r2":"#25007a","lava":"#ff4000","fres":"#1e0042"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'ШИНРАРТА-B', pos:[21.95,36,-15.57], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'Элизия', pos:[61.26,0,61], rkm:7400, rot:16, rspd:0.035, axx:16, axy:2, axz:0, kind:'terrestrial', palette:'#d400ff', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }], jets:false, unlock:2200, track:'Bonus-1.ogg', fx:{"atm":"#773a83","glow":3.56,"size":2.19,"spin":4.45,"pulse":4.15,"jets":{"on":0,"c1":"#ff00c8","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#c800ff","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.25,"icecov":0.75,"cloudcov":0.62,"cityk":0.9,"aurk":0.1,"stormk":1.85,"ocean":"#30003d","land1":"#9a4b9b","land2":"#685a37","ice":"#6e00db","cloud":"#8a2ce8","city":"#4d3c00","aur":"#040042"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'Брэстла', pos:[96.48,0,29.95], rkm:6800, rot:35, rspd:0.001, axx:45, axy:35, axz:0, kind:'gas', palette:'#eeff00', rings:true, moons:[], jets:false, unlock:2800, track:'Bonus-2.ogg', fx:{"atm":"#292929","glow":1.6,"size":1.02,"spin":0.55,"pulse":1.05,"jets":{"on":false,"c1":"#ff8c33","c2":"#73bfff","sp":0.618,"len":6.5},"ring":{"on":1,"c":"#8c7340","sp":0.04,"in":1.15,"out":2.26},"surf":{"scale":1.45,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#422000","r2":"#0f0300","lava":"#4d2d00","fres":"#4d0000"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'Шинрарта-С', pos:[85.58,0,-66.13], rkm:1400, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], rkm:24000, rot:112, rspd:2, axx:14, axy:0, axz:2, kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+    { name:'Диовкрад', pos:[-106.98,0,24.9], rkm:26000, rot:0, rspd:0.1, axx:0, axy:0, axz:0, kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#ff1e14","sunB":0.35,"sunR":0.0002} },
+    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ff1e0f","ln1":"#fbff11","ln2":"#ffbb1e","sp1":"#9e0b02","sp2":"#2e0e00","pr":"#ff1e0f"},"sun":"#ff1e0f","sunB":5,"sunR":0.0032} }
+  ]
+};
+var PLANETS_DB3 = {
   soi: 11,
   planets: [
     { name:'ХИТОМИ', pos:[-19.15,0,3.66], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
@@ -3269,7 +3304,9 @@ function resetGame(){
   hpMax = CFG.HP0; hpCur = CFG.HP0;
   boostFuel = 0; boostOn = false; boostMul = 1; boostLeft = 0;
   magnetT = 0; freezeT = 0; pepBanT = 0; hotSel = 0; hotDenyT = 0;
-  totalCollected = 0; diskSpawned = false; diskInv = 0;
+  totalCollected = 0;
+  for(var _di=0; _di<DISKS.length; _di++){ DISKS[_di].have = 0; }
+  if(diskPlaying && diskAudio){ try{ diskAudio.pause(); diskAudio.currentTime = 0; }catch(e){} diskPlaying = false; diskCurrent = null; }
   for(var si = shots.length - 1; si >= 0; si--){ if(shots[si].el && shots[si].el.parentNode) shots[si].el.parentNode.removeChild(shots[si].el); }
   shots.length = 0;
   keys = {};
@@ -3475,11 +3512,16 @@ function spawnOrbit(kind, glyph, rmin, rmax, sz, wbase, pi){
 /* Диск с историей: появляется у планеты после 50 собранных единиц любого предмета.
    Максимум 1 диск: если он уже в инвентаре или уже на орбите — ничего не спавнится. */
 function maybeSpawnDisk(){
-  if(totalCollected < 50 || diskInv >= 1) return;
-  for(var i=0;i<ITEMS.length;i++) if(ITEMS[i] && ITEMS[i].kind === 'disk') return;
-  diskSpawned = true;
-  spawnOrbit('disk', '\u{1F4C0}', CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, planet);
-  if(hudTxtEl) hudTxtEl.textContent += ' 📀 Сигнал: «Забытая запись от 8022 года»';
+  for(var d=0; d<DISKS.length; d++){
+    var dis = DISKS[d];
+    if(dis.have >= 1) continue;
+    if(!dis.need()) continue;
+    var onOrbit = false;
+    for(var i=0;i<ITEMS.length;i++) if(ITEMS[i] && ITEMS[i].kind === dis.id) { onOrbit = true; break; }
+    if(onOrbit) continue;
+    spawnOrbit(dis.id, dis.icon, CFG.PICK_RMIN, CFG.PICK_RMAX, 0, 0.05, planet);
+    if(hudTxtEl) hudTxtEl.textContent += ' ' + dis.icon + ' Сигнал: «' + dis.name + '»';
+  }
 }
 function genWorld(){
   for(var pi = 0; pi < PLANET_NAMES.length; pi++){
@@ -3579,8 +3621,16 @@ function sunDirNow(simT){
 var score = { cake: 0, cheese: 0, moon: 0 };
 var provCk = CFG.START_PROV, provCh = CFG.START_PROV;
 var pepperInv = 0;
-var diskInv = 0;
-var totalCollected = 0, diskSpawned = false;
+var totalCollected = 0;
+/* Реестр дисков. Каждый диск: 1 экз, спавнится 1 раз за забег на текущей планете
+   при выполнении условия, в инвентарь добавляется только при сборе. */
+var DISKS = [
+  { id:'disk1', name:'Забытая запись от 8022 года', icon:'\u{1F4C0}', file:'Storry-1.mp3',
+    need:function(){ return totalCollected >= 50; }, have:0 },
+  { id:'disk2', name:'Фрактальный FSD', icon:'\u{1F4BF}', file:'/Storry-2.mp3',
+    need:function(){ return expTotal >= 2250; }, have:0 }
+];
+function diskById(id){ for(var i=0;i<DISKS.length;i++) if(DISKS[i].id===id) return DISKS[i]; return null; }
 var pts = 0, moonTot = 0;
 var moonStock = 0, moonCap = CFG.MOON_CAP0;
 var immuneT = 0, pepperCd = 0;
@@ -3672,13 +3722,13 @@ function collect(it, pr){
     respawn(it);
     return;
   }
-  if(it.kind === 'disk'){
-    if(diskInv >= 1) return;
-    diskInv = 1;
+  if(it.kind === 'disk1' || it.kind === 'disk2'){
+    var _dis = diskById(it.kind);
+    if(_dis){ if(_dis.have >= 1) return; _dis.have = 1; }
     it._dead = true;
     if(it.el && it.el.parentNode) it.el.parentNode.removeChild(it.el);
     playPickup('moon');
-    if(addPickToast) addPickToast('disk');
+    if(addPickToast) addPickToast(_dis ? _dis.id : 'disk');
     invUpdateCounts();
     saveScore();
     return;
@@ -4950,6 +5000,7 @@ window.__LOAD && __LOAD.mark('ИГРА');
    У каждого ресурса: id, имя, количество (proxy к провизии), метаданные с триггерами.
    По умолчанию триггеров в мета нет — они добавляются, когда нужно взаимодействие. */
 var INV_OPEN = false;
+var INV_TAB = 'res';
 var INV_PANEL = null, INV_GRID = null;
 var invSel = 'cake';
 var INV = [
@@ -4968,10 +5019,6 @@ var INV = [
   { id:'pepper', name:'ПЕРЦЫ', icon:'\u{1F336}\uFE0F',
     get:function(){ return pepperInv; },
     set:function(v){ pepperInv = Math.max(0, v); },
-    meta:{ triggers:{} } },
-  { id:'disk',   name:'ДИСК',  icon:'\u{1F4C0}',
-    get:function(){ return diskInv; },
-    set:function(v){ diskInv = Math.max(0, Math.min(1, v)); },
     meta:{ triggers:{} } }
 ];
 function invRes(id){
@@ -5096,22 +5143,28 @@ function invPepperLuck(){
   saveScore();
 }
 /* Диск с историей: ПКМ включает/выключает локальный файл Storry-1.mp3.
-   Громкость — как у музыки в игре (0.45). Требуется наличие диска в инвентаре. */
-var diskAudio = null, diskPlaying = false;
-function invDiskToggle(){
-  if(diskInv < 1) return;
-  if(!diskAudio){
-    try{ diskAudio = new Audio(relURL('Storry-1.mp3')); }catch(e){ return; }
+   Громкость — как у музыки в игре (0.45). Воспроизводится только одна запись за раз. */
+var diskAudio = null, diskPlaying = false, diskCurrent = null;
+function invDiskToggle(disId){
+  var dis = disId ? diskById(disId) : null;
+  if(!dis || dis.have < 1) return;
+  if(diskCurrent === disId && diskPlaying){
+    try{ diskAudio.pause(); diskAudio.currentTime = 0; }catch(e){}
+    diskPlaying = false;
+    diskCurrent = null;
+    return;
+  }
+  if(diskPlaying && diskAudio){ try{ diskAudio.pause(); diskAudio.currentTime = 0; }catch(e){} }
+  if(!diskAudio || diskAudio.__file !== dis.file){
+    diskAudio = null;
+    try{ diskAudio = new Audio(relURL(dis.file)); }catch(e){ return; }
+    diskAudio.__file = dis.file;
     diskAudio.volume = 0.45;
     diskAudio.loop = false;
   }
-  if(diskPlaying){
-    try{ diskAudio.pause(); diskAudio.currentTime = 0; }catch(e){}
-    diskPlaying = false;
-  } else {
-    diskPlaying = true;
-    try{ var p = diskAudio.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
-  }
+  diskPlaying = true;
+  diskCurrent = disId;
+  try{ var p = diskAudio.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
 }
 /* ---------- UI: ПАНЕЛЬ + СЕТКА + ОТКРЫТИЕ/ЗАКРЫТИЕ (клавиша I) ---------- */
 function initInvPanel(){
@@ -5119,14 +5172,44 @@ function initInvPanel(){
   INV_PANEL = document.createElement('div');
   INV_PANEL.id = 'invPanel';
   INV_PANEL.setAttribute('data-keep','1');
-  INV_PANEL.innerHTML = '<h3>\u{1F9F2} ИНВЕНТАРЬ</h3><div id="invGrid"></div><div id="invHint">ЛКМ — выбрать · ПКМ — триггер · T — использовать · I/Esc — закрыть</div>';
+  INV_PANEL.innerHTML = '<h3>\u{1F9F2} ИНВЕНТАРЬ</h3>'
+    + '<div id="invTabs"><button class="inv-tab' + (INV_TAB==='res'?' on':'') + '" data-tab="res">\u{1F9F2} Ресурсы</button><button class="inv-tab' + (INV_TAB==='disk'?' on':'') + '" data-tab="disk">\u{1F4C0} Диски</button></div><div id="invGrid"></div><div id="invHint">ЛКМ — выбрать · ПКМ — триггер · T — использовать · I/Esc — закрыть</div>';
   document.body.appendChild(INV_PANEL);
   INV_GRID = document.getElementById('invGrid');
+  var tabs = INV_PANEL.querySelectorAll('.inv-tab');
+  for(var _t=0; _t<tabs.length; _t++){
+    (function(btn){
+      btn.addEventListener('click', function(){
+        INV_TAB = btn.getAttribute('data-tab');
+        for(var _s=0; _s<tabs.length; _s++){ tabs[_s].classList.toggle('on', tabs[_s]===btn); }
+        invRefresh();
+      });
+    })(tabs[_t]);
+  }
   invRefresh();
 }
 function invRefresh(){
   if(!INV_GRID) return;
   INV_GRID.innerHTML = '';
+  if(INV_TAB === 'disk'){
+    for(var di=0; di<DISKS.length; di++){
+      var dis = DISKS[di];
+      var cell = document.createElement('div');
+      cell.className = 'inv-slot disk-slot';
+      cell.style.opacity = (dis.have >= 1) ? '1' : '0.35';
+      cell.innerHTML = '<div class="inv-ico">'+dis.icon+'</div>'
+        + '<div class="inv-name" style="color:' + (dis.have>=1 ? '#ffd700' : '#888') + ';">'+dis.name+'</div>'
+        + '<div class="inv-cnt">' + (dis.have>=1 ? 'В ИНВЕНТАРЕ' : 'НЕ НАЙДЕН') + '</div>';
+      (function(disId){
+        cell.addEventListener('mousedown', function(ev){
+          if(ev.button === 2){ ev.preventDefault(); invDiskToggle(disId); return; }
+        });
+        cell.addEventListener('contextmenu', function(ev){ ev.preventDefault(); });
+      })(dis.id);
+      INV_GRID.appendChild(cell);
+    }
+    return;
+  }
   for(var i=0;i<INV.length;i++){
     var r = INV[i];
     if(r.get() <= 0) continue;
@@ -5144,7 +5227,6 @@ function invRefresh(){
         if(ev.button === 2){
           ev.preventDefault();
           if(rid === 'pepper'){ invPepperLuck(); }
-          if(rid === 'disk'){ invDiskToggle(); }
           invFire('onRMB', invRes(rid));
           return;
         }
