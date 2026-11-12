@@ -1018,7 +1018,7 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
    kind: terrestrial | gas | pulsar | cheese; unlock — EXP для разблокировки.
    Блок объявлен ДО R46-фона: шейдер дотягивается до реестра в кадре — исключён доступ до инициализации. */
 var PLANETS_DB = {
-  soi: 11,
+    soi: 11,
   planets: [
     { name:'ХИТОМИ', pos:[-19.15,0,3.66], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], rkm:70000, rot:32, rspd:1.45, axx:-4, axy:0, axz:0, kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
@@ -1029,11 +1029,11 @@ var PLANETS_DB = {
     { name:'Шинрарта-С', pos:[85.58,0,-66.13], rkm:1400, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], rkm:24000, rot:112, rspd:2, axx:14, axy:0, axz:2, kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'Диовкрад', pos:[-106.98,0,24.9], rkm:26000, rot:0, rspd:0.1, axx:0, axy:0, axz:0, kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#ff1e14","sunB":0.35,"sunR":0.0002} },
-    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ff1e0f","ln1":"#fbff11","ln2":"#ffbb1e","sp1":"#9e0b02","sp2":"#2e0e00","pr":"#ff1e0f"},"sun":"#ff1e0f","sunB":5,"sunR":0.0032} }
+    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":2.18,"out":2.35},"surf":{"scale":8,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#643200","ln1":"#320000","ln2":"#050000","sp1":"#ff0d00","sp2":"#2e0e00","pr":"#ff1100","stScale":2,"stTSpeed":0.005,"stWarp":2.5,"stOct":4},"sun":"#ff1e0f","sunB":1.3,"sunR":0.0032} }
   ]
 };
 var PLANETS_DB2 = {
-  soi: 11,
+    soi: 11,
   planets: [
     { name:'ХИТОМИ', pos:[-19.15,0,3.66], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], rkm:70000, rot:32, rspd:1.45, axx:-4, axy:0, axz:0, kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
@@ -1044,11 +1044,11 @@ var PLANETS_DB2 = {
     { name:'Шинрарта-С', pos:[85.58,0,-66.13], rkm:1400, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], rkm:24000, rot:112, rspd:2, axx:14, axy:0, axz:2, kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'Диовкрад', pos:[-106.98,0,24.9], rkm:26000, rot:0, rspd:0.1, axx:0, axy:0, axz:0, kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#ff1e14","sunB":0.35,"sunR":0.0002} },
-    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ff1e0f","ln1":"#fbff11","ln2":"#ffbb1e","sp1":"#9e0b02","sp2":"#2e0e00","pr":"#ff1e0f"},"sun":"#ff1e0f","sunB":5,"sunR":0.0032} }
+    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":2.18,"out":2.35},"surf":{"scale":8,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#643200","ln1":"#320000","ln2":"#050000","sp1":"#ff0d00","sp2":"#2e0e00","pr":"#ff1100","stScale":2,"stTSpeed":0.005,"stWarp":2.5,"stOct":4},"sun":"#ff1e0f","sunB":1.3,"sunR":0.0032} }
   ]
 };
 var PLANETS_DB3 = {
-  soi: 11,
+    soi: 11,
   planets: [
     { name:'ХИТОМИ', pos:[-19.15,0,3.66], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], rkm:70000, rot:32, rspd:1.45, axx:-4, axy:0, axz:0, kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
@@ -1059,7 +1059,7 @@ var PLANETS_DB3 = {
     { name:'Шинрарта-С', pos:[85.58,0,-66.13], rkm:1400, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], rkm:24000, rot:112, rspd:2, axx:14, axy:0, axz:2, kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
     { name:'Диовкрад', pos:[-106.98,0,24.9], rkm:26000, rot:0, rspd:0.1, axx:0, axy:0, axz:0, kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#ff1e14","sunB":0.35,"sunR":0.0002} },
-    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ff1e0f","ln1":"#fbff11","ln2":"#ffbb1e","sp1":"#9e0b02","sp2":"#2e0e00","pr":"#ff1e0f"},"sun":"#ff1e0f","sunB":5,"sunR":0.0032} }
+    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":2.18,"out":2.35},"surf":{"scale":8,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#643200","ln1":"#320000","ln2":"#050000","sp1":"#ff0d00","sp2":"#2e0e00","pr":"#ff1100","stScale":2,"stTSpeed":0.005,"stWarp":2.5,"stOct":4},"sun":"#ff1e0f","sunB":1.3,"sunR":0.0032} }
   ]
 };
 var PKIND = {
@@ -1084,18 +1084,18 @@ let FIN = PLANETS_DB.planets.length - 1; /* финальная планета м
 var HOME_PLANETS = PLANETS_DB.planets.map(function(p){ return JSON.parse(JSON.stringify(p)); });
 var SOL_PLANETS = [
 	/* Проследний обект в системе нужен для зарядки сирментного FSD Это пульсар с линзей и джетами на жаргоне медведей "Гладем нейтронную звезду как кошку и летим домой"*/
-  { name:'МАЯК-КОЛЫБЕЛИ', pos:[500,0,-500], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#050000","sunB":0.4,"sunR":0.0002} },
-    { name:'МАРС', pos:[-305.15,336,0], rkm:27371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#003cbd', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#140100","glow":0.88,"size":1.05,"spin":0,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":false,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#382119","land1":"#595959","land2":"#8f8f8f","ice":"#260d08","cloud":"#f2f7ff","city":"#575757","aur":"#4d4d4d"},"sun":"#2e0000","sunB":0.2,"sunR":0.0002} },
-    { name:'МЕРКУРИЙ', pos:[250.15,0,245], rkm:9651, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#ecbe74', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#141414","glow":0.21,"size":0.3,"spin":1.1,"pulse":0.3,"jets":{"on":0,"c1":"#ff6f00","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#454545","land1":"#212121","land2":"#330000","ice":"#525252","cloud":"#050505","city":"#121212","aur":"#1a1a1a"},"sun":"#ffdf9e","sunB":0.35,"sunR":0.0004} },
-    { name:'ЗЕМЛЯ', pos:[130.15,0,0], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#0b001f","glow":0.95,"size":1.61,"spin":1.25,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.2,"in":3,"out":3.27},"surf":{"scale":2.8,"icecov":0.84,"cloudcov":0.53,"cityk":0.05,"aurk":0.15,"stormk":0,"ocean":"#383838","land1":"#cccccc","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1b004d"},"sun":"#4d0500","sunB":0.4,"sunR":0.0002} },
-    { name:'ЮПИТЕР', pos:[45.15,0,0], rkm:120371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'cheese', palette:'#ffbf59', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#7a4a00","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"b1":"#decca0","b2":"#b88c57","b3":"#ede0bd","storm":"#cc6b38","fres":"#ff731a","haze":"#e6b873","fog":"#ebcc94"},"sun":"#ffdf9e","sunB":2.55,"sunR":0.0011} },
-    { name:'СОЛНЦЕ', pos:[0,0,0], rkm:2400000, rot:36, rspd:0.05, axx:0, axy:0, axz:0, kind:'star-gl', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.4,"size":1.7,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ffdf9e","c2":"#ffb35c","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ffdf9e","ln1":"#fff4c0","ln2":"#ffb35c","sp1":"#ff8c33","sp2":"#7a3a00","pr":"#ffdf9e"},"sun":"#ffdf9e","sunB":5,"sunR":0.0032} }
+  { name:'МАЯК-КОЛЫБЕЛИ', pos:[500,0,-500], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+  { name:'МАРС', pos:[-305.15,336,0], rkm:27371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+  { name:'МЕРКУРИЙ', pos:[250.15,0,245], rkm:9651, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#ffbf59', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#7a4a00","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#2a1200","land1":"#8a5a1e","land2":"#c9a35a","ice":"#ffdf9e","cloud":"#fff3d6","city":"#ffbf59","aur":"#ff8c33"},"sun":"#ffdf9e","sunB":1.2,"sunR":0.0004} },
+  { name:'ЗЕМЛЯ', pos:[130.15,0,0], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+  { name:'ЮПИТЕР', pos:[45.15,0,0], rkm:120371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#ffbf59', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#7a4a00","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#2a1200","land1":"#8a5a1e","land2":"#c9a35a","ice":"#ffdf9e","cloud":"#fff3d6","city":"#ffbf59","aur":"#ff8c33"},"sun":"#ffdf9e","sunB":1.2,"sunR":0.0004} },
+  { name:'СОЛНЦЕ', pos:[0,0,0], rkm:2400000, rot:36, rspd:0.0335, axx:0, axy:0, axz:0, kind:'star-gl', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.4,"size":1.7,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ffdf9e","c2":"#ffb35c","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#fbff00","ln1":"#3b4200","ln2":"#ff9924","sp1":"#0f0900","sp2":"#ff0000","pr":"#ffaa00","stScale":7,"stTSpeed":0.015,"stWarp":2,"stOct":4},"sun":"#ffdf9e","sunB":5,"sunR":0.0032} }
 ];
 var SIRIUS_PLANETS = [
 	/* Проследний обект в системе нужен для зарядки сирментного FSD Это пульсар с линзей и джетами на жаргоне медведей "Гладем нейтронную звезду как кошку и летим домой"*/
   { name:'МАЯК-РЗРУШЕНИЯ', pos:[350.95,0,-350], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
   { name:'СРИУС-1A', pos:[50.15,19,30.66], rkm:164000, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#97b8ff', rings:false, moons:[], jets:true, unlock:0, track:'Star-2.ogg', fx:{"atm":"#dfc6ff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#bfe8ff","c2":"#5a8cff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#dfe6ff","r2":"#8fa8ff","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#bfe8ff","sunB":1.5,"sunR":0.0004} },
-  { name:'СРИУС-A', pos:[0,0,0], rkm:2800000, rot:36, rspd:0.06, axx:0, axy:0, axz:0, kind:'star-gl', type:'star_A', palette:'#dff0ff', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#8fb8ff","glow":1.3,"size":1.6,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#bfe8ff","c2":"#6a9cff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#bfe8ff","ln1":"#dff0ff","ln2":"#8fb8ff","sp1":"#4a7aff","sp2":"#1e3a7a","pr":"#bfe8ff"},"sun":"#bfe8ff","sunB":5,"sunR":0.0032} }
+  { name:'СРИУС-A', pos:[0,0,0], rkm:2800000, rot:36, rspd:0.0116, axx:0, axy:0, axz:0, kind:'star-gl', type:'star_A', palette:'#dff0ff', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#8fb8ff","glow":1.3,"size":1.6,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#bfe8ff","c2":"#6a9cff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#9fdbfe","ln1":"#5f7a91","ln2":"#4b6186","sp1":"#060b19","sp2":"#13295d","pr":"#bfe8ff","stScale":6.7,"stTSpeed":0.005,"stWarp":4,"stOct":4},"sun":"#bfe8ff","sunB":5,"sunR":0.0032} }
 ];
 var SYSTEM_SETS = { home: HOME_PLANETS, sol: SOL_PLANETS, sirius: SIRIUS_PLANETS };
 
@@ -1452,6 +1452,15 @@ uniform float uJetsOn; uniform vec3 uJetsC1; uniform vec3 uJetsC2; uniform float
 uniform vec3 uSunC;
 uniform float uSunB;
 uniform float uSunR;
+/* ==== ЗВЁЗДНЫЙ ШЕЙДЕР (STAR-GL): маска поверхности звёзд домен-варпом ==== */
+uniform float uSTScale;   /* детализация (texture scale), фид 4.2 */
+uniform float uSTTSpeed;  /* скорость кипения (time scale), фид 0.03 */
+uniform float uSTWarp;    /* сила варпа (4·q), фид 4 */
+uniform float uSTOct;     /* октавы fbm 1..4 */
+uniform vec3  uSTC1;      /* палитра: c1 (основной) */
+uniform vec3  uSTC2;      /* c2 (линз/лучи) */
+uniform vec3  uSTC3;      /* c3 */
+uniform vec3  uSTC4;      /* c4 */
 uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float uRingIn; uniform float uRingOut;
 uniform float uSpin; uniform float uPulseR;
 uniform float uSurfScale;
@@ -1599,6 +1608,56 @@ float softShadowSDF(vec3 ro, vec3 lightDir, vec3 sC){
   return clamp(res, 0.0, 1.0);
 }
 
+/* ==== ЗВЁЗДНЫЙ ШЕЙДЕР (STAR-GL): симплекс-шум + fbm + домен-варп (ST-суффикс).
+   Порт из SH-Gl.txt (Nikita Miropolskiy / Inigo Quilez). Рисует маску поверхности
+   звёзд Шинрарта-A / SOL / Sirius — кипящая плазма с активными областями. ==== */
+vec3 STrandom3(vec3 c){
+  float j = 4096.0*sin(dot(c, vec3(17.0, 59.4, 15.0)));
+  vec3 rr;
+  rr.z = fract(512.0*j); j *= 0.125;
+  rr.x = fract(512.0*j); j *= 0.125;
+  rr.y = fract(512.0*j);
+  return rr - 0.5;
+}
+const float STF3 = 0.3333333;
+const float STG3 = 0.1666667;
+float STnoise(vec3 p){
+  vec3 s = floor(p + dot(p, vec3(STF3)));
+  vec3 x = p - s + dot(s, vec3(STG3));
+  vec3 e = step(vec3(0.0), x - x.yzx);
+  vec3 i1 = e*(1.0 - e.zxy);
+  vec3 i2 = 1.0 - e.zxy*(1.0 - e);
+  vec3 x1 = x - i1 + STG3;
+  vec3 x2 = x - i2 + 2.0*STG3;
+  vec3 x3 = x - 1.0 + 3.0*STG3;
+  vec4 w, d;
+  w.x = dot(x, x); w.y = dot(x1, x1); w.z = dot(x2, x2); w.w = dot(x3, x3);
+  w = max(0.6 - w, 0.0);
+  d.x = dot(STrandom3(s), x);
+  d.y = dot(STrandom3(s + i1), x1);
+  d.z = dot(STrandom3(s + i2), x2);
+  d.w = dot(STrandom3(s + 1.0), x3);
+  w *= w; w *= w; d *= w;
+  return 0.5 + dot(d, vec4(43.0));
+}
+float STfbm(vec3 x){
+  float v = 0.0;
+  float a = 0.5;
+  vec3 shift = vec3(100.0);
+  for(int i = 0; i < 4; ++i){
+    if(float(i) >= uSTOct) break;
+    v += a*STnoise(x);
+    x = x*2.0 + shift;
+    a *= 0.5;
+  }
+  return v;
+}
+/* домен-варп: q и r — векторы вариаций, используемые ниже в троичном mix цветов */
+void STpattern(in vec3 p, out vec3 q, out vec3 r){
+  q = vec3(STfbm(p + vec3(1.3, 5.2, 0.0)), STfbm(p + vec3(5.2, 1.3, 0.0)), STfbm(p + vec3(0.0, 0.0, 1.0)));
+  r = vec3(STfbm(p + uSTWarp*q + vec3(1.3, 5.2, 0.0)), STfbm(p + uSTWarp*q + vec3(5.2, 1.3, 0.0)), STfbm(p + uSTWarp*q + vec3(0.0, 0.0, 1.0)));
+}
+
 /* ОСВЕЩЁННАЯ ПОВЕРХНОСТЬ ПЛАНЕТЫ: единый источник истины — близкая и дальние
    планеты рисуются одной функцией, поэтому ЛОД 1-в-1 повторяет анимацию реальной. */
 vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
@@ -1694,30 +1753,20 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
     r += palc(3.0)*fresP*0.45;
   } else {
     /* ---- STAR-GL: независимая звёздная ветка (kind 4) ----
-       слой 1: основной цвет palc(0.0)
-       слой 2: тёмные линии 1 palc(1.0) — техника нейтронных линий
-       слой 3: тёмные линии 2 palc(2.0)
-       слой 4: солнечные пятна 1 palc(3.0)
-       слой 5: солнечные пятна 2 palc(4.0) — крупные области
-       слой 6: протуберанцы palc(5.0) — языки пламени у лимба */
-    vec3 sq = n*(3.0*SCL);
-    float f1 = fbm3(sq*2.2 + vec3(0.0, uTime*0.02*SPIN, uTime*0.012*SPIN));
-    float f2 = fbm3(sq*4.6 - vec3(uTime*0.015*SPIN, 0.0, 0.0));
-    float ln1 = 1.0 - smoothstep(0.0, 0.022, abs(f1 - 0.5));
-    float ln2 = 1.0 - smoothstep(0.0, 0.014, abs(f2 - 0.5));
-    float sp1 = smoothstep(0.58, 0.75, fbm5(sq*1.15 + 7.7));
-    float sp2 = smoothstep(0.52, 0.72, fbm5(sq*0.45 + 3.3));
-    float prF = smoothstep(0.55, 0.85, fbm3(n*2.6 + vec3(0.0, uTime*0.05*SPIN, 0.0)));
-    vec3 sgl = palc(0.0);
-    sgl = mix(sgl, palc(1.0), ln1);
-    sgl = mix(sgl, palc(2.0), ln2*0.85);
-    sgl = mix(sgl, palc(3.0), sp1);
-    sgl = mix(sgl, palc(4.0), sp2*0.8);
+       Поверхность — домен-варп паттерн (SH-gl): симплекс-шум + fbm + STpattern.
+       Координаты: нормаль сферы n (уже вращена) × uSTScale + время (uSTTSpeed).
+       Палитра uSTC1..uSTC4 отвечает за базовый цвет/активные области. */
+    vec3 STq, STr;
+    vec3 STp = n*uSTScale + vec3(0.0, uTime*uSTTSpeed*0.6, uTime*uSTTSpeed);
+    STpattern(STp, STq, STr);
+    float STn = STfbm(STp + uSTWarp*STr);
+    vec3 sgl = mix(mix(mix(palc(0.0), palc(1.0), STr.z), palc(2.0), STq.x), palc(3.0), STn);
     r = sgl*(0.4 + 0.6*lit); /* самосветящаяся: ночная сторона почти не гаснет */
+    /* лимб-затемнение по френелю: край диска мягко темнеет (как край настоящей звезды) */
     float fresP = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
+    r *= 0.65 + 0.35*smoothstep(0.0, 0.5, 1.0 - fresP);
     r += palc(0.0)*fresP*0.3;
-    /* слой 6: протуберанцы — языки пламени у лимба, дышат по времени */
-    r += palc(5.0)*smoothstep(0.35, 0.9, fresP)*prF*(0.55 + 0.45*sin(uTime*0.7));
+    r += palc(1.0)*fresP*0.5; /* свечение кромки у лимба */
   }
   return r;
 }
@@ -2195,6 +2244,15 @@ const uRingOut = gl.getUniformLocation(prog, 'uRingOut');
 const uSpin = gl.getUniformLocation(prog, 'uSpin');
 const uPulseR = gl.getUniformLocation(prog, 'uPulseR');
 const uSurfScale = gl.getUniformLocation(prog, 'uSurfScale');
+/* ==== ЗВЁЗДНЫЙ ШЕЙДЕР (STAR-GL): uniform-локации маски поверхности ==== */
+const uSTScale = gl.getUniformLocation(prog, 'uSTScale');
+const uSTTSpeed = gl.getUniformLocation(prog, 'uSTTSpeed');
+const uSTWarp = gl.getUniformLocation(prog, 'uSTWarp');
+const uSTOct = gl.getUniformLocation(prog, 'uSTOct');
+const uSTC1 = gl.getUniformLocation(prog, 'uSTC1');
+const uSTC2 = gl.getUniformLocation(prog, 'uSTC2');
+const uSTC3 = gl.getUniformLocation(prog, 'uSTC3');
+const uSTC4 = gl.getUniformLocation(prog, 'uSTC4');
     const uRotC = gl.getUniformLocation(prog, 'uRotC');
 const uOceanC = gl.getUniformLocation(prog, 'uOceanC');
 const uLand1C = gl.getUniformLocation(prog, 'uLand1C');
@@ -2348,7 +2406,8 @@ var FXDEF = {
        ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
        surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
               c1:'#ffcf5c', ln1:'#7a3c08', ln2:'#a35a10', sp1:'#5a2400', sp2:'#3d1802', pr:'#ff9a3c',
-              r1:'#ffcf5c', r2:'#ffcf5c', river:'#7a3c08', fres:'#ffcf5c' } }
+              r1:'#ffcf5c', r2:'#ffcf5c', river:'#7a3c08', fres:'#ffcf5c',
+              stScale:4.2, stTSpeed:0.03, stWarp:4.0, stOct:4 } }
 };
 window.FXDEF = FXDEF; /* EDIT: экспорт в глобальную область — панель живёт в другом script-блоке */
 function fxPush(pi){
@@ -2380,6 +2439,20 @@ gl.uniform1f(uSunR, f.sunR == null ? 0.0008 : f.sunR);
   gl.uniform1f(uRingIn, fxNum(ring.in, d.ring.in));
   gl.uniform1f(uRingOut, fxNum(ring.out, d.ring.out));
   gl.uniform1f(uSurfScale, fxNum(surf.scale, d.surf.scale));
+  /* ==== ЗВЁЗДНЫЙ ШЕЙДЕР (STAR-GL): настройки маски поверхности звёзд ====
+     Если в fx/surf этих полей нет — дефолты из FXDEF[4].surf (ST*), иначе фиксированные. */
+  gl.uniform1f(uSTScale, fxNum(surf.stScale, fxNum(d.surf.stScale, 4.2)));
+  gl.uniform1f(uSTTSpeed, fxNum(surf.stTSpeed, fxNum(d.surf.stTSpeed, 0.03)));
+  gl.uniform1f(uSTWarp, fxNum(surf.stWarp, fxNum(d.surf.stWarp, 4.0)));
+  gl.uniform1f(uSTOct, fxNum(surf.stOct, fxNum(d.surf.stOct, 4.0)));
+  var stc1 = fxHex(surf.c1, fxHex(d.surf.c1, [1.0, 0.96, 0.75]));
+  var stc2 = fxHex(surf.ln1, fxHex(d.surf.ln1, [1.0, 0.87, 0.62]));
+  var stc3 = fxHex(surf.ln2, fxHex(d.surf.ln2, [0.87, 0.55, 0.2]));
+  var stc4 = fxHex(surf.sp1, fxHex(d.surf.sp1, [0.48, 0.23, 0.0]));
+  gl.uniform3f(uSTC1, stc1[0], stc1[1], stc1[2]);
+  gl.uniform3f(uSTC2, stc2[0], stc2[1], stc2[2]);
+  gl.uniform3f(uSTC3, stc3[0], stc3[1], stc3[2]);
+  gl.uniform3f(uSTC4, stc4[0], stc4[1], stc4[2]);
   gl.uniform1f(uIceCov, fxNum(surf.icecov, d.surf.icecov));
   gl.uniform1f(uCloudCov, fxNum(surf.cloudcov, d.surf.cloudcov));
   gl.uniform1f(uCityK, fxNum(surf.cityk, d.surf.cityk));
@@ -4258,6 +4331,16 @@ Object.defineProperty(window, 'PW', { get: function(){ return PW; }, configurabl
 var skyWrap = null, skyWrapEls = [], skyCvEls = [], skyLblEls = [], skyRet = null;
 var fsdAudio = null;
 var warpCv = null, warpCtx = null, warpStreaks = null;
+/* ☩ МЕЖЗВЁЗДНЫЙ ПЕРЕЛЁТ: отдельный WebGL-оверлей с warp-шейдером (звёздный туннель).
+   Показывается только для warp.isStar, поверх игрового слоя, и плавно угасает после прилёта. */
+var warpShaderCv = null, warpGl = null, warpProg = null, warpBuf = null;
+var warpST = 0.0, warpShaderOn = false, warpFade = 0.0;
+/* Фазы межзвёздного прыжка (warp.isStar):
+   A — текущая 2D-анимация туннеля играет целиком (с задержкой перед прыжком);
+   B — во время перемещения играет шейдер-туннель (STAR_WARP_SHADER_T секунд);
+   C — плавное угасание шейдера по прозрачности (STAR_WARP_FADE), затем показ новой системы. */
+var STAR_WARP_SHADER_T = 8.0;
+var STAR_WARP_FADE = 2.0;
 
 function unlockedIdx(k){
   if(k <= 0) return true;
@@ -4805,6 +4888,37 @@ function fsdInitSound(){
   fsdAudio = a;
   return a;
 }
+/* ☩ ОЗВУЧКА МЕЖЗВЁЗДНОГО ПРЫЖКА: три собственных сэмпла рядом с HTML.
+   warp-start.ogg  — фаза A (начало прыжка / разгон),
+   warp-run.ogg    — фаза B (перемещение по шейдер-туннелю),
+   warp-finish.ogg — фаза C (прибытие в новую систему).
+   Каждый проигрывается ровно один раз за прыжок. */
+var WARP_PH = { start:'warp-start.ogg', run:'warp-run.ogg', finish:'warp-finish.ogg' };
+var warpPhAudio = { start:null, run:null, finish:null };
+function warpPhGet(phase){
+  if(warpPhAudio[phase]) return warpPhAudio[phase];
+  var fn = WARP_PH[phase];
+  if(!fn) return null;
+  try{
+    var a = new Audio(relURL(fn));
+    a.addEventListener('error', function(){
+      console.warn('[ИГРА] ' + fn + ' не найден рядом с HTML — фаза ' + phase + ' без звука');
+    });
+    warpPhAudio[phase] = a;
+  }catch(e){ warpPhAudio[phase] = null; }
+  return warpPhAudio[phase];
+}
+function warpPhPlay(phase){
+  if(!sfx || !sfx.musicOn) return;
+  var a = warpPhGet(phase);
+  if(!a) return;
+  try{
+    a.currentTime = 0;
+    a.volume = 0.55;
+    var pr = a.play();
+    if(pr && pr.catch) pr.catch(function(){});
+  }catch(e){}
+}
 function initWarpCv(){
   if(warpCv) return;
   warpCv = document.createElement('canvas');
@@ -4813,62 +4927,169 @@ function initWarpCv(){
   warpCv.setAttribute('data-keep','1');
   warpCtx = warpCv.getContext('2d');
 }
-function commitJump(target){
-  planet = target;
-  inTransit = false;
-  var dir = sub(FT.pos, PW[target]);
-  var dl2 = len(dir);
-  dir = (dl2 > 0.001) ? mul(dir, 1/dl2) : [0, 0.2, 1];
-  F.pos = mul(dir, FSD_DOCK);  /* выход из варпа: близко к планете — стыковочная дистанция */
-  F.fwd = FT.fwd; F.right = FT.right; F.up = FT.up;
-  speed = Math.min(speed, CFG.SPD_MAX*boostMul);
-  magnetT = 0; freezeT = 0;
-  for(var si = shots.length - 1; si >= 0; si--){ if(shots[si].el && shots[si].el.parentNode) shots[si].el.parentNode.removeChild(shots[si].el); }
-  shots.length = 0;
-  if(sfx.music && sfx.started){ try{ sfx.music.pause(); sfx.music.src = trackFor(planet); }catch(e){} }
-  if(sfx.musicOn) tryMusic();
-  targetIdx = -1;
-  updHud();
-  toastFx('ВЫХОД ИЗ ВАРПА: ' + PLANET_NAMES[target]);
+/* ☩ МЕЖЗВЁЗДНЫЙ warp-шейдер (оверлей). Порт Shadertoy-туннеля: WebGL1, gl_FragColor,
+   iTime→uTime, iResolution→uRes, iMouse.x→uMx. Рисует звёздный туннель с шумом fBm/simplex. */
+var WARP_SHADER_SRC = `precision highp float;
+uniform vec2  uRes;
+uniform float uTime;
+uniform vec2  uMouse;
+const float TAU = 6.28318;
+const float PI  = 3.141592;
+const float t2  = 8.0;
+#define MOD3 vec3(.1031,.11369,.13787)
+vec3 hash33(vec3 p3){
+  p3 = fract(p3 * MOD3);
+  p3 += dot(p3, p3.yxz+14.14);
+  return -2.0 + 3.0 * fract(vec3((p3.x+p3.y)*p3.z, (p3.x+p3.z)*p3.y, (p3.y+p3.z)*p3.x));
 }
-function finishWarp(){
-  warp = null;
-  if(warpCv) warpCv.style.display = 'none';
-  switching = false;
-  keys = {};
-  if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} }
-  setSpaceMode();
+float simplexNoise(vec3 p){
+  const float K1 = 0.333333333;
+  const float K2 = 0.166666667;
+  vec3 i = floor(p + (p.x+p.y+p.z)*K1);
+  vec3 d0 = p - (i - (i.x+i.y+i.z)*K2);
+  vec3 e = step(vec3(0.0), d0 - d0.yzx);
+  vec3 i1 = e * (1.0 - e.zxy);
+  vec3 i2 = 1.0 - e.zxy * (1.0 - e);
+  vec3 d1 = d0 - (i1 - 1.0*K2);
+  vec3 d2 = d0 - (i2 - 2.0*K2);
+  vec3 d3 = d0 - (1.0 - 3.0*K2);
+  vec4 h = max(0.6 - vec4(dot(d0,d0),dot(d1,d1),dot(d2,d2),dot(d3,d3)), 0.0);
+  vec4 n = h*h*h*h * vec4(dot(d0,hash33(i)),dot(d1,hash33(i+i1)),dot(d2,hash33(i+i2)),dot(d3,hash33(i+1.0)));
+  return dot(vec4(21.316), n);
 }
-function cancelWarp(){
-  if(!warp) return;
-  warp = null;
-  if(warpCv) warpCv.style.display = 'none';
-  switching = false;
-  if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} }
-  setSpaceMode();
-}
-function updWarp(dt){
-  if(!warp) return;
-  initWarpCv();
-  var W = window.innerWidth, H = window.innerHeight;
-  if(warpCv.width !== W || warpCv.height !== H){ warpCv.width = W; warpCv.height = H; }
-  var ctx = warpCtx;
-  warp.t += dt;
-  var t1 = FSD_CHARGE, t2 = t1 + FSD_TUNNEL, t3 = t2 + FSD_EXIT;
-  var inten = 0, streakSpd = 0;
-  if(warp.t < t1){ var p = warp.t/t1; inten = 0.25 + 0.65*p; streakSpd = 0.15 + 0.85*p; }
-  else if(warp.t < t2){
-    inten = 1; streakSpd = 1.6;
-    if(!warp.committed && warp.t >= t1 + FSD_TUNNEL*0.5){
-      if(warp.isStar) commitStarJump(warp.target); else commitJump(warp.target);
-      warp.committed = true;
-    }
-  } else {
-    var pe = (warp.t - t2)/FSD_EXIT;
-    inten = Math.max(0, 1 - pe);
-    streakSpd = Math.max(0.2, 1.6*(1 - pe));
+float fBm3(in vec3 p){
+  float f = 0.0;
+  float scale = 5.0;
+  p = mod(p, scale);
+  float amp = 0.75;
+  for(int i=0;i<33;i++){
+    f += simplexNoise(p*scale)*amp;
+    amp *= 0.5;
+    scale *= 2.2;
   }
-  warpCv.style.display = 'block';
+  return min(f, 1.0);
+}
+vec3 mod289(vec3 x){ return x - floor(x*(3.0/289.0))*289.0; }
+vec4 mod289(vec4 x){ return x - floor(x*(1.0/289.0))*289.0; }
+vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
+vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314*r; }
+float snoise(vec3 v){
+  const vec2 C = vec2(0.1666666666666667, 0.3333333333333333);
+  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+  vec3 i  = floor(v + dot(v, C.yyy));
+  vec3 x0 = v - i + dot(i, C.xxx);
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min(g.xyz, l.zxy);
+  vec3 i2 = max(g.xyz, l.zxy);
+  vec3 x1 = x0 - i1 + C.xxx;
+  vec3 x2 = x0 - i2 + C.yyy;
+  vec3 x3 = x0 - D.yyy;
+  i = mod289(i);
+  vec4 p = permute(permute(permute(i.z + vec4(0.0,i1.z,i2.z,1.0)) + i.y + vec4(0.0,i1.y,i2.y,1.0)) + i.x + vec4(0.0,i1.x,i2.x,1.0));
+  float n_ = 0.142857142857;
+  vec3 ns = n_ * D.wyz - D.xzx;
+  vec4 j = p - 49.0*floor(p*ns.z*ns.z);
+  vec4 x_ = floor(j*ns.z);
+  vec4 y_ = floor(j - 7.0*x_);
+  vec4 x = x_*ns.x + ns.yyyy;
+  vec4 y = y_*ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+  vec4 b0 = vec4(x.xy, y.xy);
+  vec4 b1 = vec4(x.zw, y.zw);
+  vec4 s0 = floor(b0)*2.0 + 1.0;
+  vec4 s1 = floor(b1)*2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+  vec3 p0 = vec3(a0.xy,h.x);
+  vec3 p1 = vec3(a0.zw,h.y);
+  vec3 p2 = vec3(a1.xy,h.z);
+  vec3 p3 = vec3(a1.zw,h.w);
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+  vec4 m = max(0.6 - vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)), 0.0);
+  m = m*m;
+  return 42.0*dot(m*m, vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}
+void main(){
+  float t = mod(uTime, t2)/t2;
+  vec4 col = vec4(0.0);
+  vec2 q = gl_FragCoord.xy / uRes.xy;
+  vec2 p = (2.0*gl_FragCoord.xy - uRes.xy)/min(uRes.y, uRes.x);
+  vec2 mo = (2.0*uMouse - uRes.xy)/min(uRes.x, uRes.y);
+  p += vec2(0.0, -0.1);
+  float ay = 0.0, ax = 0.0;
+  if(uMouse.x != uMouse.y){} /* мышь опционально вращает туннель */
+  mat3 mY = mat3(cos(ay),0.0,sin(ay), 0.0,1.0,0.0, -sin(ay),0.0,cos(ay));
+  mat3 mX = mat3(1.0,0.0,0.0, 0.0,cos(ax),sin(ax), 0.0,-sin(ax),cos(ax));
+  mat3 m = mX*mY;
+  vec3 v = m*vec3(p,1.0);
+  float v_xy = length(v.xy);
+  float z = v.z/v_xy;
+  float focal_depth = 0.15;
+  float p_len = length(v.xy);
+  float polar_y = z*focal_depth + uTime*2.0;
+  float a = atan(v.y, v.x);
+  a = 0.5 + 0.5*a/PI;
+  a -= uTime*0.3;
+  float x = fract(a);
+  if(x >= 0.5) x = 1.0 - x;
+  float val = 0.45 + 0.55*fBm3(vec3(vec2(2.0,0.5)*vec2(x,polar_y), 0.15*uTime));
+  val = clamp(val, 0.0, 1.0);
+  col.rgb = vec3(0.15,0.4,0.9)*vec3(val);
+  vec3 white = 0.35*vec3(smoothstep(0.55,1.0,val));
+  col.rgb += white;
+  col.rgb = clamp(col.rgb,0.0,1.0);
+  float disk_col = exp(-(p_len-0.025)*4.0);
+  col.rgb += clamp(vec3(disk_col),0.0,1.0);
+  gl_FragColor = vec4(col.rgb,1.0);
+}`;
+function initWarpShader(){
+  if(warpShaderCv) return;
+  try{
+    warpShaderCv = document.createElement('canvas');
+    warpShaderCv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:48;pointer-events:none;display:none;';
+    document.body.appendChild(warpShaderCv);
+    warpShaderCv.setAttribute('data-keep','1');
+    warpGl = warpShaderCv.getContext('webgl',{antialias:false,depth:false,premultipliedAlpha:true})
+      || warpShaderCv.getContext('experimental-webgl',{antialias:false,depth:false,premultipliedAlpha:true});
+    if(!warpGl){ warpGl=null; return; }
+    var vsSrc = 'attribute vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);}';
+    var mk = function(t,s){ var x=warpGl.createShader(t); warpGl.shaderSource(x,s); warpGl.compileShader(x);
+      if(!warpGl.getShaderParameter(x,warpGl.COMPILE_STATUS)){ console.error('WARP-SH: '+warpGl.getShaderInfoLog(x)); return null;} return x; };
+    var vs = mk(warpGl.VERTEX_SHADER, vsSrc);
+    var fs = mk(warpGl.FRAGMENT_SHADER, WARP_SHADER_SRC);
+    if(!vs||!fs) return;
+    warpProg = warpGl.createProgram();
+    warpGl.attachShader(warpProg,vs); warpGl.attachShader(warpProg,fs);
+    warpGl.linkProgram(warpProg);
+    if(!warpGl.getProgramParameter(warpProg, warpGl.LINK_STATUS)){ console.error('WARP-SH link: '+warpGl.getProgramInfoLog(warpProg)); return; }
+    warpGl.useProgram(warpProg);
+    warpBuf = warpGl.createBuffer();
+    warpGl.bindBuffer(warpGl.ARRAY_BUFFER, warpBuf);
+    warpGl.bufferData(warpGl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), warpGl.STATIC_DRAW);
+    var aPos = warpGl.getAttribLocation(warpProg,'aPos');
+    warpGl.enableVertexAttribArray(aPos);
+    warpGl.vertexAttribPointer(aPos,2,warpGl.FLOAT,false,0,0);
+    warpGl.uRes = warpGl.getUniformLocation(warpProg,'uRes');
+    warpGl.uTime = warpGl.getUniformLocation(warpProg,'uTime');
+    warpGl.uMx = warpGl.getUniformLocation(warpProg,'uMouse');
+  }catch(e){ warpGl=null; console.error('WARP-SH init error', e); }
+}
+function drawWarpShader(dt){
+  if(!warpGl || !warpProg || !warpShaderCv) return;
+  var W=window.innerWidth, H=window.innerHeight;
+  if(warpShaderCv.width!==W || warpShaderCv.height!==H){ warpShaderCv.width=W; warpShaderCv.height=H; }
+  warpGl.viewport(0,0,W,H);
+  warpGl.uniform2f(warpGl.uRes, W, H);
+  warpGl.uniform1f(warpGl.uTime, warpST);
+  warpGl.uniform2f(warpGl.uMx, 0.0, 0.0);
+  warpGl.drawArrays(warpGl.TRIANGLES,0,3);
+}
+/* Отрисовка 2D-FSD-туннеля (страйки + градиент + вспышка выхода). Общая для фазы A
+   межзвёздного прыжка и для межпланетного прыжка. */
+function drawWarpTunnel(W, H, ctx, inten, streakSpd, dt){
   ctx.clearRect(0, 0, W, H);
   var cx = W/2, cy = H/2, R = Math.sqrt(cx*cx + cy*cy);
   ctx.globalCompositeOperation = 'lighter';
@@ -4894,15 +5115,121 @@ function updWarp(dt){
   g.addColorStop(1, 'rgba(140,190,255,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
+}
+function commitJump(target){
+  planet = target;
+  inTransit = false;
+  var dir = sub(FT.pos, PW[target]);
+  var dl2 = len(dir);
+  dir = (dl2 > 0.001) ? mul(dir, 1/dl2) : [0, 0.2, 1];
+  F.pos = mul(dir, FSD_DOCK);  /* выход из варпа: близко к планете — стыковочная дистанция */
+  F.fwd = FT.fwd; F.right = FT.right; F.up = FT.up;
+  speed = Math.min(speed, CFG.SPD_MAX*boostMul);
+  magnetT = 0; freezeT = 0;
+  for(var si = shots.length - 1; si >= 0; si--){ if(shots[si].el && shots[si].el.parentNode) shots[si].el.parentNode.removeChild(shots[si].el); }
+  shots.length = 0;
+  if(sfx.music && sfx.started){ try{ sfx.music.pause(); sfx.music.src = trackFor(planet); }catch(e){} }
+  if(sfx.musicOn) tryMusic();
+  targetIdx = -1;
+  updHud();
+  toastFx('ВЫХОД ИЗ ВАРПА: ' + PLANET_NAMES[target]);
+}
+function finishWarp(){
+  warp = null;
+  warpShaderOn = false; warpFade = 0; warpST = 0;
+  if(warpCv) warpCv.style.display = 'none';
+  if(warpShaderCv){ warpShaderCv.style.display = 'none'; warpShaderCv.style.opacity = '1'; }
+  switching = false;
+  keys = {};
+  if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} }
+  setSpaceMode();
+}
+function cancelWarp(){
+  if(!warp) return;
+  warp = null;
+  warpShaderOn = false; warpFade = 0; warpST = 0;
+  if(warpCv) warpCv.style.display = 'none';
+  if(warpShaderCv){ warpShaderCv.style.display = 'none'; warpShaderCv.style.opacity = '1'; }
+  switching = false;
+  if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} }
+  setSpaceMode();
+}
+function updWarp(dt){
+  initWarpCv();
+  var W = window.innerWidth, H = window.innerHeight;
+  if(warpCv.width !== W || warpCv.height !== H){ warpCv.width = W; warpCv.height = H; }
+  var ctx = warpCtx;
+  warp.t += dt;
+  var t1 = FSD_CHARGE, t2 = t1 + FSD_TUNNEL, t3t = t2 + FSD_EXIT;
+  var inten = 0, streakSpd = 0;
+
+  if(warp.isStar){
+    /* ============ МЕЖЗВЁЗДНЫЙ ПРЫЖОК: 3 фазы ============ */
+    if(!warp.committed){
+      /* ФАЗА A: текущая 2D-анимация (зарядка→туннель→выход) проигрывается ЦЕЛИКОМ.
+         Задержка перед прыжком: реальное перемещение (коммит) происходит только
+         в самом конце фазы A (t3t), чтобы анимация успела отыграть. */
+      if(warp.t < t1){ var p = warp.t/t1; inten = 0.25 + 0.65*p; streakSpd = 0.15 + 0.85*p; }
+      else if(warp.t < t2){ inten = 1; streakSpd = 1.6; }
+      else { var pe = (warp.t - t2)/FSD_EXIT; inten = Math.max(0, 1 - pe); streakSpd = Math.max(0.2, 1.6*(1 - pe)); }
+      warpCv.style.display = 'block';
+      if(warpShaderCv) warpShaderCv.style.display = 'none';
+      drawWarpTunnel(W, H, ctx, inten, streakSpd, dt);
+      if(warp.t >= t3t){
+        /* конец фазы A: реально перемещаемся в новую систему */
+        commitStarJump(warp.target);
+        warp.committed = true;
+        initWarpShader();
+        warpST = 0; warpFade = 0;
+        warpPhPlay('run'); /* фаза B: звук перемещения по туннелю */
+        /* ФАЗА B: прячем 2D-туннель, включаем шейдер-туннель на всё время движения */
+        warpCv.style.display = 'none';
+        if(warpShaderCv){ warpShaderCv.style.display = 'block'; warpShaderCv.style.opacity = '1'; }
+      }
+    } else {
+      /* ФАЗА B: во время перемещения играет шейдер-туннель */
+      warpST += dt;
+      if(warpShaderCv){
+        if(warpST < STAR_WARP_SHADER_T){
+          warpShaderCv.style.opacity = '1';
+          drawWarpShader(dt);
+        } else {
+          /* ФАЗА C: после прибытия плавное угасание по прозрачности → показ новой системы */
+          if(!warp.sndFinish){ warp.sndFinish = true; warpPhPlay('finish'); }
+          var ft = (warpST - STAR_WARP_SHADER_T)/Math.max(0.001, STAR_WARP_FADE);
+          warpShaderCv.style.opacity = String(Math.max(0, 1 - ft));
+          if(warpST < STAR_WARP_SHADER_T + STAR_WARP_FADE) drawWarpShader(dt);
+          if(ft >= 1) finishWarp();
+        }
+      }
+    }
+    return;
+  }
+
+  /* ============ МЕЖПЛАНЕТНЫЙ прыжок: прежнее поведение (коммит в середине туннеля) ============ */
+  if(warp.t < t1){ var p = warp.t/t1; inten = 0.25 + 0.65*p; streakSpd = 0.15 + 0.85*p; }
+  else if(warp.t < t2){
+    inten = 1; streakSpd = 1.6;
+    if(!warp.committed && warp.t >= t1 + FSD_TUNNEL*0.5){
+      commitJump(warp.target);
+      warp.committed = true;
+    }
+  } else {
+    var pe = (warp.t - t2)/FSD_EXIT;
+    inten = Math.max(0, 1 - pe);
+    streakSpd = Math.max(0.2, 1.6*(1 - pe));
+  }
+  warpCv.style.display = 'block';
+  drawWarpTunnel(W, H, ctx, inten, streakSpd, dt);
   if(warp.t >= t2){
     var pf = (warp.t - t2)/FSD_EXIT;
     if(pf > 0.65){
-      ctx.fillStyle = 'rgba(255,255,255,' + Math.min(1, (pf - 0.65)/0.35).toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.9*Math.min(1, (pf - 0.65)/0.35)).toFixed(3) + ')';
       ctx.fillRect(0, 0, W, H);
     }
     if(fsdAudio){ try{ fsdAudio.volume = Math.max(0, 0.55*(1 - pf)); }catch(e){} }
   }
-  if(warp.t >= t3) finishWarp();
+  if(warp.t >= t3t) finishWarp();
 }
 /* ☩ СМЕНА ЗВЁЗДНОЙ СИСТЕМЫ: подменяем живую таблицу PLANETS_DB.planets новым набором
    и пересобираем всё, что от неё зависит. Прогресс (EXP/HP/запасы/диски) сохраняется —
@@ -4968,13 +5295,17 @@ function startFSD(target, isStar){
   }
   warp = { t: 0, target: target, committed: false, isStar: !!isStar };
   setSpaceMode();
-  var a = fsdInitSound();
-  if(a && sfx.musicOn){
-    try{
-      a.currentTime = 0; a.volume = 0.55;
-      var pr = a.play();
-      if(pr && pr.catch) pr.catch(function(){});
-    }catch(e){}
+  if(isStar){
+    warpPhPlay('start'); /* фаза A: звук начала межзвёздного прыжка */
+  } else {
+    var a = fsdInitSound();
+    if(a && sfx.musicOn){
+      try{
+        a.currentTime = 0; a.volume = 0.55;
+        var pr = a.play();
+        if(pr && pr.catch) pr.catch(function(){});
+      }catch(e){}
+    }
   }
   toastFx(isStar ? ('FSD: ПЕРЕЛЁТ \u2192 ' + StarsDB[target].name) : ('FSD: ЗАРЯДКА \u2192 ЦЕЛЬ: ' + PLANET_NAMES[target]));
 }
