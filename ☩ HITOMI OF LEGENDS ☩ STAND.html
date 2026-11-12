@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☩ HITOMI OF LEGENDS ☩ СТЕНД ЗВЁЗД — маска домен-варпа</title>
+<style>
+  body{ background:#05060c; color:#cfd2e8; font:12px 'Courier New',monospace; margin:0; padding:18px; user-select:none; }
+  h1{ color:#f7cc1d; font-size:1.15rem; letter-spacing:2px; text-shadow:0 0 10px rgba(247,204,29,.5); margin:0 0 4px; }
+  .sub{ color:#8b93b8; margin-bottom:14px; }
+  .stars{ display:flex; flex-wrap:wrap; gap:14px; }
+  .cell{ background:#0b0f16; border:3px outset #950; padding:8px; border-radius:8px; }
+  .cell .nm{ color:#f7cc1d; font-size:12px; letter-spacing:1px; margin-bottom:5px; }
+  .cell .meta{ color:#8b93b8; font-size:10px; margin-top:4px; }
+  canvas.star{ width:260px; height:260px; display:block; background:#000; border:2px solid #1a1a2e; }
+  .panel{ margin-top:14px; background:#0b0f16; border:3px outset #950; padding:10px 12px; max-width:860px; border-radius:8px; }
+  .frow{ display:flex; align-items:center; gap:8px; margin:5px 0; }
+  .frow label{ flex:0 0 210px; color:#9fd8ff; font-size:11px; }
+  .frow input[type=range]{ flex:1; accent-color:#f79e1d; }
+  .fval{ flex:0 0 60px; text-align:right; color:#a3ff52; }
+  .badge{ display:inline-block; padding:2px 8px; border:1px solid #950; color:#7dff8a; font-size:10px; margin-left:6px; }
+  .note{ margin-top:14px; background:#0d1220; border:2px inset #1a1a2e; padding:12px 14px; max-width:860px; line-height:1.55; font-size:11px; }
+  .note b{ color:#f7cc1d; }
+  .note code{ color:#a3ff52; }
+  .warn{ color:#ff9d9d; }
+</style>
+</head>
+<body>
+<h1>☩ СТЕНД ЗВЁЗД — маска поверхности (домен-варп, Nikita Miropolskiy / Inigo Quilez)</h1>
+<div class="sub">Шинрарта-A (star_M) · СОЛНЦЕ (SOL) · СРИУС-A (SIRIUS). Палитры — из игровых записей PLANETS_DB. <span class="badge" id="engine">…</span></div>
+
+<div class="stars">
+  <div class="cell"><div class="nm">ШИНРАРТА-A (HIP0367)</div><canvas class="star" id="cv0"></canvas><div class="meta">star_M · rkm 280000 · atm #ff8f4d</div></div>
+  <div class="cell"><div class="nm">СОЛНЦЕ (SOL)</div><canvas class="star" id="cv1"></canvas><div class="meta">star-gl · rkm 2400000 · sun #ffdf9e</div></div>
+  <div class="cell"><div class="nm">СРИУС-A (SIRIUS)</div><canvas class="star" id="cv2"></canvas><div class="meta">star_A · rkm 2800000 · sun #bfe8ff</div></div>
+</div>
+
+<div class="panel">
+  <div class="frow"><label>Размер маски (доля кадра)</label><input type="range" id="sMask" min="0.35" max="1" step="0.01" value="0.78"><div class="fval" id="vMask">0.78</div></div>
+  <div class="frow"><label>Детализация (texture scale)</label><input type="range" id="sScale" min="1" max="12" step="0.1" value="4.2"><div class="fval" id="vScale">4.2</div></div>
+  <div class="frow"><label>Скорость кипения (time scale)</label><input type="range" id="sTime" min="0" max="0.2" step="0.005" value="0.03"><div class="fval" id="vTime">0.03</div></div>
+  <div class="frow"><label>Сила варпа (4·q)</label><input type="range" id="sWarp" min="0" max="8" step="0.1" value="4"><div class="fval" id="vWarp">4.0</div></div>
+  <div class="frow"><label>Октавы fbm</label><input type="range" id="sOct" min="1" max="4" step="1" value="4"><div class="fval" id="vOct">4</div></div>
+  <div class="frow"><label>Свечение короны</label><input type="range" id="sGlow" min="0.2" max="3" step="0.05" value="1.2"><div class="fval" id="vGlow">1.2</div></div>
+  <div class="frow"><label>Палитра</label><input type="checkbox" id="cGame" checked><span style="color:#9fd8ff;font-size:11px">цвета из игры (c1/ln1/sp1/sp2)</span></div>
+</div>
+
+<div class="note">
+  <b>ЗАМЕТКА: куда добавлять в игре.</b><br>
+  1. Звёздную поверхность в игре рисует шейдер фона <code>#glbg</code>. Блок «сфера звезды» находится
+  во фрагментном шейдере glbg по ветке <code>starHit</code> (сферический ЛОД-2 звезды, там же счёт короны
+  <code>col += uSunC*pow(max(dStK,0.0), 6.0)*0.35*uSunB;</code>).<br>
+  2. Вставь функции <code>random3 / noise / fbm / pattern</code> из этого стенда ВЫШЕ <code>main()</code> шейдера glbg
+  (рядом с уже живущими там <code>fbm3</code> — конфликтов имён нет, здесь суффикс ST).<br>
+  3. В ветке <code>starHit</code> вместо плоского <code>sphCol</code> считай:
+  <code>vec3 nrm = normalize(hitPos - uStarPos);</code> → <code>float n = STpattern(nrm*uScale + vec3(0.0, uTime*uTS), q, r);</code> →
+  <code>col = mix(mix(mix(c1, c2, r.z), c3, q.x), c4, n);</code> где c1..c4 = <code>fx.surf.ln1 / c1 / sp1 / sp2</code>
+  звезды (уже приходят uniform-ами или добавь один <code>uniform vec3 uStarPal[4]</code>).<br>
+  4. Размер маски в игре не нужен отдельным слайдером: диск звезды задаёт ray-sphere hit, «маска» = сам hit-круг,
+  а лимб-затемнение <code>smoothstep(1.0, 0.15, length(uv))</code> бери из локального UV пересечения.<br>
+  5. <span class="warn">Производительность:</span> pattern() = 7 вызовов fbm. На весь экран тяжело; в игре звезда
+  занимает малую часть кадра — приемлемо. Если нужен разгон: в интеграции обрезай pattern до
+  <code>n = fbm(p + 4.0*q)</code> (2 fbm вместо 7) — теряется ~20% выразительности.<br>
+  6. 2D-фолбэк для игры не требуется: glbg — уже WebGL. Фолбэк в стенде ниже — только для машин без WebGL,
+  там паттерн считается в JS на тайле 96×96 и натягивается клипом.
+</div>
+
+<script>
+/* ================= ОБЩИЙ GLSL: random3/noise (Miropolskiy) + fbm/pattern (Quilez) ================= */
+var NOISE_GLSL = [
+"precision highp float;",
+"varying vec2 vUv;",
+"uniform float uTime,uMask,uScale,uTSpeed,uWarp,uGlow,uOct;",
+"uniform vec3 uC1,uC2,uC3,uC4;",
+"vec3 random3(vec3 c){",
+"  float j = 4096.0*sin(dot(c,vec3(17.0,59.4,15.0)));",
+"  vec3 r; r.z = fract(512.0*j); j *= .125; r.x = fract(512.0*j); j *= .125; r.y = fract(512.0*j);",
+"  return r-0.5;",
+"}",
+"const float F3 = 0.3333333; const float G3 = 0.1666667;",
+"float noise(vec3 p){",
+"  vec3 s = floor(p + dot(p, vec3(F3)));",
+"  vec3 x = p - s + dot(s, vec3(G3));",
+"  vec3 e = step(vec3(0.0), x - x.yzx);",
+"  vec3 i1 = e*(1.0 - e.zxy);",
+"  vec3 i2 = 1.0 - e.zxy*(1.0 - e);",
+"  vec3 x1 = x - i1 + G3; vec3 x2 = x - i2 + 2.0*G3; vec3 x3 = x - 1.0 + 3.0*G3;",
+"  vec4 w, d;",
+"  w.x = dot(x,x); w.y = dot(x1,x1); w.z = dot(x2,x2); w.w = dot(x3,x3);",
+"  w = max(0.6 - w, 0.0);",
+"  d.x = dot(random3(s), x); d.y = dot(random3(s + i1), x1); d.z = dot(random3(s + i2), x2); d.w = dot(random3(s + 1.0), x3);",
+"  w *= w; w *= w; d *= w;",
+"  return 0.5 + dot(d, vec4(43.0));",
+"}",
+"float fbm(vec3 x){",
+"  float v = 0.0; float a = 0.5; vec3 shift = vec3(100.0);",
+"  for(int i = 0; i < 4; ++i){ if(float(i) >= uOct) break; v += a*noise(x); x = x*2.0 + shift; a *= 0.5; }",
+"  return v;",
+"}",
+"void STpattern(in vec3 p, out vec3 q, out vec3 r){",
+"  q = vec3(fbm(p + vec3(1.3,5.2,0.0)), fbm(p + vec3(5.2,1.3,0.0)), fbm(p + vec3(0.0,0.0,1.0)));",
+"  r = vec3(fbm(p + uWarp*q + vec3(1.3,5.2,0.0)), fbm(p + uWarp*q + vec3(5.2,1.3,0.0)), fbm(p + uWarp*q + vec3(0.0,0.0,1.0)));",
+"}",
+"void main(){",
+"  vec2 uv = vUv / uMask;",
+"  float d2 = dot(uv,uv);",
+"  vec3 col;",
+"  if(d2 < 1.0){",
+"    float z = sqrt(max(1.0 - d2, 0.0));",
+"    vec3 nrm = normalize(vec3(uv, z));",
+"    vec3 p = nrm * uScale + vec3(0.0, uTime*uTSpeed*0.6, uTime*uTSpeed);",
+"    vec3 q, r;",
+"    STpattern(p, q, r);",
+"    float n = fbm(p + uWarp*r);",
+"    col = mix(mix(mix(uC1, uC2, r.z), uC3, q.x), uC4, n);",
+"    float limb = smoothstep(1.0, 0.15, sqrt(d2));",
+"    col *= 0.55 + 0.65*limb;",
+"    col += uC1 * pow(max(n - 0.55, 0.0), 2.0) * 1.5;",
+"    col *= 1.9;",
+"  } else {",
+"    float e = sqrt(d2);",
+"    col = mix(uC2, uC1, 0.4) * exp(-(e-1.0)*6.0) * uGlow * 0.8;",
+"    col += uC2 * exp(-(e-1.0)*2.2) * 0.10 * uGlow;",
+"  }",
+"  gl_FragColor = vec4(col, 1.0);",
+"}"
+].join("\n");
+
+var VS = "attribute vec2 aP; varying vec2 vUv; void main(){ vUv = aP; gl_Position = vec4(aP, 0.0, 1.0); }";
+
+/* ================= Данные звёзд — из игровых записей PLANETS_DB ================= */
+var STARS = [
+  { name:'ШИНРАРТА-A', id:'cv0', type:'star_M', rkm:280000,
+    pal:{ c1:'#fbff11', c2:'#ff1e0f', c3:'#9e0b02', c4:'#2e0e00' } },
+  { name:'СОЛНЦЕ (SOL)', id:'cv1', type:'star-gl', rkm:2400000,
+    pal:{ c1:'#fff4c0', c2:'#ffdf9e', c3:'#ff8c33', c4:'#7a3a00' } },
+  { name:'СРИУС-A (SIRIUS)', id:'cv2', type:'star_A', rkm:2800000,
+    pal:{ c1:'#dff0ff', c2:'#bfe8ff', c3:'#4a7aff', c4:'#1e3a7a' } }
+];
+var PAL_FALLBACK = { c1:'#ffffff', c2:'#ff8830', c3:'#aa2200', c4:'#220a00' };
+
+function hex2rgb(h){
+  h = h.replace('#','');
+  return [parseInt(h.substr(0,2),16)/255, parseInt(h.substr(2,2),16)/255, parseInt(h.substr(4,2),16)/255];
+}
+
+var P = { mask:0.78, scale:4.2, tspeed:0.03, warp:4.0, oct:4, glow:1.2, game:true };
+function bind(id, key, fmt){
+  var s = document.getElementById('s'+id), v = document.getElementById('v'+id);
+  s.addEventListener('input', function(){ P[key] = parseFloat(s.value); v.textContent = fmt ? fmt(P[key]) : P[key]; });
+}
+bind('Mask','mask',function(x){return x.toFixed(2);});
+bind('Scale','scale',function(x){return x.toFixed(1);});
+bind('Time','tspeed',function(x){return x.toFixed(3);});
+bind('Warp','warp',function(x){return x.toFixed(1);});
+bind('Oct','oct',function(x){return x;});
+bind('Glow','glow',function(x){return x.toFixed(2);});
+document.getElementById('cGame').addEventListener('change', function(){ P.game = this.checked; });
+
+/* ================= WebGL-рендер звезды ================= */
+function makeGL(canvas){
+  var gl = null;
+  try{ gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); }catch(e){}
+  if(!gl) return null;
+  function sh(type, src){
+    var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){ console.warn(gl.getShaderInfoLog(s)); return null; }
+    return s;
+  }
+  var vs = sh(gl.VERTEX_SHADER, VS), fs = sh(gl.FRAGMENT_SHADER, NOISE_GLSL);
+  if(!vs || !fs) return null;
+  var pr = gl.createProgram(); gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+  gl.useProgram(pr);
+  var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  var loc = gl.getAttribLocation(pr, 'aP');
+  gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  var U = {};
+  ['uTime','uMask','uScale','uTSpeed','uWarp','uGlow','uOct','uC1','uC2','uC3','uC4'].forEach(function(n){ U[n] = gl.getUniformLocation(pr, n); });
+  return { gl:gl, U:U, canvas:canvas, t0:Math.random()*100 };
+}
+
+/* ================= 2D-фолбэк: тот же паттерн в JS на тайле ================= */
+function jhash(x,y,z){ var s = Math.sin(x*17.0 + y*59.4 + z*15.0)*4096.0; return s - Math.floor(s); }
+function jval(x,y,z){
+  var xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  var xf = x-xi, yf = y-yi, zf = z-zi;
+  function sm(t){ return t*t*(3-2*t); }
+  var a = jhash(xi,yi,zi),   b = jhash(xi+1,yi,zi),   c = jhash(xi,yi+1,zi),   d = jhash(xi+1,yi+1,zi);
+  var e = jhash(xi,yi,zi+1), f = jhash(xi+1,yi,zi+1), g = jhash(xi,yi+1,zi+1), h = jhash(xi+1,yi+1,zi+1);
+  var u = sm(xf), v = sm(yf), w = sm(zf);
+  var i00 = a*(1-u) + b*u, i10 = c*(1-u) + d*u, i01 = e*(1-u) + f*u, i11 = g*(1-u) + h*u;
+  return (i00*(1-v) + i10*v)*(1-w) + (i01*(1-v) + i11*v)*w;
+}
+function jfbm(x,y,z,oct){
+  var v = 0, a = 0.5, s = 100;
+  for(var i = 0; i < oct; i++){ v += a*jval(x,y,z); x = x*2 + s; y = y*2 + s; z = z*2 + s; a *= 0.5; }
+  return v;
+}
+function jmixc(a,b,t){
+  return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
+}
+var TS = 96; /* тайл фолбэка */
+function render2D(ctx, cv, star, time){
+  var pal = P.game ? star.pal : PAL_FALLBACK;
+  var C1 = hex2rgb(pal.c1), C2 = hex2rgb(pal.c2), C3 = hex2rgb(pal.c3), C4 = hex2rgb(pal.c4);
+  if(!star.off){ star.off = document.createElement('canvas'); star.off.width = TS; star.off.height = TS; star.octx = star.off.getContext('2d'); star.img = star.octx.createImageData(TS, TS); }
+  var d = star.img.data;
+  var sc = P.scale, ts = P.tspeed*10, wa = P.warp;
+  for(var py = 0; py < TS; py++){
+    for(var px = 0; px < TS; px++){
+      var u = (px/TS)*2 - 1, v = (py/TS)*2 - 1, r2 = u*u + v*v;
+      var idx = (py*TS + px)*4;
+      if(r2 >= 1){ d[idx] = 0; d[idx+1] = 0; d[idx+2] = 0; d[idx+3] = 0; continue; }
+      var z = Math.sqrt(1 - r2), l = Math.sqrt(u*u + v*v + z*z);
+      var nx = u/l, ny = v/l, nz = z/l;
+      var X = nx*sc, Y = ny*sc + time*ts*0.6, Z = nz*sc + time*ts;
+      var qx = jfbm(X + 1.3, Y + 5.2, Z, P.oct);
+      var qy = jfbm(X + 5.2, Y + 1.3, Z, P.oct);
+      var qz = jfbm(X, Y, Z + 1.0, P.oct);
+      var rz = jfbm(X + wa*qx, Y + wa*qy, Z + wa*qz, P.oct);
+      var n = jfbm(X + wa*rz, Y + wa*rz, Z + wa*rz, P.oct);
+      var col = jmixc(jmixc(jmixc(C1, C2, rz), C3, qx), C4, n);
+      var limb = 0.55 + 0.65*(1 - Math.sqrt(r2));
+      var k = 255 * Math.min(1, col[0]*1.9*limb);
+      d[idx]   = Math.round(255*Math.min(1, col[0]*1.9*limb));
+      d[idx+1] = Math.round(255*Math.min(1, col[1]*1.9*limb));
+      d[idx+2] = Math.round(255*Math.min(1, col[2]*1.9*limb));
+      d[idx+3] = 255;
+    }
+  }
+  star.octx.putImageData(star.img, 0, 0);
+  var W = cv.width, H = cv.height;
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  var R = Math.min(W, H)/2 * P.mask;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(W/2, H/2, R, 0, 6.28318); ctx.clip();
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(star.off, W/2 - R, H/2 - R, R*2, R*2);
+  ctx.restore();
+  var gr = ctx.createRadialGradient(W/2, H/2, R*0.98, W/2, H/2, R*2.2);
+  gr.addColorStop(0, pal.c2);
+  gr.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.globalAlpha = 0.35*P.glow;
+  ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = 1;
+}
+
+/* ================= Инициализация ================= */
+var engines = [];
+STARS.forEach(function(st){
+  var cv = document.getElementById(st.id);
+  cv.width = 520; cv.height = 520;
+  var glr = makeGL(cv);
+  if(glr){ engines.push({ kind:'gl', r:glr, star:st }); cv.title = 'WebGL'; }
+  else { engines.push({ kind:'2d', ctx:cv.getContext('2d'), canvas:cv, star:st, last:0 }); cv.title = '2D fallback'; }
+});
+var glCount = engines.filter(function(e){ return e.kind === 'gl'; }).length;
+document.getElementById('engine').textContent = glCount > 0
+  ? ('движок: WebGL (' + glCount + '/3) · фолбэк: ' + (3 - glCount))
+  : 'движок: 2D-фолбэк (WebGL недоступен)';
+
+var t0 = performance.now(), acc2d = 0;
+function frame(now){
+  var t = (now - t0)/1000;
+  engines.forEach(function(e){
+    var cv = e.canvas || e.r.canvas;
+    if(e.kind === 'gl'){
+      var gl = e.r.gl, U = e.r.U;
+      gl.viewport(0, 0, cv.width, cv.height);
+      gl.uniform1f(U.uTime, t + e.r.t0);
+      gl.uniform1f(U.uMask, P.mask);
+      gl.uniform1f(U.uScale, P.scale);
+      gl.uniform1f(U.uTSpeed, P.tspeed);
+      gl.uniform1f(U.uWarp, P.warp);
+      gl.uniform1f(U.uGlow, P.glow);
+      gl.uniform1f(U.uOct, P.oct);
+      var pal = P.game ? e.star.pal : PAL_FALLBACK;
+      var a = hex2rgb(pal.c1), b = hex2rgb(pal.c2), c = hex2rgb(pal.c3), dd = hex2rgb(pal.c4);
+      gl.uniform3f(U.uC1, a[0],a[1],a[2]);
+      gl.uniform3f(U.uC2, b[0],b[1],b[2]);
+      gl.uniform3f(U.uC3, c[0],c[1],c[2]);
+      gl.uniform3f(U.uC4, dd[0],dd[1],dd[2]);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    } else {
+      acc2d += 1;
+      if(acc2d % 6 === 0 || !e.rendered){ render2D(e.ctx, cv, e.star, t); e.rendered = true; }
+    }
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
