@@ -409,7 +409,31 @@ var PKIND = {
   'star-gl':4 /* STAR-GL — независимая ветка звёзд */
 };
 function pKind(k){ var e = PLANETS_DB.planets[k]; return e ? (PKIND[e.kind] || 0) : 0; }
-var FIN = PLANETS_DB.planets.length - 1; /* финальная планета маршрута */
+let FIN = PLANETS_DB.planets.length - 1; /* финальная планета маршрута; пересчитывается при смене системы (см. loadStarSystem) */
+
+/* ===== НАБОРЫ ТЕЛ ДЛЯ ЗВЁЗДНЫХ СИСТЕМ =====
+   Движок работает на живом PLANETS_DB.planets: сколько тел положим — столько
+   и будет в системе, без создания отдельных сцен. Звезда всегда ПОСЛЕДНЯЯ
+   в наборе (индекс последний), планета(0) — стартовая, как в базовой системе.
+   HOME = базовый набор (возврат «домой»). SOL и SIRIUS — по 2 тела:
+   планета(0) + своя звезда(последняя). */
+var HOME_PLANETS = PLANETS_DB.planets.map(function(p){ return JSON.parse(JSON.stringify(p)); });
+var SOL_PLANETS = [
+	/* Проследний обект в системе нужен для зарядки сирментного FSD Это пульсар с линзей и джетами на жаргоне медведей "Гладем нейтронную звезду как кошку и летим домой"*/
+  { name:'МАЯК-КОЛЫБЕЛИ', pos:[500,0,-500], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+  { name:'МАРС', pos:[-305.15,336,0], rkm:27371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+  { name:'МЕРКУРИЙ', pos:[250.15,0,245], rkm:9651, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#ffbf59', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#7a4a00","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#2a1200","land1":"#8a5a1e","land2":"#c9a35a","ice":"#ffdf9e","cloud":"#fff3d6","city":"#ffbf59","aur":"#ff8c33"},"sun":"#ffdf9e","sunB":1.2,"sunR":0.0004} },
+  { name:'ЗЕМЛЯ', pos:[130.15,0,0], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+  { name:'ЮПИТЕР', pos:[45.15,0,0], rkm:120371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#ffbf59', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#7a4a00","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#2a1200","land1":"#8a5a1e","land2":"#c9a35a","ice":"#ffdf9e","cloud":"#fff3d6","city":"#ffbf59","aur":"#ff8c33"},"sun":"#ffdf9e","sunB":1.2,"sunR":0.0004} },
+  { name:'СОЛНЦЕ', pos:[0,0,0], rkm:2400000, rot:36, rspd:0.05, axx:0, axy:0, axz:0, kind:'star-gl', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.4,"size":1.7,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ffdf9e","c2":"#ffb35c","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ffdf9e","ln1":"#fff4c0","ln2":"#ffb35c","sp1":"#ff8c33","sp2":"#7a3a00","pr":"#ffdf9e"},"sun":"#ffdf9e","sunB":5,"sunR":0.0032} }
+];
+var SIRIUS_PLANETS = [
+	/* Проследний обект в системе нужен для зарядки сирментного FSD Это пульсар с линзей и джетами на жаргоне медведей "Гладем нейтронную звезду как кошку и летим домой"*/
+  { name:'МАЯК-РЗРУШЕНИЯ', pos:[350.95,0,-350], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
+  { name:'СРИУС-1A', pos:[50.15,19,30.66], rkm:164000, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#97b8ff', rings:false, moons:[], jets:true, unlock:0, track:'Star-2.ogg', fx:{"atm":"#dfc6ff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#bfe8ff","c2":"#5a8cff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#dfe6ff","r2":"#8fa8ff","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#bfe8ff","sunB":1.5,"sunR":0.0004} },
+  { name:'СРИУС-A', pos:[0,0,0], rkm:2800000, rot:36, rspd:0.06, axx:0, axy:0, axz:0, kind:'star-gl', type:'star_A', palette:'#dff0ff', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#8fb8ff","glow":1.3,"size":1.6,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#bfe8ff","c2":"#6a9cff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#bfe8ff","ln1":"#dff0ff","ln2":"#8fb8ff","sp1":"#4a7aff","sp2":"#1e3a7a","pr":"#bfe8ff"},"sun":"#bfe8ff","sunB":5,"sunR":0.0032} }
+];
+var SYSTEM_SETS = { home: HOME_PLANETS, sol: SOL_PLANETS, sirius: SIRIUS_PLANETS };
 </script>
 <script>
 /* ═══════════════ КОНСТАНТЫ СИМУЛЯЦИИ ФОНА (править здесь) ═══════════════ */
@@ -1820,20 +1844,21 @@ function frame(now){
     if(uPIcur) gl.uniform1f(uPIcur, cur);
     if(window.DIAG_DUMP){ window.__diagP = { cur: cur, list: list, klist: klist }; }
   }
-  /* ==== ГРАВИТАЦИОННАЯ ЛИНЗА ПУЛЬСАРОВ B/C (в полёте у пульсара, не в гипере) ==== */
+  /* ==== ГРАВИТАЦИОННАЯ ЛИНЗА ПУЛЬСАРОВ (в полёте у пульсара, не в гипере) ====
+     Линза у ЛЮБОГО тела с pKind===3 (pulsar/neutron/star), не по хардкод-индексам 3/6 —
+     чтобы не цепляла обычные планеты в настраиваемых системах. */
   if(uLensPos && uLensStr && uLensRad && uLensDopp && uLensActive && window.PW && !hypOn){
     var PWarr = window.PW;
     var curRef = (PWarr[cur]) ? PWarr[cur] : [0,0,0];
     var camF = (g && g.active && g.pos) ? [g.pos[0], g.pos[1], g.pos[2]] : [0,0,0];
-    var bp = (PWarr && PWarr[3]) ? PWarr[3] : null, cp6 = (PWarr && PWarr[6]) ? PWarr[6] : null;
     var bestL = 1.0e12, bestPos = [0,0,0], bestDopp = 0.0, lensOn = 0.0;
-    var cands = [];
-    if(bp) cands.push([bp[0]-curRef[0], bp[1]-curRef[1], bp[2]-curRef[2]]);
-    if(cp6) cands.push([cp6[0]-curRef[0], cp6[1]-curRef[1], cp6[2]-curRef[2]]);
-    for(var li = 0; li < cands.length; li++){
-      var dx = camF[0]-cands[li][0], dy = camF[1]-cands[li][1], dz = camF[2]-cands[li][2];
+    for(var _li = 0; _li < PWarr.length; _li++){
+      if(pKind(_li) !== 3) continue; /* только пульсары/нейтронные/звёзды */
+      var cP = [PWarr[_li][0]-curRef[0], PWarr[_li][1]-curRef[1], PWarr[_li][2]-curRef[2]];
+      var dx = camF[0]-cP[0], dy = camF[1]-cP[1], dz = camF[2]-cP[2];
       var d = Math.sqrt(dx*dx+dy*dy+dz*dz);
-      if(d <= 10.0 && d < bestL){ bestL = d; bestPos = cands[li];
+      if(d <= 10.0 && d < bestL){
+        bestL = d; bestPos = cP;
         var t2 = Math.min(Math.max((10.0 - d) / (10.0 - 1.1), 0.0), 1.0);
         bestDopp = 0.1 + (2.0 - 0.1) * t2;
       }
@@ -1848,11 +1873,14 @@ function frame(now){
 
   /* Позиция Шинрарта-A (солнце, 10-я планета в (0,0,0)) — в системе камеры.
      Обычный полёт: PW[9]-PW[cur]; гипер: мировые. */
-  if(uStarPos && window.PW && window.PW[9]){
-    if(hypOn){
-      gl.uniform3f(uStarPos, window.PW[9][0], window.PW[9][1], window.PW[9][2]);
-    } else {
-      gl.uniform3f(uStarPos, window.PW[9][0]-curRef[0], window.PW[9][1]-curRef[1], window.PW[9][2]-curRef[2]);
+  if(uStarPos && window.PW && window.PW.length){
+    var stI = window.PW.length - 1; /* звезда — ПОСЛЕДНЯЯ в наборе тел (теперь не жёсткий индекс 9) */
+    if(window.PW[stI]){
+      if(hypOn){
+        gl.uniform3f(uStarPos, window.PW[stI][0], window.PW[stI][1], window.PW[stI][2]);
+      } else {
+        gl.uniform3f(uStarPos, window.PW[stI][0]-curRef[0], window.PW[stI][1]-curRef[1], window.PW[stI][2]-curRef[2]);
+      }
     }
   }
   /* OPT: uSplash меняется редко — не шлём одинаковое значение каждый кадр */
@@ -2012,7 +2040,7 @@ var keys = {}, drag = null, mouseCtl = false;
 /* ---------- ЧИЗИЯ : Какой сырный мишка не захочит себе огромнуя планет состоящию из сыра. Планета была притянута Разумными плюшивыми медведями с планеты ХИТОМИ спомощью квантового гравитационного завхвата. И зачем они это сделали ? Теперь по звездной системе летает сыр и остатки когдато пышных колец этой планеты. Говорят они состояли из кексиков.  ---------- */
 /* ---------- НГАЛИН: Гравитационные Эксперементы плюшевых медведий с притяжением ЧИЗИИ закончились притяжением когдато брошенной в сторону Дарк войда старшего брата планеты ХИТОМИ . ХИТОМИ не хотела чтобы НГАЛИН Держался постоянно за нее и жил дальше сам . Однако из за Плюшевых медведей ХИТОМИ некогда не избавится от НГАЛИН. ---------- */
 /* ===== PLANETS_DB — объявлена в отдельном блоке до R46-фона (см. выше) ===== */
-var planet = 0, PLANET_NAMES = PLANETS_DB.planets.map(function(p){ return p.name; });
+var planet = 0; var PLANET_NAMES = PLANETS_DB.planets.map(function(p){ return p.name; }); /* пересобирается при смене системы; var — чтобы window.PLANET_NAMES оставался доступным */
 var OCCL_Y = 0; /* вертикальный центр окклюзии: звезда опущена на заставке */
 var gameOn = false, switching = false, paused = false, pauseEl = null;
 
@@ -2181,8 +2209,43 @@ function initTopPanel(){
   document.body.appendChild(topPanel);
   segPtsEl = document.getElementById('segPtsEl');
   updTopScore();
+  /* FSD-бар зарядки под окном очков: показывается только при активной зарядке от звезды */
+  fsdChargeWrap = document.createElement('div');
+  fsdChargeWrap.style.cssText = 'position:fixed;top:54px;left:50%;transform:translateX(-50%);z-index:70;display:none;flex-direction:column;align-items:center;gap:3px;background:#0c150c;border:2px inset #1a1a2e;border-radius:6px;padding:3px 10px;box-shadow:0 4px 12px rgba(0,0,0,.5);';
+  fsdChargeWrap.setAttribute('data-keep','1');
+  var lb = document.createElement('div');
+  lb.style.cssText = 'font:700 8px/1 monospace;letter-spacing:2px;color:#4ae8ff;white-space:nowrap;';
+  lb.textContent = '\u{1F4AA} FSD ЗАРЯД';
+  fsdChargeWrap.appendChild(lb);
+  fsdBarProgressEl = document.createElement('div');
+  fsdBarProgressEl.style.cssText = 'position:relative;width:260px;height:14px;background:#051520;border:1px solid #0a4a5a;border-radius:6px;overflow:hidden;';
+  fsdBarFillEl = document.createElement('div');
+  fsdBarFillEl.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#0a4a5a,#4ae8ff);';
+  fsdBarProgressEl.appendChild(fsdBarFillEl);
+  fsdChargeWrap.appendChild(fsdBarProgressEl);
+  fsdSegCounterEl = document.createElement('div');
+  fsdSegCounterEl.style.cssText = 'font:700 9px/1 monospace;color:#4ae8ff;white-space:nowrap;';
+  fsdSegCounterEl.textContent = '0/7';
+  fsdChargeWrap.appendChild(fsdSegCounterEl);
+  document.body.appendChild(fsdChargeWrap);
 }
 function updTopScore(){ segSetN(segPtsEl, pts, 10); }
+function updFsdChargeUi(){
+  if(!fsdChargeWrap) return;
+  /* показываем ТОЛЬКО при активной зарядке от звезды/нейтронной звезды (fsdActiveRate>0);
+     у планеты/в паузе бар скрыт, пассивная зарядка не отображается */
+  /* скрываем при: не игре/паузе, нет активной зарядки, либо заряд уже полный (7/7) */
+  if(!gameOn || paused || fsdActiveRate <= 0 || fsdCharge >= fsdMax){ fsdChargeWrap.style.display = 'none'; return; }
+  fsdChargeWrap.style.display = 'flex';
+  if(fsdBarFillEl){
+    var _pct = Math.round(fsdChargeProgress*100);
+    if(fsdBarFillEl.__p !== _pct){ fsdBarFillEl.style.width = _pct + '%'; fsdBarFillEl.__p = _pct; }
+  }
+  if(fsdSegCounterEl){
+    var _tx = fsdCharge + '/' + fsdMax;
+    if(fsdSegCounterEl.__t !== _tx){ fsdSegCounterEl.textContent = _tx; fsdSegCounterEl.__t = _tx; }
+  }
+}
 
 /* ---------- НИЖНЯЯ ПАНЕЛЬ: HP, ФОРСАЖ, PowerUp ---------- */
 function initBottomPanel(){
@@ -2221,6 +2284,14 @@ function initBottomPanel(){
   expLabelEl.textContent = '0/500';
   eRow.appendChild(eWrap); eRow.appendChild(expLabelEl);
   botPanel.appendChild(eRow);
+  /* FSD: межзвёздный заряд — 7 сегментов (как HP). Заряд копится у пульсаров. */
+  var fRow = document.createElement('div');
+  fRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
+  fRow.innerHTML = '<span style="font:700 9px/1 monospace;letter-spacing:1px;color:#4ae8ff;white-space:nowrap;">FSD</span>';
+  fsdBarEl = document.createElement('div');
+  fsdBarEl.style.cssText = 'display:flex;gap:3px;';
+  fRow.appendChild(fsdBarEl);
+  botPanel.appendChild(fRow);
   var cRow = document.createElement('div');
   cRow.style.cssText = 'display:flex;gap:5px;justify-content:center;margin-top:2px;';
   botPanel.appendChild(buildHotRow());
@@ -2261,6 +2332,23 @@ function updBottomPanel(){
   for(var k = 0; k < hpMax; k++){
     var blk = hpBarEl.children[k];
     if(blk) blk.style.background = k < hpCur ? '#ff4a3a' : '#3a0d0d';
+  }
+  /* FSD: 7 сегментов заряда — как HP (перестроение только при смене fsdMax) */
+  if(fsdBarEl){
+    if(lastFsdMax !== fsdMax){
+      lastFsdMax = fsdMax;
+      fsdBarEl.innerHTML = '';
+      for(var fi = 0; fi < fsdMax; fi++){
+        var fc = document.createElement('div');
+        fc.style.cssText = 'width:10px;height:11px;border:1px solid #0a4a5a;border-radius:3px;background:#062030;';
+        fsdBarEl.appendChild(fc);
+      }
+    }
+    for(var fk = 0; fk < fsdMax; fk++){
+      var fcell = fsdBarEl.children[fk];
+      if(fcell) fcell.style.background = fk < fsdCharge ? '#4ae8ff' : '#062030';
+      if(fcell) fcell.style.boxShadow = (fk < fsdCharge && fsdCharge === fsdMax) ? '0 0 6px #4ae8ff' : 'none';
+    }
   }
   /* OPT: кэш — не перезаписываем style.width/фильтр, если значение прежнее */
   var bw = boostFuel.toFixed(1) + '%';
@@ -2676,6 +2764,12 @@ var pickTray = document.createElement('div');
 pickTray.style.cssText = 'position:fixed;left:10px;bottom:70px;z-index:60;display:flex;flex-direction:column;gap:4px;pointer-events:none;';
 document.body.appendChild(pickTray);
 pickTray.setAttribute('data-keep','1');
+/* ОКНО ПОЗИЦИИ МИШКИ (инструмент): показывает где медведь сейчас в реал-тайме */
+var bearPosEl = document.createElement('div');
+bearPosEl.style.cssText = 'position:fixed;left:10px;top:118px;z-index:50;background:rgba(3,8,13,.85);border:2px inset #4ae8ff;color:#4ae8ff;font:700 10px/1.5 monospace;padding:5px 8px;pointer-events:none;white-space:pre;min-width:220px;';
+bearPosEl.setAttribute('data-keep','1');
+bearPosEl.textContent = 'МИШКА: --';
+document.body.appendChild(bearPosEl);
 var PICK_COL = { cake:'#ffd9f0', cheese:'#ffe97d', moon:'#cfe0ff', pepper:'#ff5a4a', heart:'#ffb3d9', disk:'#ffd700' };
 var PICK_NAME = { cake:'КЕКС', cheese:'СЫР', moon:'ЛУНА', pepper:'ПЕРЕЦ', heart:'СЕРДЦЕ', disk:'ДИСК' };
 function addPickToast(kind){
@@ -2717,6 +2811,19 @@ var btnTheme = document.createElement('button');
 btnTheme.textContent = '🎨ТЕМА';
 btnTheme.addEventListener('click', cycleTheme);
 ctl.appendChild(btnTheme);
+var btnRestart = document.createElement('button');
+btnRestart.textContent = '🔄НАЧАТЬ СНАЧАЛА';
+btnRestart.addEventListener('click', function(){
+  resetGame();
+  gameOver = false;
+  gameOn = true;
+  paused = false;
+  if(pauseEl) pauseEl.style.display = 'none';
+  hideGameOver();
+  applyGameMode();
+  toastFx('🔄 НОВЫЙ РЕЙС', '#7dff8a');
+});
+ctl.appendChild(btnRestart);
 document.body.appendChild(ctl);
 ctl.classList.add('ui-ctl');
 ctl.setAttribute('data-keep','1');
@@ -2729,6 +2836,11 @@ var botPanel = null, hpBarEl = null, boostFillEl = null;
 var expFillEl = null, expLabelEl = null;
 var goPanel = null, goPtsEl = null, goMoonEl, goTitleEl = null, goWinBtn = null;
 var lensEl = null, lastHpMax = -1;
+var fsdBarEl = null, lastFsdMax = -1, fsdCharge = 0, fsdMax = 7;
+var fsdChargeProgress = 0, fsdActiveRate = 0; /* прогресс текущего сегмента 0..1 и активная скорость зарядки */
+var fsdPassiveT = 0, fsdPassiveGiven = 0; /* пассивная регенерация: аккумулятор + флаг — уже выдан 1 сегмент */
+var FSD_NEUTRON_TIME = 15, FSD_STAR_TIME = 60, FSD_PASSIVE_TIME = 180; /* сек на 1 сегмент: нейтрон/обычная звезда/пассив (пассив — максимум 1 сегмент всего) */
+var fsdChargeWrap = null, fsdBarProgressEl = null, fsdBarFillEl = null, fsdSegCounterEl = null;
 function segRowHtml(id, label){
   var s = '<div style="display:flex;align-items:center;gap:8px;">'
     + '<span style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;">' + label + '</span>'
@@ -3134,8 +3246,27 @@ function physics(dt){
   }
   P.pos = add(P.pos, mul(P.fwd, speed*dt));
   if(inTransit){
-    /* стыковка с любой планетой: дальняя граница гиперпространства */
-    if(dn >= 0 && dd < FSD_SOI){ /* стыковка с любой планетой: влет из гиперпространства открыт */
+    /* ТВЁРДЫЕ ШАРЫ ВЕЗДЕ: в гиперпространстве нельзя пролететь сквозь планеты/звезду.
+       Для каждого тела — сфера столкновения радиуса HYP_R (рендер R=1 + запас корабля).
+       Корабль выталкивается на границу сферы, нормальная скорость гасится (скольжение). */
+    for(var hy = 0; hy < PW.length; hy++){
+      var hvv = sub(FT.pos, PW[hy]);
+      var hd = len(hvv);
+      if(hd < HYP_R){
+        var hn = (hd > 1e-6) ? mul(hvv, 1/hd) : [1,0,0];
+        FT.pos = add(PW[hy], mul(hn, HYP_R));
+        var hdot = dot(P.fwd, hn);
+        if(hdot < 0){ /* разворачиваем взгляд по касательной, не отталкиваем назад */
+          P.fwd = norm(sub(P.fwd, mul(hn, hdot)));
+          P.right = norm(sub(P.right, mul(P.fwd, dot(P.right, P.fwd))));
+          P.up = cross(P.right, P.fwd);
+        }
+      }
+    }
+  }
+  if(inTransit){
+    /* стыковка на достаточном зазоре от тела: зона входа = 10 (была 10 — возвращаем), с заметным зазором между телом и зоной вхождения */
+    if(dn >= 0 && dd < 10.0){
       planet = dn;
       inTransit = false;
       F.pos = sub(FT.pos, PW[dn]);
@@ -3254,6 +3385,15 @@ function updHud(){
   } else if(hud._last !== txt){ hud.textContent = txt; hud._last = txt; }
   var pct = Math.round(speed/CFG.SPD_MAX*100);
   if(hudThrSegEl) segSetN(hudThrSegEl, Math.max(0, Math.min(250, pct)), 3);
+  /* окно позиции мишки — обновление в реальном времени */
+  if(bearPosEl){
+    var _CP = inTransit ? FT : F;
+    var _mx = _CP.pos[0], _my = _CP.pos[1], _mz = _CP.pos[2];
+    var _ms = inTransit ? 'ГИПЕР' : PLANET_NAMES[planet];
+    var _txt = 'МИШКА: x ' + _mx.toFixed(2) + '  y ' + _my.toFixed(2) + '  z ' + _mz.toFixed(2)
+      + '\nСИСТЕМА: ' + _ms + '  (инд ' + planet + ')';
+    if(bearPosEl.__last !== _txt){ bearPosEl.textContent = _txt; bearPosEl.__last = _txt; }
+  }
 }
 
 function trackFor(p){
@@ -3324,7 +3464,7 @@ function initPausePanel(){
   pauseEl.innerHTML =
     '<div style="font:900 20px/1 monospace;letter-spacing:5px;color:#f7cc1d;text-shadow:2px 2px 0 #7a5c00;">ПАУЗА</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#7dff8a;">УПРАВЛЕНИЕ</div>'
-    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G — FSD-прыжок к цели (Y), J — к предыдущей планете<br>Y — захват планеты в цель: прицел на небе<br>Вне зоны планеты (11 а.е.) — гиперпространство: перегон по синусоиде, скорость растёт с удалением<br>Подлёт к любой планете — стыковка: влет из гиперпространства открыт<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
+    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G — FSD-прыжок к цели (Y), J — к предыдущей планете<br>Y — захват планеты в цель: прицел на небе<br>U — межзвёздный FSD: выделить ориентир-звезду (Sol / Sirius), кольцо = цель<br>FSD-заряд (панель): копится у пульсаров/нейтронных звёзд, 7 сегментов<br>Вне зоны планеты (11 а.е.) — гиперпространство: перегон по синусоиде, скорость растёт с удалением<br>Подлёт к любой планете — стыковка: влет из гиперпространства открыт<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#f7cc1d;">МЕХАНИКИ</div>'
     + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Кексик +3 EXP, сыр +5 EXP, луна +10 EXP (крупные — вдвое)<br>500 EXP — ЧИЗИЯ, 1500 EXP — НГАЛИН, 2250 EXP — ШИНРАРТА-B<br>7000 EXP — РЕЙС ПРОЙДЕН: ПРОДОЛЖИТЬ ИЛИ СНАЧАЛА<br>Добыча наполняет Форсаж: кексик +2%, сыр +1%, луна +5%<br>Форсаж — разгон до ×2.5, тает за 10 с, реген 100% за 90 с<br>Магнит — 12 с притяжения, Залп — 10 снарядов, Цель — 5 самонаводящихся<br>Вспышка — перчики исчезают на 10 с, Заморозка — стоп на 16 с<br>Обменник — кексики ↔ сыр 1:1, обратно 1 кексик = 2 сыра</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#ff5a4a;">ПРАВИЛА</div>'
@@ -3340,9 +3480,25 @@ function initPausePanel(){
 var FSD_CHARGE = 2.6, FSD_TUNNEL = 1.2, FSD_EXIT = 1.5;   /* фазы прыжка, с */
 var FSD_SC_GAIN = 0.3, FSD_SC_CAP = 24;   /* потолок суперкруиза = SPD_MAX*(1+(d-2)*GAIN), не выше SPD_MAX*CAP */
 var FSD_DOCK = 2.4, FSD_SOI = 11.0, SIN_AMP = 7.5; /* SIN_AMP — крутизна синусоиды перегона */ /* стыковка / стена закрытых / ГИПЕРПРОСТРАНСТВО начинается здесь (диск планеты на небе ~ как на скриншоте), а.е. */
+var HYP_R = 1.06; /* твёрдая сфера столкновения тела в гиперпространстве (рендер R=1 + запас корабля); нормальная скорость гасится — корабль скользит по поверхности */
+
+/* ===== ЗВЁЗДЫ-ЛОДЫ (межзвёздная механика FSD) =====
+   Дальние звёзды-ориентиры на небе (пока без высадки — вводим поэтапно).
+   Позиции — мировые координаты, далеко за планетной системой (-110..110).
+   Каждая звезда: имя, позиция, цвет и мощность свечения. */
+var StarsDB = [
+  { name:'SOL',  pos:[420,-180,620],    color:'#ffdf9e', glow:0.95, sys:'sol' },
+  { name:'SIRIUS', pos:[-560,120,-390],  color:'#bfe8ff', glow:0.75, sys:'sirius' },
+  { name:'ШИНРАРТА', pos:[0,0,-820],      color:'#9fd9a0', glow:0.6,  sys:'home' }
+];
+var STARS = StarsDB.map(function(s){ return s; });
+var starSel = -1; /* индекс выделенного лода (-1 — нет) */
+var starEls = null; /* DOM-элементы звёзд-лодов на небе (создаются в initSky) */
+var currentSystem = 'home'; /* sys-ключ системы, где игрок сейчас — её лод скрывается */
 var WARP_SND = 'warp.ogg'; /* URL-ссылки отключены: локальный файл warp.ogg рядом с HTML */
 /* мировые позиции планет (радиус планеты = 1): ХИТОМИ, ЧИЗИЯ, НГАЛИН, ШИНРАРТА-B */
-var PW = PLANETS_DB.planets.map(function(p){ return p.pos.slice(); }); /* из реестра */
+var PW = PLANETS_DB.planets.map(function(p){ return p.pos.slice(); }); /* из реестра; пересобирается при смене системы */
+/* window.PW — геттер только для чтения (defineProperty ниже): не присваиваем сюда */
 
 /* ===== ГЛОБАЛЬНЫЙ ТАЙМЕР: СИНХРОНИЗАЦИЯ ПО ДАТЕ КОМПЬЮТЕРА =====
    Эпо́ха (константа ниже) — момент, когда планеты стоят в позициях реестра.
@@ -3425,11 +3581,21 @@ var skyWrap = null, skyWrapEls = [], skyCvEls = [], skyLblEls = [], skyRet = nul
 var fsdAudio = null;
 var warpCv = null, warpCtx = null, warpStreaks = null;
 
-function unlockedIdx(k){ return (k <= 0) ? true : (expTotal >= PLANETS_DB.planets[k].unlock); }
-function expNeed(k){ return (k > 0) ? PLANETS_DB.planets[k].unlock : 0; }
+function unlockedIdx(k){
+  if(k <= 0) return true;
+  var _e = PLANETS_DB.planets[k];
+  return (_e && _e.unlock != null) ? (expTotal >= _e.unlock) : true;
+}
+function expNeed(k){
+  if(k > 0){
+    var _e = PLANETS_DB.planets[k];
+    return (_e && _e.unlock != null) ? _e.unlock : 0;
+  }
+  return 0;
+}
 function toastFx(msg, col){
   var t = document.createElement('div');
-  t.style.cssText = 'position:fixed;left:50%;bottom:56px;transform:translateX(-50%);z-index:120;font:700 12px/1 monospace;letter-spacing:2px;color:' + (col || '#7dff8a') + ';background:#0c150cdd;border:3px outset #950;border-radius:8px;padding:9px 16px;pointer-events:none;';
+  t.style.cssText = 'position:fixed;left:50%;bottom:172px;transform:translateX(-50%);z-index:120;font:700 12px/1 monospace;letter-spacing:2px;color:' + (col || '#7dff8a') + ';background:#0c150cdd;border:3px outset #950;border-radius:8px;padding:9px 16px;pointer-events:none;';
   t.setAttribute('data-keep','1');
   t.textContent = msg;
   document.body.appendChild(t);
@@ -3799,6 +3965,23 @@ function initSky(){
     skyCvEls.push(cv);
     skyLblEls.push(lbl);
   }
+  /* звёзды-лоды (межзвёздная механика): каждая — точка-метка + кольцо выделения */
+  starEls = [];
+  for(var sk = 0; sk < StarsDB.length; sk++){
+    var sw = document.createElement('div');
+    sw.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;display:none;pointer-events:none;z-index:6;';
+    var ring2 = document.createElement('div');
+    ring2.setAttribute('data-star', String(sk));
+    ring2.style.cssText = 'position:absolute;left:0;top:0;transform:translate(-50%,-50%);border:2px dashed ' + StarsDB[sk].color + ';border-radius:50%;box-shadow:0 0 10px ' + StarsDB[sk].color + ';display:none;';
+    sw.appendChild(ring2);
+    var slbl = document.createElement('div');
+    slbl.style.cssText = 'position:absolute;left:50%;top:14px;transform:translateX(-50%);font:700 10px/1 monospace;letter-spacing:1px;white-space:nowrap;text-shadow:1px 1px 2px #000;display:none;';
+    slbl.textContent = StarsDB[sk].name;
+    slbl.style.color = StarsDB[sk].color;
+    sw.appendChild(slbl);
+    skyWrap.appendChild(sw);
+    starEls.push(sw);
+  }
   skyRet = document.createElement('div');
   skyRet.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;display:none;z-index:6000;pointer-events:none;';
   var ring = document.createElement('div');
@@ -3902,6 +4085,39 @@ function drawPlanetsSky(cam, W, H, bgSim){
   /* канвы-призраки: всё, что не попало в кадр, прячем */
   for(var k3 = 0; k3 < skyWrapEls.length; k3++) if(!drawn[k3]) skyWrapEls[k3].style.display = 'none';
 }
+/* ☩ ЗВЁЗДЫ-ЛОДЫ (межзвёздная механика): проецируем каждую на экран как дальний ориентир.
+   Всегда видны (даже из гиперпространства) — это маяки для межзвёздного перелёта. */
+function drawStarsSky(cam, W, H){
+  if(!skyWrap){ initSky(); }
+  if(!gameOn){ for(var z = 0; z < starEls.length; z++) starEls[z].style.display = 'none'; return; }
+  for(var si = 0; si < StarsDB.length; si++){
+    var s = StarsDB[si];
+    var sw = starEls[si];
+    /* скрываем лод той системы, в которой игрок сейчас */
+    if(s.sys === currentSystem){ sw.style.display = 'none'; continue; }
+    var wpS = inTransit ? s.pos.slice() : sub(s.pos, PW[planet]);
+    var vS = sub(wpS, cam.pos), zS = dot(vS, cam.fwd);
+    if(zS < 0.02){ sw.style.display = 'none'; continue; }
+    var uxS = dot(vS, cam.right)/(zS*CFG.FOV_TAN), uyS = dot(vS, cam.up)/(zS*CFG.FOV_TAN);
+    var sxS = (uxS*H + W)/2, syS = (H - uyS*H)/2;
+    if(sxS < -5 || sxS > W+5 || syS < -5 || syS > H+5){ sw.style.display = 'none'; continue; }
+    sw.style.display = 'block';
+    sw.style.transform = 'translate(' + sxS.toFixed(1) + 'px,' + syS.toFixed(1) + 'px)';
+    var sizeS = Math.max(3, Math.min(H*2.0, (1/zS)*H));
+    var ringS = sw.firstChild;
+    if(starSel === si && !s.locked){
+      ringS.style.display = 'block';
+      var rsS = Math.max(16, Math.min(H, sizeS*1.8 + 12));
+      ringS.style.width = ringS.style.height = rsS.toFixed(1) + 'px';
+    } else {
+      ringS.style.display = 'none';
+    }
+    var lblS = sw.children[1];
+    lblS.style.display = 'block';
+    lblS.style.top = (sizeS*0.5 + 12).toFixed(1) + 'px';
+    lblS.textContent = (starSel === si) ? (s.name + ' ◈') : s.name;
+  }
+}
 function fsdInitSound(){
   if(fsdAudio) return fsdAudio;
   var a = new Audio(relURL(WARP_SND));
@@ -3964,7 +4180,10 @@ function updWarp(dt){
   if(warp.t < t1){ var p = warp.t/t1; inten = 0.25 + 0.65*p; streakSpd = 0.15 + 0.85*p; }
   else if(warp.t < t2){
     inten = 1; streakSpd = 1.6;
-    if(!warp.committed && warp.t >= t1 + FSD_TUNNEL*0.5){ commitJump(warp.target); warp.committed = true; }
+    if(!warp.committed && warp.t >= t1 + FSD_TUNNEL*0.5){
+      if(warp.isStar) commitStarJump(warp.target); else commitJump(warp.target);
+      warp.committed = true;
+    }
   } else {
     var pe = (warp.t - t2)/FSD_EXIT;
     inten = Math.max(0, 1 - pe);
@@ -4006,14 +4225,64 @@ function updWarp(dt){
   }
   if(warp.t >= t3) finishWarp();
 }
-function startFSD(target){
+/* ☩ СМЕНА ЗВЁЗДНОЙ СИСТЕМЫ: подменяем живую таблицу PLANETS_DB.planets новым набором
+   и пересобираем всё, что от неё зависит. Прогресс (EXP/HP/запасы/диски) сохраняется —
+   сбрасывается только мир предметов, чтобы тела успели отродиться в новой системе. */
+function loadStarSystem(si){
+  var key = (StarsDB[si] && StarsDB[si].sys) || 'home';
+  var set = SYSTEM_SETS[key] || HOME_PLANETS;
+  currentSystem = key; /* прячем лод системы, куда вошли */
+  PLANETS_DB.planets = set;
+  PLANET_NAMES = set.map(function(p){ return p.name; });
+  PW = set.map(function(p){ return p.pos.slice(); });
+  /* window.PW — геттер только для чтения: переприсваиваем PW, а не window.PW */
+  FIN = set.length - 1;
+  /* звезда системы — тело kind 'star-gl' (точка 0,0,0). На её орбиту телепортируем мишку. */
+  var starIdx = 0;
+  for(var _sk = 0; _sk < set.length; _sk++){ if(pKind(_sk) === 4){ starIdx = _sk; break; } }
+  if(starIdx >= set.length) starIdx = set.length - 1;
+  CAMR0 = 1.0 + 1000.0/bodyRadiusKm(starIdx);
+  /* точка прилёта к SOL — с зазором от звезды (не вплотную); у остальных систем как есть */
+  if(key === 'sol') CAMR0 = 5.0;
+  for(var _i = ITEMS.length - 1; _i >= 0; _i--){ if(ITEMS[_i] && ITEMS[_i].el && ITEMS[_i].el.parentNode) ITEMS[_i].el.parentNode.removeChild(ITEMS[_i].el); }
+  ITEMS.length = 0;
+  planet = starIdx; inTransit = false; targetIdx = -1; starSel = -1;
+  if(F.pos){
+if(key === 'sirius'){
+      /* точка прилёта к SIRIUS — фиксированная координата (цель со скрина): [5.84, -0.21, 1.10] */
+      F.pos = [5.84, -0.21, 1.10];
+    } else {
+      F.pos = [Math.cos(A0)*CAMR0, Math.sin(A0)*CAMR0, 0];
+    }
+    resetBasis();
+  }
+  setSpaceMode();
+  orbitalInit();
+  orbitalApply();
+  genWorld();
+  lastHpMax = -1;
+  if(sfx.music && sfx.started){ try{ sfx.music.pause(); sfx.music.src = trackFor(starIdx); }catch(e){} }
+  if(sfx.musicOn) tryMusic();
+  updHud();
+  updBottomPanel();
+  toastFx('СИСТЕМА: ' + StarsDB[si].name, '#4ae8ff');
+}
+function commitStarJump(si){
+  loadStarSystem(si);
+  speed = Math.min(speed, CFG.SPD_MAX*boostMul);
+  F.fwd = FT.fwd; F.right = FT.right; F.up = FT.up;
+  for(var sl = shots.length - 1; sl >= 0; sl--){ if(shots[sl].el && shots[sl].el.parentNode) shots[sl].el.parentNode.removeChild(shots[sl].el); }
+  shots.length = 0;
+  updHud();
+}
+function startFSD(target, isStar){
   switching = true;
   keys = {};
   if(!inTransit){
     FT = { pos: add(PW[planet], F.pos), fwd: F.fwd, up: F.up, right: F.right };
     inTransit = true;
   }
-  warp = { t: 0, target: target, committed: false };
+  warp = { t: 0, target: target, committed: false, isStar: !!isStar };
   setSpaceMode();
   var a = fsdInitSound();
   if(a && sfx.musicOn){
@@ -4023,10 +4292,18 @@ function startFSD(target){
       if(pr && pr.catch) pr.catch(function(){});
     }catch(e){}
   }
-  toastFx('FSD: ЗАРЯДКА \u2192 ЦЕЛЬ: ' + PLANET_NAMES[target]);
+  toastFx(isStar ? ('FSD: ПЕРЕЛЁТ \u2192 ' + StarsDB[target].name) : ('FSD: ЗАРЯДКА \u2192 ЦЕЛЬ: ' + PLANET_NAMES[target]));
 }
 function fsdJump(dir){
   if(!gameOn || paused || switching || warp) return;
+  /* МЕЖЗВЁЗДНЫЙ ПЕРЕЛЁТ: G при выделенном звёздном лоде (U) сменяет систему */
+  if(dir > 0 && starSel >= 0){
+    /* межзвёздный прыжок: нужен минимум 1 сегмент заряда; прыжок тратит 1 */
+    if(fsdCharge < 1){ toastFx('FSD: НУЖЕН 1 ЗАРЯД', '#ff5a4a'); return; }
+    fsdCharge--; fsdChargeProgress = 0; fsdActiveRate = 0;
+    startFSD(starSel, true);
+    return;
+  }
   var target = -1;
   if(dir > 0){
     if(targetIdx >= 0){ target = targetIdx; }
@@ -4049,10 +4326,22 @@ function cycleTarget(){
     if(k !== planet) break;
   }
   targetIdx = k;
+  starSel = -1; /* переключение механик: планетная цель гасит межзвёздный ориентир */
+}
+function cycleStar(){
+  if(!gameOn || paused || warp) return;
+  var k = starSel;
+  for(var n = 0; n < StarsDB.length; n++){
+    k = (k + 1) % StarsDB.length;
+    break;
+  }
+  starSel = k;
+  targetIdx = -1; /* переключение механик: звёздный ориентир гасит планетную цель */
+  toastFx('FSD: ОРИЕНТИР \u2192 ' + StarsDB[starSel].name, '#4ae8ff');
 }
 
 /* ---------- ВВОД ---------- */
-var KEYSET = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, KeyQ:1, KeyE:1, KeyG:1, KeyJ:1, KeyP:1, KeyY:1, ArrowUp:1, ArrowDown:1 };
+var KEYSET = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, KeyQ:1, KeyE:1, KeyG:1, KeyJ:1, KeyP:1, KeyY:1, KeyU:1, ArrowUp:1, ArrowDown:1 };
 window.__splashPlanet = 0;
 var SPLASH_TOAST = null;
 function cycleSplash(){
@@ -4113,6 +4402,7 @@ window.addEventListener('keydown', function(e){
   if(!gameOn || paused || warp || !KEYSET[e.code]) return;
   e.preventDefault(); e.stopPropagation();
   if(e.code === 'KeyY' && !e.repeat) cycleTarget();
+  else if(e.code === 'KeyU' && !e.repeat) cycleStar();
   else if(e.code === 'KeyG' && !e.repeat) fsdJump(1);
   else if(e.code === 'KeyJ' && !e.repeat) fsdJump(-1);
   else if(e.code === 'KeyP' && !e.repeat) toggleMouse();
@@ -4233,6 +4523,29 @@ function loop(now){
     if(gameOn){
       if(!paused){
       if(warp) updWarp(dt); else physics(dt);
+      /* FSD-заряд: активная зарядка у НЕЙТРОННЫХ (пульсаров, jets.on) и ОБЫЧНЫХ звёзд (star-gl),
+           1 сегмент за FSD_NEUTRON_TIME / FSD_STAR_TIME сек. Пассивная регенерация — макс 1 сегмент
+           за FSD_PASSIVE_TIME сек, без отображения в HUD. */
+      if(!warp && gameOn && !inTransit){
+        var _rate = 0;
+        if(pKind(planet) === 3){ /* пульсар/нейтронная: нужен включённый jets */
+          var _eJ = PLANETS_DB.planets[planet].fx && PLANETS_DB.planets[planet].fx.jets;
+          if(_eJ && _eJ.on) _rate = FSD_NEUTRON_TIME;
+        } else if(pKind(planet) === 4){ /* обычная звезда (star-gl) */
+          _rate = FSD_STAR_TIME;
+        }
+        fsdActiveRate = _rate;
+        if(_rate > 0 && fsdCharge < fsdMax){
+          fsdChargeProgress = Math.min(1, fsdChargeProgress + dt/_rate);
+          if(fsdChargeProgress >= 1){ fsdChargeProgress = 0; fsdCharge++; toastFx('FSD ЗАРЯД: ' + fsdCharge + '/7', '#4ae8ff'); }
+        }
+        if(fsdCharge < fsdMax && fsdPassiveGiven === 0){
+          fsdPassiveT += dt;
+          if(fsdPassiveT >= FSD_PASSIVE_TIME){ fsdPassiveT = 0; fsdPassiveGiven = 1; fsdCharge++; toastFx('FSD ПАССИВ: +1', '#4ae8ff'); }
+        }
+      } else if(!inTransit){
+        fsdChargeProgress = 0; fsdActiveRate = 0;
+      }
       if(pepperCd > 0) pepperCd = Math.max(0, pepperCd - dt);
       if(immuneT > 0) immuneT = Math.max(0, immuneT - dt);
       if(boostOn){
@@ -4284,7 +4597,9 @@ function loop(now){
     }
     drawSprites(cam, W, H, bgSim, dt);
     drawPlanetsSky(cam, W, H, bgSim);
+    drawStarsSky(cam, W, H);
     drawHypSky(dt, cam);
+    updFsdChargeUi();
     updHud();
   }catch(e){
     gameErr('ИГРА: ошибка кадра — ' + (e && e.message ? e.message : e));
@@ -4585,7 +4900,7 @@ function el(tag, attrs, html){
 function gid(id){ return document.getElementById(id); }
 function num(v){ v = +v; if (!isFinite(v)) v = 0; var r = Math.round(v * 1e4) / 1e4; return Object.is(r, -0) ? 0 : r; }
 function q(s){ return "'" + String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'"; }
-function rebuildPW(){ try { var dbsrc = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB; window.PW = dbsrc.planets.map(function(p){ return p.pos.slice(); }); if(typeof orbitalInit==='function'){ orbitalInit(); orbitalApply(); } } catch(e){} }
+function rebuildPW(){ try { var dbsrc = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB; PW = dbsrc.planets.map(function(p){ return p.pos.slice(); }); if(typeof orbitalInit==='function'){ orbitalInit(); orbitalApply(); } } catch(e){} }
 function syncFlags(p){ if (p.fx.ring) p.rings = !!p.fx.ring.on; if (p.fx.jets) p.jets = !!p.fx.jets.on; }
 function gameOn(){ return !!(window.__gameState && window.__gameState.active); }
 
