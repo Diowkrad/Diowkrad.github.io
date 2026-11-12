@@ -417,15 +417,15 @@ let FIN = PLANETS_DB.planets.length - 1; /* финальная планета м
    в наборе (индекс последний), планета(0) — стартовая, как в базовой системе.
    HOME = базовый набор (возврат «домой»). SOL и SIRIUS — по 2 тела:
    планета(0) + своя звезда(последняя). */
-var HOME_PLANETS = PLANETS_DB.planets.map(function(p){ return JSON.parse(JSON.stringify(p)); });
+var HOME_PLANETS = PLANETS_DB.planets; /* SYNC: живая ссылка — правки редактора переживают перелёты */
 var SOL_PLANETS = [
 	/* Проследний обект в системе нужен для зарядки сирментного FSD Это пульсар с линзей и джетами на жаргоне медведей "Гладем нейтронную звезду как кошку и летим домой"*/
-  { name:'МАЯК-КОЛЫБЕЛИ', pos:[500,0,-500], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-  { name:'МАРС', pos:[-305.15,336,0], rkm:27371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-  { name:'МЕРКУРИЙ', pos:[250.15,0,245], rkm:9651, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#ffbf59', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#7a4a00","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#2a1200","land1":"#8a5a1e","land2":"#c9a35a","ice":"#ffdf9e","cloud":"#fff3d6","city":"#ffbf59","aur":"#ff8c33"},"sun":"#ffdf9e","sunB":1.2,"sunR":0.0004} },
-  { name:'ЗЕМЛЯ', pos:[130.15,0,0], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-  { name:'ЮПИТЕР', pos:[45.15,0,0], rkm:120371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#ffbf59', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#7a4a00","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#2a1200","land1":"#8a5a1e","land2":"#c9a35a","ice":"#ffdf9e","cloud":"#fff3d6","city":"#ffbf59","aur":"#ff8c33"},"sun":"#ffdf9e","sunB":1.2,"sunR":0.0004} },
-  { name:'СОЛНЦЕ', pos:[0,0,0], rkm:2400000, rot:36, rspd:0.05, axx:0, axy:0, axz:0, kind:'star-gl', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.4,"size":1.7,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ffdf9e","c2":"#ffb35c","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ffdf9e","ln1":"#fff4c0","ln2":"#ffb35c","sp1":"#ff8c33","sp2":"#7a3a00","pr":"#ffdf9e"},"sun":"#ffdf9e","sunB":5,"sunR":0.0032} }
+  { name:'МАЯК-КОЛЫБЕЛИ', pos:[500,0,-500], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#757eff","glow":1.73,"size":1.52,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#002aff","c2":"#3300ff","sp":0.434,"len":20},"ring":{"on":0,"c":"#d9c294","sp":0.059,"in":1.45,"out":2.35},"surf":{"scale":2.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#999999","r2":"#627cfe","river":"#ffffff","fres":"#955cff","lava":"#ffd8b0"},"sun":"#050000","sunB":0.4,"sunR":0.0002} },
+    { name:'МАРС', pos:[-305.15,336,0], rkm:27371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#003cbd', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#140100","glow":0.88,"size":1.05,"spin":0,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":false,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#382119","land1":"#595959","land2":"#8f8f8f","ice":"#260d08","cloud":"#f2f7ff","city":"#575757","aur":"#4d4d4d"},"sun":"#2e0000","sunB":0.2,"sunR":0.0002} },
+    { name:'МЕРКУРИЙ', pos:[250.15,0,245], rkm:9651, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#ecbe74', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#141414","glow":0.21,"size":0.3,"spin":1.1,"pulse":0.3,"jets":{"on":0,"c1":"#ff6f00","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"ocean":"#454545","land1":"#212121","land2":"#330000","ice":"#525252","cloud":"#050505","city":"#121212","aur":"#1a1a1a"},"sun":"#ffdf9e","sunB":0.35,"sunR":0.0004} },
+    { name:'ЗЕМЛЯ', pos:[130.15,0,0], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#0b001f","glow":0.95,"size":1.61,"spin":1.25,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":1,"c":"#d9c294","sp":0.2,"in":3,"out":3.27},"surf":{"scale":2.8,"icecov":0.84,"cloudcov":0.53,"cityk":0.05,"aurk":0.15,"stormk":0,"ocean":"#383838","land1":"#cccccc","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1b004d"},"sun":"#4d0500","sunB":0.4,"sunR":0.0002} },
+    { name:'ЮПИТЕР', pos:[45.15,0,0], rkm:120371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'cheese', palette:'#ffbf59', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#7a4a00","glow":1.78,"size":1.75,"spin":4,"pulse":0.3,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1},"ring":{"on":0,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46},"surf":{"scale":4.1,"icecov":0.64,"cloudcov":0.53,"cityk":0.15,"aurk":1.2,"stormk":0.25,"b1":"#decca0","b2":"#b88c57","b3":"#ede0bd","storm":"#cc6b38","fres":"#ff731a","haze":"#e6b873","fog":"#ebcc94"},"sun":"#ffdf9e","sunB":2.55,"sunR":0.0011} },
+    { name:'СОЛНЦЕ', pos:[0,0,0], rkm:2400000, rot:36, rspd:0.05, axx:0, axy:0, axz:0, kind:'star-gl', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.4,"size":1.7,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ffdf9e","c2":"#ffb35c","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ffdf9e","ln1":"#fff4c0","ln2":"#ffb35c","sp1":"#ff8c33","sp2":"#7a3a00","pr":"#ffdf9e"},"sun":"#ffdf9e","sunB":5,"sunR":0.0032} }
 ];
 var SIRIUS_PLANETS = [
 	/* Проследний обект в системе нужен для зарядки сирментного FSD Это пульсар с линзей и джетами на жаргоне медведей "Гладем нейтронную звезду как кошку и летим домой"*/
@@ -434,6 +434,9 @@ var SIRIUS_PLANETS = [
   { name:'СРИУС-A', pos:[0,0,0], rkm:2800000, rot:36, rspd:0.06, axx:0, axy:0, axz:0, kind:'star-gl', type:'star_A', palette:'#dff0ff', rings:false, moons:[], jets:false, unlock:0, track:'Star-0.ogg', fx:{"atm":"#8fb8ff","glow":1.3,"size":1.6,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#bfe8ff","c2":"#6a9cff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#bfe8ff","ln1":"#dff0ff","ln2":"#8fb8ff","sp1":"#4a7aff","sp2":"#1e3a7a","pr":"#bfe8ff"},"sun":"#bfe8ff","sunB":5,"sunR":0.0032} }
 ];
 var SYSTEM_SETS = { home: HOME_PLANETS, sol: SOL_PLANETS, sirius: SIRIUS_PLANETS };
+/* ☩ SYNC: вкладки редактора «СИСТЕМА 2/3» → живые наборы SOL/SIRIUS (правки применяются к игре) */
+PLANETS_DB2.planets = SOL_PLANETS;
+PLANETS_DB3.planets = SIRIUS_PLANETS;
 </script>
 <script>
 /* ═══════════════ КОНСТАНТЫ СИМУЛЯЦИИ ФОНА (править здесь) ═══════════════ */
@@ -4170,6 +4173,7 @@ function cancelWarp(){
   setSpaceMode();
 }
 function updWarp(dt){
+  if(!warp) return; /* ☩ guard: после finishWarp/cancelWarp warp === null */
   initWarpCv();
   var W = window.innerWidth, H = window.innerHeight;
   if(warpCv.width !== W || warpCv.height !== H){ warpCv.width = W; warpCv.height = H; }
@@ -4218,7 +4222,7 @@ function updWarp(dt){
   if(warp.t >= t2){
     var pf = (warp.t - t2)/FSD_EXIT;
     if(pf > 0.65){
-      ctx.fillStyle = 'rgba(255,255,255,' + (0.9*Math.min(1, (pf - 0.65)/0.35)).toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(255,255,255,' + Math.min(1, (pf - 0.65)/0.35).toFixed(3) + ')';
       ctx.fillRect(0, 0, W, H);
     }
     if(fsdAudio){ try{ fsdAudio.volume = Math.max(0, 0.55*(1 - pf)); }catch(e){} }
@@ -4889,6 +4893,9 @@ requestAnimationFrame(loop);
 (function(){
 'use strict';
 var ORIG = JSON.parse(JSON.stringify(PLANETS_DB));
+/* ☩ SYNC: оригиналы SOL/SIRIUS для «СБРОС ПЛАНЕТЫ» (снимок до правок) */
+var ORIG_SOL = PLANETS_DB2.planets.map(function(p){ return JSON.parse(JSON.stringify(p)); });
+var ORIG_SIR = PLANETS_DB3.planets.map(function(p){ return JSON.parse(JSON.stringify(p)); });
 var CFG_ORIG = window.CFG ? JSON.parse(JSON.stringify(window.CFG)) : null;
 
 function el(tag, attrs, html){
@@ -4900,7 +4907,8 @@ function el(tag, attrs, html){
 function gid(id){ return document.getElementById(id); }
 function num(v){ v = +v; if (!isFinite(v)) v = 0; var r = Math.round(v * 1e4) / 1e4; return Object.is(r, -0) ? 0 : r; }
 function q(s){ return "'" + String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'"; }
-function rebuildPW(){ try { var dbsrc = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB; PW = dbsrc.planets.map(function(p){ return p.pos.slice(); }); if(typeof orbitalInit==='function'){ orbitalInit(); orbitalApply(); } } catch(e){} }
+function syncSetToGame(){ try { var sk = ((typeof activeDb !== 'undefined' && activeDb === PLANETS_DB2) ? 'sol' : ((typeof activeDb !== 'undefined' && activeDb === PLANETS_DB3) ? 'sirius' : 'home')); if (window.SYSTEM_SETS) SYSTEM_SETS[sk] = activeDb.planets; } catch(e){} }
+function rebuildPW(){ try { var sysNow = window.currentSystem || 'home'; var tierSys = ((typeof activeDb !== 'undefined' && activeDb === PLANETS_DB2) ? 'sol' : ((typeof activeDb !== 'undefined' && activeDb === PLANETS_DB3) ? 'sirius' : 'home')); if (gameOn() && sysNow !== tierSys) return; /* ☩ SYNC: правим чужую систему — PW живой системы не трогаем */ var dbsrc = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB; PW = dbsrc.planets.map(function(p){ return p.pos.slice(); }); if(typeof orbitalInit==='function'){ orbitalInit(); orbitalApply(); } } catch(e){} }
 function syncFlags(p){ if (p.fx.ring) p.rings = !!p.fx.ring.on; if (p.fx.jets) p.jets = !!p.fx.jets.on; }
 function gameOn(){ return !!(window.__gameState && window.__gameState.active); }
 
@@ -5053,7 +5061,7 @@ function importDB(){
   try {
     var db = (new Function('return (' + t + ')'))();
     if (!db || !db.planets || !db.planets.length) throw new Error('в блоке нет планет');
-    var KINDS = ['terrestrial','ocean','stone','energy','cheese','gas','pulsar','neutron','star_g','star_a','star_m'];
+    var KINDS = ['terrestrial','ocean','stone','energy','cheese','gas','pulsar','neutron','star','star-gl'];
     db.planets.forEach(function(p, i){
       var w = 'планета #' + i;
       if (!p || typeof p.name !== 'string' || !p.name.trim()) throw new Error(w + ': пустое имя');
@@ -5065,6 +5073,7 @@ function importDB(){
     htPush(htSnap()); /* шаг истории ДО импорта */
     activeDb.soi = (db.soi != null) ? db.soi : activeDb.soi;
     activeDb.planets = JSON.parse(JSON.stringify(db.planets));
+    syncSetToGame();
     rebuildPW();
     cur = 0; window.__splashPlanet = 0;
     buildPlanet();
@@ -5143,7 +5152,7 @@ function buildPlanet(){
     var ns = {};
     SURF_R.forEach(function(r){ ns[r[0]] = (old[r[0]] != null) ? old[r[0]] : (p.fx.surf ? p.fx.surf[r[0]] : 0.5); });
     ns.scale = ns.scale || 1;
-    SURF_C[p.kind].forEach(function(cc){ if (old[cc[0]] != null) ns[cc[0]] = old[cc[0]]; else { var dd = FXDEF[PKIND[p.kind]]; if (dd && dd.surf && dd.surf[cc[0]] != null) ns[cc[0]] = dd.surf[cc[0]]; } });
+    if (SURF_C[p.kind]) SURF_C[p.kind].forEach(function(cc){ if (old[cc[0]] != null) ns[cc[0]] = old[cc[0]]; else { var dd = FXDEF[PKIND[p.kind]]; if (dd && dd.surf && dd.surf[cc[0]] != null) ns[cc[0]] = dd.surf[cc[0]]; } });
     p.fx.surf = ns;
     buildPlanet();
     toast('Тип: ' + p.kind + ' — поверхность пересобрана');
@@ -5313,7 +5322,7 @@ function buildPlanet(){
   bImp.addEventListener('click', importDB);
   var bRst = el('button', {'class':'edbtn2 del', type:'button'}, 'СБРОС ПЛАНЕТЫ');
   bRst.addEventListener('click', function(){
-    activeDb.planets[cur] = JSON.parse(JSON.stringify((activeDb === PLANETS_DB ? ORIG.planets[cur] : activeDb.planets[cur])));
+    activeDb.planets[cur] = JSON.parse(JSON.stringify((activeDb === PLANETS_DB ? ORIG.planets[cur] : (activeDb === PLANETS_DB2 ? ORIG_SOL[cur] : (activeDb === PLANETS_DB3 ? ORIG_SIR[cur] : activeDb.planets[cur])))));
     rebuildPW();
     buildPlanet();
     toast('Планета восстановлена из оригинала');
@@ -5390,7 +5399,7 @@ toast('Редактор вселенной готов. Tab — скрыть/по
 var SKEY_ED = 'hitomi_tools_session_v2';
 function htStrip(o){ return JSON.parse(JSON.stringify(o, function(k, v){ return typeof v === 'function' ? undefined : v; })); }
 function htClone(o){ return JSON.parse(JSON.stringify(o)); }
-function htSnap(){ var a = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB; return JSON.stringify({ db: { soi: a.soi, planets: a.planets }, cfg: htStrip(window.CFG || {}) }); }
+function htSnap(){ var a = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB; return JSON.stringify({ sys: activeDbName, db: { soi: a.soi, planets: a.planets }, cfg: htStrip(window.CFG || {}) }); }
 var htPristine = htSnap(); /* оригинал для диффа — ДО восстановления сессии */
 var htHist = [htPristine], htIdx = 0, htPend = null, htPendT = 0, htLock = 0;
 
@@ -5398,9 +5407,13 @@ function htApply(json){
   try {
     htLock = 1;
     var s = JSON.parse(json);
+    /* ☩ SYNC: откат чужой системы блокируем — иначе undo перезапишет чужой реестр */
+    if (s.sys && s.sys !== activeDbName) { htLock = 0; toast('Откат другой системы — переключи вкладку: ' + s.sys); return; }
+    if (!s.sys && activeDb !== PLANETS_DB) { htLock = 0; toast('Старый откат — переключи вкладку СИСТЕМА 1'); return; }
     var a = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB;
     a.soi = s.db.soi;
     a.planets = htClone(s.db.planets);
+    syncSetToGame();
     var C = window.CFG || {};
     Object.keys(s.cfg).forEach(function(k){ try { C[k] = htClone(s.cfg[k]); } catch(e){} });
     window.CFG = C;
@@ -5411,7 +5424,7 @@ function htApply(json){
   setTimeout(function(){ htLock = 0; }, 500);
 }
 function htSaveSess(){
-  try { var a = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB; localStorage.setItem(SKEY_ED, JSON.stringify({ t: Date.now(), db: { soi: a.soi, planets: htClone(a.planets) }, cfg: htStrip(window.CFG || {}) })); } catch(e){}
+  try { var a = (typeof activeDb !== 'undefined' && activeDb) ? activeDb : PLANETS_DB; localStorage.setItem(SKEY_ED, JSON.stringify({ t: Date.now(), sys: activeDbName, db: { soi: a.soi, planets: htClone(a.planets) }, cfg: htStrip(window.CFG || {}) })); } catch(e){}
 }
 function htPush(json){
   htHist = htHist.slice(0, htIdx + 1);
@@ -5510,6 +5523,7 @@ bar.insertBefore(htBDiff, gid('edHide'));
 var htBSess = el('button', { id: 'edSess', 'class': 'edbtn', type: 'button', title: 'Стереть сессию и вернуть оригинал' }, 'СЕСС ✕');
 htBSess.addEventListener('click', function(){
   try { localStorage.removeItem(SKEY_ED); } catch(e){}
+  if (activeDb !== PLANETS_DB) switchDb(0); /* ☩ SYNC: htPristine — снимок СИСТЕМЫ 1 */
   htApply(htPristine);
   htHist = [htPristine]; htIdx = 0; htUndoBtns();
   toast('Сессия стёрта — реестр возвращён к оригиналу');
