@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRC-BackUp-GL · Спрайты и текстуры</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:#0a0e16; color:#dfe7f0; font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; }
+  header{ padding:18px 22px; border-bottom:1px solid #1c2838; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  header h1{ font-size:16px; letter-spacing:1px; text-transform:uppercase; color:#4fd8ff; }
+  header .sub{ font-size:12px; color:#7c8aa0; }
+  .wrap{ padding:20px; display:grid; gap:18px; max-width:1400px; margin:0 auto; }
+  h2{ font-size:13px; letter-spacing:1px; color:#9dffe0; margin:6px 0 10px; text-transform:uppercase; border-left:3px solid #2aa; padding-left:8px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+  .cell{ background:#111827; border:1px solid #263349; border-radius:8px; padding:12px; text-align:center; }
+  .cell .glyph{ font-size:52px; line-height:1.2; filter:drop-shadow(0 0 6px rgba(120,220,255,.25)); }
+  .cell .name{ font:700 12px/1 monospace; color:#cfe0f0; margin-top:8px; }
+  .cell .kind{ font:400 11px/1.3 monospace; color:#7c8aa0; margin-top:3px; }
+  .texgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+  .texcell{ background:#111827; border:1px solid #263349; border-radius:8px; padding:12px; }
+  .texcell .swatches{ display:flex; flex-wrap:wrap; gap:2px; margin:8px 0; }
+  .texcell .sw{ width:26px; height:26px; border-radius:4px; border:1px solid #0006; }
+  .texcell .tname{ font:700 12px/1 monospace; color:#cfe0f0; }
+  .texcell .tinfo{ font:400 11px/1.4 monospace; color:#7c8aa0; margin-top:4px; white-space:pre-wrap; }
+  footer{ padding:14px 22px; color:#5b6880; font:400 11px/1.6 monospace; border-top:1px solid #1c2838; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SRC-BackUp-GL · Спрайты и текстуры</h1>
+  <span class="sub">Все ресурсы HITOMI в отдельных окнах — для быстрого просмотра и подбора.</span>
+</header>
+
+<div class="wrap">
+  <section>
+    <h2>Спрайты-предметы (эмодзи-иконки, рендер в слое спрайтов)</h2>
+    <div class="grid" id="sprites"></div>
+  </section>
+
+  <section>
+    <h2>Текстуры планет (палитра fx.surf — цветовые наборы каждой планеты)</h2>
+    <div class="texgrid" id="textures"></div>
+  </section>
+</div>
+
+<footer>
+  Стенд показывает только данные/спрайты — без WebGL. Источник: WORK GL.html (PLANETS_DB fx.surf, kind, moons).
+  Редактируй здесь цвета/спрайты, чтобы подобрать нужный вид перед переносом в игру/инструмент.
+</footer>
+
+<script>
+"use strict";
+/* ---- СПРАЙТЫ: иконки, которые игра рендерит как предметы/диски ---- */
+const SPRITES = [
+  { glyph:'🧁', name:'КЕКС',     kind:'cake Маленький' },
+  { glyph:'🧁', name:'КЕКС большой', kind:'cake Крупный (OUT)' },
+  { glyph:'🧀', name:'СЫР',      kind:'cheese Маленький' },
+  { glyph:'🧀', name:'СЫР большой', kind:'cheese Крупный (OUT)' },
+  { glyph:'🌶️', name:'ПЕРЕЦ',    kind:'pepper Опасность' },
+  { glyph:'❤️', name:'СЕРДЦЕ',   kind:'heart Бонус HP' },
+  { glyph:'🌕', name:'ЛУНА',     kind:'moon Спутник/ресурс' },
+  { glyph:'💿', name:'ДИСК 1 (запись)', kind:'disk1 Забытая запись 8022' },
+  { glyph:'🗿', name:'ДИСК 2 (фрактальный FSD)', kind:'disk2 Фрактальный FSD' }
+];
+const spriteEl = document.getElementById('sprites');
+SPRITES.forEach(function(s){
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  cell.innerHTML = '<div class="glyph">' + s.glyph + '</div>'
+    + '<div class="name">' + s.name + '</div>'
+    + '<div class="kind">' + s.kind + '</div>';
+  spriteEl.appendChild(cell);
+});
+
+/* ---- ТЕКСТУРЫ: цветовые наборы планет из PLANETS_DB (Home-система) ---- */
+const TEX = [
+  { n:'ХИТОМИ (terr)', s:{ocean:'#051a38',land1:'#14421a',land2:'#6b5c33',ice:'#589edf',cloud:'#f2f7ff',city:'#ffbf59',aur:'#1ae673'} },
+  { n:'ЧИЗИЯ (cheese)', s:{b1:'#ff2600',b2:'#573b00',b3:'#ff9500',storm:'#ff5900',fres:'#412901',haze:'#ff9900',fog:'#eeff00'} },
+  { n:'НГАЛИН (gas)', s:{r1:'#4c00ff',r2:'#25007a',lava:'#ff4000',fres:'#1e0042'} },
+  { n:'ШИНРАРТА-B (pulsar)', s:{r1:'#999999',r2:'#627cfe',river:'#ffffff',fres:'#955cff',lava:'#ffd8b0'} },
+  { n:'Элизия (terr)', s:{ocean:'#30003d',land1:'#9a4b9b',land2:'#685a37',ice:'#6e00db',cloud:'#8a2ce8',city:'#4d3c00',aur:'#040042'} },
+  { n:'Брэстла (gas)', s:{r1:'#422000',r2:'#0f0300',lava:'#4d2d00',fres:'#4d0000'} },
+  { n:'Шинрарта-С (pulsar)', s:{r1:'#ffffff',r2:'#cfcfcf',river:'#eff5f9',fres:'#4da6ff',lava:'#ffd8b0'} },
+  { n:'НЕМЕЗИДА (cheese)', s:{b1:'#7000fa',b2:'#d60072',b3:'#54006b',storm:'#ff00dd',fres:'#00b3ff',haze:'#8000ff',fog:'#8c00ff'} },
+  { n:'Диовкрад (gas)', s:{r1:'#020080',r2:'#1c005c',lava:'#805a1e',fres:'#7a0000'} },
+  { n:'Шинрарта-A (star-gl)', s:{c1:'#ff1e0f',ln1:'#fbff11',ln2:'#ffbb1e',sp1:'#9e0b02',sp2:'#2e0e00',pr:'#ff1e0f'} }
+];
+const texEl = document.getElementById('textures');
+TEX.forEach(function(t){
+  const cell = document.createElement('div');
+  cell.className = 'texcell';
+  let sw = '<div class="swatches">';
+  let info = '';
+  for(const k in t.s){ sw += '<div class="sw" style="background:' + t.s[k] + '" title="' + k + ': ' + t.s[k] + '"></div>'; info += k + ': ' + t.s[k] + '\n'; }
+  sw += '</div>';
+  cell.innerHTML = '<div class="tname">' + t.n + '</div>' + sw + '<div class="tinfo">' + info.trim() + '</div>';
+  texEl.appendChild(cell);
+});
+</script>
+</body>
+</html>

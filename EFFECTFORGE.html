@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🧸 EFFECTFORGE — эффекты, анимация и атмосферы планет</title>
+<style>
+:root{ --bg:#0f0f1b; --panel:#1a1a2e; --gold:#f7cc1d; --cyan:#7dff8a; --accent:#4f8ee9; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:#103; color:#cfd2e8; font-family:'Courier New',monospace; padding:18px; display:flex; flex-direction:column; align-items:center; }
+h1{ color:var(--gold); letter-spacing:3px; text-shadow:2px 2px 0 #7a5c00, 0 0 10px rgba(247,204,29,.55); border:4px outset #950; background:var(--panel); padding:8px 18px; margin-bottom:14px; font-size:1.2rem; }
+.panel{ background:var(--panel); border:4px outset #950; padding:14px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-bottom:14px; }
+.col{ display:flex; flex-direction:column; gap:8px; }
+#list{ min-width:230px; max-height:430px; overflow:auto; border:4px inset #1a1a2e; padding:6px; background:#000c; }
+.pbtn{ display:block; width:100%; text-align:left; font-family:inherit; font-size:0.78rem; background:#111; color:var(--cyan); border:2px outset #553; padding:6px 8px; margin-bottom:5px; cursor:pointer; }
+.pbtn.sel{ background:#f79e1d; color:#99fffc; border-color:#4f8ee9; }
+.pbtn small{ color:#889; float:right; }
+canvas{ border:4px inset #1a1a2e; background:#000; }
+#ctrls{ width:330px; border:4px inset #1a1a2e; padding:10px; background:#000c; overflow:auto; max-height:430px; }
+.ctrl label{ display:block; font-size:0.72rem; color:var(--cyan); margin-top:9px; }
+.ctrl label b{ color:var(--gold); float:right; }
+input[type=range]{ width:100%; accent-color:#f90; }
+input[type=color]{ width:100%; height:26px; background:#111; border:2px solid #553; }
+.row2{ display:flex; gap:8px; align-items:center; margin-top:10px; }
+.row2 span{ font-size:0.72rem; color:var(--cyan); }
+button{ font-family:inherit; background:#222; color:var(--gold); border:4px outset #950; padding:6px 12px; cursor:pointer; font-size:0.8rem; box-shadow:2px 2px 0 #000; }
+button:hover{ box-shadow:0 0 10px rgba(247,204,29,.55); }
+.bottom{ width:100%; max-width:1080px; }
+textarea{ width:100%; height:210px; background:#000; color:var(--cyan); border:4px inset #1a1a2e; font-family:inherit; font-size:0.68rem; padding:8px; }
+.hint{ font-size:0.72rem; color:#889; margin-top:6px; line-height:1.5; }
+</style>
+</head>
+<body>
+<h1>🧸 EFFECTFORGE — ЭФФЕКТЫ ПЛАНЕТ</h1>
+
+<div class="panel">
+  <div class="col"><div style="color:var(--gold);font-size:0.8rem;text-align:center;">ПЛАНЕТЫ СИСТЕМЫ</div><div id="list"></div></div>
+  <div class="col"><div style="color:var(--gold);font-size:0.8rem;text-align:center;">ЖИВОЕ ПРЕВЬЮ</div><canvas id="cv" width="420" height="420"></canvas></div>
+  <div class="col"><div style="color:var(--gold);font-size:0.8rem;text-align:center;">ЭФФЕКТЫ ПЛАНЕТЫ</div><div id="ctrls" class="ctrl"></div></div>
+</div>
+
+<div class="panel bottom">
+  <div class="col" style="width:100%;">
+    <div style="color:var(--gold);font-size:0.8rem;">ЭКСПОРТ PLANETS_DB (fx вшит в записи)</div>
+    <textarea id="out" spellcheck="false"></textarea>
+    <div class="row2">
+      <button id="bExp">↻ Сформировать</button>
+      <button id="bCopy">⧉ В буфер</button>
+      <button id="bDl">⤓ Скачать .txt</button>
+      <button id="bImp">⤒ Импорт блока</button>
+    </div>
+    <textarea id="inp" spellcheck="false" placeholder="Сюда вставь старый блок PLANETS_DB (или output PLANETFORGE) — fx по умолчанию добавится всем планетам" style="height:110px;margin-top:8px;"></textarea>
+    <div class="hint">palette — цвет атмосферы и поверхности • atmGlow — сила свечения ореола • atmSize — толщина ореола (относительно радиуса) • spin — скорость вращения поверхности • ringColor/ringSpeed — цвет и скорость колец • jetsColor/jetsSpeed/jetsLen — струи пульсара • pulse — частота пульсаций • moonSpeed — скорость лун • twinkle — мерцание звёзд у планеты. Экспорт дописывает fx к каждой записи PLANETS_DB — реестр остаётся совместимым с игрой.</div>
+  </div>
+</div>
+
+<script>
+/* ===== реестр по умолчанию — раскладка из Alpha 1.2.15 ===== */
+const DEF_FX = { atmGlow:0.6, atmSize:1.35, spin:0.4, ringColor:'#d8c9a0', ringSpeed:0.5, jetsColor:'#8ff6ff', jetsSpeed:1.4, jetsLen:2.8, pulse:4.0, moonSpeed:1.0, twinkle:0.5 };
+const KINDS = { terrestrial:'камень', gas:'гигант', pulsar:'пульсар', cheese:'сыр' };
+
+let DB = { soi:11, planets:[
+ { name:'ХИТОМИ {Землеподобная Планета}', pos:[-19.15,0,3.66], kind:'terrestrial', palette:'#3fa9f5', rings:false, moons:[{d:2,s:0.35,c:'#d8d2c4'}], jets:false, unlock:0, track:'Music-1.ogg' },
+ { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], kind:'cheese', palette:'#905000', rings:true, moons:[{d:2.2,s:0.4,c:'#cbb69a'},{d:3.1,s:0.3,c:'#b7a184'},{d:3.4,s:0.35,c:'#d8d2c4'},{d:4.1,s:0.35,c:'#d8d2c4'}], jets:false, unlock:250, track:'Music-2.ogg' },
+ { name:'НГАЛИН', pos:[-18.43,32,59.08], kind:'gas', palette:'#300090', rings:false, moons:[], jets:false, unlock:500, track:'Music-3.ogg' },
+ { name:'ШИНРАРТА-B', pos:[21.95,36,-15.57], kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[{d:2,s:0.35,c:'#d8d2c4'},{d:2.7,s:0.35,c:'#d8d2c4'},{d:3.4,s:0.35,c:'#d8d2c4'},{d:4.1,s:0.35,c:'#d8d2c4'},{d:4.8,s:0.35,c:'#d8d2c4'},{d:5.5,s:0.35,c:'#d8d2c4'},{d:6.2,s:0.35,c:'#d8d2c4'},{d:6.9,s:0.35,c:'#d8d2c4'}], jets:true, unlock:1500, track:'Star-1.ogg' },
+ { name:'Элизия {Землеподобная Планета}', pos:[61.26,0,61], kind:'terrestrial', palette:'#d400ff', rings:true, moons:[{d:2,s:0.35,c:'#d8d2c4'},{d:2.7,s:0.35,c:'#d8d2c4'},{d:3.4,s:0.35,c:'#d8d2c4'},{d:4.1,s:0.35,c:'#d8d2c4'}], jets:false, unlock:2200, track:'Bonus-1.ogg' },
+ { name:'Брэстла', pos:[96.48,0,29.95], kind:'gas', palette:'#eeff00', rings:true, moons:[], jets:false, unlock:2800, track:'Bonus-2.ogg' },
+ { name:'Шинрарта-С', pos:[85.58,0,-66.13], kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg' },
+ { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], kind:'gas', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg' },
+ { name:'Диовкрад', pos:[-106.98,0,24.9], kind:'gas', palette:'#ff0000', rings:true, moons:[{d:2,s:0.35,c:'#d8d2c4'},{d:2.7,s:0.35,c:'#d8d2c4'},{d:3.4,s:0.35,c:'#d8d2c4'},{d:4.1,s:0.35,c:'#d8d2c4'},{d:4.8,s:0.35,c:'#d8d2c4'},{d:5.5,s:0.35,c:'#d8d2c4'},{d:6.2,s:0.35,c:'#d8d2c4'},{d:6.9,s:0.35,c:'#d8d2c4'}], jets:true, unlock:6300, track:'Bonus-4.ogg' }
+]};
+DB.planets.forEach(p=>{ p.fx = Object.assign({}, DEF_FX); });
+
+let sel = 0;
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+const stars = []; for(let i=0;i<150;i++) stars.push({x:Math.random()*420, y:Math.random()*420, r:Math.random()*1.2+0.3, ph:Math.random()*6.28, sp:0.5+Math.random()*2.5});
+
+function hexRGB(h){ h=String(h||'#fff').replace('#',''); if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2]; return [parseInt(h.slice(0,2),16)||0,parseInt(h.slice(2,4),16)||0,parseInt(h.slice(4,6),16)||0]; }
+function shade(h,f,a){ const c=hexRGB(h); const m=v=>Math.max(0,Math.min(255,Math.round(v*f))); return 'rgba('+m(c[0])+','+m(c[1])+','+m(c[2])+','+(a===undefined?1:a)+')'; }
+function hash(s){ let a=7; for(const ch of String(s)) a=((a*31)+ch.charCodeAt(0))>>>0; return a; }
+
+/* ===== рисование превью ===== */
+function draw(){
+  const W=cv.width, H=cv.height, t=performance.now()/1000;
+  ctx.fillStyle='#02030a'; ctx.fillRect(0,0,W,H);
+  const p=DB.planets[sel], fx=p.fx||DEF_FX;
+  const tw=(0.4+fx.twinkle);
+  for(const s of stars){ const a=(0.25+0.75*(0.5+0.5*Math.sin(t*s.sp+s.ph)))*tw*0.9; ctx.fillStyle='rgba(255,255,255,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.283); ctx.fill(); }
+  const cx=W/2, cy=H/2, R=105;
+  const pulse = p.kind==='pulsar' ? (0.72+0.28*Math.sin(t*fx.pulse*6.283)) : 1;
+
+  if(p.rings) drawRing(p,fx,cx,cy,R,t,true);
+  drawSphere(p,fx,cx,cy,R,t,pulse);
+  if(p.rings) drawRing(p,fx,cx,cy,R,t,false);
+  drawAtmo(p,fx,cx,cy,R,pulse);
+  if(p.jets) drawJets(p,fx,cx,cy,R,t,pulse);
+  drawMoons(p,fx,cx,cy,R,t);
+  requestAnimationFrame(draw);
+}
+
+function drawSphere(p,fx,cx,cy,R,t,pulse){
+  const pal=p.palette, h=hash(p.name);
+  let base=pal;
+  if(p.kind==='pulsar') base='#e8f4ff';
+  if(p.kind==='cheese') base=pal;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,6.283); ctx.clip();
+  /* базовый шар со светотенью */
+  const g=ctx.createRadialGradient(cx-R*0.4,cy-R*0.4,R*0.15,cx,cy,R*1.05);
+  g.addColorStop(0,shade(base,1.25)); g.addColorStop(0.55,shade(base,1.0)); g.addColorStop(1,shade(base,0.25));
+  ctx.fillStyle=g; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+
+  if(p.kind==='gas'){
+    /* полосы гиганта — ползут со скоростью spin */
+    const off=(t*fx.spin*18)%26;
+    for(let y=-R-30;y<R;y+=26){
+      const f=0.75+0.3*Math.abs(Math.sin((y+off*2)*0.06+h%7));
+      ctx.fillStyle=shade(pal,f,0.55); ctx.fillRect(cx-R,cy+y,R*2,13);
+    }
+  } else if(p.kind==='terrestrial'){
+    /* материки — пятна, вращаются по широте */
+    for(let i=0;i<7;i++){
+      const a=h*0.7+i*2.399+t*fx.spin*0.35;
+      const rr=R*(0.25+((h>>(i*3))%50)/100);
+      const mx=cx+Math.cos(a)*rr*0.8, my=cy+Math.sin(a*1.3+i)*rr*0.7;
+      ctx.fillStyle=shade(p.kind==='terrestrial'?mixGreen(pal):pal,0.8,0.5);
+      ctx.beginPath(); ctx.ellipse(mx,my,R*0.22,R*0.13,a,0,6.283); ctx.fill();
+    }
+  } else if(p.kind==='cheese'){
+    /* дырки в сыре */
+    for(let i=0;i<9;i++){
+      const a=h*0.3+i*1.7+t*fx.spin*0.3;
+      const rr=R*(0.2+((h>>(i*2))%60)/110);
+      ctx.fillStyle='rgba(40,20,5,0.55)';
+      ctx.beginPath(); ctx.arc(cx+Math.cos(a)*rr, cy+Math.sin(a*1.7+i*2)*rr*0.85, R*(0.05+((h>>i)%8)/100), 0, 6.283); ctx.fill();
+    }
+  } else {
+    /* пульсар — яркая кора с трещинами, пульсирует */
+    ctx.globalAlpha=0.5+0.5*pulse;
+    for(let i=0;i<6;i++){
+      const a=h*0.9+i*1.05;
+      ctx.strokeStyle=shade('#7fb8ff',1,0.5); ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*R*0.9, cy+Math.sin(a)*R*0.9);
+      ctx.lineTo(cx+Math.cos(a+2.6)*R*0.5, cy+Math.sin(a+2.6)*R*0.5); ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+  /* терминатор */
+  const sh=ctx.createRadialGradient(cx-R*0.5,cy-R*0.5,R*0.2,cx,cy,R);
+  sh.addColorStop(0,'rgba(0,0,0,0)'); sh.addColorStop(1,'rgba(0,0,10,0.75)');
+  ctx.fillStyle=sh; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+  ctx.restore();
+}
+
+function mixGreen(pal){
+  const c=hexRGB(pal); return '#'+[Math.round((c[0]+40)/2),Math.round(Math.min(255,c[1]*0.7+90)),Math.round(c[2]*0.5)].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function drawAtmo(p,fx,cx,cy,R,pulse){
+  const outer=R*(fx.atmSize||1.35);
+  const g=ctx.createRadialGradient(cx,cy,R*0.92,cx,cy,outer);
+  const c=hexRGB(p.palette);
+  const a=(fx.atmGlow||0.6)*0.85*pulse;
+  g.addColorStop(0,'rgba('+c[0]+','+c[1]+','+c[2]+','+(a*0.9).toFixed(3)+')');
+  g.addColorStop(0.55,'rgba('+c[0]+','+c[1]+','+c[2]+','+(a*0.35).toFixed(3)+')');
+  g.addColorStop(1,'rgba('+c[0]+','+c[1]+','+c[2]+',0)');
+  ctx.save(); ctx.globalCompositeOperation='lighter';
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,outer,0,6.283); ctx.fill();
+  ctx.restore();
+}
+
+function drawRing(p,fx,cx,cy,R,t,back){
+  ctx.save();
+  ctx.translate(cx,cy); ctx.rotate(Math.sin(t*(fx.ringSpeed||0.5)*0.2)*0.25);
+  const rx=R*1.95, ry=R*0.52;
+  ctx.strokeStyle=shade(fx.ringColor||'#d8c9a0',1,back?0.55:0.9);
+  ctx.lineWidth=R*0.22; ctx.beginPath();
+  if(back) ctx.ellipse(0,0,rx,ry,0,Math.PI,2*Math.PI); else ctx.ellipse(0,0,rx,ry,0,0,Math.PI);
+  ctx.stroke();
+  ctx.strokeStyle=shade(fx.ringColor||'#d8c9a0',1.2,back?0.3:0.55); ctx.lineWidth=R*0.07;
+  ctx.beginPath(); if(back) ctx.ellipse(0,0,rx*1.08,ry*1.08,0,Math.PI,2*Math.PI); else ctx.ellipse(0,0,rx*1.08,ry*1.08,0,0,Math.PI); ctx.stroke();
+  ctx.restore();
+}
+
+function drawJets(p,fx,cx,cy,R,t,pulse){
+  const a=t*(fx.jetsSpeed||1.4), L=R*(fx.jetsLen||2.8);
+  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.translate(cx,cy); ctx.rotate(a);
+  const flick=0.55+0.45*Math.sin(t*(fx.pulse||4)*6.283);
+  for(const s of [1,-1]){
+    const g=ctx.createLinearGradient(0,0,0,s*L);
+    g.addColorStop(0,shade(fx.jetsColor||'#8ff6ff',1,(0.9*pulse*flick).toFixed(3)));
+    g.addColorStop(0.4,shade(fx.jetsColor||'#8ff6ff',1,(0.4*pulse*flick).toFixed(3)));
+    g.addColorStop(1,shade(fx.jetsColor||'#8ff6ff',1,0));
+    ctx.fillStyle=g; ctx.beginPath();
+    ctx.moveTo(-R*0.16,0); ctx.lineTo(R*0.16,0); ctx.lineTo(R*0.045,s*L); ctx.lineTo(-R*0.045,s*L); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawMoons(p,fx,cx,cy,R,t){
+  (p.moons||[]).forEach((m,i)=>{
+    const ang=t*(fx.moonSpeed||1)*0.7*(2.2/m.d)+i*2.399;
+    const d=R*(0.55+m.d*0.21), ms=Math.max(3,m.s*R*0.5);
+    const mx=cx+Math.cos(ang)*d, my=cy+Math.sin(ang)*d*0.35;
+    const g=ctx.createRadialGradient(mx-ms*0.4,my-ms*0.4,ms*0.2,mx,my,ms);
+    g.addColorStop(0,shade(m.c,1.3)); g.addColorStop(1,shade(m.c,0.3));
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(mx,my,ms,0,6.283); ctx.fill();
+  });
+}
+
+/* ===== интерфейс ===== */
+function buildList(){
+  const L=document.getElementById('list'); L.innerHTML='';
+  DB.planets.forEach((p,i)=>{
+    const b=document.createElement('button'); b.className='pbtn'+(i===sel?' sel':'');
+    b.innerHTML=p.name+' <small>'+KINDS[p.kind]+'</small>';
+    b.onclick=()=>{ sel=i; buildList(); buildCtrls(); };
+    L.appendChild(b);
+  });
+}
+function slider(key,label,min,max,step,fmt){
+  const fx=DB.planets[sel].fx;
+  const w=document.createElement('div');
+  w.innerHTML='<label>'+label+' <b id="v_'+key+'">'+(fmt?fmt(fx[key]):fx[key])+'</b></label>';
+  const inp=document.createElement('input'); inp.type='range'; inp.min=min; inp.max=max; inp.step=step; inp.value=fx[key];
+  inp.oninput=()=>{ DB.planets[sel].fx[key]=parseFloat(inp.value); document.getElementById('v_'+key).textContent=fmt?fmt(inp.value):inp.value; };
+  w.appendChild(inp); return w;
+}
+function colorPick(key,label){
+  const fx=DB.planets[sel].fx;
+  const w=document.createElement('div');
+  w.innerHTML='<label>'+label+'</label>';
+  const inp=document.createElement('input'); inp.type='color'; inp.value=fx[key];
+  inp.oninput=()=>{ DB.planets[sel].fx[key]=inp.value; };
+  w.appendChild(inp); return w;
+}
+function check(key,label){
+  const p=DB.planets[sel];
+  const w=document.createElement('div'); w.className='row2';
+  const inp=document.createElement('input'); inp.type='checkbox'; inp.checked=!!p[key];
+  inp.onchange=()=>{ p[key]=inp.checked; };
+  w.appendChild(inp); const s=document.createElement('span'); s.textContent=label; w.appendChild(s); return w;
+}
+function buildCtrls(){
+  const p=DB.planets[sel], C=document.getElementById('ctrls'); C.innerHTML='';
+  const ttl=document.createElement('div'); ttl.style.cssText='color:var(--gold);font-size:0.85rem;margin-bottom:4px;'; ttl.textContent=p.name; C.appendChild(ttl);
+  /* атмосфера */
+  const h1=document.createElement('div'); h1.style.cssText='color:#4f8ee9;font-size:0.7rem;margin-top:6px;'; h1.textContent='— АТМОСФЕРА —'; C.appendChild(h1);
+  C.appendChild(colorPick('palette','Цвет атмосферы/поверхности (palette)'));
+  C.appendChild(slider('atmGlow','Свечение ореола',0,1.5,0.05,v=>Number(v).toFixed(2)));
+  C.appendChild(slider('atmSize','Толщина ореола ×R',1.05,2,0.01,v=>Number(v).toFixed(2)+'×'));
+  /* поверхность */
+  const h2=document.createElement('div'); h2.style.cssText='color:#4f8ee9;font-size:0.7rem;margin-top:6px;'; h2.textContent='— ПОВЕРХНОСТЬ —'; C.appendChild(h2);
+  C.appendChild(slider('spin','Вращение поверхности',0,2,0.05,v=>Number(v).toFixed(2)));
+  if(p.kind==='pulsar') C.appendChild(slider('pulse','Пульсация, Гц',0.5,12,0.1,v=>Number(v).toFixed(1)));
+  /* кольца */
+  const h3=document.createElement('div'); h3.style.cssText='color:#4f8ee9;font-size:0.7rem;margin-top:6px;'; h3.textContent='— КОЛЬЦА —'; C.appendChild(h3);
+  C.appendChild(check('rings','Кольца включены'));
+  C.appendChild(colorPick('ringColor','Цвет колец'));
+  C.appendChild(slider('ringSpeed','Скорость колец',-2,2,0.1,v=>Number(v).toFixed(1)));
+  /* струи */
+  const h4=document.createElement('div'); h4.style.cssText='color:#4f8ee9;font-size:0.7rem;margin-top:6px;'; h4.textContent='— СТРУИ (ДЖЕТЫ) —'; C.appendChild(h4);
+  C.appendChild(check('jets','Струи включены'));
+  C.appendChild(colorPick('jetsColor','Цвет струй'));
+  C.appendChild(slider('jetsSpeed','Скорость вращения струй',0,4,0.1,v=>Number(v).toFixed(1)));
+  C.appendChild(slider('jetsLen','Длина струй ×R',1,5,0.1,v=>Number(v).toFixed(1)));
+  /* прочее */
+  const h5=document.createElement('div'); h5.style.cssText='color:#4f8ee9;font-size:0.7rem;margin-top:6px;'; h5.textContent='— ЛУНЫ И НЕБО —'; C.appendChild(h5);
+  C.appendChild(slider('moonSpeed','Скорость лун',0,3,0.05,v=>Number(v).toFixed(2)));
+  C.appendChild(slider('twinkle','Мерцание звёзд',0,1,0.05,v=>Number(v).toFixed(2)));
+}
+
+/* ===== импорт/экспорт ===== */
+function q(s){ return "'"+String(s).replace(/'/g,"\\'")+"'"; }
+function exportDB(){
+  let s="// ===== PLANETS_DB — сгенерировано EFFECTFORGE =====\n";
+  s+="// fx — эффекты планеты: atmGlow/atmSize (ореол), spin (вращение), ringColor/ringSpeed (кольца),\n";
+  s+="// jetsColor/jetsSpeed/jetsLen (струи), pulse (пульсация), moonSpeed (луны), twinkle (звёзды)\n";
+  s+="const PLANETS_DB = {\n  soi: "+DB.soi+",\n  planets: [\n";
+  DB.planets.forEach(p=>{
+    const f=p.fx;
+    s+="    { name:"+q(p.name)+", pos:["+p.pos.join(', ')+"], kind:"+q(p.kind)+", palette:"+q(p.palette)+", rings:"+!!p.rings+", moons:["+((p.moons||[]).map(m=>"{ d:"+m.d+", s:"+m.s+", c:"+q(m.c)+" }").join(', '))+"], jets:"+!!p.jets+", unlock:"+p.unlock+", track:"+q(p.track)+", fx:{ atmGlow:"+f.atmGlow+", atmSize:"+f.atmSize+", spin:"+f.spin+", ringColor:"+q(f.ringColor)+", ringSpeed:"+f.ringSpeed+", jetsColor:"+q(f.jetsColor)+", jetsSpeed:"+f.jetsSpeed+", jetsLen:"+f.jetsLen+", pulse:"+f.pulse+", moonSpeed:"+f.moonSpeed+", twinkle:"+f.twinkle+" } },\n";
+  });
+  s+="  ]\n};";
+  return s;
+}
+function importDB(){
+  const txt=document.getElementById('inp').value.trim();
+  if(!txt){ alert('Сначала вставь блок PLANETS_DB в нижнее поле'); return; }
+  try{
+    const i=txt.indexOf('{'), j=txt.lastIndexOf('}');
+    const obj=(new Function('return ('+txt.slice(i,j+1)+')'))();
+    if(!obj.planets||!obj.planets.length) throw new Error('нет массива planets');
+    obj.planets.forEach(p=>{ p.fx=Object.assign({},DEF_FX,p.fx||{}); });
+    DB=obj; sel=0; buildList(); buildCtrls(); alert('Импортировано планет: '+DB.planets.length);
+  }catch(e){ alert('Не удалось разобрать блок: '+e.message); }
+}
+document.getElementById('bExp').onclick=()=>{ document.getElementById('out').value=exportDB(); };
+document.getElementById('bCopy').onclick=()=>{ const o=document.getElementById('out'); o.value=exportDB(); o.select(); try{ document.execCommand('copy'); }catch(e){} if(navigator.clipboard) navigator.clipboard.writeText(o.value).catch(()=>{}); };
+document.getElementById('bDl').onclick=()=>{
+  const blob=new Blob([exportDB()],{type:'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='PLANETS_DB_fx.txt'; a.click();
+};
+document.getElementById('bImp').onclick=importDB;
+
+buildList(); buildCtrls(); requestAnimationFrame(draw);
+</script>
+</body>
+</html>

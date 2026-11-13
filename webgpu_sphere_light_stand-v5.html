@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebGPU + WGSL Multi-Light & Atmosphere Stand v5</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #05070c; font-family: system-ui, -apple-system, sans-serif; color: #e2e8f0; }
+  canvas { display: block; width: 100vw; height: 100vh; cursor: grab; }
+  canvas.dragging { cursor: grabbing; }
+  canvas.hover-obj { cursor: pointer; }
+  #ui {
+    position: fixed; top: 14px; left: 14px; width: 300px; max-height: calc(100vh - 28px);
+    overflow-y: auto; background: rgba(10, 14, 24, 0.86); backdrop-filter: blur(12px);
+    border: 1px solid rgba(56, 189, 248, 0.28); border-radius: 12px; padding: 14px 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7); z-index: 10; font-size: 12px;
+  }
+  #ui::-webkit-scrollbar { width: 5px; }
+  #ui::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.35); border-radius: 4px; }
+  h1 { font-size: 13px; font-weight: 700; letter-spacing: 0.6px; color: #38bdf8; margin-bottom: 10px; text-transform: uppercase; }
+  .section { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin: 10px 0 6px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; gap: 8px; }
+  .row label { color: #cbd5e1; flex: 1; white-space: nowrap; }
+  .row span.val { color: #38bdf8; font-variant-numeric: tabular-nums; width: 38px; text-align: right; font-size: 11px; }
+  input[type="range"] { width: 112px; accent-color: #38bdf8; cursor: pointer; }
+  input[type="color"] { width: 36px; height: 22px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: none; cursor: pointer; }
+  input[type="checkbox"] { accent-color: #38bdf8; width: 15px; height: 15px; cursor: pointer; }
+  .btn-group { display: flex; gap: 6px; margin-bottom: 8px; }
+  button {
+    flex: 1; background: rgba(56, 189, 248, 0.14); border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #e0f2fe; padding: 6px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: 0.15s;
+  }
+  button:hover { background: rgba(56, 189, 248, 0.28); }
+  button.danger { background: rgba(244, 63, 94, 0.14); border-color: rgba(244, 63, 94, 0.35); color: #ffe4e6; }
+  button.danger:hover { background: rgba(244, 63, 94, 0.28); }
+  #sel-info { font-size: 11px; color: #38bdf8; margin-bottom: 6px; font-weight: 600; }
+  #status { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: #4ade80; }
+  #hint { margin-top: 6px; font-size: 10.5px; color: #64748b; line-height: 1.4; }
+  #err {
+    position: fixed; bottom: 14px; left: 14px; right: 14px; background: rgba(127, 29, 29, 0.92);
+    border: 1px solid #f87171; color: #fecaca; padding: 10px 14px; border-radius: 8px;
+    font-family: monospace; font-size: 12px; display: none; z-index: 20; white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+<canvas id="gpu-canvas"></canvas>
+
+<div id="ui">
+  <h1>WebGPU + WGSL Stand v5</h1>
+
+  <div class="section" style="margin-top:0; border-top:none; padding-top:0;">Время суток и Туман</div>
+  <div class="row"><label>Время суток</label><input id="timeOfDay" type="range" min="0" max="1" step="0.005" value="0.28"><span class="val" id="v-timeOfDay">День</span></div>
+  <div class="row"><label>Плотность тумана</label><input id="fogDensity" type="range" min="0" max="0.08" step="0.001" value="0.014"><span class="val" id="v-fogDensity">0.014</span></div>
+  <div class="row"><label>Свой цвет тумана</label><input id="customFog" type="checkbox"><input id="fogColor" type="color" value="#7aa2c4"></div>
+
+  <div class="section">Объекты и Свет (клик — выбор)</div>
+  <div id="sel-info">Выбрано: Сфера #1</div>
+  <div class="btn-group">
+    <button id="addSphere">+ Сфера (до 8)</button>
+    <button id="addLight">+ Свет (до 8)</button>
+  </div>
+  <div class="btn-group">
+    <button id="delSelected" class="danger">Удалить выбранное</button>
+    <button id="resetScene">Сброс</button>
+  </div>
+  <div class="row"><label>Цвет выбранного</label><input id="objColor" type="color" value="#38bdf8"></div>
+  <div class="row" id="row-radius"><label>Радиус сферы</label><input id="objRadius" type="range" min="0.35" max="2.2" step="0.05" value="1.0"><span class="val" id="v-objRadius">1.00</span></div>
+  <div class="row" id="row-rough"><label>Шероховатость</label><input id="objRough" type="range" min="0.05" max="1.0" step="0.01" value="0.22"><span class="val" id="v-objRough">0.22</span></div>
+  <div class="row" id="row-metal"><label>Металличность</label><input id="objMetal" type="range" min="0.0" max="1.0" step="0.01" value="0.80"><span class="val" id="v-objMetal">0.80</span></div>
+  <div class="row" id="row-intensity" style="display:none;"><label>Мощность света</label><input id="lightPower" type="range" min="1.0" max="40.0" step="0.5" value="14.0"><span class="val" id="v-lightPower">14.0</span></div>
+  <div class="row"><label>Орбита 1-го света</label><input id="orbit" type="checkbox" checked></div>
+
+  <div class="section">Отражения пола</div>
+  <div class="row"><label>Зеркальность</label><input id="reflStrength" type="range" min="0" max="1" step="0.01" value="0.45"><span class="val" id="v-reflStrength">0.45</span></div>
+  <div class="row"><label>Эффект Френеля</label><input id="fresnelPow" type="range" min="0" max="5" step="0.1" value="2.5"><span class="val" id="v-fresnelPow">2.5</span></div>
+
+  <div id="status">Инициализация WebGPU...</div>
+  <div id="hint">
+    ЛКМ по сфере/лампе — выбор и перетаскивание<br>
+    ПКМ / ЛКМ по пустому — обзор камеры<br>
+    WASD + Q/E — полет · Shift — ускорение
+  </div>
+</div>
+
+<div id="err"></div>
+
+<script type="module">
+const errBox = document.getElementById('err');
+function showError(msg) {
+  errBox.style.display = 'block';
+  errBox.textContent = msg;
+}
+
+const wgslCode = /* wgsl */`
+struct Uniforms {
+  resTime: vec4<f32>,      // x: width, y: height, z: time, w: timeOfDay (0..1)
+  camPos: vec4<f32>,       // xyz: pos, w: fogDensity
+  camForward: vec4<f32>,   // xyz: forward, w: reflStrength
+  camRight: vec4<f32>,     // xyz: right, w: fresnelPow
+  camUp: vec4<f32>,        // xyz: up, w: sphereCount
+  fogParams: vec4<f32>,    // xyz: customFogColor, w: useCustomFog
+  counts: vec4<f32>,       // x: lightCount, y: selType (0=sphere,1=light), z: selIdx, w: unused
+  spheresPos: array<vec4<f32>, 8>,   // xyz: pos, w: radius
+  spheresCol: array<vec4<f32>, 8>,   // rgb: albedo, w: packed(rough + metal*10)
+  lightsPos: array<vec4<f32>, 8>,    // xyz: pos, w: intensity
+  lightsCol: array<vec4<f32>, 8>,    // rgb: color, w: unused
+};
+
+@group(0) @binding(0) var<uniform> u: Uniforms;
+
+struct VSOut {
+  @builtin(position) pos: vec4<f32>,
+  @location(0) uv: vec2<f32>,
+};
+
+@vertex
+fn vs_main(@builtin(vertex_index) vid: u32) -> VSOut {
+  var pts = array<vec2<f32>, 3>(
+    vec2<f32>(-1.0, -1.0),
+    vec2<f32>( 3.0, -1.0),
+    vec2<f32>(-1.0,  3.0)
+  );
+  var out: VSOut;
+  let p = pts[vid];
+  out.pos = vec4<f32>(p, 0.0, 1.0);
+  out.uv = p;
+  return out;
+}
+
+const PI: f32 = 3.14159265359;
+
+fn mapScene(p: vec3<f32>) -> vec2<f32> {
+  // Floor at y = -1.0 (id = 1.0)
+  var res = vec2<f32>(p.y + 1.0, 1.0);
+  let sc = i32(u.camUp.w + 0.5);
+  for (var i: i32 = 0; i < 8; i = i + 1) {
+    if (i >= sc) { break; }
+    let sp = u.spheresPos[i];
+    let d = length(p - sp.xyz) - sp.w;
+    if (d < res.x) {
+      res = vec2<f32>(d, f32(2 + i));
+    }
+  }
+  return res;
+}
+
+fn calcNormal(p: vec3<f32>) -> vec3<f32> {
+  let e = 0.0012;
+  let d = mapScene(p).x;
+  let n = vec3<f32>(
+    mapScene(p + vec3<f32>(e, 0.0, 0.0)).x - d,
+    mapScene(p + vec3<f32>(0.0, e, 0.0)).x - d,
+    mapScene(p + vec3<f32>(0.0, 0.0, e)).x - d
+  );
+  return normalize(n);
+}
+
+fn calcSoftShadow(ro: vec3<f32>, rd: vec3<f32>, mint: f32, maxt: f32, k: f32) -> f32 {
+  var res: f32 = 1.0;
+  var t: f32 = mint;
+  for (var i: i32 = 0; i < 40; i = i + 1) {
+    let h = mapScene(ro + rd * t).x;
+    res = min(res, k * h / t);
+    t = t + clamp(h, 0.02, 0.35);
+    if (res < 0.002 || t > maxt) { break; }
+  }
+  return clamp(res, 0.0, 1.0);
+}
+
+fn calcAO(pos: vec3<f32>, nor: vec3<f32>) -> f32 {
+  var occ: f32 = 0.0;
+  var sca: f32 = 1.0;
+  for (var i: i32 = 0; i < 4; i = i + 1) {
+    let h = 0.03 + 0.14 * f32(i) / 3.0;
+    let d = mapScene(pos + h * nor).x;
+    occ = occ + (h - d) * sca;
+    sca = sca * 0.72;
+  }
+  return clamp(1.0 - 2.2 * occ, 0.0, 1.0);
+}
+
+fn distributionGGX(N: vec3<f32>, H: vec3<f32>, roughness: f32) -> f32 {
+  let a = roughness * roughness;
+  let a2 = a * a;
+  let NdotH = max(dot(N, H), 0.0);
+  let NdotH2 = NdotH * NdotH;
+  let denom = (NdotH2 * (a2 - 1.0) + 1.0);
+  return a2 / max(PI * denom * denom, 0.00001);
+}
+
+fn geometrySchlickGGX(NdotV: f32, roughness: f32) -> f32 {
+  let r = roughness + 1.0;
+  let k = (r * r) / 8.0;
+  return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+fn geometrySmith(N: vec3<f32>, V: vec3<f32>, L: vec3<f32>, roughness: f32) -> f32 {
+  return geometrySchlickGGX(max(dot(N, V), 0.0), roughness) *
+         geometrySchlickGGX(max(dot(N, L), 0.0), roughness);
+}
+
+fn fresnelSchlick(cosTheta: f32, F0: vec3<f32>) -> vec3<f32> {
+  return F0 + (vec3<f32>(1.0, 1.0, 1.0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+fn getSunDir(tod: f32) -> vec3<f32> {
+  let ang = (tod - 0.25) * 2.0 * PI;
+  return normalize(vec3<f32>(cos(ang) * 0.7, sin(ang), 0.45));
+}
+
+fn getSkyColor(rd: vec3<f32>, tod: f32) -> vec3<f32> {
+  let sunDir = getSunDir(tod);
+  let sunH = sunDir.y;
+  let dayFactor = smoothstep(-0.15, 0.25, sunH);
+  let sunsetFactor = exp(-pow((sunH - 0.02) / 0.14, 2.0));
+
+  let nightZenith = vec3<f32>(0.008, 0.012, 0.028);
+  let nightHorizon = vec3<f32>(0.02, 0.03, 0.06);
+  let dayZenith = vec3<f32>(0.12, 0.36, 0.78);
+  let dayHorizon = vec3<f32>(0.55, 0.74, 0.92);
+  let sunsetCol = vec3<f32>(0.95, 0.36, 0.12);
+
+  let h = clamp(rd.y, 0.0, 1.0);
+  let nightSky = mix(nightHorizon, nightZenith, pow(h, 0.6));
+  let daySky = mix(dayHorizon, dayZenith, pow(h, 0.55));
+  var sky = mix(nightSky, daySky, dayFactor);
+  sky = sky + sunsetCol * sunsetFactor * pow(1.0 - h, 3.0) * 0.85;
+
+  let sunDot = max(dot(rd, sunDir), 0.0);
+  if (sunH > -0.18) {
+    let sunGlow = pow(sunDot, 24.0) * 0.45 + pow(sunDot, 350.0) * 3.5;
+    let sunTint = mix(vec3<f32>(1.0, 0.45, 0.15), vec3<f32>(1.0, 0.96, 0.88), clamp(sunH * 2.5, 0.0, 1.0));
+    sky = sky + sunTint * sunGlow * smoothstep(-0.18, 0.0, sunH);
+  }
+  return sky;
+}
+
+fn evalPBR(
+  p: vec3<f32>, N: vec3<f32>, V: vec3<f32>,
+  albedo: vec3<f32>, roughness: f32, metallic: f32,
+  doShadows: bool
+) -> vec3<f32> {
+  var F0 = vec3<f32>(0.04, 0.04, 0.04);
+  F0 = mix(F0, albedo, metallic);
+  let NdotV = max(dot(N, V), 0.001);
+  let ao = calcAO(p, N);
+  var Lo = vec3<f32>(0.0, 0.0, 0.0);
+
+  // 1. Directional Sun / Moon light based on timeOfDay
+  let tod = u.resTime.w;
+  let sunDir = getSunDir(tod);
+  let dayFactor = smoothstep(-0.12, 0.2, sunDir.y);
+  let skyLightDir = normalize(vec3<f32>(sunDir.x, abs(sunDir.y) + 0.15, sunDir.z));
+  let sunRadiance = mix(
+    vec3<f32>(0.06, 0.09, 0.18),
+    mix(vec3<f32>(1.4, 0.65, 0.3), vec3<f32>(2.4, 2.3, 2.1), clamp(sunDir.y * 2.0, 0.0, 1.0)),
+    dayFactor
+  );
+  {
+    let L = skyLightDir;
+    let H = normalize(V + L);
+    let NDF = distributionGGX(N, H, roughness);
+    let G = geometrySmith(N, V, L, roughness);
+    let F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+    let spec = (NDF * G * F) / max(4.0 * NdotV * max(dot(N, L), 0.0), 0.001);
+    let kD = (vec3<f32>(1.0, 1.0, 1.0) - F) * (1.0 - metallic);
+    let NdotL = max(dot(N, L), 0.0);
+    var sh = 1.0;
+    if (doShadows && NdotL > 0.001) {
+      sh = calcSoftShadow(p + N * 0.004, L, 0.03, 18.0, 14.0);
+    }
+    Lo = Lo + (kD * albedo / PI + spec) * sunRadiance * NdotL * sh;
+  }
+
+  // 2. Dynamic Point Lights (up to 8)
+  let lc = i32(u.counts.x + 0.5);
+  for (var i: i32 = 0; i < 8; i = i + 1) {
+    if (i >= lc) { break; }
+    let lp = u.lightsPos[i];
+    let lcol = u.lightsCol[i].rgb;
+    let toL = lp.xyz - p;
+    let dist = length(toL);
+    let L = toL / max(dist, 0.0001);
+    let H = normalize(V + L);
+    let atten = lp.w / (1.0 + 0.16 * dist * dist);
+    let radiance = lcol * atten;
+
+    let NDF = distributionGGX(N, H, roughness);
+    let G = geometrySmith(N, V, L, roughness);
+    let F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+    let spec = (NDF * G * F) / max(4.0 * NdotV * max(dot(N, L), 0.0), 0.001);
+    let kD = (vec3<f32>(1.0, 1.0, 1.0) - F) * (1.0 - metallic);
+    let NdotL = max(dot(N, L), 0.0);
+
+    var sh = 1.0;
+    if (doShadows && NdotL > 0.001) {
+      sh = calcSoftShadow(p + N * 0.004, L, 0.03, dist - 0.05, 16.0);
+    }
+    Lo = Lo + (kD * albedo / PI + spec) * radiance * NdotL * sh;
+  }
+
+  let ambientSky = getSkyColor(N, tod) * 0.32;
+  let ambient = ambientSky * albedo * ao;
+  return ambient + Lo;
+}
+
+fn getMatProps(id: f32, p: vec3<f32>) -> vec3<f32> {
+  // Returns x: roughness, y: metallic, z: isSelected(1/0)
+  if (id < 1.5) {
+    let checker = fract(floor(p.x * 0.8) * 0.5 + floor(p.z * 0.8) * 0.5) * 2.0;
+    return vec3<f32>(mix(0.28, 0.55, checker), 0.05, 0.0);
+  }
+  let idx = i32(id - 1.5);
+  let packed = u.spheresCol[idx].w;
+  let rough = fract(packed);
+  let metal = floor(packed) * 0.1;
+  var sel = 0.0;
+  if (i32(u.counts.y + 0.5) == 0 && i32(u.counts.z + 0.5) == idx) {
+    sel = 1.0;
+  }
+  return vec3<f32>(clamp(rough, 0.05, 1.0), clamp(metal, 0.0, 1.0), sel);
+}
+
+fn getMatAlbedo(id: f32, p: vec3<f32>) -> vec3<f32> {
+  if (id < 1.5) {
+    let checker = fract(floor(p.x * 0.8) * 0.5 + floor(p.z * 0.8) * 0.5) * 2.0;
+    return mix(vec3<f32>(0.08, 0.10, 0.14), vec3<f32>(0.24, 0.27, 0.33), checker);
+  }
+  let idx = i32(id - 1.5);
+  return u.spheresCol[idx].rgb;
+}
+
+@fragment
+fn fs_main(in: VSOut) -> @location(0) vec4<f32> {
+  let aspect = u.resTime.x / max(u.resTime.y, 1.0);
+  let uv = vec2<f32>(in.uv.x * aspect, in.uv.y);
+  let ro = u.camPos.xyz;
+  let rd = normalize(u.camForward.xyz * 1.65 + u.camRight.xyz * uv.x + u.camUp.xyz * uv.y);
+
+  var t: f32 = 0.0;
+  var hitId: f32 = 0.0;
+  for (var i: i32 = 0; i < 110; i = i + 1) {
+    let p = ro + rd * t;
+    let res = mapScene(p);
+    if (res.x < 0.0015) {
+      hitId = res.y;
+      break;
+    }
+    t = t + res.x;
+    if (t > 65.0) { break; }
+  }
+
+  let tod = u.resTime.w;
+  var col = getSkyColor(rd, tod);
+  var distTravel = 65.0;
+
+  if (hitId > 0.5) {
+    distTravel = t;
+    let p = ro + rd * t;
+    let N = calcNormal(p);
+    let V = -rd;
+    let albedo = getMatAlbedo(hitId, p);
+    let props = getMatProps(hitId, p);
+    col = evalPBR(p, N, V, albedo, props.x, props.y, true);
+
+    // Selection rim highlight on sphere
+    if (props.z > 0.5) {
+      let rim = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+      col = col + vec3<f32>(0.22, 0.74, 0.97) * rim * 0.9;
+    }
+
+    // Floor Reflections with Fresnel & PBR
+    let reflStrength = u.camForward.w;
+    if (hitId < 1.5 && reflStrength > 0.001) {
+      let reflDir = reflect(rd, N);
+      var rt: f32 = 0.03;
+      var rHitId: f32 = 0.0;
+      for (var j: i32 = 0; j < 64; j = j + 1) {
+        let rp = p + reflDir * rt;
+        let rRes = mapScene(rp);
+        if (rRes.x < 0.003) {
+          rHitId = rRes.y;
+          break;
+        }
+        rt = rt + rRes.x;
+        if (rt > 35.0) { break; }
+      }
+      var reflCol = getSkyColor(reflDir, tod);
+      if (rHitId > 1.5) {
+        let rp = p + reflDir * rt;
+        let rN = calcNormal(rp);
+        let rAlb = getMatAlbedo(rHitId, rp);
+        let rProps = getMatProps(rHitId, rp);
+        reflCol = evalPBR(rp, rN, -reflDir, rAlb, rProps.x, rProps.y, false);
+      }
+      let fresnel = pow(1.0 - max(dot(N, V), 0.0), u.camRight.w);
+      let refFactor = clamp(reflStrength * mix(0.25, 1.0, fresnel), 0.0, 0.95);
+      col = mix(col, reflCol, refFactor);
+    }
+  }
+
+  // Exponential Distance Fog
+  let fogDensity = u.camPos.w;
+  if (fogDensity > 0.0001) {
+    let fogBase = select(getSkyColor(normalize(vec3<f32>(rd.x, max(rd.y, 0.02), rd.z)), tod), u.fogParams.xyz, u.fogParams.w > 0.5);
+    let fogFactor = 1.0 - exp(-pow(distTravel * fogDensity, 2.0));
+    col = mix(col, fogBase, clamp(fogFactor, 0.0, 1.0));
+  }
+
+  // Volumetric Glow for Point Lights
+  let lc = i32(u.counts.x + 0.5);
+  for (var i: i32 = 0; i < 8; i = i + 1) {
+    if (i >= lc) { break; }
+    let lPos = u.lightsPos[i].xyz;
+    let lPow = u.lightsPos[i].w;
+    let lCol = u.lightsCol[i].rgb;
+    let toLight = lPos - ro;
+    let proj = dot(toLight, rd);
+    if (proj > 0.0 && proj < distTravel) {
+      let perpDist = length(toLight - rd * proj);
+      let isSelLight = (i32(u.counts.y + 0.5) == 1 && i32(u.counts.z + 0.5) == i);
+      let coreSize = select(0.11, 0.15, isSelLight);
+      let halo = exp(-perpDist * 4.5) * (0.28 + lPow * 0.025);
+      let core = smoothstep(coreSize, coreSize * 0.35, perpDist) * 2.5;
+      col = col + lCol * (halo + core);
+      if (isSelLight) {
+        let ring = smoothstep(0.03, 0.0, abs(perpDist - 0.24));
+        col = col + vec3<f32>(1.0, 1.0, 1.0) * ring * 1.2;
+      }
+    }
+  }
+
+  // Tone mapping (ACES-like) & Gamma
+  col = (col * (2.51 * col + 0.03)) / (col * (2.43 * col + 0.59) + 0.14);
+  col = pow(clamp(col, vec3<f32>(0.0, 0.0, 0.0), vec3<f32>(1.0, 1.0, 1.0)), vec3<f32>(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2));
+  return vec4<f32>(col, 1.0);
+}
+`;
+
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255];
+}
+function rgbToHex(rgb) {
+  const c = v => Math.max(0, Math.min(255, Math.round(v * 255))).toString(16).padStart(2, '0');
+  return '#' + c(rgb[0]) + c(rgb[1]) + c(rgb[2]);
+}
+
+async function init() {
+  const statusEl = document.getElementById('status');
+  if (!navigator.gpu) {
+    statusEl.textContent = 'WebGPU не поддерживается';
+    statusEl.style.color = '#f87171';
+    showError('Ваш браузер не поддерживает WebGPU. Включите флаг #enable-unsafe-webgpu или обновите Chrome/Edge.');
+    return;
+  }
+
+  const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+  if (!adapter) { showError('Не удалось получить GPU-адаптер.'); return; }
+  const device = await adapter.requestDevice();
+  device.addEventListener('uncapturederror', e => showError('WebGPU Error: ' + e.error.message));
+
+  const canvas = document.getElementById('gpu-canvas');
+  const context = canvas.getContext('webgpu');
+  const format = navigator.gpu.getPreferredCanvasFormat();
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.floor(window.innerWidth * dpr));
+    canvas.height = Math.max(1, Math.floor(window.innerHeight * dpr));
+    context.configure({ device, format, alphaMode: 'opaque' });
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const module = device.createShaderModule({ code: wgslCode });
+  const info = await module.getCompilationInfo();
+  for (const m of info.messages) {
+    if (m.type === 'error') { showError(`WGSL Error (${m.lineNum}:${m.linePos}): ${m.message}`); return; }
+  }
+
+  const pipeline = device.createRenderPipeline({
+    layout: 'auto',
+    vertex: { module, entryPoint: 'vs_main' },
+    fragment: { module, entryPoint: 'fs_main', targets: [{ format }] },
+    primitive: { topology: 'triangle-list' }
+  });
+
+  // Uniform buffer size: 7 vec4 (28 floats) + 32 vec4 (128 floats) = 156 floats * 4 = 624 bytes -> 640 aligned
+  const uniformBuffer = device.createBuffer({
+    size: 640,
+    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+  });
+
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(0),
+    entries: [{ binding: 0, resource: { buffer: uniformBuffer } }]
+  });
+
+  // Scene State
+  let spheres = [];
+  let lights = [];
+  let selected = { type: 'sphere', index: 0 };
+
+  function resetSceneData() {
+    spheres = [
+      { pos: [0.0, 0.0, 0.0], radius: 1.0, color: [0.22, 0.74, 0.97], rough: 0.22, metal: 0.80 },
+      { pos: [-2.4, -0.35, -1.2], radius: 0.65, color: [0.96, 0.45, 0.18], rough: 0.15, metal: 0.90 }
+    ];
+    lights = [
+      { pos: [2.4, 1.8, 2.2], intensity: 16.0, color: [1.0, 0.95, 0.85] },
+      { pos: [-2.6, 1.4, 1.8], intensity: 14.0, color: [0.35, 0.65, 1.0] }
+    ];
+    selected = { type: 'sphere', index: 0 };
+    syncUIFromSelection();
+  }
+
+  // UI Elements
+  const elTime = document.getElementById('timeOfDay');
+  const elFog = document.getElementById('fogDensity');
+  const elCustomFog = document.getElementById('customFog');
+  const elFogColor = document.getElementById('fogColor');
+  const elObjColor = document.getElementById('objColor');
+  const elObjRadius = document.getElementById('objRadius');
+  const elObjRough = document.getElementById('objRough');
+  const elObjMetal = document.getElementById('objMetal');
+  const elLightPower = document.getElementById('lightPower');
+  const elOrbit = document.getElementById('orbit');
+  const elRefl = document.getElementById('reflStrength');
+  const elFresnel = document.getElementById('fresnelPow');
+
+  function formatTimeLabel(v) {
+    const hours = Math.floor(v * 24);
+    const mins = Math.floor((v * 24 - hours) * 60);
+    return String(hours).padStart(2, '0') + ':' + String(mins).padStart(2, '0');
+  }
+
+  function syncUIFromSelection() {
+    const infoEl = document.getElementById('sel-info');
+    const rRad = document.getElementById('row-radius');
+    const rRough = document.getElementById('row-rough');
+    const rMetal = document.getElementById('row-metal');
+    const rPow = document.getElementById('row-intensity');
+
+    if (selected.type === 'sphere' && spheres[selected.index]) {
+      const s = spheres[selected.index];
+      infoEl.textContent = `Выбрано: Сфера #${selected.index + 1} (из ${spheres.length})`;
+      rRad.style.display = 'flex';
+      rRough.style.display = 'flex';
+      rMetal.style.display = 'flex';
+      rPow.style.display = 'none';
+      elObjColor.value = rgbToHex(s.color);
+      elObjRadius.value = s.radius;
+      document.getElementById('v-objRadius').textContent = s.radius.toFixed(2);
+      elObjRough.value = s.rough;
+      document.getElementById('v-objRough').textContent = s.rough.toFixed(2);
+      elObjMetal.value = s.metal;
+      document.getElementById('v-objMetal').textContent = s.metal.toFixed(2);
+    } else if (selected.type === 'light' && lights[selected.index]) {
+      const l = lights[selected.index];
+      infoEl.textContent = `Выбрано: Свет #${selected.index + 1} (из ${lights.length})`;
+      rRad.style.display = 'none';
+      rRough.style.display = 'none';
+      rMetal.style.display = 'none';
+      rPow.style.display = 'flex';
+      elObjColor.value = rgbToHex(l.color);
+      elLightPower.value = l.intensity;
+      document.getElementById('v-lightPower').textContent = l.intensity.toFixed(1);
+    }
+  }
+
+  elTime.addEventListener('input', () => {
+    document.getElementById('v-timeOfDay').textContent = formatTimeLabel(parseFloat(elTime.value));
+  });
+  elFog.addEventListener('input', () => {
+    document.getElementById('v-fogDensity').textContent = parseFloat(elFog.value).toFixed(3);
+  });
+  elRefl.addEventListener('input', () => {
+    document.getElementById('v-reflStrength').textContent = parseFloat(elRefl.value).toFixed(2);
+  });
+  elFresnel.addEventListener('input', () => {
+    document.getElementById('v-fresnelPow').textContent = parseFloat(elFresnel.value).toFixed(1);
+  });
+
+  elObjColor.addEventListener('input', () => {
+    const c = hexToRgb(elObjColor.value);
+    if (selected.type === 'sphere' && spheres[selected.index]) spheres[selected.index].color = c;
+    if (selected.type === 'light' && lights[selected.index]) lights[selected.index].color = c;
+  });
+  elObjRadius.addEventListener('input', () => {
+    if (selected.type === 'sphere' && spheres[selected.index]) {
+      const r = parseFloat(elObjRadius.value);
+      spheres[selected.index].radius = r;
+      if (spheres[selected.index].pos[1] - r < -1.0) spheres[selected.index].pos[1] = -1.0 + r;
+      document.getElementById('v-objRadius').textContent = r.toFixed(2);
+    }
+  });
+  elObjRough.addEventListener('input', () => {
+    if (selected.type === 'sphere' && spheres[selected.index]) {
+      spheres[selected.index].rough = parseFloat(elObjRough.value);
+      document.getElementById('v-objRough').textContent = spheres[selected.index].rough.toFixed(2);
+    }
+  });
+  elObjMetal.addEventListener('input', () => {
+    if (selected.type === 'sphere' && spheres[selected.index]) {
+      spheres[selected.index].metal = parseFloat(elObjMetal.value);
+      document.getElementById('v-objMetal').textContent = spheres[selected.index].metal.toFixed(2);
+    }
+  });
+  elLightPower.addEventListener('input', () => {
+    if (selected.type === 'light' && lights[selected.index]) {
+      lights[selected.index].intensity = parseFloat(elLightPower.value);
+      document.getElementById('v-lightPower').textContent = lights[selected.index].intensity.toFixed(1);
+    }
+  });
+
+  document.getElementById('addSphere').addEventListener('click', () => {
+    if (spheres.length >= 8) return;
+    const angle = spheres.length * 1.1;
+    const r = 0.75;
+    const palette = [[0.2, 0.85, 0.55], [0.85, 0.3, 0.85], [0.95, 0.8, 0.2], [0.3, 0.5, 0.98]];
+    const col = palette[spheres.length % palette.length];
+    spheres.push({
+      pos: [Math.cos(angle) * 2.5, -1.0 + r, Math.sin(angle) * 2.5],
+      radius: r, color: col, rough: 0.25, metal: 0.7
+    });
+    selected = { type: 'sphere', index: spheres.length - 1 };
+    syncUIFromSelection();
+  });
+
+  document.getElementById('addLight').addEventListener('click', () => {
+    if (lights.length >= 8) return;
+    const angle = lights.length * 1.4;
+    const palette = [[0.2, 1.0, 0.6], [1.0, 0.25, 0.55], [0.95, 0.85, 0.25], [0.4, 0.8, 1.0]];
+    const col = palette[lights.length % palette.length];
+    lights.push({
+      pos: [Math.cos(angle) * 2.8, 1.6 + (lights.length % 2) * 0.7, Math.sin(angle) * 2.8],
+      intensity: 15.0, color: col
+    });
+    selected = { type: 'light', index: lights.length - 1 };
+    syncUIFromSelection();
+  });
+
+  document.getElementById('delSelected').addEventListener('click', () => {
+    if (selected.type === 'sphere' && spheres.length > 1) {
+      spheres.splice(selected.index, 1);
+      selected.index = Math.max(0, selected.index - 1);
+      syncUIFromSelection();
+    } else if (selected.type === 'light' && lights.length > 1) {
+      lights.splice(selected.index, 1);
+      selected.index = Math.max(0, selected.index - 1);
+      syncUIFromSelection();
+    }
+  });
+
+  document.getElementById('resetScene').addEventListener('click', resetSceneData);
+  resetSceneData();
+  document.getElementById('v-timeOfDay').textContent = formatTimeLabel(parseFloat(elTime.value));
+
+  // Camera & Interaction
+  let camPos = [0.0, 1.3, 5.8];
+  let yaw = 0.0;
+  let pitch = -0.18;
+  const keys = {};
+  window.addEventListener('keydown', e => { keys[e.code] = true; });
+  window.addEventListener('keyup', e => { keys[e.code] = false; });
+
+  function getCamBasis() {
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const sy = Math.sin(yaw), cy = Math.cos(yaw);
+    const forward = [sy * cp, sp, -cy * cp];
+    const right = [cy, 0, sy];
+    const up = [
+      right[1] * forward[2] - right[2] * forward[1],
+      right[2] * forward[0] - right[0] * forward[2],
+      right[0] * forward[1] - right[1] * forward[0]
+    ];
+    return { forward, right, up };
+  }
+
+  function screenToRay(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = 1 - ((clientY - rect.top) / rect.height) * 2;
+    const aspect = rect.width / Math.max(rect.height, 1);
+    const { forward, right, up } = getCamBasis();
+    const dx = forward[0] * 1.65 + right[0] * nx * aspect + up[0] * ny;
+    const dy = forward[1] * 1.65 + right[1] * nx * aspect + up[1] * ny;
+    const dz = forward[2] * 1.65 + right[2] * nx * aspect + up[2] * ny;
+    const len = Math.hypot(dx, dy, dz);
+    return [dx / len, dy / len, dz / len];
+  }
+
+  function raySphereDist(ro, rd, center, radius) {
+    const oc = [ro[0] - center[0], ro[1] - center[1], ro[2] - center[2]];
+    const b = oc[0] * rd[0] + oc[1] * rd[1] + oc[2] * rd[2];
+    const c = oc[0] * oc[0] + oc[1] * oc[1] + oc[2] * oc[2] - radius * radius;
+    const h = b * b - c;
+    if (h < 0) return -1;
+    const t = -b - Math.sqrt(h);
+    return t > 0 ? t : -1;
+  }
+
+  function pickObject(clientX, clientY) {
+    const rd = screenToRay(clientX, clientY);
+    let bestT = Infinity;
+    let bestHit = null;
+
+    lights.forEach((l, idx) => {
+      const t = raySphereDist(camPos, rd, l.pos, 0.32);
+      if (t > 0 && t < bestT) { bestT = t; bestHit = { type: 'light', index: idx }; }
+    });
+    spheres.forEach((s, idx) => {
+      const t = raySphereDist(camPos, rd, s.pos, s.radius);
+      if (t > 0 && t < bestT) { bestT = t; bestHit = { type: 'sphere', index: idx }; }
+    });
+    return bestHit;
+  }
+
+  let dragMode = null; // 'camera' | 'object'
+  let dragPlaneNormal = [0, 0, 1];
+  let dragPlaneD = 0;
+  let lastMouse = [0, 0];
+
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  canvas.addEventListener('mousedown', e => {
+    lastMouse = [e.clientX, e.clientY];
+    if (e.button === 0) {
+      const hit = pickObject(e.clientX, e.clientY);
+      if (hit) {
+        selected = hit;
+        syncUIFromSelection();
+        if (hit.type === 'light' && hit.index === 0) elOrbit.checked = false;
+        dragMode = 'object';
+        const { forward } = getCamBasis();
+        dragPlaneNormal = [-forward[0], -forward[1], -forward[2]];
+        const targetPos = hit.type === 'sphere' ? spheres[hit.index].pos : lights[hit.index].pos;
+        dragPlaneD = -(dragPlaneNormal[0] * targetPos[0] + dragPlaneNormal[1] * targetPos[1] + dragPlaneNormal[2] * targetPos[2]);
+        canvas.classList.add('dragging');
+        return;
+      }
+    }
+    dragMode = 'camera';
+    canvas.classList.add('dragging');
+  });
+
+  window.addEventListener('mousemove', e => {
+    const dx = e.clientX - lastMouse[0];
+    const dy = e.clientY - lastMouse[1];
+    lastMouse = [e.clientX, e.clientY];
+
+    if (!dragMode) {
+      const hit = pickObject(e.clientX, e.clientY);
+      canvas.classList.toggle('hover-obj', !!hit);
+      return;
+    }
+
+    if (dragMode === 'camera') {
+      yaw += dx * 0.004;
+      pitch = Math.max(-1.48, Math.min(1.48, pitch - dy * 0.004));
+    } else if (dragMode === 'object') {
+      const rd = screenToRay(e.clientX, e.clientY);
+      const denom = dragPlaneNormal[0] * rd[0] + dragPlaneNormal[1] * rd[1] + dragPlaneNormal[2] * rd[2];
+      if (Math.abs(denom) > 0.0001) {
+        const t = -(dragPlaneNormal[0] * camPos[0] + dragPlaneNormal[1] * camPos[1] + dragPlaneNormal[2] * camPos[2] + dragPlaneD) / denom;
+        if (t > 0.5 && t < 50.0) {
+          const nx = camPos[0] + rd[0] * t;
+          const ny = camPos[1] + rd[1] * t;
+          const nz = camPos[2] + rd[2] * t;
+          if (selected.type === 'sphere' && spheres[selected.index]) {
+            const r = spheres[selected.index].radius;
+            spheres[selected.index].pos = [nx, Math.max(-1.0 + r, ny), nz];
+          } else if (selected.type === 'light' && lights[selected.index]) {
+            lights[selected.index].pos = [nx, Math.max(-0.85, ny), nz];
+          }
+        }
+      }
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    dragMode = null;
+    canvas.classList.remove('dragging');
+  });
+
+  let flySpeed = 5.0;
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    flySpeed = Math.max(1.0, Math.min(25.0, flySpeed * (e.deltaY < 0 ? 1.15 : 0.87)));
+  }, { passive: false });
+
+  const uData = new Float32Array(160);
+  let lastTime = performance.now();
+  let frameCount = 0;
+  let fpsTimer = lastTime;
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - lastTime) * 0.001);
+    lastTime = now;
+    const elapsed = now * 0.001;
+
+    frameCount++;
+    if (now - fpsTimer >= 500) {
+      const fps = Math.round((frameCount * 1000) / (now - fpsTimer));
+      statusEl.textContent = `WebGPU Active · ${fps} FPS · Сфер: ${spheres.length} · Света: ${lights.length}`;
+      frameCount = 0;
+      fpsTimer = now;
+    }
+
+    // Camera movement
+    const { forward, right, up } = getCamBasis();
+    const spd = flySpeed * (keys['ShiftLeft'] || keys['ShiftRight'] ? 2.4 : 1.0) * dt;
+    if (keys['KeyW'] || keys['ArrowUp']) { camPos[0] += forward[0]*spd; camPos[1] += forward[1]*spd; camPos[2] += forward[2]*spd; }
+    if (keys['KeyS'] || keys['ArrowDown']) { camPos[0] -= forward[0]*spd; camPos[1] -= forward[1]*spd; camPos[2] -= forward[2]*spd; }
+    if (keys['KeyD'] || keys['ArrowRight']) { camPos[0] += right[0]*spd; camPos[2] += right[2]*spd; }
+    if (keys['KeyA'] || keys['ArrowLeft']) { camPos[0] -= right[0]*spd; camPos[2] -= right[2]*spd; }
+    if (keys['KeyE'] || keys['Space']) { camPos[1] += spd; }
+    if (keys['KeyQ'] || keys['ControlLeft']) { camPos[1] -= spd; }
+    if (camPos[1] < -0.75) camPos[1] = -0.75;
+
+    // Orbit 1st light if enabled
+    if (elOrbit.checked && lights.length > 0) {
+      lights[0].pos[0] = Math.cos(elapsed * 0.9) * 2.8;
+      lights[0].pos[2] = Math.sin(elapsed * 0.9) * 2.8;
+    }
+
+    // Pack uniforms
+    uData[0] = canvas.width;
+    uData[1] = canvas.height;
+    uData[2] = elapsed;
+    uData[3] = parseFloat(elTime.value);
+
+    uData[4] = camPos[0];
+    uData[5] = camPos[1];
+    uData[6] = camPos[2];
+    uData[7] = parseFloat(elFog.value);
+
+    uData[8] = forward[0];
+    uData[9] = forward[1];
+    uData[10] = forward[2];
+    uData[11] = parseFloat(elRefl.value);
+
+    uData[12] = right[0];
+    uData[13] = right[1];
+    uData[14] = right[2];
+    uData[15] = parseFloat(elFresnel.value);
+
+    uData[16] = up[0];
+    uData[17] = up[1];
+    uData[18] = up[2];
+    uData[19] = spheres.length;
+
+    const customFog = hexToRgb(elFogColor.value);
+    uData[20] = customFog[0];
+    uData[21] = customFog[1];
+    uData[22] = customFog[2];
+    uData[23] = elCustomFog.checked ? 1.0 : 0.0;
+
+    uData[24] = lights.length;
+    uData[25] = selected.type === 'sphere' ? 0.0 : 1.0;
+    uData[26] = selected.index;
+    uData[27] = 0.0;
+
+    for (let i = 0; i < 8; i++) {
+      const s = spheres[i] || { pos: [0, -100, 0], radius: 0.1, color: [1,1,1], rough: 0.5, metal: 0.0 };
+      const baseP = 28 + i * 4;
+      uData[baseP] = s.pos[0]; uData[baseP+1] = s.pos[1]; uData[baseP+2] = s.pos[2]; uData[baseP+3] = s.radius;
+
+      const baseC = 60 + i * 4;
+      const packedMat = Math.min(0.99, Math.max(0.05, s.rough)) + Math.round(s.metal * 10) * 1.0;
+      uData[baseC] = s.color[0]; uData[baseC+1] = s.color[1]; uData[baseC+2] = s.color[2]; uData[baseC+3] = packedMat;
+    }
+
+    for (let i = 0; i < 8; i++) {
+      const l = lights[i] || { pos: [0, -100, 0], intensity: 0, color: [1,1,1] };
+      const baseP = 92 + i * 4;
+      uData[baseP] = l.pos[0]; uData[baseP+1] = l.pos[1]; uData[baseP+2] = l.pos[2]; uData[baseP+3] = l.intensity;
+
+      const baseC = 124 + i * 4;
+      uData[baseC] = l.color[0]; uData[baseC+1] = l.color[1]; uData[baseC+2] = l.color[2]; uData[baseC+3] = 1.0;
+    }
+
+    device.queue.writeBuffer(uniformBuffer, 0, uData);
+
+    const encoder = device.createCommandEncoder();
+    const pass = encoder.beginRenderPass({
+      colorAttachments: [{
+        view: context.getCurrentTexture().createView(),
+        loadOp: 'clear',
+        clearValue: { r: 0.02, g: 0.03, b: 0.05, a: 1.0 },
+        storeOp: 'store'
+      }]
+    });
+    pass.setPipeline(pipeline);
+    pass.setBindGroup(0, bindGroup);
+    pass.draw(3, 1, 0, 0);
+    pass.end();
+    device.queue.submit([encoder.finish()]);
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+}
+
+init().catch(e => showError(e.stack || e.message));
+</script>
+</body>
+</html>

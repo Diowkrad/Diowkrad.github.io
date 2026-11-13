@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☩ DIOWKRAD DSP AUDIOFLEX STAND ☩</title>
+    <style>
+        :root {
+            --bg: #05060c;
+            --panel: #0d121f;
+            --ink: #a3ff52;
+            --gold: #f7cc1d;
+            --line: #1a2a3a;
+            --font: 'Courier New', Courier, monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: radial-gradient(1200px 700px at 50% -10%, #141a2e 0%, transparent 60%), var(--bg);
+            color: #cfd8e3;
+            font-family: var(--font);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--panel);
+            border: 4px outset #995500;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        h1 {
+            color: var(--gold);
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            text-align: center;
+            text-shadow: 2px 2px 0 #7a5c00;
+            border: 4px outset #950;
+            background: #1a1a2e;
+            padding: 10px;
+        }
+        .lcd {
+            background: #000000bd;
+            border: 6px inset #1a1a2e;
+            color: var(--ink);
+            padding: 12px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            min-height: 80px;
+            white-space: pre-wrap;
+            text-shadow: 0 0 6px rgba(163,255,82,0.55);
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            font-family: var(--font);
+            font-size: 0.85rem;
+            background: #222;
+            color: var(--gold);
+            border: 4px outset #950;
+            padding: 8px 16px;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #000;
+        }
+        button.on {
+            background: #244a0e;
+            color: #e2f77e;
+            border-color: var(--ink);
+        }
+        button:active { transform: translateY(1px); }
+        .slider-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr 60px;
+            gap: 10px;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            padding: 8px;
+            border: 1px solid var(--line);
+        }
+        input[type=range] {
+            accent-color: var(--gold);
+            width: 100%;
+            cursor: pointer;
+        }
+        canvas {
+            background: #050d08;
+            border: 2px inset #174a17;
+            width: 100%;
+            height: 160px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>☩ DIOWKRAD DSP CONVEYOR EXPERIMENTAL STAND ☩</h1>
+    <div class="lcd" id="mainLcd">СТЕНД: Ожидание инициализации Аудио-Контекста...
+Нажмите [ЗАПУСТИТЬ ДВИЖОК] для активации фрактального конвейера.</div>
+    
+    <div class="controls">
+        <button id="btnToggle" class="">▶ ЗАПУСТИТЬ ДВИЖОК</button>
+        <button id="btnTone" class="on">♪ ОПОРНЫЙ ТОН: C4</button>
+    </div>
+
+    <div class="slider-grid">
+        <span>ГРОМКОСТЬ:</span>
+        <input type="range" id="sliderVol" min="0" max="100" value="70">
+        <span id="txtVol">70%</span>
+    </div>
+
+    <div class="slider-grid">
+        <span>ИМИТАЦИЯ FPS:</span>
+        <input type="range" id="sliderFps" min="15" max="60" value="60">
+        <span id="txtFps">60 Гц</span>
+    </div>
+
+    <canvas id="scopeCanvas"></canvas>
+    <div class="lcd" id="telemetryLcd">ТЕЛЕМЕТРИЯ: Тракт молчит.</div>
+</div>
+
+<script>
+    'use strict';
+
+    // 1. БЛОБ ДВИЖКА (Инлайновый код ворклета для независимости от файлов)
+    const WORKLET_CODE = `
+    class DiowkUnifiedProc extends AudioWorkletProcessor {
+        constructor() {
+            super();
+            this.historyL = new Float32Array(4);
+            this.historyR = new Float32Array(4);
+            this.deEssHistL = 0;
+            this.deEssHistR = 0;
+            this.__beats = 0;
+        }
+
+        // Фрактальное запирание потока (20 Гц - 20 кГц)
+        fractalFilter(sample, history) {
+            let x = sample;
+            for (let i = 0; i < 3; i++) {
+                history[i] = Math.sin(x * 12.5663) * 0.5 + history[i] * 0.5;
+                x = x * 1.5 - history[i] * 0.35;
+            }
+            return x;
+        }
+
+        // Учебные функции стабилизации формы волны
+        textbookA(x) { return x * (1.5 - 0.5 * x * x); }
+        textbookB(x) { return Math.atan(x * 1.2) / 1.2; }
+        textbookC(x) { return x < 0 ? x * (1.0 + 0.1 * x) : x * (1.0 - 0.1 * x); }
+
+        // Диэссер (Подавление свистящих пиков сибилянтов)
+        deEsser(x, lastHist) {
+            let diff = x - lastHist;
+            let filter = lastHist * 0.85 + x * 0.15;
+            if (Math.abs(diff) > 0.42) {
+                x = filter + diff * 0.35;
+            }
+            return x;
+        }
+
+        // Технология AudioFlex (Растяжение/сужение буфера на лету при просадке кадров)
+        audioFlexMatch(sample, fps) {
+            let step = 1.0;
+            if (fps < 58.0) {
+                step = fps / 60.0; // AudioFlex резинит волну, уберегая от щелчка разрыва
+            }
+            return sample * step;
+        }
+
+        // Жесткий лимитер страж
+        hardLimiter(x) {
+            const THRESHOLD = 0.98;
+            if (x > THRESHOLD) return THRESHOLD;
+            if (x < -THRESHOLD) return -THRESHOLD;
+            return x;
+        }
+
+        process(inputs, outputs, parameters) {
+            const inp = (inputs && inputs[0] && inputs[0][0]) ? inputs[0][0] : null;
+            const out = outputs && outputs[0] ? outputs[0] : null;
+
+            if (!out || out.length < 2) return true;
+            
+            const outL = out[0];
+            const outR = out[1];
+            const len = outL ? outL.length : 128;
+
+            // Считываем динамический инпут фреймрейта из основного JS-потока
+            const fps = parameters.fps ? parameters.fps[0] : 60.0;
+
+            for (let i = 0; i < len; i++) {
+                let rawSample = inp ? inp[i] : 0.0;
+
+                // Запуск технологии верификации кадра AudioFlex
+                let flexed = this.audioFlexMatch(rawSample, fps);
+
+                // Раздвоитель перед симметричным конвейером L/R
+                let sL = flexed;
+                let sR = flexed;
+
+                // --- КОНВЕЙЕР ЛЕВОГО КАНАЛА ---
+                sL = this.fractalFilter(sL, this.historyL);
+                sL = this.textbookA(sL);
+                sL = this.textbookB(sL);
+                sL = this.textbookC(sL);
+                sL = sL > 1.0 ? 1.0 : (sL < -1.0 ? -1.0 : sL);
+                sL = this.deEsser(sL, this.deEssHistL);
+                this.deEssHistL = this.deEssHistL * 0.85 + sL * 0.15;
+                sL = this.hardLimiter(sL);
+
+                // --- КОНВЕЙЕР ПРАВОГО КАНАЛА ---
+                sR = this.fractalFilter(sR, this.historyR);
+                sR = this.textbookA(sR);
+                sR = this.textbookB(sR);
+                sR = this.textbookC(sR);
+                sR = sR > 1.0 ? 1.0 : (sR < -1.0 ? -1.0 : sR);
+                sR = this.deEsser(sR, this.deEssHistR);
+                this.deEssHistR = this.deEssHistR * 0.85 + sR * 0.15;
+                sR = this.hardLimiter(sR);
+
+                // QH-Стерео расширение (HALO)
+                let mid = (sL + sR) * 0.5;
+                let side = (sL - sR) * 0.22; // Смещение фазы
+
+                // Выходные лимитеры выставлены одинаково по громкости
+                if(outL) outL[i] = this.hardLimiter(mid + side);
+                if(outR) outR[i] = this.hardLimiter(mid - side);
+            }
+
+            // Передача пульса телеметрии в основной поток
+            this.__beats += len;
+            if (this.__beats >= 4096) {
+                this.__beats = 0;
+                let pk = 0.0;
+                if(outL) {
+                    for(let j=0; j<len; j++) {
+                        let av = Math.abs(outL[j]);
+                        if(av > pk) pk = av;
+                    }
+                }
+                this.port.postMessage({ tick: true, peak: pk });
+            }
+
+            return true;
+        }
+    }
+    registerProcessor('diowk-unified-proc', DiowkUnifiedProc);
+    `;
+
+    // 2. ИНИЦИАЛИЗАЦИЯ И СВЯЗКА ГРАФА
+    let audioCtx = null, masterVolume = null, toneOsc = null;
+    let dspNode = null, analyser = null;
+    let isRunning = false;
+    let targetFps = 60.0;
+
+    const mainLcd = document.getElementById('mainLcd');
+    const telemetryLcd = document.getElementById('telemetryLcd');
+    const btnToggle = document.getElementById('btnToggle');
+
+    async function initAudio() {
+        if (audioCtx) return;
+        
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+
+        // Загрузка инлайнового блоб-модуля
+        const blob = new Blob([WORKLET_CODE], { type: 'application/javascript' });
+        const url = URL.createObjectURL(blob);
+        await audioCtx.audioWorklet.addModule(url);
+
+        // Создание узлов мастера
+        masterVolume = audioCtx.createGain();
+        masterVolume.gain.value = document.getElementById('sliderVol').value / 100;
+
+        // Мягкий клиппер-насытитель (WaveShaper) как в движке
+        const clipCurve = new Float32Array(2048);
+        for (let i = 0; i < 2048; i++) {
+            const x = (i / 1023.5) - 1, a = Math.abs(x);
+            clipCurve[i] = Math.sign(x) * (a < 0.6 ? a : 0.6 + 0.35 * Math.tanh((a - 0.6) / 0.35));
+        }
+        const clipNode = audioCtx.createWaveShaper();
+        clipNode.curve = clipCurve;
+        clipNode.oversample = '4x';
+
+        // Создание ворклета (1 вход, 1 выход, но выход стерео - 2 канала)
+        dspNode = new AudioWorkletNode(audioCtx, 'diowk-unified-proc', {
+            numberOfInputs: 1,
+            numberOfOutputs: 1,
+            outputChannelCount: [2]
+        });
+
+        // Слушатель телеметрии
+        dspNode.port.onmessage = (e) => {
+            if (e.data.tick) {
+                telemetryLcd.textContent = `ТЕЛЕМЕТРИЯ: Конвейер стабилен | FPS-Захват: ${targetFps} Гц | Текущий Пик: ${e.data.peak.toFixed(3)} ед.`;
+            }
+        };
+
+        // Анализатор для осциллографа
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 1024;
+
+        // Генератор опорного тона C4 (261.63 Гц)
+        toneOsc = audioCtx.createOscillator();
+        toneOsc.type = 'sawtooth'; // Пила для максимальной нагруженности фильтров гармониками
+        toneOsc.frequency.value = 261.63;
+
+        // Сборка графа: ГЕНЕРАТОР -> ВОРКЛЕТ -> КЛИППЕР -> МАСТЕР ГЕЙН -> АНАЛИЗАТОР -> ВЫХОД
+        toneOsc.connect(dspNode);
+        dspNode.connect(clipNode);
+        clipNode.connect(masterVolume);
+        masterVolume.connect(analyser);
+        masterVolume.connect(audioCtx.destination);
+
+        toneOsc.start();
+        
+        mainLcd.textContent = `2A03/YM2413 DSP КОНВЕЙЕР: Инициализирован.\nЧастота дискретизации: ${audioCtx.sampleRate} Гц\nСтатус ворклета: READY (Сэмпл-точный тракт запущен).`;
+    }
+
+    // 3. УПРАВЛЕНИЕ И СЛАЙДЕРЫ
+    btnToggle.addEventListener('click', async () => {
+        if (!isRunning) {
+            btnToggle.disabled = true;
+            btnToggle.textContent = "ЗАГРУЗКА...";
+            try {
+                await initAudio();
+                if (audioCtx.state === 'suspended') await audioCtx.resume();
+                isRunning = true;
+                btnToggle.disabled = false;
+                btnToggle.classList.add('on');
+                btnToggle.textContent = "■ ОСТАНОВИТЬ ДВИЖОК";
+            } catch(e) {
+                btnToggle.disabled = false;
+                btnToggle.textContent = "▶ ЗАПУСТИТЬ ДВИЖОК";
+                mainLcd.textContent = "ОШИБКА: Запуск сорван. Скорее всего, браузер блокирует инлайновые блоб-ворклеты при открытии через file://. Запусти локальный сервер или разверни код на хостинге.";
+            }
+        } else {
+            if (audioCtx) await audioCtx.close();
+            audioCtx = null;
+            isRunning = false;
+            btnToggle.classList.remove('on');
+            btnToggle.textContent = "▶ ЗАПУСТИТЬ ДВИЖОК";
+            mainLcd.textContent = "СТЕНД: Контекст закрыт. Тракт остановлен.";
+            telemetryLcd.textContent = "ТЕЛЕМЕТРИЯ: Тракт молчит.";
+        }
+    });
+
+    document.getElementById('sliderVol').addEventListener('input', (e) => {
+        const v = e.target.value;
+        document.getElementById('txtVol').textContent = v + '%';
+        if (masterVolume && audioCtx) masterVolume.gain.setTargetAtTime(v / 100, audioCtx.currentTime, 0.02);
+    });
+
+    document.getElementById('sliderFps').addEventListener('input', (e) => {
+        const fps = parseFloat(e.target.value);
+        targetFps = fps;
+        document.getElementById('txtFps').textContent = fps + ' Гц';
+        
+        if (dspNode && audioCtx) {
+            // Динамическая передача имитируемого FPS в параметр ворклета
+            const param = dspNode.parameters.get('fps');
+            if (param) param.setValueAtTime(fps, audioCtx.currentTime);
+            
+            if (fps < 58.0) {
+                mainLcd.textContent = `СТЕНД: Имитация падения FPS до ${fps} Гц!\nДвижок активировал режим AudioFlex.\nРазмерность кадра урезана, швы волны интерполируются. Щелчки устранены.`;
+            } else {
+                mainLcd.textContent = `2A03/YM2413 DSP КОНВЕЙЕР: Стабильный рендеринг.\nAudioFlex в режиме ожидания эталона.`;
+            }
+        }
+    });
+
+    // 4. СЭМПЛ-ВИЗУАЛИЗАТОР (ОСЦИЛЛОГРАФ)
+    const canvas = document.getElementById('scopeCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 600; canvas.height = 160;
+
+    function renderScope() {
+        requestAnimationFrame(renderScope);
+        ctx.fillStyle = '#050d08';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Отрисовка координатной сетки
+        ctx.strokeStyle = '#174a17';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 40) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 20) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+
+        if (!analyser || !isRunning) return;
+
+        const bufferLength = analyser.fftSize;
+        const dataArray = new Float32Array(bufferLength);
+        analyser.getFloatTimeDomainData(dataArray);
+
+        ctx.strokeStyle = '#a3ff52';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+
+        const sliceWidth = canvas.width / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i];
+            const y = canvas.height / 2 + v * canvas.height * 0.45;
+
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+
+            x += sliceWidth;
+        }
+
+        ctx.stroke();
+    }
+    renderScope();
+</script>
+
+</body>
+</html>

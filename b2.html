@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRC-BackUp-GL · Шейдеры (подкрутка механик)</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:#080b12; color:#e2e8f0; font-family:'Segoe UI',system-ui,sans-serif; overflow:hidden; }
+  canvas#gl{ display:block; position:fixed; inset:0; width:100%; height:100%; }
+  #panel{ position:fixed; top:14px; right:14px; width:300px; background:rgba(14,20,32,.93); border:1px solid #2c3a52; border-radius:12px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.6); max-height:calc(100vh - 28px); overflow:auto; z-index:10; }
+  #panel h1{ font-size:12px; letter-spacing:1px; text-transform:uppercase; color:#4fd8ff; margin-bottom:10px; }
+  .row{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:9px; font-size:12px; }
+  .row label{ color:#c7d3e2; flex:1; }
+  input[type=range]{ width:110px; accent-color:#2aa8f0; }
+  select{ width:130px; background:#111a2b; color:#e2e8f0; border:1px solid #2c3a52; border-radius:4px; padding:2px; }
+  .val{ width:46px; text-align:right; color:#8fd8a8; font-family:monospace; font-size:11px; }
+  .hint{ margin-top:10px; padding-top:10px; border-top:1px solid #22304a; font-size:11px; color:#7c8aa0; line-height:1.5; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="panel">
+  <h1>Шейдеры · подкрутка механик</h1>
+  <div class="row"><label>Шейдер</label><select id="shaderSel">
+    <option value="planet">Планета / звезда</option>
+    <option value="warp">Warp-туннель (FTL)</option>
+  </select></div>
+  <div class="row"><label>Планета (kind)</label><select id="kind"></select></div>
+  <div class="row"><label>Атмосфера glow</label><input id="glow" type="range" min="0" max="4" step="0.02" value="1.2"><span class="val" id="v_glow"></span></div>
+  <div class="row"><label>Атмосфера size</label><input id="size" type="range" min="0.3" max="3" step="0.01" value="1.7"><span class="val" id="v_size"></span></div>
+  <div class="row"><label>Spin (дрейф)</label><input id="spin" type="range" min="0" max="8" step="0.1" value="2"><span class="val" id="v_spin"></span></div>
+  <div class="row"><label>Pulse</label><input id="pulse" type="range" min="0" max="8" step="0.1" value="1.5"><span class="val" id="v_pulse"></span></div>
+  <div class="row"><label>Яркость солнца</label><input id="sunB" type="range" min="0.2" max="5" step="0.05" value="1"><span class="val" id="v_sunB"></span></div>
+  <div class="row"><label>Размер солнца</label><input id="sunR" type="range" min="0.0002" max="0.0032" step="0.0001" value="0.0008"><span class="val" id="v_sunR"></span></div>
+  <div id="stBox">
+    <div class="row"><label>Звезда: масштаб</label><input id="stScale" type="range" min="1" max="12" step="0.1" value="4.2"><span class="val" id="v_stScale"></span></div>
+    <div class="row"><label>Звезда: скорость</label><input id="stTS" type="range" min="0" max="0.2" step="0.005" value="0.03"><span class="val" id="v_stTS"></span></div>
+    <div class="row"><label>Звезда: варп</label><input id="stWarp" type="range" min="0" max="8" step="0.1" value="4"><span class="val" id="v_stWarp"></span></div>
+    <div class="row"><label>Звезда: октавы</label><input id="stOct" type="range" min="1" max="4" step="1" value="4"><span class="val" id="v_stOct"></span></div>
+  </div>
+  <div class="row"><label>Туман вдали</label><input id="haze" type="range" min="0" max="1" step="0.01" value="0.2"><span class="val" id="v_haze"></span></div>
+  <div class="hint">Клик по холсту — захват мыши · ЛКМ+тянуть — обзор · WASD+QE — полёт · Shift — быстрее · Колесо — скорость · в warp-туннеле мышь вращает трассу</div>
+</div>
+<script>
+"use strict";
+(function(){
+const cv = document.getElementById('gl');
+const gl = cv.getContext('webgl', {antialias:false, depth:false, alpha:false});
+if(!gl){ document.body.innerHTML='<p style="color:#f77;padding:20px;font-family:monospace">WebGL недоступен</p>'; return; }
+function $(s){ return document.getElementById(s); }
+function compile(type, src){
+  const sh = gl.createShader(type); gl.shaderSource(sh, src); gl.compileShader(sh);
+  if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
+  return sh;
+}
+const KIND = [['terrestrial',0.6,'#1e64ff'],['ocean',0.9,'#1e8aff'],['stone',0.6,'#9a9a9a'],['energy',0.6,'#cc46ff'],['cheese',1.2,'#c88800'],['gas',1.4,'#6a3afe'],['pulsar',0.5,'#bfe8ff'],['neutron',0.5,'#cfe8ff'],['star-GL',4.0,'#fff4c0']];
+const kindSel = $('kind');
+KIND.forEach(function(k,i){ const o=document.createElement('option'); o.value=String(i); o.textContent=k[0]; kindSel.appendChild(o); });
+kindSel.value = String(KIND.length-1);
+const STAR_SIZE = [0.73,0.9,0.6,0.6,1.75,0.52,0.16,0.6,4.2]; /* визуальные радиусы в единицах */
+const SHADER = `
+precision highp float;
+uniform vec2 uRes; uniform float uTime; uniform vec2 uCam; uniform float uZoom;
+uniform vec3 uCamPos; uniform vec3 uCamF; uniform vec3 uCamR; uniform vec3 uCamU; uniform float uFov;
+uniform vec3 uAtmC; uniform float uGlow; uniform float uSize; uniform float uSpin; uniform float uPulse;
+uniform vec3 uSunC; uniform float uSunB; uniform float uSunR;
+uniform float uSTScale; uniform float uSTTS; uniform float uSTWarp; uniform float uSTOct;
+uniform float uHaze; uniform int uKind; uniform float uBodyR;
+#define R uBodyR
+float h13(vec3 p){ p=fract(p*0.3183+vec3(0.1,0.2,0.3)); p*=17.0; return fract(p.x*p.y*p.z*(p.x+p.y+p.z)); }
+float vnoise(vec3 x){ vec3 i=floor(x); vec3 f=fract(x); f=f*f*(3.-2.*f);
+  return mix(mix(mix(h13(i),h13(i+vec3(1,0,0)),f.x),mix(h13(i+vec3(0,1,0)),h13(i+vec3(1,1,0)),f.x),f.y),
+             mix(mix(h13(i+vec3(0,0,1)),h13(i+vec3(1,0,1)),f.x),mix(h13(i+vec3(0,1,1)),h13(i+vec3(1,1,1)),f.x),f.y),f.z); }
+float fbm5(vec3 p){ float v=0.,a=.5; for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=.5;} return v; }
+float fbm3(vec3 p){ float v=0.,a=.5; for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=.5;} return v; }
+void main(){
+  vec2 uv=(gl_FragCoord.xy*2.0-uRes)/uRes.y;
+  vec3 ro=uCamPos; vec3 fo=normalize(uCamF); vec3 up=normalize(uCamU); vec3 ri=normalize(uCamR);
+  vec3 uv2=cross(ri,fo);
+  vec3 rd=normalize(fo+(uv.x*ri+uv.y*uv2)*uFov);
+  float sa=uTime*0.1; vec3 sdir=normalize(vec3(cos(sa),.22*sin(sa),sin(sa)));
+  vec3 sC=vec3(0.0); vec3 wc=ro-sC; float b=dot(wc,rd); float disc=b*b-dot(wc,wc)+R*R;
+  vec3 col=vec3(0.0);
+  if(disc>0.0){
+    float th=-b-sqrt(disc); vec3 p=ro+rd*th; vec3 n=normalize(p-sC);
+    float nl=dot(n,normalize(sdir)); float lit=smoothstep(-.06,.18,nl);
+    float rot=uTime*0.05*uSpin; vec3 alb;
+    if(uKind==0){ /* terrestrial: континенты+океан+лёд+облака */
+      float cont=fbm5(n*2.6+vec3(0,0,rot)); float land=smoothstep(.46,.54,cont);
+      vec3 ocean=vec3(.02,.1,.22); vec3 landc=mix(vec3(.08,.26,.1),vec3(.42,.36,.2),smoothstep(.52,.78,cont));
+      float ice=smoothstep(.8,.94,abs(n.y)); alb=mix(ocean,landc,land); alb=mix(alb,vec3(.85,.9,.95),ice);
+      float cl=smoothstep(.5,.74,fbm5(n*4.2+vec3(0,0,rot*2.))); alb=mix(alb,vec3(.95,.97,1.),cl*.9); }
+    else if(uKind==1){ /* ocean: почти весь океан + редкие острова */
+      float cont=fbm5(n*2.2+vec3(0,0,rot*.6)); float land=smoothstep(.62,.72,cont);
+      vec3 ocean=vec3(.01,.07,.16); vec3 isle=mix(vec3(.1,.3,.18),vec3(.4,.38,.25),smoothstep(.64,.78,cont));
+      alb=mix(ocean,isle,land); }
+    else if(uKind==2){ /* stone: скалы, без океана/облаков */
+      float rock=fbm5(n*3.2+vec3(0,0,rot*.3)); alb=mix(vec3(.22,.22,.25),vec3(.5,.48,.45),rock);
+      float crack=smoothstep(.7,.85,fbm3(n*7.)); alb=mix(alb,vec3(.08,.08,.1),crack*.4); }
+    else if(uKind==3){ /* energy: terrestrial + высокая автосветимость/сияние */
+      float cont=fbm5(n*2.6+vec3(0,0,rot)); float land=smoothstep(.46,.54,cont);
+      vec3 ocean=mix(vec3(.02,.1,.22),uAtmC*.8,0.4); vec3 landc=mix(uAtmC,vec3(.9,.5,1.),smoothstep(.52,.78,cont));
+      alb=mix(ocean,landc,land); alb=mix(alb,vec3(1.,.5,1.),smoothstep(.7,.85,fbm5(n*5.+vec3(0,0,rot*2.)))*.6); }
+    else if(uKind==4){ /* cheese: сыр с дырками */
+      float m=fbm5(n*3.5); float hole=smoothstep(.55,.75,fbm5(n*6.+vec3(7.3))); alb=mix(vec3(1,.78,.25),vec3(.95,.6,.15),m); alb=mix(alb,vec3(.25,.15,.04),hole*.8); }
+    else if(uKind==5){ /* gas: полосы + шторм */
+      float lat=n.y; float warp=fbm3(n*2.5); float bands=sin(lat*14.+warp*3.2); alb=mix(vec3(.35,.2,.75),vec3(.85,.3,.2),smoothstep(-.6,.6,bands));
+      float st2=smoothstep(.35,.5,fbm5(n*5.+vec3(0,rot*3.,0))); alb=mix(alb,vec3(1,.95,.85),st2*.4); }
+    else if(uKind==6||uKind==7){ /* pulsar/neutron: жилы + пятна */
+      float vein=fbm5(n*4.); float spots=smoothstep(.42,.62,fbm3(n*3.+3.3)); alb=mix(uAtmC*.7,vec3(1),spots); alb=mix(alb,vec3(.5,.65,1.),vein*.5); }
+    else { /* star-GL (uKind==8): плазма домен-варп */
+      vec3 st=n*uSTScale+vec3(0.,uTime*uSTTS*.6,uTime*uSTTS);
+      float q1=fbm3(st+vec3(1.3,5.2,0.)); float q2=fbm3(st+vec3(5.2,1.3,0.));
+      float r1=fbm3(st+uSTWarp*vec3(q1,q2,q1)+vec3(1.3,5.2,0.));
+      float hot=smoothstep(.5,.8,r1); alb=mix(vec3(1,.45,.15),vec3(1,.9,.55),hot); alb=mix(alb,vec3(1,.98,.9),q2*hot*.8); }
+    vec3 colDay=alb*(.15+1.05*lit); float cell=h13(floor(n*90.)); float city=step(.8,cell)*step(.46,fbm5(n*2.6));
+    vec3 colN=alb*.03+vec3(1,.75,.35)*city*.9; col=mix(colN,colDay,lit);
+    float fres=pow(1.-clamp(dot(-rd,n),0.,1.),3.); col+=vec3(.25,.5,1.)*fres*(.2+.8*lit)*1.1;
+  } else {
+    vec3 night=vec3(.003,.005,.011);
+    night+=(vec3(.7,.8,1.)*step(.996,h13(rd*120.)) + vec3(1,.85,.6)*step(.9965,h13(rd*90.)))*(0.5+0.5*sin(uTime*2.));
+    float horiz=max(0.,rd.y); vec3 day=mix(uAtmC*.5,vec3(.5,.7,.95),horiz);
+    float dS=dot(rd,normalize(sdir) ); day+=uSunC*pow(max(dS,0.),8.)*.5*uSunB+uSunC*pow(max(dS,0.),350.)*.9*uSunB;
+    day+=uSunC*smoothstep(1.-uSunR,1.-uSunR*.44,dS)*3.*uSunB;
+    col=mix(night,day,max(0.,dot(normalize(ro),normalize(sdir))*.5+.5)*(1.-uHaze*.4));
+    float atmo=(1.-smoothstep(1.,uSize,length(ro-rd*b)))*smoothstep(-.2,.4,b);
+    if(disc<0.) col+=uAtmC*atmo*max(0.,dot(normalize(ro),normalize(sdir))*.5+.5)*uGlow;
+  }
+  col=col/(col+vec3(1.)); col=pow(max(col,vec3(0.)),vec3(1./2.2)); gl_FragColor=vec4(col,1.);
+}
+`;
+const SHADER_FINAL = SHADER;
+let prog, loc;
+function build(){
+  const vs = compile(gl.VERTEX_SHADER, 'attribute vec2 p; void main(){ gl_Position=vec4(p,0.,1.); }');
+  const fs = compile(gl.FRAGMENT_SHADER, SHADER_FINAL);
+  prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+  const a = gl.getAttribLocation(prog,'p'); gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a,2,gl.FLOAT,false,0,0);
+  loc = {}; ['uRes','uTime','uCam','uZoom','uCamPos','uCamF','uCamR','uCamU','uFov','uAtmC','uGlow','uSize','uSpin','uPulse','uSunC','uSunB','uSunR','uSTScale','uSTTS','uSTWarp','uSTOct','uHaze','uKind','uBodyR'].forEach(function(n){ loc[n]=gl.getUniformLocation(prog,n); });
+  gl.useProgram(prog);
+}
+/* --- ☩ Warp-туннель (FTL). Порт с игры: WebGL1, fBm/simplex, звёздный туннель --- */
+const WARP_SHADER_SRC = `precision highp float;
+uniform vec2 uRes; uniform float uTime; uniform vec2 uMouse;
+const float TAU=6.28318; const float PI=3.141592; const float t2=8.0;
+#define MOD3 vec3(.1031,.11369,.13787)
+vec3 hash33(vec3 p3){ p3=fract(p3*MOD3); p3+=dot(p3,p3.yxz+14.14);
+  return -2.0+3.0*fract(vec3((p3.x+p3.y)*p3.z,(p3.x+p3.z)*p3.y,(p3.y+p3.z)*p3.x)); }
+float simplexNoise(vec3 p){
+  const float K1=0.333333333; const float K2=0.166666667;
+  vec3 i=floor(p+(p.x+p.y+p.z)*K1); vec3 d0=p-(i-(i.x+i.y+i.z)*K2);
+  vec3 e=step(vec3(0.0),d0-d0.yzx); vec3 i1=e*(1.0-e.zxy); vec3 i2=1.0-e.zxy*(1.0-e);
+  vec3 d1=d0-(i1-1.0*K2); vec3 d2=d0-(i2-2.0*K2); vec3 d3=d0-(1.0-3.0*K2);
+  vec4 h=max(0.6-vec4(dot(d0,d0),dot(d1,d1),dot(d2,d2),dot(d3,d3)),0.0);
+  vec4 n=h*h*h*h*vec4(dot(d0,hash33(i)),dot(d1,hash33(i+i1)),dot(d2,hash33(i+i2)),dot(d3,hash33(i+1.0)));
+  return dot(vec4(21.316),n); }
+float fBm3(in vec3 p){
+  float f=0.0; float scale=5.0; p=mod(p,scale); float amp=0.75;
+  for(int i=0;i<33;i++){ f+=simplexNoise(p*scale)*amp; amp*=0.5; scale*=2.2; }
+  return min(f,1.0); }
+vec3 mod289(vec3 x){ return x-floor(x*(3.0/289.0))*289.0; }
+vec4 mod289(vec4 x){ return x-floor(x*(1.0/289.0))*289.0; }
+vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
+vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159-0.85373472095314*r; }
+float snoise(vec3 v){
+  const vec2 C=vec2(0.1666666666666667,0.3333333333333333); const vec4 D=vec4(0.0,0.5,1.0,2.0);
+  vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
+  vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.0-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+  vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy;
+  i=mod289(i);
+  vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+  float n_=0.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+  vec4 j=p-49.0*floor(p*ns.z*ns.z); vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.0*x_);
+  vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.0-abs(x)-abs(y);
+  vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+  vec4 s0=floor(b0)*2.0+1.0; vec4 s1=floor(b1)*2.0+1.0; vec4 sh=-step(h,vec4(0.0));
+  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+  vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
+  vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0); m=m*m;
+  return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3))); }
+void main(){
+  float t=mod(uTime,t2)/t2;
+  vec4 col=vec4(0.0);
+  vec2 p=(2.0*gl_FragCoord.xy-uRes.xy)/min(uRes.y,uRes.x);
+  vec2 mo=(2.0*uMouse-uRes.xy)/min(uRes.x,uRes.y);
+  p+=vec2(0.0,-0.1);
+  float ay=uMouse.y*2.0, ax=uMouse.x*2.0;
+  mat3 mY=mat3(cos(ay),0.0,sin(ay),0.0,1.0,0.0,-sin(ay),0.0,cos(ay));
+  mat3 mX=mat3(1.0,0.0,0.0,0.0,cos(ax),sin(ax),0.0,-sin(ax),cos(ax));
+  mat3 m=mX*mY;
+  vec3 v=m*vec3(p,1.0);
+  float v_xy=length(v.xy); float z=v.z/v_xy;
+  float focal_depth=0.15; float p_len=length(v.xy);
+  float polar_y=z*focal_depth+uTime*2.0;
+  float a=atan(v.y,v.x); a=0.5+0.5*a/PI; a-=uTime*0.3;
+  float x=fract(a); if(x>=0.5)x=1.0-x;
+  float val=0.45+0.55*fBm3(vec3(vec2(2.0,0.5)*vec2(x,polar_y),0.15*uTime));
+  val=clamp(val,0.0,1.0);
+  col.rgb=vec3(0.15,0.4,0.9)*vec3(val);
+  vec3 white=0.35*vec3(smoothstep(0.55,1.0,val));
+  col.rgb+=white; col.rgb=clamp(col.rgb,0.0,1.0);
+  float disk_col=exp(-(p_len-0.025)*4.0);
+  col.rgb+=clamp(vec3(disk_col),0.0,1.0);
+  gl_FragColor=vec4(col.rgb,1.0);
+}`;
+let warpProg, warpLoc;
+function buildWarp(){
+  const vs = compile(gl.VERTEX_SHADER, 'attribute vec2 p; void main(){ gl_Position=vec4(p,0.,1.); }');
+  const fs = compile(gl.FRAGMENT_SHADER, WARP_SHADER_SRC);
+  warpProg = gl.createProgram(); gl.attachShader(warpProg, vs); gl.attachShader(warpProg, fs); gl.linkProgram(warpProg);
+  if(!gl.getProgramParameter(warpProg, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(warpProg));
+  const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+  const a = gl.getAttribLocation(warpProg,'p'); gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a,2,gl.FLOAT,false,0,0);
+  warpLoc = {}; ['uRes','uTime','uMouse'].forEach(function(n){ warpLoc[n]=gl.getUniformLocation(warpProg,n); });
+}
+function resize(){ const dpr=Math.min(devicePixelRatio||1,2); cv.width=Math.max(1,innerWidth*dpr); cv.height=Math.max(1,innerHeight*dpr); gl.viewport(0,0,cv.width,cv.height); }
+addEventListener('resize', resize); resize();
+let camPos=[0.0,0.0,3.0], fwd=[0,0,-1], right=[1,0,0], up=[0,1,0];
+let yaw=-1.57, pitch=0.0, zoom=0.6, drag=false, px=0,py=0, plock=false;
+const keys={};
+document.addEventListener('keydown',e=>{ if(e.code==='Tab'){e.preventDefault();return;} keys[e.code]=true; });
+document.addEventListener('keyup',e=>{ keys[e.code]=false; });
+cv.addEventListener('pointerdown',e=>{ cv.requestPointerLock(); drag=true; px=e.clientX; py=e.clientY; });
+document.addEventListener('pointerlockchange',()=>{ plock=(document.pointerLockElement===cv); });
+document.addEventListener('mousemove',e=>{ if(!plock) return; yaw+=e.movementX*0.003; pitch+=e.movementY*0.003; pitch=Math.max(-1.5,Math.min(1.5,pitch)); });
+cv.addEventListener('wheel',e=>{ zoom=Math.max(0.05,Math.min(12.,zoom+e.deltaY*0.002)); },{passive:true});
+function updateBasis(){
+  const cp=Math.cos(pitch), sp=Math.sin(pitch), cy=Math.cos(yaw), sy=Math.sin(yaw);
+  fwd=[cp*sy, sp, cp*cy]; right=[cy,0,-sy]; up=[-sp*sy, cp, -sp*cy];
+}
+function moveCam(dt){
+  let m=Math.max(0.05,zoom)*dt*3.0;
+  if(keys['ShiftLeft']||keys['ShiftRight']) m*=3.0;
+  const F=fwd, R=right, U=up; let dx=0,dy=0,dz=0;
+  if(keys['KeyW']){dx+=F[0];dy+=F[1];dz+=F[2];}
+  if(keys['KeyS']){dx-=F[0];dy-=F[1];dz-=F[2];}
+  if(keys['KeyD']){dx+=R[0];dy+=R[1];dz+=R[2];}
+  if(keys['KeyA']){dx-=R[0];dy-=R[1];dz-=R[2];}
+  if(keys['KeyE']){dx+=U[0];dy+=U[1];dz+=U[2];}
+  if(keys['KeyQ']){dx-=U[0];dy-=U[1];dz-=U[2];}
+  const l=Math.hypot(dx,dy,dz); if(l>0){ m/=l; camPos=[camPos[0]+dx*m, camPos[1]+dy*m, camPos[2]+dz*m]; }
+}
+const binders={};
+[['glow',1.2],['size',1.7],['spin',2],['pulse',1.5],['sunB',1],['sunR',0.0008],['stScale',4.2],['stTS',0.03],['stWarp',4],['stOct',4],['haze',0.2]].forEach(function(x){
+  const id=x[0], el=$(id);
+  el.addEventListener('input',function(){ $('v_'+id).textContent = Number(el.value); });
+  $('v_'+id).textContent = el.value;
+});
+let start=performance.now(), lastNow=performance.now();
+function frame(now){
+  const t=(now-start)/1000;
+  const dt=Math.min(0.05,(now-lastNow)/1000); lastNow=now;
+  updateBasis(); moveCam(dt);
+  if(shaderSel.value==='warp'){
+    gl.useProgram(warpProg);
+    gl.uniform2f(warpLoc.uRes, cv.width, cv.height);
+    gl.uniform1f(warpLoc.uTime, t);
+    gl.uniform2f(warpLoc.uMouse, yaw, pitch);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(frame); return;
+  }
+  gl.useProgram(prog);
+  gl.uniform2f(loc.uRes, cv.width, cv.height);
+  gl.uniform1f(loc.uTime, t);
+  gl.uniform2f(loc.uCam, yaw, pitch);
+  gl.uniform1f(loc.uZoom, zoom);
+  gl.uniform3f(loc.uCamPos, camPos[0], camPos[1], camPos[2]);
+  gl.uniform3f(loc.uCamF, fwd[0], fwd[1], fwd[2]);
+  gl.uniform3f(loc.uCamR, right[0], right[1], right[2]);
+  gl.uniform3f(loc.uCamU, up[0], up[1], up[2]);
+  gl.uniform1f(loc.uFov, 1.0);
+  const ki = +kindSel.value;
+  const atmHex = KIND[ki][2];
+  const atm = [parseInt(atmHex.slice(1,3),16)/255, parseInt(atmHex.slice(3,5),16)/255, parseInt(atmHex.slice(5,7),16)/255];
+  gl.uniform3f(loc.uAtmC, atm[0], atm[1], atm[2]);
+  gl.uniform1f(loc.uGlow, +$('glow').value);
+  gl.uniform1f(loc.uSize, +$('size').value);
+  gl.uniform1f(loc.uSpin, +$('spin').value);
+  gl.uniform1f(loc.uPulse, +$('pulse').value);
+  gl.uniform3f(loc.uSunC, 1.0, 0.9, 0.7);
+  gl.uniform1f(loc.uSunB, +$('sunB').value);
+  gl.uniform1f(loc.uSunR, +$('sunR').value);
+  gl.uniform1f(loc.uSTScale, +$('stScale').value);
+  gl.uniform1f(loc.uSTTS, +$('stTS').value);
+  gl.uniform1f(loc.uSTWarp, +$('stWarp').value);
+  gl.uniform1f(loc.uSTOct, +$('stOct').value);
+  gl.uniform1f(loc.uHaze, +$('haze').value);
+  gl.uniform1i(loc.uKind, ki);
+  gl.uniform1f(loc.uBodyR, STAR_SIZE[ki]||1.0);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  requestAnimationFrame(frame);
+}
+try{ build(); buildWarp(); gl.useProgram(prog); requestAnimationFrame(frame); }
+catch(err){ document.body.innerHTML='<p style="color:#f77;padding:20px;font-family:monospace;white-space:pre">'+err.message+'</p>'; }
+})();
+</script>
+</body>
+</html>

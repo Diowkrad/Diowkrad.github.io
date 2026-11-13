@@ -1,0 +1,4237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🧸 ☩ SIRIUS-B PROTOCOL Alpha 0.2.0 ☩ «Neutron Exile» ☩ 🥈</title>
+<link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
+<style>
+/* ============================================================
+   ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS - ☩
+   Селекторы отсортированы по группам, внутри группы — по алфавиту:
+   1) ТЕГИ и служебные селекторы;
+   2) ID;
+   3) КЛАССЫ;
+   4) АНИМАЦИЯ.
+   BUILD Alpha 1.2.15 «Deep Sky»
+   База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»
+   ============================================================ */
+
+.rack-mount {
+         width: 100%;
+    max-width: 1100px;
+    background: var(--bg-panel);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 18px rgba(79,142,233,0.12), 0 0 46px rgba(79,142,233,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 4px outset #995500;
+	align-items: stretch;
+    }
+
+
+
+/* ---------- 0. Подпись в нижней панели ---------- */
+.span_b{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-evenly;
+  flex-wrap:nowrap;
+  align-items:center;
+  background:#031;
+  padding:8px;
+  border:6px inset #1a1a2e;
+}
+
+/* ---------- 1. ТЕГИ И СЛУЖЕБНЫЕ СЕЛЕКТОРЫ ---------- */
+
+:root{
+  --bg: #0f0f1b;
+  --bg-panel: #0b0f16b0;   /* непрозрачный фон панелей/клавиатур — закрывает фон-звезду, чтобы Keys не просвечивали сквозь звезду */
+  --panel: #1a1a2eb0;
+  --gold: #f7cc1d;
+  --cyan: #7dff8a;
+  --key-white: #fff;
+  --key-black: #16161d;
+  --accent: #4f8ee9;
+}
+
+
+
+
+/* глобальный сброс */
+*{ box-sizing:border-box; margin:1px; padding:0; }
+
+::-webkit-scrollbar{ width:12px; }
+
+::-webkit-scrollbar-track{
+  background: #140;
+    border: 1px solid #950;
+    border-radius: 1px;
+    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #031 2px, #000000 2px, #000000 4px), repeating-radial-gradient(circle at 50% 50%, #29ff00 1px, #008951 1px, #027729 1px, #0a1a12 6px);
+    background-size: 5px 4px, 12px 12px;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color:#207;
+  border-radius:4px;
+  border:3px solid #950;
+}
+
+html{
+  background:#103;
+}
+body{
+  background:transparent;
+      color: var(--text-main);
+      margin: 0;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+}
+
+/* чип-кнопка */
+button{
+  font-family:inherit;
+  background:#222;
+  color:var(--gold);
+  border:4px outset #950;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.85rem;
+  width:180px;
+  height:40px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #111 0px, #333 1px, #111 1px, #222 6px);
+  background-size: 2px 2px, 18px 18px;
+}
+
+button:hover{
+  box-shadow:0 0 10px rgba(247,204,29,0.55), 0 0 20px rgba(247,204,29,0.25), 2px 2px 0 #000;
+}
+button:active{
+  transform:translateY(1px);
+}
+
+/* активная кнопка */
+button.on{
+  background:#f79e1d;
+  color:#99fffc;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 0px, #000000 1px, #1a1a2e 1px, #03000b 6px);
+  background-size: 2px 2px, 9px 9px;
+  border:4px outset #4f8ee9;
+  box-shadow:0 0 12px rgba(79,142,233,0.65), 0 0 26px rgba(79,142,233,0.35), 2px 2px 0 #000;
+  text-shadow:0 0 6px rgba(153,255,252,0.8);
+}
+
+/* вывеска */
+h1 h2 h3{
+  color:var(--gold);
+  font-size:1.4rem;
+  letter-spacing:3px;
+  margin-bottom:12px;
+  text-shadow:2px 2px 0 #7a5c00, 0 0 10px rgba(247,204,29,.55);
+  border:4px outset #950;
+  background:#1a1a2e;
+  padding:6px;
+  background-image:
+    repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px),
+    repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
+  background-size: 12px 12px, 18px 18px;
+}
+
+/* загрузчик банка и выпадающие списки */
+input[type=file],
+select{
+  font-family:inherit;
+  background:#111;
+  color:var(--cyan);
+  border:4px outset #950;
+  padding:4px;
+  max-width:340px;
+  font-size:0.8rem;
+}
+
+/* ползунки */
+input[type=range]{
+  accent-color:#3bc3d6;
+  width:140px;
+}
+input[type=range]{
+  accent-color:#f90;
+  width:460px;
+  -webkit-appearance:none;
+  background:#0a2a12;
+  border:4px outset #950;
+  outline:none;
+  border-radius:16px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+  margin-top:-5px;
+  box-shadow:0 0 6px rgba(249,153,0,.9), 0 0 14px rgba(249,153,0,.5);
+}
+input[type=range]::-moz-range-track{
+  height:6px;
+  background:#0a2a12;
+  border:1px solid var(--gold);
+  border-radius:3px;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px;
+  height:14px;
+  background:#f90;
+  border:2px solid var(--panel);
+  border-radius:50%;
+}
+
+/* ---------- 2. ID ---------- */
+
+#keys{
+  position:relative;
+  height:152px;
+  width:100%;
+  user-select:none;
+  touch-action:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border:4px outset #950;
+  margin-bottom:10px;
+}
+
+#keys2{
+  position:relative;
+  height:152px;
+  width:100%;
+  user-select:none;
+  touch-action:none;
+  display:flex;
+  box-shadow:4px 4px 0 #000;
+  border:4px outset #950;
+  margin-bottom:10px;
+}
+
+
+
+/* ---------- 3. КЛАССЫ ---------- */
+
+a.btn{
+  display:inline-block;
+  font-family:inherit;
+  background:#222;
+  color:var(--gold);
+  border:4px outset #950;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.85rem;
+      width: 280px;
+  height:40px;
+  line-height:22px;
+  text-align:center;
+  text-decoration:none;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #111 0px, #333 1px, #111 1px, #222 6px);
+  background-size:2px 2px, 18px 18px;
+}
+a.btn:hover{ filter:brightness(1.25); }
+a.btn:active{ border-style:inset; }
+
+
+.bk{
+  position:absolute;
+  top:0;
+  height:60%;
+  background:var(--key-black);
+  border:2px solid #000;
+  z-index:2;
+  cursor:pointer;
+  touch-action:none;
+  transition:0.2s;
+  CORNER-SHAPE: SUPERELLIPSE(0.4);
+  border-radius: 0px 0px 12px 12px;
+}
+.bk:hover{
+  background:#333;
+  border:2px solid #f90;
+}
+.bk.act{ background:var(--accent) !important; }
+
+.lbl{
+  font-size:0.75rem;
+  position:absolute;
+  bottom:2px;
+  width:96%;
+  text-align:center;
+  color:#ffffff;
+  pointer-events:none;
+  text-shadow:2px 2px 6px #00000080;
+  background:#00000080;
+  text-emphasis-style:"☩";
+  border-radius:8px;
+  CORNER-SHAPE: SUPERELLIPSE(-0.7);
+  border:1px double #950;
+}
+
+/* LCD-экран */
+.lcd{
+      background: #00000061;
+    border: 6px inset #1a1a2e;
+    color: #a3ff52;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    margin: 10px 5px 0px 5px;
+    height: 320px;
+    width: 240px;
+    max-width: 100%;
+    overflow: auto;
+    line-height: 150%;
+    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06bd 2px, #000000bd 2px, #000000bd 4px), repeating-radial-gradient(circle at 50% 50%, #000000b0 1px, #000000b0 1px, #0a1a12b0 1px, #0a1a12b0 6px);
+    background-size: 2px 3px, 12px 12px;
+}
+
+/* анимированная вывеска */
+.logotype{
+  padding:5px 5px;
+  animation:gradientMove 30s ease infinite;
+}
+
+/* окно-панель (и таб-бар) */
+.panel{
+  background:#1a1a2e;
+  border:4px outset #950;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content: center;
+  flex-direction:row;
+  align-content:flex-start;
+  margin: 12px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
+  background-size: 2px 1px, 18px 18px;
+}
+
+.panel_2{
+      background: #1a1a2eb0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: row;
+    align-content: flex-start;
+    margin: 12px;
+    border: 6px inset #1a1a2e;
+}
+/* правая колонка панели */
+.panel_buttons{
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:flex-start;
+  margin:10px 15px;
+  flex-direction:column;
+  width:760px;
+}
+
+/* панель с кнопками под LCD */
+.panel_buttons_c{
+  display:inline-grid;
+  grid-auto-flow:row dense;
+  justify-items:start;
+  align-items:center;
+  justify-content:start;
+  align-content:start;
+}
+
+/* внутренний ряд панели */
+.panel_lcd{
+    display: flex;
+    justify-content: flex-start;
+    align-content: flex-start;
+    margin: 15px;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+/* горизонтальный ряд */
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:8px;
+  align-content:flex-start;
+  justify-content:flex-start;
+}
+
+/* «кнопка-подпись» в LCD-стиле */
+.row span{
+  font-family:inherit;
+  background:#000;
+  color:var(--cyan);
+  border:6px inset #1a1a2e;
+  padding:6px 14px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #000;
+  font-size:0.8rem;
+  width:180px;
+  height:40px;
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+  background-size: 2px 3px, 12px 12px;
+}
+
+/* span без экрана и рамки */
+.row span.plain{
+  background:none;
+  border:none;
+  box-shadow:none;
+  color:#cfd2e8;
+  padding:0;
+}
+
+/* нижняя панель подсказки */
+.row_b{
+  background:#1a1a2e;
+  border:4px outset #950;
+  padding:8px;
+  display:flex;
+  background-image:
+    repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px),
+    repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
+  background-size: 12px 12px, 18px 18px;
+}
+
+/* текст подсказки */
+.row_b span{
+  font-family:'Courier New', monospace;
+  font-size:0.75rem;
+  letter-spacing:1px;
+  color:var(--cyan);
+  background-image:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
+    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+  background-size: 2px 3px, 12px 12px;
+}
+
+/* белая клавиша */
+.wk{
+  flex:1;
+  background:var(--key-white);
+  border:1px solid #555;
+  position:relative;
+  cursor:pointer;
+  touch-action:none;
+  transition:0.2s;
+  CORNER-SHAPE: SUPERELLIPSE(0.3);
+  border-radius:0px 0px 10px 10px;
+}
+.wk:hover{
+  background:#CCC;
+  border:1px solid #309;
+}
+.wk.act{ background:var(--accent) !important; }
+
+/* обёртка прокрутки клавиатуры */
+.kbd-wrap{
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+  /* OPT: непрозрачная подложка клавиатур — фон-звезда/джет не просвечивает сквозь Keys */
+  background:#0d1119;
+  border:1px solid #1a1a2e;
+}
+.kbd-wrap::-webkit-scrollbar{ display:none; }
+
+/* фирменная лента скролла */
+.kbd-strip{
+  height:18px;
+  margin-bottom:6px;
+  box-shadow:2px 2px 0 #000;
+  border:2px inset #950;
+  background:#14101e;
+  overflow:hidden;
+  cursor:pointer;
+  user-select:none;
+  touch-action:none;
+}
+.tape{ position:relative; width:100%; height:100%; }
+.tape-thumb{
+  position:absolute;
+  top:1px;
+  height:12px;
+  background:var(--accent);
+  border:2px solid #000;
+  cursor:grab;
+  touch-action:none;
+  transition:0.15s;
+}
+.tape-thumb:active{ cursor:grabbing; }
+
+/* режим «1 КЛАВИАТУРА» */
+body.kb-single #strip2{ display:none !important; }
+body.kb-single #keys2{ display:none !important; }
+
+/* ---------- 4. АНИМАЦИЯ ---------- */
+
+@keyframes gradientMove{
+  10%{color:#FFA;}
+  20%{color:#F6F;}
+  30%{color:#AFF;}
+  40%{color:#AF9;}
+  50%{color:#AAF;}
+  60%{color:#fAF;}
+  70%{color:#96F;}
+  80%{color:#F93;}
+  90%{color:#FF9;}
+  100%{color:#666;}
+}
+
+/* ---------- 5. ДОПОЛНЕНИЕ ДЛЯ САЙТА-ВИЗИТКИ ---------- */
+
+/* логотип-шапка на всю ширину */
+#logo{ width:100%; text-align:center; }
+
+/* скрытие/показ секций-вкладок */
+.view-hidden{ display:none; }
+
+/* таб-бар без лишнего отступа ряда */
+.tabs .row{ margin-bottom:0; }
+
+/* текстовые блоки: полный объём вместо узкого 240px */
+.lcd-full{
+        width: 100%;
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;    border-radius: 24px;
+}
+
+/* подзаголовки внутри LCD */
+.lcd h2{ font-size:0.95rem; color:var(--gold); margin:6px 0 4px; }
+.lcd h3{ font-size:0.85rem; color:#99fffc; margin:6px 0 2px; }
+.lcd p, .lcd li{ margin:2px 0; }
+
+/* МОБИЛЬНЫЙ РОЛЛ v1.0.37 */
+@media (max-width:768px){
+  #keys, #keys2{ transform:scaleY(0.75); transform-origin:top left; }
+  .kbd-wrap{ height:114px; }
+}
+.p_block_flex-wrap{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+	border-radius: 1920px;
+	border-bottom: 6px inset #1a1a2e;
+	border-top: 2px inset #e1e1ff;;
+	    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06 2px, #000000 2px, #000000 4px), repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
+    background-size: 2px 3px, 12px 12px;
+}
+</style>
+</head>
+<body>
+<!-- ☩ ФОН: GLSL-планета R46 «ГРАНЬ» перенесена на задний план. Канва позади интерфейса,
+     клики и клавиши не перехватывает, при отсутствии WebGL интерфейс работает как раньше.
+     Константы — в блоке «КОНСТАНТЫ СИМУЛЯЦИИ ФОНА» в конце файла. ☩ -->
+<canvas id="glbg" aria-hidden="true"></canvas>
+<style>
+/* фон-канва: позади всего интерфейса, не перехватывает клики */
+canvas#glbg{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:-1;
+  pointer-events:none;
+  display:block;
+}
+/* CRT-развёртка в духе GLSL-стенда поверх всего экрана (снять при надобности) 
+html::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:9;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px);
+} */
+</style>
+<div class="rack-mount" style="display: flex;overflow: auto;flex-direction: column;align-items: stretch;">
+<!-- ================= ШАПКА ================= -->
+<header class="panel">
+  <h1 class="logotype">🧸 SIRIUS-B PROTOCOL Alpha 0.2.0 ☩ «Neutron Exile» ☩ 🥈 </h1><br>
+</header>
+<div class="panel_2"
+style="
+animation: gradientMove 60s ease infinite;    text-align: center;
+"
+>
+<main id="app" style="
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+	max-width: 900px;
+">
+<div class="p_block_flex-wrap" style="
+       background-color: #10111dcf;
+    background-image: linear-gradient(5deg, #013b147d 0 16px, transparent 16px 26px, #14411000 4px 4px, transparent 4px 5px, #0a390873 55px 70px, transparent 70px 88px, #2350197a 88px 96px, transparent 96px 115px, #14411000 115px 128px, transparent 128px 142px, #2e5c257a 142px 148px, transparent 148px 165px), linear-gradient(31deg, transparent 0 12px, #14411070 12px 19px, transparent 19px 44px, #2350196b 44px 51px, transparent 51px 76px, #0a390875 76px 83px, transparent 83px 108px, #144110 108px 115px, transparent 115px 140px, #2e5c256e 140px 147px, transparent 147px 168px), linear-gradient(71deg, transparent 0 18px, #23501994 18px 25px, transparent 25px 55px, #0a3908a1 55px 62px, transparent 62px 92px, #14411000 92px 99px, transparent 99px 130px, #2e5c257d 130px 137px, transparent 137px 165px);
+    background-size: 26px 27px;
+    background-repeat: repeat;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    align-content: center;    min-width: 440px;
+">
+<div class="p_block" >
+<div>
+<span class="mishka-wrap" style="display:inline-block; text-decoration:none; line-height:0;">
+<svg class="bear" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:380px; height:380px; cursor:pointer;">
+  <defs>
+    <radialGradient id="mgHead" cx="40%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#f2b48c"/><stop offset="55%" stop-color="#e69f70"/><stop offset="100%" stop-color="#c97f4e"/>
+    </radialGradient>
+    <radialGradient id="mgBody" cx="42%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#f0b183"/><stop offset="60%" stop-color="#e29564"/><stop offset="100%" stop-color="#c17747"/>
+    </radialGradient>
+    <radialGradient id="mgMuzzle" cx="40%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffedbc"/><stop offset="70%" stop-color="#fbdf9d"/><stop offset="100%" stop-color="#eec77f"/>
+    </radialGradient>
+    <radialGradient id="mgInnerEar" cx="45%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#fff0c2"/><stop offset="100%" stop-color="#f4d98f"/>
+    </radialGradient>
+    <radialGradient id="mgPaw" cx="40%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#eda76f"/><stop offset="100%" stop-color="#c9793f"/>
+    </radialGradient>
+    <radialGradient id="mgFoot" cx="42%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#e59a60"/><stop offset="100%" stop-color="#b96a34"/>
+    </radialGradient>
+    <radialGradient id="mgScarf" cx="40%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#ffd94f"/><stop offset="100%" stop-color="#f0a92c"/>
+    </radialGradient>
+    <radialGradient id="mgHeart" cx="40%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#fff6d8"/><stop offset="100%" stop-color="#fbe7ac"/>
+    </radialGradient>
+    <linearGradient id="mgShine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".55"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="mgSoft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="mgSofter" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+
+  <ellipse class="shadow" cx="256" cy="470" rx="150" ry="24" fill="#b97b45" opacity=".55" filter="url(#mgSofter)"/>
+
+  <g class="body-group">
+    <g class="ear-left">
+      <circle cx="150" cy="90" r="52" fill="url(#mgPaw)"/>
+      <circle cx="150" cy="92" r="30" fill="url(#mgInnerEar)"/>
+      <path d="M128 68 q10 -14 26 -12" stroke="#fff" stroke-opacity=".45" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M136 104 q4 4 10 6" stroke="#c98a4e" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M142 96 q6 6 14 8" stroke="#c98a4e" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <g class="ear-right">
+      <circle cx="362" cy="90" r="52" fill="url(#mgPaw)"/>
+      <circle cx="362" cy="92" r="30" fill="url(#mgInnerEar)"/>
+      <path d="M340 68 q10 -14 26 -12" stroke="#fff" stroke-opacity=".45" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M348 104 q4 4 10 6" stroke="#c98a4e" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M354 96 q6 6 14 8" stroke="#c98a4e" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+
+    <g class="head">
+      <circle cx="256" cy="190" r="138" fill="url(#mgHead)"/>
+      <path d="M190 96 q30 -34 66 -34 q36 0 66 34 q-30 -18 -66 -18 q-36 0 -66 18z" fill="#f9c79b" opacity=".7"/>
+      <ellipse cx="210" cy="110" rx="46" ry="26" fill="url(#mgShine)" opacity=".5"/>
+      <path d="M256 60 v26" stroke="#b9713f" stroke-width="3" stroke-dasharray="7 6" stroke-linecap="round" opacity=".55"/>
+      <path d="M212 148 q14 -8 28 -2" stroke="#8a4f26" stroke-width="4.5" fill="none" stroke-linecap="round" opacity=".85"/>
+      <path d="M272 146 q14 -6 28 2" stroke="#8a4f26" stroke-width="4.5" fill="none" stroke-linecap="round" opacity=".85"/>
+      <g class="eye left">
+        <ellipse cx="224" cy="172" rx="10" ry="13" fill="#3d3a4e"/>
+        <circle cx="220.5" cy="167" r="3.2" fill="#fff" opacity=".95"/>
+        <circle cx="227" cy="176" r="1.6" fill="#fff" opacity=".6"/>
+      </g>
+      <g class="eye right">
+        <ellipse cx="288" cy="172" rx="10" ry="13" fill="#3d3a4e"/>
+        <circle cx="284.5" cy="167" r="3.2" fill="#fff" opacity=".95"/>
+        <circle cx="291" cy="176" r="1.6" fill="#fff" opacity=".6"/>
+      </g>
+      <path class="lid" d="M212 172 q12 -12 24 0" stroke="#3d3a4e" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path class="lid" d="M276 172 q12 -12 24 0" stroke="#3d3a4e" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="196" cy="200" rx="17" ry="10" fill="#f4836d" opacity=".38"/>
+      <ellipse cx="316" cy="200" rx="17" ry="10" fill="#f4836d" opacity=".38"/>
+      <circle cx="185" cy="192" r="2" fill="#c9764a" opacity=".7"/>
+      <circle cx="196" cy="188" r="1.8" fill="#c9764a" opacity=".7"/>
+      <circle cx="205" cy="194" r="1.6" fill="#c9764a" opacity=".7"/>
+      <circle cx="307" cy="194" r="2" fill="#c9764a" opacity=".7"/>
+      <circle cx="316" cy="188" r="1.8" fill="#c9764a" opacity=".7"/>
+      <circle cx="327" cy="192" r="1.6" fill="#c9764a" opacity=".7"/>
+      <ellipse cx="256" cy="222" rx="64" ry="48" fill="url(#mgMuzzle)"/>
+      <ellipse cx="234" cy="204" rx="22" ry="14" fill="url(#mgShine)" opacity=".55"/>
+      <path d="M242 206 q14 -10 28 0 q4 4 -2 10 q-9 8 -24 0 q-6 -6 -2 -10z" fill="#6b4a3a"/>
+      <ellipse cx="250" cy="207" rx="6" ry="3.4" fill="#fff" opacity=".45"/>
+      <path d="M238 232 q18 16 36 0" stroke="#6b4a3a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M248 238 q8 8 16 1 q-3 9 -9 9 q-7 0 -7 -10z" fill="#e2606a"/>
+      <path d="M248 238 q8 8 16 1" stroke="#6b4a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="238" cy="216" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="232" cy="222" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="238" cy="227" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="274" cy="216" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="280" cy="222" r="1.7" fill="#8a5a34" opacity=".8"/>
+      <circle cx="274" cy="227" r="1.7" fill="#8a5a34" opacity=".8"/>
+    </g>
+
+    <ellipse cx="256" cy="372" rx="128" ry="112" fill="url(#mgBody)"/>
+    <ellipse cx="256" cy="386" rx="74" ry="80" fill="#f4c68d"/>
+    <ellipse cx="256" cy="386" rx="74" ry="80" fill="none" stroke="#c9854c" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round" opacity=".8"/>
+    <ellipse cx="228" cy="348" rx="34" ry="22" fill="url(#mgShine)" opacity=".5"/>
+    <g opacity=".95">
+      <ellipse cx="330" cy="392" rx="26" ry="20" fill="#f7d8a4" transform="rotate(-12 330 392)"/>
+      <ellipse cx="330" cy="392" rx="26" ry="20" fill="none" stroke="#c98a4e" stroke-width="2.5" stroke-dasharray="6 5" transform="rotate(-12 330 392)"/>
+      <path d="M318 392 h24 M330 382 v20" stroke="#d99a5e" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+    </g>
+
+    <path d="M186 296 q70 40 140 0 q6 26 -6 34 q-64 34 -128 0 q-12 -8 -6 -34z" fill="url(#mgScarf)"/>
+    <path d="M186 296 q70 40 140 0 q2 8 1 12 q-70 42 -142 0 q-1 -4 1 -12z" fill="#ffffff" opacity=".22"/>
+    <path d="M196 322 l0 0" stroke="none"/>
+    <path d="M236 322 q20 -16 40 0 q-6 16 -20 16 q-14 0 -20 -16z" fill="#f5b62e"/>
+    <path d="M244 328 q12 -8 24 0" stroke="#d9931a" stroke-width="3" fill="none" stroke-linecap="round" opacity=".7"/>
+    <path d="M262 334 q14 34 8 58 q-2 8 -12 8 q-10 0 -12 -10 q-6 -26 -4 -54z" fill="#f6b62f"/>
+    <path d="M246 396 l-2 12 M256 398 l0 12 M266 396 l2 12" stroke="#e8a51f" stroke-width="4" stroke-linecap="round"/>
+    <path d="M266 348 q4 20 2 40" stroke="#ffffff" stroke-opacity=".25" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+    <g>
+      <path d="M136 318 q-34 30 -34 74 q0 34 26 44 q26 8 44 -16 q14 -22 8 -58 q-6 -34 -44 -44z" fill="url(#mgPaw)"/>
+      <ellipse cx="146" cy="418" rx="26" ry="24" fill="#f0b479"/>
+      <ellipse cx="146" cy="418" rx="15" ry="12" fill="#f9dcae"/>
+      <path d="M136 408 v6 M146 404 v7 M156 408 v6" stroke="#c9884e" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+    </g>
+
+    <g class="paw-right">
+      <path d="M376 318 q34 30 34 74 q0 34 -26 44 q-26 8 -44 -16 q-14 -22 -8 -58 q6 -34 44 -44z" fill="url(#mgPaw)"/>
+      <ellipse cx="366" cy="418" rx="26" ry="24" fill="#f0b479"/>
+      <ellipse cx="366" cy="418" rx="15" ry="12" fill="#f9dcae"/>
+      <path d="M356 408 v6 M366 404 v7 M376 408 v6" stroke="#c9884e" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+      <ellipse cx="392" cy="336" rx="16" ry="9" fill="url(#mgShine)" opacity=".55" transform="rotate(30 392 336)"/>
+    </g>
+
+    <g>
+      <ellipse cx="186" cy="448" rx="52" ry="46" fill="url(#mgFoot)"/>
+      <ellipse cx="186" cy="448" rx="30" ry="27" fill="#f2c48d"/>
+      <path d="M168 470 q18 10 36 0" stroke="#c9884e" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
+      <path d="M170 438 q-3 -10 4 -16 M186 432 q0 -11 0 -11 M202 438 q3 -10 -4 -16" stroke="#c9884e" stroke-width="3" stroke-linecap="round" fill="none" opacity=".75"/>
+      <path d="M186 440 c-4 -8 -16 -6 -16 3 c0 8 10 12 16 17 c6 -5 16 -9 16 -17 c0 -9 -12 -11 -16 -3z" fill="url(#mgHeart)"/>
+      <path d="M180 444 q3 -3 6 -2" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7" fill="none"/>
+    </g>
+    <g>
+      <ellipse cx="326" cy="448" rx="52" ry="46" fill="url(#mgFoot)"/>
+      <ellipse cx="326" cy="448" rx="30" ry="27" fill="#f2c48d"/>
+      <path d="M308 470 q18 10 36 0" stroke="#c9884e" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>
+      <path d="M310 438 q-3 -10 4 -16 M326 432 q0 -11 0 -11 M342 438 q3 -10 -4 -16" stroke="#c9884e" stroke-width="3" stroke-linecap="round" fill="none" opacity=".75"/>
+      <path d="M326 440 c-4 -8 -16 -6 -16 3 c0 8 10 12 16 17 c6 -5 16 -9 16 -17 c0 -9 -12 -11 -16 -3z" fill="url(#mgHeart)"/>
+      <path d="M320 444 q3 -3 6 -2" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7" fill="none"/>
+    </g>
+
+    <ellipse cx="200" cy="330" rx="30" ry="18" fill="url(#mgShine)" opacity=".4"/>
+  </g>
+
+  <g fill="#ffd94f" stroke="#e8a51f" stroke-width="2">
+    <path class="star" d="M120 150 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5z"/>
+    <path class="star" d="M400 120 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5z"/>
+    <path class="star" d="M410 260 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/>
+    <path class="star" d="M105 270 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/>
+  </g>
+</svg>
+</span>
+<style>
+  #app .mishka-wrap{ display:inline-block; }
+  #app .mishka-wrap .bear{ display:block; cursor:pointer; }
+  #app .mishka-wrap .paw-right{
+    transform-box:view-box; transform-origin:402px 300px;
+    transition:transform .4s cubic-bezier(.34,1.6,.64,1);
+    transform:rotate(0deg) translateY(0);
+  }
+  #app .mishka-wrap .bear:hover .paw-right{ transform:rotate(-38deg) translateY(-10px); }
+  #app .mishka-wrap .ear-left{ transform-box:view-box; transform-origin:150px 90px; transition:transform .5s ease; }
+  #app .mishka-wrap .ear-right{ transform-box:view-box; transform-origin:362px 90px; transition:transform .5s ease; }
+  #app .mishka-wrap .bear:hover .ear-left{ animation:mg-earL 1.4s ease-in-out infinite; }
+  #app .mishka-wrap .bear:hover .ear-right{ animation:mg-earR 1.4s ease-in-out infinite; }
+  @keyframes mg-earL{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(-6deg)} }
+  @keyframes mg-earR{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(6deg)} }
+  #app .mishka-wrap .head{ transform-box:view-box; transform-origin:256px 250px; transition:transform .5s ease; }
+  #app .mishka-wrap .bear:hover .head{ animation:mg-nod 1.6s ease-in-out infinite; }
+  @keyframes mg-nod{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(3deg) translateY(3px)} }
+  #app .mishka-wrap .bear:active,#app .mishka-wrap .bear.jumping{ animation:mg-jump .55s cubic-bezier(.3,0,.4,1); }
+  @keyframes mg-jump{
+    0%{transform:translateY(0) scale(1,1)}
+    15%{transform:translateY(4px) scale(1.04,.96)}
+    40%{transform:translateY(-30px) scale(1.03,.97)}
+    65%{transform:translateY(0) scale(.95,1.06)}
+    80%{transform:translateY(-10px) scale(1,1)}
+    100%{transform:translateY(0) scale(1,1)}
+  }
+  #app .mishka-wrap .shadow{ transform-box:view-box; transform-origin:256px 470px; transition:transform .3s ease,opacity .3s ease; }
+  #app .mishka-wrap .bear:active .shadow,#app .mishka-wrap .bear.jumping .shadow{ animation:mg-shadow .55s cubic-bezier(.3,0,.4,1); }
+  @keyframes mg-shadow{
+    0%{transform:scale(1); opacity:.9}
+    40%{transform:scale(.6,.5); opacity:.4}
+    65%{transform:scale(1.08,.9); opacity:1}
+    80%{transform:scale(.95); opacity:.85}
+    100%{transform:scale(1); opacity:.9}
+  }
+  #app .mishka-wrap .eye{ transform-box:fill-box; transform-origin:center; animation:mg-blink 4.6s infinite; }
+  #app .mishka-wrap .eye.right{ animation-delay:4.4s; }
+  @keyframes mg-blink{ 0%,4%,100%{transform:scaleY(1)} 6%{transform:scaleY(.08)} 8%,10%{transform:scaleY(1)} }
+  #app .mishka-wrap .lid{ opacity:0; transition:opacity .08s; }
+  #app .mishka-wrap .bear:hover .lid{ opacity:1; }
+  #app .mishka-wrap .star{ transform-box:fill-box; transform-origin:center; opacity:0; transform:scale(.3) rotate(0deg); transition:opacity .3s ease,transform .5s ease; }
+  #app .mishka-wrap .bear:hover .star{ opacity:1; animation:mg-twinkle 1.4s ease-in-out infinite; }
+  #app .mishka-wrap .bear:hover .star:nth-of-type(2){ animation-delay:.25s; }
+  #app .mishka-wrap .bear:hover .star:nth-of-type(3){ animation-delay:.5s; }
+  #app .mishka-wrap .bear:hover .star:nth-of-type(4){ animation-delay:.75s; }
+  @keyframes mg-twinkle{
+    0%{opacity:.2; transform:scale(.4) rotate(0deg)}
+    50%{opacity:1; transform:scale(1.15) rotate(35deg)}
+    100%{opacity:.2; transform:scale(.4) rotate(70deg)}
+  }
+  #app .mishka-wrap .body-group{ transform-box:view-box; transform-origin:256px 400px; animation:mg-breathe 4s ease-in-out infinite; }
+  @keyframes mg-breathe{ 0%,100%{transform:scale(1,1)} 50%{transform:scale(1.012,.992)} }
+</style>
+<style>
+/* ---------- ИГРА: АНИМАЦИЯ КЛОНА МЕДВЕДЯ (gbear — вне #app) ---------- */
+  .gbear .bear{ animation:zg-bob 3.2s ease-in-out infinite; }
+  .gbear .ear-left{ transform-box:view-box; transform-origin:150px 90px; animation:mg-earL 3.4s ease-in-out infinite; }
+  .gbear .ear-right{ transform-box:view-box; transform-origin:362px 90px; animation:mg-earR 3.4s ease-in-out -1.2s infinite; }
+  .gbear .head{ transform-box:view-box; transform-origin:256px 250px; animation:mg-nod 5.2s ease-in-out infinite; }
+  .gbear .eye{ transform-box:fill-box; transform-origin:center; animation:mg-blink 4.6s infinite; }
+  .gbear .eye.right{ animation-delay:4.4s; }
+  .gbear .star{ transform-box:fill-box; transform-origin:center; opacity:1; animation:mg-twinkle 1.4s ease-in-out infinite; }
+  .gbear .star:nth-of-type(2){ animation-delay:.25s; }
+  .gbear .star:nth-of-type(3){ animation-delay:.5s; }
+  .gbear .star:nth-of-type(4){ animation-delay:.75s; }
+  .gbear .bear.jumping{ animation:mg-jump .55s cubic-bezier(.3,0,.4,1); }
+  .gbear .bear.jumping .shadow{ transform-box:view-box; transform-origin:256px 470px; animation:mg-shadow .55s cubic-bezier(.3,0,.4,1); }
+  @keyframes zg-bob{ 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-7px) rotate(2.5deg)} }
+/* ---------- СЕМИСЕГМЕНТНЫЕ СЧЁТЧИКИ ---------- */
+  .segd div{ position:absolute; background:#a3ff52; box-shadow:0 0 6px rgba(163,255,82,.75); }
+  .segd div.h{ clip-path:polygon(0% 50%,16% 0%,84% 0%,100% 50%,84% 100%,16% 100%); }
+  .segd div.v{ clip-path:polygon(50% 0%,100% 16%,100% 84%,50% 100%,0% 84%,0% 16%); }
+</style>
+<script>
+(function(){
+  var b=document.querySelector('.mishka-wrap .bear');
+  if(!b) return;
+  function jump(){
+    b.classList.remove('jumping');
+    void b.offsetWidth;
+    b.classList.add('jumping');
+  }
+  b.addEventListener('pointerdown',jump);
+  b.addEventListener('animationend',function(e){ if(e.animationName==='mg-jump') b.classList.remove('jumping'); });
+
+  /* Реакция медведя на нажатие нотных клавиш (раскладки из «УПРАВЛЕНИЕ»):
+     2 ряда: ZSXDCVGBHNM,.;/' + Q2W3ER5T6Y7UI9O0P[]'
+     1 ряд:  AWSEDFTGYHUJKOLP;'
+     Любая из них заставляет медведя прыгнуть в такт нажатию.
+     Автоповтор (e.repeat) пропускаем, чтобы зажатая клавиша не везла перезапуск. */
+  var NOTE_KEYS={};
+  ('ZSXDCVGBHNM,.;/\"Q2W3ER5T6Y7UI9O0P[]\'AWSEDFTGYHUJKOLP').split('').forEach(function(k){ NOTE_KEYS[k.toLowerCase()]=1; });
+  document.addEventListener('keydown',function(e){
+    if(e.repeat) return;
+    var t=e.target;
+    if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+    if(!NOTE_KEYS[(e.key||'').toLowerCase()]) return;
+    jump();
+  });
+})();
+</script>
+</div>
+</div>
+</div>
+
+
+
+
+<!-- ================= ФУТЕР ================= -->
+<footer class="panel row_b" style=" border-radius: 1280px;">
+  <span style="
+    display: flex;
+    width: 100%;
+    margin: 0px 45px;
+   
+">☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩ © 2026▮ Diowkrad Studio ® 2011-2026</span>
+</footer>
+
+<script>
+// Переключение вкладок таб-бара
+document.querySelectorAll('#tabs button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#tabs button').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on');
+    document.querySelectorAll('main section').forEach(function(s){ s.classList.add('view-hidden'); });
+    var target = document.getElementById(btn.dataset.view);
+    if (target) target.classList.remove('view-hidden');
+  });
+});
+</script>
+</div>
+</main>
+<script>
+/* ===== PLANETS_DB — реестр планет (генератор PLANETFORGE, приёмка численная) =====
+   Добавление планеты = одна запись в PLANETS_DB.planets.
+   kind: terrestrial | gas | pulsar | cheese; unlock — EXP для разблокировки.
+   Блок объявлен ДО R46-фона: шейдер дотягивается до реестра в кадре — исключён доступ до инициализации. */
+var PLANETS_DB = {
+  soi: 11,
+  planets: [
+    /* ── ПРОТОКОЛ СИРИУС-B: пустое межзвёздное пространство.
+       1 мировая единица = 1 клетка сетки = 256 св.лет.
+       K-002_SIRIUS-B — нуль координат: трон звезды занят законно.
+       K-001_DIOWKRAD — калибровочная на краю перегона (~18 200 св.лет). ── */
+    { name:'K-002_SIRIUS-B', pos:[0.0, 0.0, 0.0], kind:'pulsar', palette:'#bfe8ff', rings:false, moons:[], jets:true, unlock:0, track:'Star-1.ogg', fx:{"atm": "#757eff", "glow": 1.73, "size": 1.52, "spin": 1, "pulse": 1.5, "jets": {"on": 1, "c1": "#ffffff", "c2": "#00eeff", "sp": 0.158, "len": 9.55}, "ring": {"on": 0, "c": "#d9c294", "sp": 0.059, "in": 1.45, "out": 2.35}, "surf": {"scale": 2.05, "icecov": 0.5, "cloudcov": 0.5, "cityk": 0.9, "aurk": 0.55, "stormk": 0.85, "r1": "#0d0b0d", "r2": "#29211f", "river": "#eff5f9", "fres": "#99ccff"}} },
+    { name:'K-001_DIOWKRAD', pos:[52.0, 0.0, -48.0], kind:'pulsar', palette:'#969696', rings:false, moons:[], jets:true, unlock:0, track:'Star-2.ogg', fx:{"atm": "#9aa4ad", "glow": 1.73, "size": 1.4, "spin": 1, "pulse": 2.2, "jets": {"on": 1, "c1": "#d8dce0", "c2": "#5f8fa0", "sp": 0.158, "len": 7.0}, "ring": {"on": 0, "c": "#d9c294", "sp": 0.059, "in": 1.45, "out": 2.35}, "surf": {"scale": 2.05, "icecov": 0.5, "cloudcov": 0.5, "cityk": 0.9, "aurk": 0.55, "stormk": 0.85, "r1": "#14161a", "r2": "#3a3f45", "river": "#eff5f9", "fres": "#8fb0c0"}} }
+  ]
+};
+var PKIND = { terrestrial:0, cheese:1, gas:2, pulsar:3 };
+function pKind(k){ var e = PLANETS_DB.planets[k]; return e ? (PKIND[e.kind] || 0) : 0; }
+var FIN = PLANETS_DB.planets.length - 1; /* финальная планета маршрута */
+</script>
+<script>
+/* ═══════════════ КОНСТАНТЫ СИМУЛЯЦИИ ФОНА (править здесь) ═══════════════ */
+/* Графика перенесена из GLSL-стенда R46 «ГРАНЬ» без изменений шейдера.      */
+const PLANET_RADIUS_KM  = 29371.0;   /* радиус планеты, км                    */
+const FLIGHT_SPEED_KMH  = 292000.0;   /* скорость полёта, км/ч                 */
+const SIM_TIME_SCALE    = 60.0;      /* 1 реальная секунда = N секунд симуляции */
+const DAY_CYCLE_HOURS   = 1.0;       /* длительность суток, сим-часов         */
+const CAMERA_ALT_KM     = 1000.0;     /* высота орбиты камеры                  */
+const FOV_DEG           = 60.0;      /* вертикальный угол обзора              */
+const RENDER_SCALE      = 1.0;       /* в стенде было 2.3 — для фона тяжело; 1.0 честнее */
+const START_PHASE_RAD   = 0.0;       /* стартовое положение камеры на орбите  */
+
+const CAM_R = 1.0 + CAMERA_ALT_KM / PLANET_RADIUS_KM;
+const ORBIT_PERIOD_SIM_SEC = (2*Math.PI*PLANET_RADIUS_KM/FLIGHT_SPEED_KMH)*3600.0;
+const DAY_CYCLE_SIM_SEC = DAY_CYCLE_HOURS*3600.0;
+const FOV_TAN = Math.tan(FOV_DEG*0.5*Math.PI/180.0);
+/* ════════════════════════════════════════════════════ */
+
+/* шейдеры — дословно из стенда R46, без изменений */
+const VERT = 'attribute vec2 aPos;\nvoid main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
+
+
+
+const FRAG_BASE = `precision highp float;
+uniform vec2  uRes;
+uniform float uTime;
+uniform float uCamA;
+uniform float uSunA;
+uniform vec3 uL0;
+uniform vec3 uL1;
+uniform float uPlanet;
+uniform float uSplash;
+
+#define R    1.0
+#define CAMR __CAMR__
+#define FOT  __FOT__
+
+/* --- хэш и шумы (средний слой) --- */
+float hash13(vec3 p){
+  p = fract(p*0.3183099 + vec3(0.1,0.2,0.3));
+  p *= 17.0;
+  return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
+}
+float vnoise(vec3 x){
+  vec3 i = floor(x);
+  vec3 f = fract(x);
+  f = f*f*(3.0-2.0*f);
+  float n0=hash13(i);
+  float n1=hash13(i+vec3(1.0,0.0,0.0));
+  float n2=hash13(i+vec3(0.0,1.0,0.0));
+  float n3=hash13(i+vec3(1.0,1.0,0.0));
+  float n4=hash13(i+vec3(0.0,0.0,1.0));
+  float n5=hash13(i+vec3(1.0,0.0,1.0));
+  float n6=hash13(i+vec3(0.0,1.0,1.0));
+  float n7=hash13(i+vec3(1.0,1.0,1.0));
+  return mix(mix(mix(n0,n1,f.x),mix(n2,n3,f.x),f.y),
+             mix(mix(n4,n5,f.x),mix(n6,n7,f.x),f.y),f.z);
+}
+/* тяжёлый: 5 октав */
+float fbm5(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
+  return v;
+}
+/* средний: 3 октавы */
+float fbm3(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=0.5; }
+  return v;
+}
+
+/* --- звёзды: три слоя гридов с мерцанием --- */
+vec3 stars(vec3 rd){
+  vec3 c = vec3(0.0);
+  for(int L=0; L<3; L++){
+    float sc = 90.0 + float(L)*80.0;
+    vec3 g  = rd*sc;
+    vec3 id = floor(g);
+    vec3 fr = fract(g) - 0.5;
+    float h = hash13(id + float(L)*37.0);
+    if(h > 0.975){
+      vec3 off = (vec3(hash13(id+1.0), hash13(id+2.0), hash13(id+3.0)) - 0.5)*0.6;
+      float d  = length(fr - off);
+      float tw = 0.55 + 0.45*sin(uTime*(1.0+h*4.0) + h*40.0);
+      float s  = (1.0 - smoothstep(0.0, 0.14, d))*tw;
+      vec3 tint = mix(vec3(0.70,0.80,1.0), vec3(1.0,0.85,0.60), hash13(id+4.0));
+      c += s*tint*(0.35 + h*0.8);
+    }
+  }
+  return c;
+}
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
+
+  /* --- камера: орбита через полюса, ось планеты = Y --- */
+  vec3 camPos = vec3(cos(uCamA)*CAMR, sin(uCamA)*CAMR, 0.0);
+if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
+  vec3 fwd = vec3(-sin(uCamA), cos(uCamA), 0.0);
+  vec3 up0 = normalize(camPos);
+  fwd = normalize(mix(fwd, -up0, 0.22));
+  vec3 right = normalize(cross(fwd, up0));
+  vec3 upv   = cross(right, fwd);
+  vec3 rd    = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
+
+  /* солнце — экваториальный круг с лёгким наклоном; луна — отстает на 0.9 рад */
+  float st = sin(uSunA), ct = cos(uSunA);
+    vec3 sunDir = normalize(uL0);
+    vec3 moonDir = normalize(uL1);
+
+  /* пересечение луча со сферой планеты */
+  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+  vec3 wC = camPos - sC;
+  float b    = dot(wC, rd);
+  float cc   = dot(wC, wC) - R*R;
+  float disc = b*b - cc;
+  float tHit = -b - sqrt(max(disc, 0.0));
+  bool hitP  = (disc > 0.0) && (tHit > 0.0);
+
+  float dayLocal = dot(normalize(camPos), sunDir);
+  float dayness  = smoothstep(-0.25, 0.30, dayLocal);
+
+  vec3 col = vec3(0.0);
+
+  if(hitP){
+    /* ---- ПЛАНЕТА ---- */
+    vec3 p = camPos + rd*tHit;
+    vec3 n = normalize(p);
+    float nl  = dot(n, sunDir);
+    float lit = smoothstep(-0.06, 0.18, nl);
+
+    /* континенты: тяжёлый fbm по нормали, планета медленно вращается */
+    vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
+    float cont = fbm5(sp);
+    float land = smoothstep(0.46, 0.54, cont);
+    /* ДЕТАЛЬ: волнение береговой линии (турбулентность) — плавнее граница суши/океана */
+    float coast = fbm3(n*8.0 + vec3(0.0, uTime*0.006, 0.0));
+    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
+    vec3 ocean = vec3(0.02,0.10,0.22);
+    vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
+
+    /* ДЕТАЛЬ: микро-рельеф суши (горы/равнины) — доп. fbm, не меняет границы суши */
+    float mdet = fbm3(n*12.0 + vec3(uTime*0.003, uTime*0.001, 0.0));
+    landc *= 0.85 + 0.30*mdet;
+
+    float ice  = smoothstep(0.80, 0.94, abs(n.y));
+    vec3 surf  = mix(ocean, landc, land);
+    surf = mix(surf, vec3(0.85,0.90,0.95), ice);
+
+    /* облака: второй тяжёлый слой, свой дрейф */
+    float cl = fbm5(n*4.2 + vec3(uTime*0.010, 0.0, -uTime*0.006));
+    cl = smoothstep(0.50, 0.74, cl);
+    surf = mix(surf, vec3(0.95,0.97,1.0), cl*0.9);
+
+    vec3 colDay = surf*(0.15 + 1.05*lit);
+    /* блик океана */
+    vec3 hv = normalize(sunDir - rd);
+    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
+    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+
+    /* ночь: огни городов на суше, мерцание */
+    float cellH = hash13(floor(n*90.0));
+    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
+    vec3 colNight = surf*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+
+    col = mix(colNight, colDay, lit);
+
+    /* ШИНРАРТА-B: поверхность как у НГАЛИН, эффект голубой #eff5f9 */
+    if(uPlanet > 2.5){
+      vec3 nS = normalize(p - sC);
+      float rock = fbm5(nS*3.2);
+      vec3 surfS = mix(vec3(0.05,0.045,0.05), vec3(0.16,0.13,0.12), rock);
+      float riv1 = fbm3(nS*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
+      float riv2 = fbm3(nS*7.0 - vec3(uTime*0.015, 0.0, 0.0));
+      float lavS = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5))) + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+      lavS = min(lavS, 1.0);
+      float pulS = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
+      col = surfS*(0.05 + 0.9*lit) + vec3(0.937,0.961,0.976)*lavS*pulS*(1.6 + (1.0 - lit)*2.6);
+      float fresS = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+      col += vec3(0.60,0.80,1.0)*fresS*0.45;
+    }
+
+    /* атмосферный ободок на лимбе */
+    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    col += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
+
+    /* полярные сияния на ночном полюсе */
+    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
+    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
+    col += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
+  } else {
+    /* ---- НЕБО ---- */
+    float daySky = smoothstep(-0.15, 0.35, dayLocal);
+
+    /* ночь: база + звёзды + млечный путь */
+    vec3 night = vec3(0.003,0.005,0.011);
+    night += stars(rd)*1.3;
+    float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
+    night += vec3(0.45,0.5,0.7)*bandW*fbm3(rd*4.0)*0.42;
+    night += vec3(0.8,0.75,0.6)*bandW*bandW*0.12; /* тёплая центральная полоса млечного пути */
+
+    /* день: градиент к горизонту, зарево у солнца, облака на куполе */
+    float horiz = 1.0 - abs(dot(rd, up0));
+    vec3 day = mix(vec3(0.22,0.42,0.82), vec3(0.60,0.80,1.0), horiz*0.85);
+    float sunAmt = max(dot(rd, sunDir), 0.0);
+    day += vec3(0.45,0.80,1.0)*pow(sunAmt, 8.0)*0.35; /* голубое свечение пульсара */
+    day += vec3(0.35,0.60,0.92)*pow(sunAmt, 3.0)*0.14;
+    float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
+    skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
+    day = mix(day, vec3(1.0), skycl*0.75);
+
+    col = mix(night, day, daySky);
+
+    if(uPlanet > 2.5){ col = night; }
+
+    /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
+    float closest = length(camPos - rd*b);
+    /* Гасим ореол, когда луч уходит ОТ планеты (b>0 — ближайшая к центру точка
+       луча позади камеры): при развороте камеры на 180° не должно быть засветки.
+       Атмосфера планеты остаётся при взгляде на неё (b<0). */
+    float atmFwd = 1.0 - smoothstep(-0.2, 0.4, b);
+    float atmo = (1.0 - smoothstep(1.0, 1.22, closest))*atmFwd;
+    if(uPlanet < 2.5){ col += vec3(0.30,0.55,1.0)*atmo*dayness*0.85; } else { col += vec3(0.05,0.10,0.24)*atmo; }
+
+  }
+
+
+  /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
+     тёплое ядро у полюса, холодное свечение на конце, турбулентные завихрения */
+  if(uPlanet > 2.5){
+    vec3 jC = sC;
+    vec3 jW = camPos - jC;
+    float bJ = rd.y;
+    float dJd = dot(rd, jW);
+    float eJ = jW.y;
+    float denJ = 1.0 - bJ*bJ;
+    if(abs(denJ) > 0.0001){
+      float sJ = (eJ - dJd*bJ)/denJ;
+      float tJ = sJ*bJ - dJd;
+      if(tJ > 0.0){
+        float aJ = abs(sJ);
+        /* длинные струи: вдоль оси до 6.5, колокол у полюса */
+        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, 6.5, aJ));
+        /* расширение струи с высотой — конус плазмы */
+        float wJ = 0.04;   /* постоянная ширина струи (не расширяется при отлёте) */
+        vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
+        float rJ = length(cpt);
+        /* турбулентность: закрученные струи — смещение ядра по aJ+second cooperative */
+        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*0.0833);
+        float off = 0.30*(1.0 - exp(-aJ*1.4));
+        float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
+        /* тёплое основание / холодная плазма сверху + неоновый обод */
+        float cool = smoothstep(0.8, 4.2, aJ);
+        vec3 jetCol = mix(vec3(1.0,0.55,0.20), vec3(0.45,0.75,1.0), cool);
+        float twinkle = 0.75 + 0.25*sin(uTime*0.0833 + aJ*5.0);
+        /* основной светящийся шлейф */
+        col += jetCol*along*prof*twinkle*1.6;
+        /* яркое ядро */
+        float core = exp(-(rJ*rJ)/(wJ*wJ*0.10)*0.5);
+        col += vec3(0.95,0.97,1.0)*along*core*twinkle*1.1;
+        /* закрутка: лёгкое смещение потока от оси создаёт живой вихрь */
+        float swirl = exp(-( (rJ - off*turb)*(rJ - off*turb) )/(wJ*wJ*0.6)*0.5);
+        col += jetCol*along*swirl*turb*0.6;
+      }
+    }
+  }
+  /* дизеринг против бандинга */
+  col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
+  /* PBR-тонмаппинг: white-preserving Reinhard (SuperDuperVanilla) + гамма 2.2 */
+  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  float wpres = 1.5; /* WHITE_PRESERVATION */
+  float tm = (luma * (1.0 + luma / (wpres*wpres))) / (1.0 + luma);
+  col = pow(max(col * (tm / max(luma, 1e-6)), 0.0), vec3(1.0 / 2.2));
+  /* мягкая виньетка */
+  float vig = 1.0 - 0.16*dot(uv*0.6, uv*0.6);
+  col *= max(vig, 0.0);
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+const FRAG = `precision highp float;
+uniform vec2  uRes;
+uniform float uTime;
+uniform float uCamA;
+uniform float uSunA;
+uniform vec3 uL0;
+uniform vec3 uL1;
+uniform vec3  uCamPos;
+uniform vec3  uCamR;
+uniform vec3  uCamU;
+uniform vec3  uCamF;
+uniform float uPlanet;
+uniform float uSplash;
+uniform vec3  uP[8];   /* дальние планеты — позиции относительно текущей (или мировые в гипер) */
+uniform float uPKa[8]; /* индексы дальних планет (тип поверхности 0..3) */
+uniform float uPCount; /* сколько дальних планет передано в кадре */
+uniform float uHyper;  /* 1 = гиперпространство: небо Нгалин, 4 сферы, солнце стоит */
+uniform vec3  uP4;     /* гиперпространство: позиция 4-й планеты (текущей), мировые координаты */
+uniform float uPK4;
+/* ==== FX/SURF-ЮНИФОРМЫ EFFECTFORGE (дефолты = константы игры) ==== */
+uniform vec3  uAtmC; uniform float uAtmGlow; uniform float uAtmSize;
+uniform float uJetsOn; uniform vec3 uJetsC1; uniform vec3 uJetsC2; uniform float uJetsSp; uniform float uJetsLen;
+uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float uRingIn; uniform float uRingOut;
+uniform float uSpin; uniform float uPulseR;
+uniform float uSurfScale;
+uniform sampler2D uPal;   /* палитра лодов: 16x9, строка = планета */
+uniform float uPIa[8];    /* строка палитры каждой дальней планеты */
+uniform float uPIcur;     /* строка палитры текущей планеты */
+uniform vec3  uOceanC; uniform vec3 uLand1C; uniform vec3 uLand2C; uniform vec3 uIceC; uniform float uIceCov;
+uniform vec3  uCloudC; uniform float uCloudCov; uniform vec3 uCityC; uniform float uCityK;
+uniform vec3  uAurC; uniform float uAurK;
+uniform vec3  uBand1C; uniform vec3 uBand2C; uniform vec3 uBand3C; uniform vec3 uStormC; uniform float uStormK;
+uniform vec3  uHazeC; uniform vec3 uFogC;
+uniform vec3  uRock1C; uniform vec3 uRock2C; uniform vec3 uLavaC; uniform vec3 uFresC; uniform vec3 uRiverC; uniform vec3 uFres2C;
+/* CUR-страж: 1 = рисуется текущая планета (живые настройки), 0 = дальние (константы игры) */
+float gCur = 0.0;
+#define CURE(u, d) ((gCur > 0.5) ? (u) : (d))
+#define SPIN ((gCur > 0.5) ? uSpin : (paln(9.0, 0.0)*8.0))
+#define SCL  ((gCur > 0.5) ? uSurfScale : (paln(7.0, 0.0)*8.0))
+float gRow = 0.0;
+vec4 palV(float slot){ return texture2D(uPal, vec2((slot + 0.5)/16.0, (clamp(gRow, 0.0, 8.0) + 0.5)/9.0)); }
+vec3 palc(float slot){ return palV(slot).rgb; }
+float paln(float slot, float ch){
+  vec4 v = palV(slot);
+  return (ch < 0.5) ? v.r : (ch < 1.5) ? v.g : (ch < 2.5) ? v.b : v.a;
+}
+    /* гиперпространство: тип (индекс) 4-й планеты */
+
+#define R    1.0
+#define CAMR __CAMR__
+#define FOT  __FOT__
+
+/* --- хэш и шумы (средний слой) --- */
+float hash13(vec3 p){
+  p = fract(p*0.3183099 + vec3(0.1,0.2,0.3));
+  p *= 17.0;
+  return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
+}
+float vnoise(vec3 x){
+  vec3 i = floor(x);
+  vec3 f = fract(x);
+  f = f*f*(3.0-2.0*f);
+  float n0=hash13(i);
+  float n1=hash13(i+vec3(1.0,0.0,0.0));
+  float n2=hash13(i+vec3(0.0,1.0,0.0));
+  float n3=hash13(i+vec3(1.0,1.0,0.0));
+  float n4=hash13(i+vec3(0.0,0.0,1.0));
+  float n5=hash13(i+vec3(1.0,0.0,1.0));
+  float n6=hash13(i+vec3(0.0,1.0,1.0));
+  float n7=hash13(i+vec3(1.0,1.0,1.0));
+  return mix(mix(mix(n0,n1,f.x),mix(n2,n3,f.x),f.y),
+             mix(mix(n4,n5,f.x),mix(n6,n7,f.x),f.y),f.z);
+}
+/* тяжёлый: 5 октав */
+float fbm5(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
+  return v;
+}
+/* средний: 3 октавы */
+float fbm3(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=0.5; }
+  return v;
+}
+
+/* --- звёзды: три слоя гридов с мерцанием --- */
+vec3 stars(vec3 rd){
+  vec3 c = vec3(0.0);
+  for(int L=0; L<3; L++){
+    float sc = 90.0 + float(L)*80.0;
+    vec3 g  = rd*sc;
+    vec3 id = floor(g);
+    vec3 fr = fract(g) - 0.5;
+    float h = hash13(id + float(L)*37.0);
+    if(h > 0.975){
+      vec3 off = (vec3(hash13(id+1.0), hash13(id+2.0), hash13(id+3.0)) - 0.5)*0.6;
+      float d  = length(fr - off);
+      float tw = 0.55 + 0.45*sin(uTime*(1.0+h*4.0) + h*40.0);
+      float s  = (1.0 - smoothstep(0.0, 0.14, d))*tw;
+      vec3 tint = mix(vec3(0.70,0.80,1.0), vec3(1.0,0.85,0.60), hash13(id+4.0));
+      c += s*tint*(0.35 + h*0.8);
+    }
+  }
+  return c;
+}
+
+/* ОСВЕЩЁННАЯ ПОВЕРХНОСТЬ ПЛАНЕТЫ: единый источник истины — близкая и дальние
+   планеты рисуются одной функцией, поэтому ЛОД 1-в-1 повторяет анимацию реальной. */
+vec3 shadeSurface(int k, vec3 n, float lit, vec3 rd, vec3 sunDir){
+  vec3 r = vec3(0.0);
+  if(k == 0){
+    vec3  sp   = n*(2.6*SCL) + vec3(0.0, 0.0, uTime*0.004*SPIN);
+    float cont = fbm5(sp);
+    float land = smoothstep(0.46, 0.54, cont);
+    float coast = fbm3(n*(8.0*SCL) + vec3(0.0, uTime*0.006*SPIN, 0.0));
+    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
+    vec3 ocean = palc(0.0);
+    vec3 landc = mix(palc(1.0), palc(2.0), smoothstep(0.52,0.78,cont));
+    float mdet = fbm3(n*(12.0*SCL) + vec3(uTime*0.003*SPIN, uTime*0.001*SPIN, 0.0));
+    landc *= 0.85 + 0.30*mdet;
+    float ice  = smoothstep(0.94 - 0.28*paln(7.0, 1.0), 0.94, abs(n.y));
+    vec3 surf  = mix(ocean, landc, land);
+    surf = mix(surf, palc(3.0), ice);
+    float cl = fbm5(n*(4.2*SCL) + vec3(uTime*0.010*SPIN, 0.0, -uTime*0.006*SPIN));
+    cl = smoothstep(0.62 - (0.12 + 0.24*paln(7.0, 2.0)), 0.62 + (0.12 + 0.24*paln(7.0, 2.0)), cl);
+    surf = mix(surf, palc(4.0), cl*0.9);
+    vec3 colDay = surf*(0.15 + 1.05*lit);
+    vec3 hv = normalize(sunDir - rd);
+    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
+    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+    float cellH = hash13(floor(n*90.0));
+    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
+    vec3 colNight = surf*0.03 + palc(5.0)*city*paln(8.0, 0.0)*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+    r = mix(colNight, colDay, lit);
+    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
+    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
+    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
+    r += palc(6.0)*aurZ*smoothstep(0.45,0.75,aur)*paln(8.0, 1.0);
+  } else if(k == 1){
+    float lat = n.y;
+    float warp = fbm3(n*(2.6*SCL) + vec3(uTime*0.008*SPIN, 0.0, 0.0));
+    float bands = sin(lat*16.0 + warp*3.2);
+    float bands2 = sin(lat*34.0 + 1.7);
+    vec3 band1 = palc(0.0);
+    vec3 band2 = palc(1.0);
+    vec3 band3 = palc(2.0);
+    vec3 surf = mix(band1, band2, smoothstep(-0.6, 0.6, bands));
+    surf = mix(surf, band3, 0.5 + 0.5*sin(lat*7.0 + 1.0));
+    surf = mix(surf, band2*0.92, 0.25*smoothstep(0.3, 0.9, bands2));
+    vec3 sdir = normalize(vec3(cos(uTime*0.02*SPIN + 2.0), -0.30, sin(uTime*0.02*SPIN + 2.0)));
+    float angS = acos(clamp(dot(n, sdir), -1.0, 1.0));
+    float storm = 1.0 - smoothstep(0.05, 0.16, angS);
+    surf = mix(surf, palc(3.0), storm*paln(7.0, 3.0));
+    surf *= 0.92 + 0.16*fbm3(n*(9.0*SCL) + vec3(uTime*0.05*SPIN, 0.0, 0.0));
+    r = surf*(0.06 + 1.05*lit);
+    float fresA = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += palc(4.0)*fresA*(0.2 + 0.8*lit)*0.8;
+    float azi = dot(n, rd);
+    float entry = smoothstep(-0.20, 0.05, azi);
+    float blurAtm = entry*0.50;
+    r = mix(r, palc(5.0)*(0.5 + 0.6*lit), blurAtm);
+    float fogT = fbm3(n*6.0 + vec3(uTime*0.02, 0.0, uTime*0.011))-0.5;
+    float fogB = smoothstep(-0.10, 0.30, fogT);
+    float fogWide = 0.5 + 0.5*sin(lat*20.0 + fogT*7.0 + uTime*0.03);
+    float fogAmt = fogB*(0.30 + 0.70*fogWide)*(0.55 + 0.45*entry)*(0.75 + 0.25*lit);
+    r = mix(r, palc(6.0), clamp(fogAmt, 0.0, 1.0)*0.55);
+  } else if(k == 2){
+    float rock = fbm5(n*3.2);
+    vec3 surf = mix(palc(0.0), palc(1.0), rock);
+    float riv1 = fbm3(n*(3.5*SCL) + vec3(0.0, uTime*0.02*SPIN, uTime*0.013*SPIN));
+    float riv2 = fbm3(n*(7.0*SCL) - vec3(uTime*0.015*SPIN, 0.0, 0.0));
+    float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+               + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+    lava = min(lava, 1.0);
+    float pulse = 0.75 + 0.25*sin(uTime*1.5*(paln(8.0, 2.0)*8.0) + riv1*40.0);
+    r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
+    float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += palc(3.0)*fresP*0.25;
+  } else {
+    float rock = fbm5(n*3.2);
+    vec3 surf = mix(palc(0.0), palc(1.0), rock);
+    float riv1 = fbm3(n*(3.5*SCL) + vec3(0.0, uTime*0.02*SPIN, uTime*0.013*SPIN));
+    float riv2 = fbm3(n*(7.0*SCL) - vec3(uTime*0.015*SPIN, 0.0, 0.0));
+    float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+               + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+    lava = min(lava, 1.0);
+    float pulse = 0.75 + 0.25*sin(uTime*1.5*(paln(8.0, 2.0)*8.0) + riv1*40.0);
+    r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
+    float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
+    r += palc(3.0)*fresP*0.45;
+  }
+  return r;
+}
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
+
+  /* --- камера: свободный полёт — позиция и базис приходят из JS --- */
+  vec3 camPos = uCamPos;
+  vec3 fwd    = normalize(uCamF);
+  vec3 right  = normalize(uCamR);
+  vec3 upv    = normalize(uCamU);
+  vec3 rd     = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
+  vec3 up0    = normalize(camPos);
+
+  /* солнце — экваториальный круг с лёгким наклоном; луна — отстает на 0.9 рад */
+  float st = sin(uSunA), ct = cos(uSunA);
+    vec3 sunDir = normalize(uL0);
+    vec3 moonDir = normalize(uL1);
+
+  /* пересечение луча со сферой планеты */
+  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+  vec3 wC = camPos - sC;
+  float b    = dot(wC, rd);
+  float cc   = dot(wC, wC) - R*R;
+  float disc = b*b - cc;
+  float tHit = -b - sqrt(max(disc, 0.0));
+  bool hitP  = (uHyper < 0.5) && (disc > 0.0) && (tHit > 0.0); /* PHANTOM-GATE: в гипере/суперкруизе сфера текущей планеты не существует — её место занимает дальний цикл реестра */
+
+  float dayLocal = dot(normalize(camPos), sunDir);
+  float dayness  = smoothstep(-0.25, 0.30, dayLocal);
+
+  /* ПУЗЫРЬ АТМОСФЕРЫ: дневное небо живёт только внутри пузыря R=1.90 */
+  float camR  = length(camPos);
+  float atmIn = 1.0 - smoothstep(1.786, 1.90, camR);
+
+  /* цвет атмосферы по планете: ХИТОМИ голубая, ЧИЗИЯ #905000, НГАЛИН #300090 */
+  vec3 atmC = uAtmC;
+
+  vec3 col = vec3(0.0);
+
+  if(hitP){
+    /* ---- ПЛАНЕТА (ЛОД 1-в-1: единая функция поверхности) ---- */
+    vec3 p = camPos + rd*tHit;
+    vec3 n = normalize(p - sC);
+    float nl  = dot(n, sunDir);
+    float lit = smoothstep(-0.06, 0.18, nl);
+    int ki = (uPlanet < 0.5) ? 0 : ((uPlanet < 1.5) ? 1 : ((uPlanet < 2.5) ? 2 : 3));
+    gRow = uPIcur;
+    gCur = 1.0;
+    col = shadeSurface(ki, n, lit, rd, sunDir);
+  } else {
+    /* ---- НЕБО ---- */
+    /* ГИПЕРПРОСТРАНСТВО = готовое небо планеты ХИТОМИ (без магмы/градиентов),
+       солнце заморожено в одной точке (см. uSunA при hypOn), луны выкинуты. */
+    float daySky = smoothstep(-0.15, 0.35, dayLocal);
+
+    /* ночь: база + звёзды + млечный путь */
+    vec3 night = vec3(0.003,0.005,0.011);
+    night += stars(rd)*1.3;
+    float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
+    night += vec3(0.45,0.5,0.7)*bandW*fbm3(rd*4.0)*0.42;
+    night += vec3(0.8,0.75,0.6)*bandW*bandW*0.12; /* тёплая центральная полоса млечного пути */
+
+    /* день: градиент к горизонту, зарево у солнца, облака на куполе */
+    float horiz = 1.0 - abs(dot(rd, up0));
+    vec3 day = mix(atmC*0.83, mix(atmC, vec3(1.0), 0.42), horiz*0.85);
+    float sunAmt = max(dot(rd, sunDir), 0.0);
+    day += vec3(0.45,0.80,1.0)*pow(sunAmt, 8.0)*0.35; /* голубое свечение пульсара */
+    day += vec3(0.35,0.60,0.92)*pow(sunAmt, 3.0)*0.14;
+    float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
+    skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
+    day = mix(day, vec3(1.0), skycl*0.75);
+
+    col = mix(night, day, daySky*atmIn);
+    if(uPlanet > 2.5){ col = night; } else {
+    }
+
+    /* GRID-256: межзвёздная сетка — 1 клетка = 256 св.лет, только в транзите */
+    if(uHyper > 0.5 && abs(rd.y) > 1.0e-4){
+      float tg = -camPos.y/rd.y;
+      if(tg > 0.0){
+        vec3 gpt = camPos + rd*tg;
+        vec2 gq = gpt.xz;
+        vec2 gd = abs(fract(gq + 0.5) - 0.5);
+        float lw = tg*0.0012;
+        float gline = 1.0 - smoothstep(lw, lw*3.0, min(gd.x, gd.y));
+        float gfade = exp(-tg*0.016);
+        col = mix(col, vec3(0.10,0.55,0.35), clamp(gline*gfade, 0.0, 1.0)*0.9);
+      }
+    }
+
+    /* ореол атмосферы у лимба (лучи мимо планеты) */
+    float closest = length(camPos - rd*b);
+    /* Гасим ореол, когда луч уходит ОТ планеты (b>0 — ближайшая к центру точка
+       луча позади камеры): при развороте камеры на 180° не должно быть засветки.
+       Атмосфера планеты остаётся при взгляде на неё (b<0). */
+    float atmFwd = 1.0 - smoothstep(-0.2, 0.4, b);
+    float atmo = (1.0 - smoothstep(1.0, uAtmSize, closest))*atmFwd;
+    if(uPlanet < 2.5){
+      col += atmC*atmo*dayness*atmIn*uAtmGlow;
+      /* ЧИЗИЯ: анизотропное размытие входа в атмосферу — внешний ореол шире и мягче,
+         по мере входа в толщу атмосферы (atmo 0→1) добавляется туманное свечение до 50% */
+      if(uPlanet > 0.5 && uPlanet < 1.5){
+        float atmoIn = smoothstep(0.15, 1.0, atmo);
+        col = mix(col, vec3(0.88, 0.70, 0.42)*(0.5 + 0.5*dayness), atmoIn*0.5);
+      }
+    } else { col += CURE(uAtmC, vec3(0.05,0.10,0.24))*atmo; }
+
+  }
+  
+
+
+  /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
+     тёплое ядро у полюса, холодное свечение на конце, турбулентные завихрения */
+  if(uHyper <= 0.5 && (uPlanet > 2.5 || uJetsOn > 0.5)){
+    vec3 jC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+    vec3 jW = camPos - jC;
+    float bJ = rd.y;
+    float dJd = dot(rd, jW);
+    float eJ = jW.y;
+    float denJ = 1.0 - bJ*bJ;
+    if(abs(denJ) > 0.0001){
+      float sJ = (eJ - dJd*bJ)/denJ;
+      float tJ = sJ*bJ - dJd;
+      if(tJ > 0.0){
+        float aJ = abs(sJ);
+        /* длинные струи: вдоль оси до 6.5, колокол у полюса */
+        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, uJetsLen, aJ));
+        /* расширение струи с высотой — конус плазмы */
+        float wJ = 0.04;   /* постоянная ширина струи (не расширяется при отлёте) */
+        vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
+        float rJ = length(cpt);
+        /* турбулентность: закрученные струи — смещение ядра по aJ */
+        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*uJetsSp);
+        float off = 0.30*(1.0 - exp(-aJ*1.4));
+        float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
+        /* тёплое основание / холодная плазма сверху + неоновый обод */
+        float cool = smoothstep(0.8, 4.2, aJ);
+        vec3 jetCol = mix(uJetsC1, uJetsC2, cool);
+        float twinkle = 0.75 + 0.25*sin(uTime*uJetsSp + aJ*5.0);
+        /* основной светящийся шлейф */
+        col += jetCol*along*prof*twinkle*1.6;
+        /* яркое ядро */
+        float core = exp(-(rJ*rJ)/(wJ*wJ*0.10)*0.5);
+        col += vec3(0.95,0.97,1.0)*along*core*twinkle*1.1;
+        /* закрутка: лёгкое смещение потока от оси создаёт живой вихрь */
+        float swirl = exp(-( (rJ - off*turb)*(rJ - off*turb) )/(wJ*wJ*0.6)*0.5);
+        col += jetCol*along*swirl*turb*0.6;
+      }
+    }
+  }
+  /* ---- ДАЛЬНИЕ ПЛАНЕТЫ (3D-ЛОД) + ГИПЕР 4-я: корректное перекрытие без z-буфера.
+       Ищем ближайшую по лучу сферу (минимальный t) среди всех кандидатов и рисуем
+       только её — это убирает просвечивание/наложение планет сквозь планеты. ---- */
+  float bestT = 1.0e9;
+  vec3 sphCol = vec3(0.0);
+  bool haveSph = false;
+  for(int di = 0; di < 8; di++){
+    if(di >= int(uPCount + 0.5)) break;
+    vec3 pc = uP[di];
+    int dk = int(uPKa[di] + 0.5);
+    if(di < int(uPCount + 0.5)){
+      vec3 wc = camPos - pc;
+      float bb = dot(wc, rd);
+      float cc2 = dot(wc, wc) - R*R;
+      float dsc = bb*bb - cc2;
+      if(dsc > 0.0){
+        float th = -bb - sqrt(dsc);
+        if(th > 0.0 && th < bestT && (!hitP || th < tHit)){
+          vec3 pp = camPos + rd*th;
+          vec3 nn = normalize(pp - pc);
+          float dnl  = dot(nn, sunDir);
+          float dlit = smoothstep(-0.02, 0.10, dnl);
+          gRow = uPIa[di];
+          gCur = 0.0;
+          sphCol = shadeSurface(dk, nn, dlit, rd, sunDir);
+          float muL = clamp(dot(nn, -rd), 0.0, 1.0);
+          sphCol *= (0.38 + 0.62*pow(muL, 0.55));
+          float bt2 = (dnl - 0.015)/0.085;
+          float bandT = exp(-bt2*bt2);
+          sphCol += vec3(1.0, 0.44, 0.20)*bandT*0.30*max(dlit, 0.12);
+          bestT = th; haveSph = true;
+        }
+      }
+    }
+  }
+  /* гиперпространство: 4-я сфера (текущая планета, мировые координаты) — тоже кандидат */
+  if(uHyper > 0.5){
+    vec3 wc4 = camPos - uP4;
+    float bb4 = dot(wc4, rd);
+    float cc4 = dot(wc4, wc4) - R*R;
+    float ds4 = bb4*bb4 - cc4;
+    if(ds4 > 0.0){
+      float th4 = -bb4 - sqrt(ds4);
+      if(uHyper > 0.5 && th4 > 0.0 && th4 < bestT && (!hitP || th4 < tHit)){
+        vec3 pp4 = camPos + rd*th4;
+        vec3 nn4 = normalize(pp4 - uP4);
+        float nl4  = dot(nn4, sunDir);
+        float lit4 = smoothstep(-0.02, 0.10, nl4);
+        gRow = uPIcur;
+        gCur = 1.0;
+        sphCol = shadeSurface(int(uPK4 + 0.5), nn4, lit4, rd, sunDir);
+        float muL4 = clamp(dot(nn4, -rd), 0.0, 1.0);
+        sphCol *= (0.38 + 0.62*pow(muL4, 0.55));
+        float bt24 = (nl4 - 0.015)/0.085;
+        float bandT4 = exp(-bt24*bt24);
+        sphCol += vec3(1.0, 0.44, 0.20)*bandT4*0.30*max(lit4, 0.12);
+        bestT = th4; haveSph = true;
+      }
+    }
+  }
+  if(haveSph){ col = sphCol; }
+/* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
+  /* RING-DEPTH: кольца — последний слой глубины (после планет); окклюзия на пиксель */
+  if(uHyper <= 0.5 && uRingOn > 0.5){
+    vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
+    float denom = dot(rd, nR);
+    if(abs(denom) > 0.0035){
+      float tR = -dot(camPos, nR)/denom;
+      if(tR > 0.05 && (!hitP || tR < tHit) && (!haveSph || tR < bestT)){
+        vec3 q = camPos + rd*tR;
+        float rr = length(q);
+        if(rr > uRingIn && rr < uRingOut){
+          float gap = smoothstep(mix(uRingIn,uRingOut,0.3444), mix(uRingIn,uRingOut,0.3667), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.4333), mix(uRingIn,uRingOut,0.4556), rr));
+          float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
+          float edge = smoothstep(uRingIn, mix(uRingIn,uRingOut,0.0778), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.9222), uRingOut, rr));
+          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
+          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
+          float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
+          alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
+          /* Убрать дальнюю дугу колец (за планетой от камеры): оставить только
+             полукольцо на ближней стороне. dot(q,camPos)>0 — та же сторона, что камера. */
+          float nearHalf = step(0.0, dot(q, camPos));
+          alpha *= nearHalf;
+          col = mix(col, uRingC*bright, alpha*0.9);
+          /* ТУМАН В КОЛЬЦАХ (ЧИЗИЯ): лёгкая слоистая дымка, гуще у внутреннего края
+             и на ночной стороне — как застывший туман диска кол. */
+          float rngFog = fbm3(q*3.5 + vec3(uTime*0.015, 0.0, 0.0));
+          float fogR = smoothstep(1.45, 1.55, rr)*(1.0 - smoothstep(1.9, 2.2, rr));
+          float fogRing = clamp((0.35 + 0.65*rngFog)*fogR*(0.6 + 0.4*shadow)*abs(denom)*20.0, 0.0, 1.0);
+          col = mix(col, uRingC*bright, fogRing*0.35);
+        }
+      }
+    }
+  }
+  /* дизеринг против бандинга */
+  col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
+  /* PBR-тонмаппинг: white-preserving Reinhard (SuperDuperVanilla) + гамма 2.2 */
+  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  float wpres = 1.5; /* WHITE_PRESERVATION */
+  float tm = (luma * (1.0 + luma / (wpres*wpres))) / (1.0 + luma);
+  col = pow(max(col * (tm / max(luma, 1e-6)), 0.0), vec3(1.0 / 2.2));
+  /* мягкая виньетка */
+  float vig = 1.0 - 0.16*dot(uv*0.6, uv*0.6);
+  col *= max(vig, 0.0);
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+
+
+const FRAG_SRC = FRAG
+  .replace('__CAMR__', CAM_R.toFixed(6))
+  .replace('__FOT__', FOV_TAN.toFixed(6));
+const FRAG_BASE_SRC = FRAG_BASE
+  .replace('__CAMR__', CAM_R.toFixed(6))
+  .replace('__FOT__', FOV_TAN.toFixed(6));
+
+(function(){
+'use strict';
+const cv = document.getElementById('glbg');
+const gl = cv.getContext('webgl', {antialias:false, depth:false, alpha:false})
+        || cv.getContext('experimental-webgl', {antialias:false, depth:false, alpha:false});
+if(!gl){
+  cv.remove();
+  console.warn('R46 ФОН: WebGL недоступен — фон остаётся базовым, интерфейс не затронут');
+  return;
+}
+function sh(type, srcStr){
+  const s = gl.createShader(type);
+  gl.shaderSource(s, srcStr);
+  gl.compileShader(s);
+  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+    const log = gl.getShaderInfoLog(s) || 'неизвестная ошибка';
+    console.error('R46 ФОН: ошибка шейдера:\n' + log);
+    return null;
+  }
+  return s;
+}
+const prog = gl.createProgram();
+const vs = sh(gl.VERTEX_SHADER, VERT);
+let fs = sh(gl.FRAGMENT_SHADER, FRAG_SRC);
+let bgFallback = false;
+if(!fs){
+  bgFallback = true;
+  fs = sh(gl.FRAGMENT_SHADER, FRAG_BASE_SRC);
+}
+if(!vs || !fs){
+  console.error('R46 ФОН: оба шейдера не собрались — фон отключён');
+  cv.remove();
+  return;
+}
+gl.attachShader(prog, vs);
+gl.attachShader(prog, fs);
+gl.linkProgram(prog);
+if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+  console.error('R46 ФОН: ошибка линковки:\n' + (gl.getProgramInfoLog(prog)||''));
+  cv.remove();
+  return;
+}
+if(bgFallback){
+  console.warn('R46 ФОН: игровой шейдер не собрался — работает базовый ХИТОМИ (см. ошибку компиляции выше)');
+}
+window.__bgInfo = { fallback: bgFallback };
+gl.useProgram(prog);
+
+/* один большой треугольник на весь экран */
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+const locA = gl.getAttribLocation(prog, 'aPos');
+gl.enableVertexAttribArray(locA);
+gl.vertexAttribPointer(locA, 2, gl.FLOAT, false, 0, 0);
+
+const uRes = gl.getUniformLocation(prog, 'uRes');
+const uT   = gl.getUniformLocation(prog, 'uTime');
+const uCA  = gl.getUniformLocation(prog, 'uCamA');
+const uSA  = gl.getUniformLocation(prog, 'uSunA');
+const uL0L = gl.getUniformLocation(prog, 'uL0');
+const uL1L = gl.getUniformLocation(prog, 'uL1');
+const uCP = gl.getUniformLocation(prog, 'uCamPos');
+const uCR = gl.getUniformLocation(prog, 'uCamR');
+const uCU = gl.getUniformLocation(prog, 'uCamU');
+const uCF = gl.getUniformLocation(prog, 'uCamF');
+const uPL = gl.getUniformLocation(prog, 'uPlanet');
+const uSP = gl.getUniformLocation(prog, 'uSplash');
+const uP  = gl.getUniformLocation(prog, 'uP');
+const uPKa = gl.getUniformLocation(prog, 'uPKa');
+const uPC = gl.getUniformLocation(prog, 'uPCount');
+const uHY = gl.getUniformLocation(prog, 'uHyper');
+const uP4 = gl.getUniformLocation(prog, 'uP4');
+const uK4 = gl.getUniformLocation(prog, 'uPK4');
+/* ==== FX/SURF-локации EFFECTFORGE ==== */
+const uAtmC = gl.getUniformLocation(prog, 'uAtmC');
+const uAtmGlow = gl.getUniformLocation(prog, 'uAtmGlow');
+const uAtmSize = gl.getUniformLocation(prog, 'uAtmSize');
+const uJetsOn = gl.getUniformLocation(prog, 'uJetsOn');
+const uJetsC1 = gl.getUniformLocation(prog, 'uJetsC1');
+const uJetsC2 = gl.getUniformLocation(prog, 'uJetsC2');
+const uJetsSp = gl.getUniformLocation(prog, 'uJetsSp');
+const uJetsLen = gl.getUniformLocation(prog, 'uJetsLen');
+const uRingOn = gl.getUniformLocation(prog, 'uRingOn');
+const uRingC = gl.getUniformLocation(prog, 'uRingC');
+const uRingSp = gl.getUniformLocation(prog, 'uRingSp');
+const uRingIn = gl.getUniformLocation(prog, 'uRingIn');
+const uRingOut = gl.getUniformLocation(prog, 'uRingOut');
+const uSpin = gl.getUniformLocation(prog, 'uSpin');
+const uPulseR = gl.getUniformLocation(prog, 'uPulseR');
+const uSurfScale = gl.getUniformLocation(prog, 'uSurfScale');
+const uOceanC = gl.getUniformLocation(prog, 'uOceanC');
+const uLand1C = gl.getUniformLocation(prog, 'uLand1C');
+const uLand2C = gl.getUniformLocation(prog, 'uLand2C');
+const uIceC = gl.getUniformLocation(prog, 'uIceC');
+const uIceCov = gl.getUniformLocation(prog, 'uIceCov');
+const uCloudC = gl.getUniformLocation(prog, 'uCloudC');
+const uCloudCov = gl.getUniformLocation(prog, 'uCloudCov');
+const uCityC = gl.getUniformLocation(prog, 'uCityC');
+const uCityK = gl.getUniformLocation(prog, 'uCityK');
+const uAurC = gl.getUniformLocation(prog, 'uAurC');
+const uAurK = gl.getUniformLocation(prog, 'uAurK');
+const uBand1C = gl.getUniformLocation(prog, 'uBand1C');
+const uBand2C = gl.getUniformLocation(prog, 'uBand2C');
+const uBand3C = gl.getUniformLocation(prog, 'uBand3C');
+const uStormC = gl.getUniformLocation(prog, 'uStormC');
+const uStormK = gl.getUniformLocation(prog, 'uStormK');
+const uHazeC = gl.getUniformLocation(prog, 'uHazeC');
+const uFogC = gl.getUniformLocation(prog, 'uFogC');
+const uRock1C = gl.getUniformLocation(prog, 'uRock1C');
+const uRock2C = gl.getUniformLocation(prog, 'uRock2C');
+const uLavaC = gl.getUniformLocation(prog, 'uLavaC');
+const uFresC = gl.getUniformLocation(prog, 'uFresC');
+const uRiverC = gl.getUniformLocation(prog, 'uRiverC');
+const uFres2C = gl.getUniformLocation(prog, 'uFres2C');
+const uPal = gl.getUniformLocation(prog, 'uPal');
+const uPIa = gl.getUniformLocation(prog, 'uPIa');
+const uPIcur = gl.getUniformLocation(prog, 'uPIcur');
+/* ==== EFFECTFORGE: дефолты по типам (= константы игры) и заливка fx текущей планеты ==== */
+function fxHex(h, d){
+  if(typeof h !== 'string'){ return d; }
+  var m = /^#?([0-9a-fA-F]{6})$/.exec(h.trim());
+  if(!m){ return d; }
+  var v = parseInt(m[1], 16);
+  return [((v>>16)&255)/255, ((v>>8)&255)/255, (v&255)/255];
+}
+function fxNum(v, d){ return (typeof v === 'number' && isFinite(v)) ? v : d; }
+/* ==== ПАЛИТРА ЛОДОВ: текстура 16x9 из PLANETS_DB (строка = планета) ====
+   колонки 0..6 — surf-цвета по типу, 7 — (scale/8, icecov, cloudcov, stormk),
+   8 — (cityk, aurk, pulse/8), 9 — (spin/8). NEAREST+CLAMP, юнит 0. ==== */
+var PAL_TEX = null, PAL_SIG = '';
+function palBuildUpload(){
+  if(!gl || !uPal) return;
+  var pl = (PLANETS_DB && PLANETS_DB.planets) ? PLANETS_DB.planets : [];
+  var sig = JSON.stringify(pl);
+  if(PAL_TEX && sig === PAL_SIG) return;
+  PAL_SIG = sig;
+  var W = 16, H = 9;
+  var data = new Uint8Array(W*H*4);
+  function pc(h, dh){
+    var r = fxHex(h, null);
+    if(!r) r = fxHex(dh, null);
+    return r || [1, 1, 1];
+  }
+  function put(row, col, rgb, a){
+    var o = ((row*W) + col)*4;
+    data[o] = Math.round(Math.max(0, Math.min(1, rgb[0]))*255);
+    data[o+1] = Math.round(Math.max(0, Math.min(1, rgb[1]))*255);
+    data[o+2] = Math.round(Math.max(0, Math.min(1, rgb[2]))*255);
+    data[o+3] = Math.round(Math.max(0, Math.min(1, a || 0))*255);
+  }
+  for(var i = 0; i < H; i++){
+    var e = pl[i] || {};
+    var f = e.fx || {};
+    var d = FXDEF[pKind(i)] || FXDEF[0];
+    var surf = f.surf || d.surf;
+    var kind = pKind(i);
+    var s = kind === 1
+      ? [surf.b1, surf.b2, surf.b3, surf.storm, surf.fres, surf.haze, surf.fog]
+      : kind === 2
+      ? [surf.r1, surf.r2, surf.lava, surf.fres, surf.r1, surf.r1, surf.r1]
+      : kind === 3
+      ? [surf.r1, surf.r2, surf.river, surf.fres, surf.r1, surf.r1, surf.r1]
+      : [surf.ocean, surf.land1, surf.land2, surf.ice, surf.cloud, surf.city, surf.aur];
+    for(var c2 = 0; c2 < 7; c2++) put(i, c2, pc(s[c2], d.surf[['ocean','land1','land2','ice','cloud','city','aur'][c2]] || d.surf.r1), 0);
+    put(i, 7, [fxNum(surf.scale, d.surf.scale)/8, fxNum(surf.icecov, d.surf.icecov), fxNum(surf.cloudcov, d.surf.cloudcov), fxNum(surf.stormk, d.surf.stormk)], 0);
+    put(i, 8, [fxNum(surf.cityk, d.surf.cityk), fxNum(surf.aurk, d.surf.aurk), fxNum(f.pulse, d.pulse)/8, 0], 0);
+    put(i, 9, [fxNum(f.spin, d.spin)/8, 0, 0, 0], 0);
+  }
+  if(!PAL_TEX) PAL_TEX = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, PAL_TEX);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(uPal, 0);
+}
+var FXDEF = {
+  0: { atm:'#4d8cff', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:0, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              ocean:'#051a38', land1:'#14421a', land2:'#6b5c33', ice:'#d9e6f2', cloud:'#f2f7ff', city:'#ffbf59', aur:'#1ae673' } },
+  1: { atm:'#905000', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:0, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:1, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              b1:'#decca0', b2:'#b88c57', b3:'#ede0bd', storm:'#cc6b38', fres:'#e6bf80', haze:'#e6b873', fog:'#ebcc94' } },
+  2: { atm:'#300090', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:0, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              r1:'#0d0b0d', r2:'#29211f', lava:'#ff610f', fres:'#ff731a' } },
+  3: { atm:'#0a1e4d', glow:0.85, size:1.22, spin:1, pulse:1.5,
+       jets:{ on:1, c1:'#ff8c33', c2:'#73bfff', sp:0.0833, len:6.5 },
+       ring:{ on:0, c:'#d9c294', sp:0.015, in:1.45, out:2.35 },
+       surf:{ scale:1, icecov:0.5, cloudcov:0, cityk:0.9, aurk:0.55, stormk:0.85,
+              r1:'#0d0b0d', r2:'#29211f', river:'#eff5f9', fres:'#99ccff' } }
+};
+function fxPush(pi){
+  var d = FXDEF[pKind(pi)] || FXDEF[0];
+  var e = (PLANETS_DB && PLANETS_DB.planets && PLANETS_DB.planets[pi]) || {};
+  var f = e.fx || {};
+  var jets = f.jets || d.jets, ring = f.ring || d.ring, surf = f.surf || d.surf;
+  var atm = fxHex(f.atm, fxHex(d.atm, [0.30,0.55,1.0]));
+  gl.uniform3f(uAtmC, atm[0], atm[1], atm[2]);
+  gl.uniform1f(uAtmGlow, fxNum(f.glow, d.glow));
+  gl.uniform1f(uAtmSize, fxNum(f.size, d.size));
+  gl.uniform1f(uSpin, fxNum(f.spin, d.spin));
+  gl.uniform1f(uPulseR, fxNum(f.pulse, d.pulse));
+  gl.uniform1f(uJetsOn, fxNum(jets.on, d.jets.on));
+  var jc1 = fxHex(jets.c1, fxHex(d.jets.c1, [1,0.55,0.2]));
+  var jc2 = fxHex(jets.c2, fxHex(d.jets.c2, [0.45,0.75,1.0]));
+  gl.uniform3f(uJetsC1, jc1[0], jc1[1], jc1[2]);
+  gl.uniform3f(uJetsC2, jc2[0], jc2[1], jc2[2]);
+  gl.uniform1f(uJetsSp, fxNum(jets.sp, d.jets.sp));
+  gl.uniform1f(uJetsLen, fxNum(jets.len, d.jets.len));
+  gl.uniform1f(uRingOn, fxNum(ring.on, d.ring.on));
+  var rc = fxHex(ring.c, fxHex(d.ring.c, [0.85,0.76,0.58]));
+  gl.uniform3f(uRingC, rc[0], rc[1], rc[2]);
+  gl.uniform1f(uRingSp, fxNum(ring.sp, d.ring.sp));
+  gl.uniform1f(uRingIn, fxNum(ring.in, d.ring.in));
+  gl.uniform1f(uRingOut, fxNum(ring.out, d.ring.out));
+  gl.uniform1f(uSurfScale, fxNum(surf.scale, d.surf.scale));
+  gl.uniform1f(uIceCov, fxNum(surf.icecov, d.surf.icecov));
+  gl.uniform1f(uCloudCov, fxNum(surf.cloudcov, d.surf.cloudcov));
+  gl.uniform1f(uCityK, fxNum(surf.cityk, d.surf.cityk));
+  gl.uniform1f(uAurK, fxNum(surf.aurk, d.surf.aurk));
+  gl.uniform1f(uStormK, fxNum(surf.stormk, d.surf.stormk));
+  var cols = [['uOceanC', surf.ocean, d.surf.ocean], ['uLand1C', surf.land1, d.surf.land1],
+    ['uLand2C', surf.land2, d.surf.land2], ['uIceC', surf.ice, d.surf.ice],
+    ['uCloudC', surf.cloud, d.surf.cloud], ['uCityC', surf.city, d.surf.city],
+    ['uAurC', surf.aur, d.surf.aur], ['uBand1C', surf.b1, d.surf.b1],
+    ['uBand2C', surf.b2, d.surf.b2], ['uBand3C', surf.b3, d.surf.b3],
+    ['uStormC', surf.storm, d.surf.storm], ['uHazeC', surf.haze, d.surf.haze],
+    ['uFogC', surf.fog, d.surf.fog], ['uRock1C', surf.r1, d.surf.r1],
+    ['uRock2C', surf.r2, d.surf.r2], ['uLavaC', surf.lava, d.surf.lava],
+    ['uFresC', surf.fres, d.surf.fres], ['uRiverC', surf.river, d.surf.river],
+    ['uFres2C', surf.fres, d.surf.fres]];
+  var colDefs = [
+    ['uOceanC', surf.ocean, d.surf.ocean], ['uLand1C', surf.land1, d.surf.land1],
+    ['uLand2C', surf.land2, d.surf.land2], ['uIceC', surf.ice, d.surf.ice],
+    ['uCloudC', surf.cloud, d.surf.cloud], ['uCityC', surf.city, d.surf.city],
+    ['uAurC', surf.aur, d.surf.aur], ['uBand1C', surf.b1, d.surf.b1],
+    ['uBand2C', surf.b2, d.surf.b2], ['uBand3C', surf.b3, d.surf.b3],
+    ['uStormC', surf.storm, d.surf.storm], ['uHazeC', surf.haze, d.surf.haze],
+    ['uFogC', surf.fog, d.surf.fog], ['uRock1C', surf.r1, d.surf.r1],
+    ['uRock2C', surf.r2, d.surf.r2], ['uLavaC', surf.lava, d.surf.lava],
+    ['uFresC', surf.fres, d.surf.fres], ['uRiverC', surf.river, d.surf.river],
+    ['uFres2C', surf.fres, d.surf.fres]];
+  var UNIMAP = { uOceanC:uOceanC, uLand1C:uLand1C, uLand2C:uLand2C, uIceC:uIceC,
+    uCloudC:uCloudC, uCityC:uCityC, uAurC:uAurC, uBand1C:uBand1C, uBand2C:uBand2C,
+    uBand3C:uBand3C, uStormC:uStormC, uHazeC:uHazeC, uFogC:uFogC, uRock1C:uRock1C,
+    uRock2C:uRock2C, uLavaC:uLavaC, uFresC:uFresC, uRiverC:uRiverC, uFres2C:uFres2C };
+  for(var ci = 0; ci < colDefs.length; ci++){
+    var cv = fxHex(colDefs[ci][1], fxHex(colDefs[ci][2], [1,1,1]));
+    gl.uniform3f(UNIMAP[colDefs[ci][0]], cv[0], cv[1], cv[2]);
+  }
+  palBuildUpload(); /* палитра лодов: пересборка при изменении реестра (импорт fx) */
+}
+
+
+function resize(){
+  /* OPT: ограничиваем DPR фона (база только рендер фона, не интерфейса) */
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  const w = Math.max(1, Math.floor(innerWidth  * dpr * RENDER_SCALE));
+  const h = Math.max(1, Math.floor(innerHeight * dpr * RENDER_SCALE));
+  if(cv.width !== w || cv.height !== h){
+    cv.width = w; cv.height = h;
+    gl.viewport(0, 0, w, h);
+  }
+}
+addEventListener('resize', resize);
+resize();
+
+/* OPT: ПАРАЛЛАКС фона — координата курсора (-1..1) с плавным сглаживанием.
+   Используется только для фоновой камеры (стартовая сцена), механики игры не трогает. */
+let _parX = 0, _parY = 0;          /* текущая сглаженная позиция */
+let _parTX = 0, _parTY = 0;        /* целевая (raw) позиция курсора */
+addEventListener('mousemove', function(ev){
+  _parTX = (ev.clientX / Math.max(1, innerWidth)) * 2 - 1;
+  _parTY = (ev.clientY / Math.max(1, innerHeight)) * 2 - 1;
+}, { passive: true });
+const PARALLAX_AMOUNT = 0.008;     /* малый сдвиг, чтобы не ломать картинку */
+
+/* главный цикл: RAF сам замирает в фоновой вкладке, dt зажат сверху.
+   Камера: свободный полёт из игрового скрипта (__gameState) либо
+   орбитальное зеркало R46 (пилот выключен / игровой шейдер не собрался). */
+let simTime = 0, last = performance.now();
+let _uSP = null; /* OPT: кэш последнего uniform uSplash */
+function frame(now){
+  resize();
+  const dt = Math.min((now - last)/1000, 0.1);
+  last = now;
+  const g = window.__gameState;
+  /* В ГИПЕРКРУИЗЕ солнце не движется: замораживаем simTime (и __bgSim/sunA),
+     чтобы освещение и положение солнца стояли, как просил пользователь. */
+  const hypOn = !!(g && g.active && (window.inTransit || window.warp));
+  if(!hypOn){ simTime += dt*SIM_TIME_SCALE; }
+  window.__bgSim = simTime;
+  const sunA = 2*Math.PI*simTime/DAY_CYCLE_SIM_SEC;
+  /* OPT: плавная интерполяция параллакса (target приближается к курсору) */
+  _parX += (_parTX - _parX) * Math.min(1, dt*6);
+  _parY += (_parTY - _parY) * Math.min(1, dt*6);
+
+  if(g && g.active){
+    gl.uniform1f(uPL, pKind(g.planet));
+    gl.uniform3f(uCP, g.pos[0], g.pos[1], g.pos[2]);
+    gl.uniform3f(uCR, g.right[0], g.right[1], g.right[2]);
+    gl.uniform3f(uCU, g.up[0], g.up[1], g.up[2]);
+    gl.uniform3f(uCF, g.fwd[0], g.fwd[1], g.fwd[2]);
+  } else {
+    const camA = START_PHASE_RAD + 2*Math.PI*simTime/ORBIT_PERIOD_SIM_SEC;
+    /* ПАРАЛЛАКС: лёгкий сдвиг орбитальной камеры за курсором (только фон) */
+    const pxOff = _parX * PARALLAX_AMOUNT, pyOff = _parY * PARALLAX_AMOUNT * 0.6;
+    const cx = Math.cos(camA)*CAM_R + pxOff, cy = Math.sin(camA)*CAM_R - ((!g || !g.active) && pKind(window.__splashPlanet || 0) === 3 ? 0.14 : 0) + pyOff;
+    let f0x = -Math.sin(camA), f0y = Math.cos(camA);
+    let u0x = Math.cos(camA), u0y = Math.sin(camA);
+    let f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
+    const f1l = Math.sqrt(f1x*f1x + f1y*f1y) || 1;
+    f1x /= f1l; f1y /= f1l;
+    /* right = fwd x up0 (z-компоненты нулевые у обоих) */
+    const r1z = f1x*u0y - f1y*u0x;
+    /* upv = right x fwd */
+    const p1x = -r1z*f1y, p1y = r1z*f1x;
+    gl.uniform1f(uPL, (g && g.active) ? pKind(g.planet) : pKind(window.__splashPlanet || 0));
+    gl.uniform3f(uCP, cx, cy, 0);
+    gl.uniform3f(uCF, f1x, f1y, 0);
+    gl.uniform3f(uCR, 0, 0, r1z);
+    gl.uniform3f(uCU, p1x, p1y, 0);
+  }
+
+  gl.uniform2f(uRes, cv.width, cv.height);
+  gl.uniform1f(uT, simTime);
+  gl.uniform1f(uSA, sunA);
+  /* STARLIGHT-2: направления на два нейтронных источника (K-002 в нуле, K-001) */
+  try{
+    var curS = (g && g.active) ? g.planet : (window.__splashPlanet || 0);
+    var cwL = null;
+    if(g && g.active){
+      cwL = [g.pos[0], g.pos[1], g.pos[2]];
+      if(!hypOn && Array.isArray(window.PW) && Array.isArray(window.PW[curS])){
+        var _c0 = window.PW[curS];
+        cwL = [cwL[0] + _c0[0], cwL[1] + _c0[1], cwL[2] + _c0[2]];
+      }
+    }
+    if(cwL){
+      var d0x = -cwL[0], d0y = -cwL[1], d0z = -cwL[2];
+      var n0 = Math.sqrt(d0x*d0x + d0y*d0y + d0z*d0z);
+      if(n0 < 1e-6){ d0x = 0; d0y = 0; d0z = -1; n0 = 1; }
+      gl.uniform3f(uL0L, d0x/n0, d0y/n0, d0z/n0);
+      var k1 = (Array.isArray(window.PW) && Array.isArray(window.PW[1])) ? window.PW[1] : [52.0, 0.0, -48.0];
+      var d1x = k1[0] - cwL[0], d1y = k1[1] - cwL[1], d1z = k1[2] - cwL[2];
+      var n1 = Math.sqrt(d1x*d1x + d1y*d1y + d1z*d1z);
+      if(n1 < 1e-6){ d1x = 1; d1y = 0; d1z = 0; n1 = 1; }
+      gl.uniform3f(uL1L, d1x/n1, d1y/n1, d1z/n1);
+    } else {
+      gl.uniform3f(uL0L, 0.55, 0.30, 0.78);
+      gl.uniform3f(uL1L, -0.60, 0.20, 0.50);
+    }
+  }catch(e){}
+  fxPush((g && g.active) ? g.planet : (window.__splashPlanet || 0));
+  /* hyper: в гиперпространстве шейдер рисует небо Нгалин + 4 сферы + солнце */
+  gl.uniform1f(uHY, hypOn ? 1.0 : 0.0);
+  /* 3D-ЛОД: передаём мировые позиции дальних планет (в кадре текущего игрока).
+     Камера в этом шейдере — относительная к текущей планете (position близко к 0),
+     поэтому позиция планеты k = PW[k] - PW[current]. Маска uPActive в битах. */
+  {
+    var cur = (g && g.active) ? g.planet : (window.__splashPlanet || 0);
+    var list = [], klist = [], pilist = [];
+    var WPSRC = window.PW;
+    if(Array.isArray(WPSRC) && Array.isArray(WPSRC[cur]) && typeof PKIND !== 'undefined'){
+      for(var pp = 0; pp < WPSRC.length; pp++){
+        if(pp === cur) continue;
+        /* hyper: камера в мировых координатах → позиции планет тоже мировые.
+           normal: камера относительно текущей планеты → позиции PW[pp]-PW[cur]. */
+        var off = hypOn
+          ? [WPSRC[pp][0], WPSRC[pp][1], WPSRC[pp][2]]
+          : [WPSRC[pp][0]-WPSRC[cur][0], WPSRC[pp][1]-WPSRC[cur][1], WPSRC[pp][2]-WPSRC[cur][2]];
+        list.push(off); klist.push(pKind(pp));   /* шейдеру нужен ТИП поверхности (0..3) */
+        pilist.push(pp);                         /* и СТРОКА палитры (индекс планеты) */
+      }
+    }
+    if(uP && uPC && list.length){
+      var flat = new Float32Array(24), kf = new Float32Array(8), pf = new Float32Array(8);
+      for(var f2 = 0; f2 < list.length && f2 < 8; f2++){
+        flat[f2*3] = list[f2][0]; flat[f2*3+1] = list[f2][1]; flat[f2*3+2] = list[f2][2];
+        kf[f2] = klist[f2];
+        pf[f2] = pilist[f2];
+      }
+      gl.uniform3fv(uP, flat);
+      gl.uniform1fv(uPKa, kf);
+      gl.uniform1fv(uPIa, pf);
+      gl.uniform1f(uPC, Math.min(list.length, 8));
+    }
+    /* ГИПЕРПРОСТРАНСТВО: 4-я сфера = текущая планета (в мировых координатах,
+       камера гиперкруиза уже в мире). Позиция PW[cur] и ТИП её поверхности. */
+    if(uP4 && window.PW && window.PW[cur]) gl.uniform3f(uP4, window.PW[cur][0], window.PW[cur][1], window.PW[cur][2]);
+    if(uK4 && window.PW && window.PW[cur]) gl.uniform1f(uK4, pKind(cur));
+    if(uPIcur) gl.uniform1f(uPIcur, cur);
+    if(window.DIAG_DUMP){ window.__diagP = { cur: cur, list: list, klist: klist }; }
+  }
+  /* OPT: uSplash меняется редко — не шлём одинаковое значение каждый кадр */
+  const spNow = (g && g.active) ? 0.0 : 1.0;
+  if(_uSP !== spNow){ gl.uniform1f(uSP, spNow); _uSP = spNow; }
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ☩ ИГРА: СВОБОДНЫЙ ПОЛЁТ — ПЛАНЕТЫ, КОЛЬЦА, ДВА ПУЛЬСАРА ☩
+   Камера свободная: позиция + базис (fwd/right/up) честно летят.
+   W/S — тяга, A/D — рысканье, ↑/↓ — тангаж, Q/E — крен, мышь — взгляд,
+   G/J — смена планеты. Сбор предметов и EXP-механики вырезаны из протокола.
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+function gameErr(msg){
+  var d = document.getElementById('gameErrLine');
+  if(!d){
+    d = document.createElement('div');
+    d.id = 'gameErrLine';
+    d.style.cssText = 'position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:200;background:#2a0808;color:#ff9b9b;border:2px outset #900;font:12px/1.4 monospace;padding:4px 12px;max-width:92vw;';
+    document.body.appendChild(d);
+  }
+  d.textContent = msg;
+  setTimeout(function(){ if(d.parentNode) d.remove(); }, 12000);
+}
+window.addEventListener('error', function(ev){
+  gameErr('ОШИБКА СТРАНИЦЫ: ' + (ev && ev.message ? ev.message : 'unknown'));
+});
+
+try{
+
+/* ---------- КОНФИГ (править здесь) ---------- */
+var CFG = {
+  SPD_MIN: 0.0, SPD_MAX: 0.22, SPD_DEF: 0.055, SPD_RATE: 0.16,  /* скорость, ед./с */
+  YAW_MAX: 0.90, PITCH_MAX: 0.75, ROLL_MAX: 1.30,               /* рули, рад/с */
+  RESP: 11.0,                                                   /* нарастание рулей, 1/с */
+  DRAG_YAW: 0.0030, DRAG_PITCH: 0.0024,                         /* мышь, рад/пиксель */
+  MINR: 1.045,                                                  /* мин. радиус орбиты */
+  PICK_RMIN: 1.16, PICK_RMAX: 1.78, PICK_RAD: 0.075,
+  BUBBLE_R: 1.90, OUT_RMIN: 1.95, OUT_RMAX: 3.20,
+  CAKE_N: 12, CHEESE_N: 18, BIG_CAKE_N: 6, BIG_CHEESE_N: 9,
+  PEPPER_N: 20, PEPPER_RMIN: 1.95, PEPPER_RMAX: 3.20, HEART_N: 3,
+  START_PROV: 10, PEPPER_CK: 5, PEPPER_CH: 3, PEPPER_CD: 1.5,
+  PTS_CAKE: 25, PTS_CHEESE: 50, PTS_MOON: 175,
+  MOON_CAP0: 3, CAP_STEP: 2500, CAP_GOAL: 50, SHIELD_T: 30,
+  HP0: 8, HP_STEPS: [1000,5000,12000,20000,50000,100000,150000,250000,500000,1000000],
+  BOOST_MULT: 2.5, BOOST_MIN: 30, BOOST_DRAIN: 10, BOOST_REGEN: 15,
+  BOOST_CK: 2, BOOST_CH: 1, BOOST_MOON: 5, BOOST_PEPPER: 5,
+  EXP_CAKE: 3, EXP_CHEESE: 5, EXP_MOON: 10, EXP_STEPS: [500, 1500, 2250],
+  EXP_WIN: 7000,
+  MOON_R: [1.70, 2.05, 2.40, 2.75], MOON_SZ: [0.10, 0.12, 0.13, 0.15],
+  FOV_TAN: Math.tan(60.0*0.5*Math.PI/180.0),
+  FLASH_BAN: 10, FREEZE_T: 16
+};
+
+/* ---------- ХОТБАР: определения и состояние ---------- */
+var HOT_DEFS = []; /* HOT-CUT: хотбар предметов вырезан */
+var hotSel = 0, hotCells = [], hotDenyT = 0;
+var magnetT = 0, freezeT = 0, pepBanT = 0, MAG_T = 12, MAG_R = 0.85;
+var shots = [];
+var auraEl = null, snowEl = null, auraCss = false, magnetSnd = null;
+var shotX = 0, shotY = 0, shotAimX = 0, shotAimY = 0;
+
+/* ---------- ВЕКТОРА ---------- */
+function add(a,b){ return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]; }
+function sub(a,b){ return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
+function mul(a,s){ return [a[0]*s, a[1]*s, a[2]*s]; }
+function dot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+function cross(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+function len(a){ return Math.sqrt(dot(a,a)); }
+function norm(a){ var l = len(a)||1; return [a[0]/l, a[1]/l, a[2]/l]; }
+function rotAxis(v, k, ang){
+  var c = Math.cos(ang), s = Math.sin(ang);
+  var kv = cross(k, v);
+  return add(add(mul(v,c), mul(kv,s)), mul(k, dot(k,v)*(1-c)));
+}
+
+/* ---------- ПОЛЁТ: состояние ---------- */
+var CAMR0 = 1.0 + 1000.0/29371.0;
+var A0 = 0.0;
+var F = { pos: [Math.cos(A0)*CAMR0, Math.sin(A0)*CAMR0, 0], fwd: null, up: null, right: null };
+function resetBasis(){
+  var f0 = [-Math.sin(A0), Math.cos(A0), 0];
+  var u0 = norm(F.pos);
+  var f1 = [f0[0]*0.78 - u0[0]*0.22, f0[1]*0.78 - u0[1]*0.22, 0];
+  F.fwd = norm(f1);
+  F.right = norm(cross(F.fwd, u0));
+  F.up = cross(F.right, F.fwd);
+}
+resetBasis();
+var yawV = 0, pitchV = 0, rollV = 0, speed = CFG.SPD_DEF;
+var keys = {}, drag = null, mouseCtl = false;
+/* ---------- НАЗВАНИЯ ПЛАНЕТ ---------- */
+/* ---------- ХИТОМИ: Жизнепригодная планета названая в честь игрока покарившего великий трактор в игре ELITE-DANGEROUS в центре галлактики находящийся под СТРЕЛЕЦ-А* в 460с.г и на 360с.л в сторону нетронног поля где огромное скопление нетронных Звезд , белых карликов и Чёрных дыр. ---------- */
+/* ---------- ЧИЗИЯ : Какой сырный мишка не захочит себе огромнуя планет состоящию из сыра. Планета была притянута Разумными плюшивыми медведями с планеты ХИТОМИ спомощью квантового гравитационного завхвата. И зачем они это сделали ? Теперь по звездной системе летает сыр и остатки когдато пышных колец этой планеты. Говорят они состояли из кексиков.  ---------- */
+/* ---------- НГАЛИН: Гравитационные Эксперементы плюшевых медведий с притяжением ЧИЗИИ закончились притяжением когдато брошенной в сторону Дарк войда старшего брата планеты ХИТОМИ . ХИТОМИ не хотела чтобы НГАЛИН Держался постоянно за нее и жил дальше сам . Однако из за Плюшевых медведей ХИТОМИ некогда не избавится от НГАЛИН. ---------- */
+/* ===== PLANETS_DB — объявлена в отдельном блоке до R46-фона (см. выше) ===== */
+var planet = 0, PLANET_NAMES = PLANETS_DB.planets.map(function(p){ return p.name; });
+var OCCL_Y = 0; /* вертикальный центр окклюзии: звезда опущена на заставке */
+var gameOn = false, switching = false, paused = false, pauseEl = null;
+
+/* ---------- ЗВУК: звук грузится по URL: Music-1.ogg / Music-2.ogg / Music-3.ogg (свой трек на планету), loop1.ogg, loop2.ogg рядом с HTML ---------- */
+var AUDIO_URLS = { music: 'Music-1.ogg', cake: 'loop1.ogg', cheese: 'loop2.ogg', moon: 'moon.ogg', pepper: 'pepper.ogg', heart: 'heart.ogg' };
+var audioWarn = {};
+
+var sfx = { music: null, cake: null, cheese: null, moon: null, pepper: null, heart: null, musicOn: true, started: false };
+/* file:// CORS: при открытии .html двойным кликом относительные URL не грузятся.
+   Превращаем их в абсолютные file:/// ссылки на тот же файл. */
+function relURL(p){
+  if(p && typeof p === 'string'){
+    if(/^(https?:|file:|data:)/.test(p)) return p;
+    try{
+      if(window.location && window.location.protocol === 'file:'){
+        var base = window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/') + 1);
+        return 'file:///' + base.replace(/^\//, '') + p;
+      }
+    }catch(e){}
+  }
+  return p;
+}
+function loadAudio(name){
+  try{
+    var a = new Audio(relURL(AUDIO_URLS[name]));
+    a.addEventListener('error', function(){
+      if(!audioWarn[name]){ audioWarn[name] = true; console.warn('[ИГРА] Файл ' + AUDIO_URLS[name] + ' не найден рядом с HTML — этот звук не заиграет'); }
+    });
+    return a;
+  }catch(e){ return null; }
+}
+function ensureAudio(){
+  if(sfx.started) return;
+  sfx.music = loadAudio('music');
+  if(sfx.music){ sfx.music.loop = true; sfx.music.volume = 0.45; }
+  sfx.cake = loadAudio('cake');
+  sfx.cheese = loadAudio('cheese');
+  sfx.moon = loadAudio('moon');
+  sfx.pepper = loadAudio('pepper');
+  sfx.heart = loadAudio('heart');
+  sfx.started = true;
+}
+function tryMusic(){
+  ensureAudio();
+  if(!sfx.music || !sfx.musicOn) return;
+  var p = sfx.music.play();
+  if(p && p.catch) p.catch(function(){});
+}
+function playPickup(kind){
+  if(!sfx.musicOn || !sfx.started) return;
+  try{
+    var a = (kind === 'cake' ? sfx.cake : (kind === 'cheese' ? sfx.cheese : sfx.moon)).cloneNode();
+    a.volume = 0.55;
+    var p = a.play();
+    if(p && p.catch) p.catch(function(){});
+  }catch(e){}
+}
+
+/* ---------- DOM: слой спрайтов, HUD, кнопки, фейд ---------- */
+var layer = document.createElement('div');
+layer.style.cssText = 'position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden;';
+document.body.appendChild(layer);
+layer.setAttribute('data-keep','1');
+(function(){
+  var css = document.createElement('style');
+  css.textContent = 'body.dgame > :not(#glbg):not([data-keep]):not(#gameErrLine){display:none !important;}';
+  document.head.appendChild(css);
+})();
+
+/* ---------- УРОН И ЗВУК ПЕРЧИКА ---------- */
+function hurt(n, pr){
+  hpCur = Math.max(0, hpCur - n);
+  var f = document.createElement('div');
+  f.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:6500;background:radial-gradient(circle,rgba(255,60,40,0) 38%,rgba(255,60,40,0.5) 100%);opacity:.9;transition:opacity .5s ease;';
+  layer.appendChild(f);
+  requestAnimationFrame(function(){ f.style.opacity = '0'; });
+  setTimeout(function(){ if(f.parentNode) f.parentNode.removeChild(f); }, 650);
+  updBottomPanel();
+}
+function playPepper(){
+  if(!sfx.musicOn || !sfx.started) return;
+  try{
+    if(!sfx.pepper) return;
+    var a = sfx.pepper.cloneNode();
+    a.volume = 0.6;
+    var p = a.play();
+    if(p && p.catch) p.catch(function(){});
+  }catch(e){}
+}
+function playHeart(){
+  if(!sfx.musicOn || !sfx.started) return;
+  try{
+    if(!sfx.heart) return;
+    var a = sfx.heart.cloneNode();
+    a.volume = 0.6;
+    var p = a.play();
+    if(p && p.catch) p.catch(function(){});
+  }catch(e){}
+}
+
+/* ---------- N-РАЗРЯДНЫЕ СЕГМЕНТНЫЕ ДИСПЛЕИ ---------- */
+function segRowHtmlN(id, label, n){
+  var s2 = '<div style="display:flex;align-items:center;gap:8px;">'
+    + '<span style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;">' + label + '</span>'
+    + '<div id="' + id + '" style="display:flex;gap:3px;padding:2px 2px;">';
+  for(var d = 0; d < n; d++){
+    s2 += '<div class="segd" style="position:relative;width:20px;height:37px;">';
+    for(var i2 = 0; i2 < 7; i2++){
+      var p2 = SEG_GEO[i2];
+      s2 += '<div class="' + p2[0] + '" style="left:' + p2[1] + 'px;'
+        + (p2[2] < 0 ? 'bottom:' + (-p2[2]) + 'px;' : 'top:' + p2[2] + 'px;')
+        + 'width:' + p2[3] + 'px;height:' + p2[4] + 'px;opacity:.13;"></div>';
+    }
+    s2 += '</div>';
+  }
+  return s2 + '</div></div>';
+}
+function segSetN(row, val, n){
+  if(!row) return;
+  var mx = Math.pow(10, n) - 1;
+  var v = Math.max(0, Math.min(mx, Math.floor(val)));
+  var str = ('0000000000' + v).slice(-n);
+  for(var i = 0; i < n; i++){
+    var cell = row.children[i];
+    if(!cell) continue;
+    var on = SEG_ON[+str.charAt(i)] || '';
+    for(var j = 0; j < 7; j++){
+      var seg = cell.children[j];
+      if(seg) seg.style.opacity = on.indexOf('abcdefg'.charAt(j)) >= 0 ? '1' : '.13';
+    }
+  }
+}
+
+/* ---------- ВЕРХНЯЯ ПАНЕЛЬ ОЧКОВ (10 разрядов) ---------- */
+function initTopPanel(){
+  if(topPanel) return;
+  topPanel = document.createElement('div');
+  topPanel.setAttribute('data-keep', '1');
+  topPanel.style.cssText = 'position:fixed;top:8px;left:50%;transform:translateX(-50%) scale(0.59);transform-origin:top center;z-index:70;display:none;background:#0c150c;border:4px inset #1a1a2e;border-radius:8px;padding:6px 14px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
+  topPanel.innerHTML = segRowHtmlN('segPtsEl', '\u{1F31F} ОЧКИ', 10);
+  document.body.appendChild(topPanel);
+  segPtsEl = document.getElementById('segPtsEl');
+  updTopScore();
+  topPanel.style.display = 'none'; /* TOP-CUT: панель очков скрыта */
+}
+function updTopScore(){ segSetN(segPtsEl, pts, 10); }
+
+/* ---------- НИЖНЯЯ ПАНЕЛЬ: HP, ФОРСАЖ, PowerUp ---------- */
+function initBottomPanel(){
+  if(botPanel) return;
+  botPanel = document.createElement('div');
+  botPanel.setAttribute('data-keep', '1');
+  botPanel.style.cssText = 'position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:70;display:none;flex-direction:column;gap:6px;background:#0c150c;border:4px inset #1a1a2e;border-radius:8px;padding:8px 13px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
+  var hpRow = document.createElement('div');
+  hpRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
+  hpRow.innerHTML = '<span style="font:700 9px/1 monospace;letter-spacing:2px;color:#ff8a8a;white-space:nowrap;">\u2764\uFE0F HP</span>';
+  hpBarEl = document.createElement('div');
+  hpBarEl.style.cssText = 'display:flex;gap:3px;';
+  hpRow.appendChild(hpBarEl);
+  botPanel.appendChild(hpRow);
+  var bRow = document.createElement('div');
+  bRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
+  bRow.innerHTML = '<span style="font:700 9px/1 monospace;letter-spacing:2px;color:#ffb35c;white-space:nowrap;">\u{1F525} ФОРСАЖ</span>';
+  var bWrap = document.createElement('div');
+  bWrap.style.cssText = 'position:relative;width:224px;height:11px;background:#050b05;border:2px solid #950;border-radius:7px;overflow:hidden;';
+  boostFillEl = document.createElement('div');
+  boostFillEl.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#7a3c00,#ffb35c,#ffe08a);transition:width .2s linear;';
+  bWrap.appendChild(boostFillEl);
+  bRow.appendChild(bWrap);
+  botPanel.appendChild(bRow);
+  var eRow = document.createElement('div');
+  eRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
+  eRow.innerHTML = '<span style="font:700 9px/1 monospace;letter-spacing:2px;color:#7dff8a;white-space:nowrap;">\u2728 EXP</span>';
+  var eWrap = document.createElement('div');
+  eWrap.style.cssText = 'position:relative;width:224px;height:11px;background:#050b05;border:2px solid #950;border-radius:6px;overflow:hidden;';
+  expFillEl = document.createElement('div');
+  expFillEl.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#0b4d1f,#7dff8a,#d6ffb0);transition:width .2s linear;';
+  eWrap.appendChild(expFillEl);
+  expLabelEl = document.createElement('span');
+  expLabelEl.style.cssText = 'font:700 9px/1 monospace;color:#7dff8a;white-space:nowrap;';
+  expLabelEl.textContent = '0/500';
+  eRow.appendChild(eWrap); eRow.appendChild(expLabelEl);
+  /* EXP-CUT: строка EXP вырезана из протокола */
+  var cRow = document.createElement('div');
+  cRow.style.cssText = 'display:flex;gap:5px;justify-content:center;margin-top:2px;';
+  botPanel.appendChild(buildHotRow());
+  document.body.appendChild(botPanel);
+}
+function buildHotRow(){
+  var cRow = document.createElement('div');
+  cRow.style.cssText = 'display:flex;align-items:center;gap:6px;';
+  for(var i = 0; i < HOT_DEFS.length; i++){
+    var d = HOT_DEFS[i];
+    var cell = document.createElement('div');
+    cell.style.cssText = 'position:relative;width:42px;height:42px;border:2px solid #333;border-radius:8px;background:#0a0a12;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 2px 0 #000;transition:box-shadow .15s,border-color .15s;';
+    cell.innerHTML = '<div style="font-size:13px;line-height:1;">' + d.icon + '</div>'
+      + '<div style="font:700 7px/1 monospace;letter-spacing:1px;color:#9fd9a0;margin-top:3px;">' + d.name + '</div>'
+      + '<div class="hotSt" style="font:700 7px/1 monospace;color:#7dff8a;margin-top:2px;"></div>'
+      + '<div style="position:absolute;right:2px;top:1px;font:700 6px/1 monospace;color:#666;">' + (i+1) + '</div>';
+    cell.dataset.hot = String(i);
+    cell.addEventListener('click', function(ev){
+      var idx = parseInt(ev.currentTarget.dataset.hot, 10);
+      if(hotSel === idx) useHot(idx); else hotSelect(idx);
+    });
+    hotCells.push(cell);
+    cRow.appendChild(cell);
+  }
+  return cRow;
+}
+function updBottomPanel(){
+  if(!botPanel || !hpBarEl || !boostFillEl) return;
+  if(lastHpMax !== hpMax){
+    lastHpMax = hpMax;
+    hpBarEl.innerHTML = '';
+    for(var i = 0; i < hpMax; i++){
+      var b = document.createElement('div');
+      b.style.cssText = 'width:10px;height:11px;border:1px solid #5a1a1a;border-radius:3px;background:#3a0d0d;';
+      hpBarEl.appendChild(b);
+    }
+  }
+  for(var k = 0; k < hpMax; k++){
+    var blk = hpBarEl.children[k];
+    if(blk) blk.style.background = k < hpCur ? '#ff4a3a' : '#3a0d0d';
+  }
+  /* OPT: кэш — не перезаписываем style.width/фильтр, если значение прежнее */
+  var bw = boostFuel.toFixed(1) + '%';
+  if(boostFillEl._bw !== bw){ boostFillEl.style.width = bw; boostFillEl._bw = bw; }
+  var bf = boostOn ? 'brightness(1.5)' : (boostFuel >= CFG.BOOST_MIN ? 'brightness(1.05)' : 'brightness(0.55) saturate(0.6)');
+  if(boostFillEl._bf !== bf){ boostFillEl.style.filter = bf; boostFillEl._bf = bf; }
+  updHotbar();
+  if(expFillEl){
+    var TH = []; for(var ti = 1; ti < PLANETS_DB.planets.length; ti++) TH.push(PLANETS_DB.planets[ti].unlock); TH.push(CFG.EXP_WIN);
+    var lvl = 0; while(lvl < TH.length && expTotal >= TH[lvl]) lvl++;
+    var lo = (lvl === 0) ? 0 : TH[lvl - 1];
+    var hi = TH[Math.min(lvl, TH.length - 1)];
+    var pct = (lvl >= TH.length) ? 100 : Math.max(0, Math.min(100, (expTotal - lo)/(hi - lo)*100));
+    expFillEl.style.width = expMax ? '100%' : pct.toFixed(1) + '%';
+    if(expLabelEl) expLabelEl.textContent = expMax ? 'MAX' : (lvl >= TH.length) ? (expTotal + ' ПРОЙДЕНО') : (Math.min(expTotal, hi) + '/' + hi);
+  }
+}
+
+/* ---------- ЩИТ И ЛИНЗА ---------- */
+function ensureLens(){
+  if(lensEl || !bearWrap) return;
+  lensEl = document.createElement('div');
+  lensEl.className = 'mglens';
+  bearWrap.appendChild(lensEl);
+}
+function useImmunity(){
+  if(!gameOn || gameOver || immuneT > 0) return;
+  if(moonStock < 1) return;
+  moonStock--;
+  immuneT = CFG.SHIELD_T;
+  ensureLens();
+  segUpdate();
+  saveScore();
+  playPickup('moon');
+}
+
+/* ---------- POWERUP: магнит, залп, самонаводка, вспышка, заморозка, обмен ---------- */
+function playMagnet(){
+  try{
+    if(!magnetSnd) magnetSnd = new Audio(relURL('magnet.ogg'));
+    var a = magnetSnd.cloneNode(); a.volume = 0.6;
+    var p = a.play(); if(p && p.catch) p.catch(function(){});
+  }catch(e){}
+}
+function hotSelect(i){
+  if(i < 0 || i >= HOT_DEFS.length) return;
+  hotSel = i;
+  updHotbar();
+}
+function costTxt(c){
+  var parts = [];
+  if(c.ck) parts.push(c.ck + '\u{1F9C1}');
+  if(c.ch) parts.push(c.ch + '\u{1F9C0}');
+  if(c.mn) parts.push(c.mn + '\u{1F31D}');
+  return parts.join(' ') || '\u2014';
+}
+function canPay(c){
+  return (c.ck || 0) <= provCk && (c.ch || 0) <= provCh && (c.mn || 0) <= moonStock;
+}
+function payCost(c){
+  if(!canPay(c)) return false;
+  provCk -= (c.ck || 0); provCh -= (c.ch || 0); moonStock -= (c.mn || 0);
+  segUpdate(); saveScore();
+  return true;
+}
+function hotDeny(i){
+  hotDenyT = 0.6;
+  if(hotCells[i]) hotCells[i].style.borderColor = '#ff5a4a';
+}
+function updHotbar(){
+  for(var i = 0; i < hotCells.length; i++){
+    var cell = hotCells[i], d = HOT_DEFS[i];
+    if(!cell || !d) continue;
+    var st = cell.querySelector('.hotSt');
+    var sel = (i === hotSel);
+    cell.style.borderColor = sel ? ((hotDenyT > 0) ? '#ff5a4a' : '#f79e1d') : '#333';
+    cell.style.boxShadow = sel ? '0 0 8px rgba(247,158,29,.7),2px 2px 0 #000' : '2px 2px 0 #000';
+    if(st){
+      if(d.id === 'shield') st.textContent = (immuneT > 0) ? (Math.ceil(immuneT) + 'с') : ('\u00D7' + moonStock);
+      else if(d.id === 'magnet') st.textContent = (magnetT > 0) ? (Math.ceil(magnetT) + 'с') : costTxt(d.cost);
+      else if(d.id === 'freeze') st.textContent = (freezeT > 0) ? (Math.ceil(freezeT) + 'с') : costTxt(d.cost);
+      else if(d.id === 'flash') st.textContent = (pepBanT > 0) ? (Math.ceil(pepBanT) + 'с') : costTxt(d.cost);
+      else st.textContent = costTxt(d.cost);
+    }
+    var busy = (d.id === 'magnet' && magnetT > 0) || (d.id === 'freeze' && freezeT > 0) || (d.id === 'flash' && pepBanT > 0);
+    var can = d.id === 'exch' || busy || (d.id === 'shield' ? moonStock > 0 : canPay(d.cost));
+    cell.style.opacity = (sel || can) ? '1' : '0.55';
+  }
+}
+function useHot(i){
+  if(!gameOn || gameOver) return;
+  var d = HOT_DEFS[i];
+  if(!d) return;
+  if(inTransit && (d.id === 'volley' || d.id === 'homing' || d.id === 'flash')){
+    hotDeny(i); return; /* фантом-фикс: выстрелы не летают в гиперпространстве */
+  }
+  if(d.id === 'shield'){
+    if(immuneT > 0) return;
+    if(moonStock < 1){ hotDeny(i); return; }
+    useImmunity();
+    return;
+  }
+  if(d.id === 'magnet'){
+    if(magnetT > 0) return;
+    if(!payCost(d.cost)){ hotDeny(i); return; }
+    magnetT = MAG_T;
+    playMagnet();
+    return;
+  }
+  if(d.id === 'volley'){
+    if(!payCost(d.cost)){ hotDeny(i); return; }
+    fireVolley();
+    return;
+  }
+  if(d.id === 'homing'){
+    if(!payCost(d.cost)){ hotDeny(i); return; }
+    fireHoming();
+    return;
+  }
+  if(d.id === 'flash'){
+    if(pepBanT > 0) return;
+    if(!payCost(d.cost)){ hotDeny(i); return; }
+    doFlash();
+    return;
+  }
+  if(d.id === 'freeze'){
+    if(freezeT > 0) return;
+    if(!payCost(d.cost)){ hotDeny(i); return; }
+    freezeT = CFG.FREEZE_T;
+    playMagnet();
+    return;
+  }
+  if(d.id === 'exch') doExchange();
+}
+function doFlash(){
+  pepBanT = CFG.FLASH_BAN;
+  var f = document.createElement('div');
+  f.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:6400;background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,240,180,.35) 55%,rgba(255,255,255,0) 100%);opacity:1;transition:opacity .8s ease;';
+  layer.appendChild(f);
+  requestAnimationFrame(function(){ f.style.opacity = '0'; });
+  setTimeout(function(){ if(f.parentNode) f.parentNode.removeChild(f); }, 900);
+  for(var i = 0; i < ITEMS.length; i++){
+    var it = ITEMS[i];
+    if(it && it.kind === 'pepper'){ respawn(it); it.dead = true; }
+  }
+  playPickup('moon');
+}
+function doExchange(){
+  if(provCk > 0){
+    provCh += provCk;
+    provCk = 0;
+  } else if(provCh >= 2){
+    var n = Math.floor(provCh / 2);
+    provCk += n;
+    provCh -= n * 2;
+  } else {
+    hotDeny(6);
+    return;
+  }
+  segUpdate();
+  saveScore();
+  playPickup('cake');
+}
+function killPepper(it){
+  pts += 25;
+  respawn(it);
+  playPepper();
+  segUpdate();
+  saveScore();
+}
+function spawnShot(type, ang, spd, life){
+  var el = document.createElement('div');
+  el.textContent = (type === 'ch') ? '\u{1F9C0}' : '\u{1F9C1}';
+  el.style.cssText = 'position:absolute;font-size:18px;line-height:1;pointer-events:none;z-index:5200;will-change:transform;';
+  layer.appendChild(el);
+  shots.push({ type: type, x: shotX, y: shotY, a: ang, v: spd, life: life, hits: (type === 'ch' ? 2 : 99), el: el });
+}
+function fireVolley(){
+  var base = Math.atan2(shotAimY - shotY, shotAimX - shotX) || 0;
+  for(var i = 0; i < 10; i++) spawnShot('ch', base + (-0.55 + 1.1*i/9), 980, 1.4);
+  playPickup('cheese');
+}
+function fireHoming(){
+  for(var i = 0; i < 5; i++) spawnShot('ck', -Math.PI/2 + (Math.random()-0.5)*0.8, 820, 3.0);
+  playPickup('cake');
+}
+function tickShots(dt){
+  if(inTransit){
+    for(var si = shots.length - 1; si >= 0; si--){
+      var sh0 = shots[si];
+      if(sh0.el && sh0.el.parentNode) sh0.el.parentNode.removeChild(sh0.el);
+    }
+    shots.length = 0;
+    return;
+  }
+  for(var i = shots.length - 1; i >= 0; i--){
+    var sh = shots[i];
+    if(sh.type === 'ck'){
+      var best = null, bd = 1e18;
+      for(var k = 0; k < ITEMS.length; k++){
+        var it = ITEMS[k];
+        if(!it || it.kind !== 'pepper' || it.dead || it.planet !== planet || it._sx == null) continue;
+        var dx = it._sx - sh.x, dy = it._sy - sh.y, dd = dx*dx + dy*dy;
+        if(dd < bd){ bd = dd; best = Math.atan2(dy, dx); }
+      }
+      if(best != null){
+        var diff = best - sh.a;
+        while(diff > Math.PI) diff -= 2*Math.PI;
+        while(diff < -Math.PI) diff += 2*Math.PI;
+        sh.a += Math.max(-6*dt, Math.min(6*dt, diff));
+      }
+    }
+    sh.x += Math.cos(sh.a)*sh.v*dt;
+    sh.y += Math.sin(sh.a)*sh.v*dt;
+    sh.life -= dt;
+    var dead = sh.life <= 0 || sh.x < -60 || sh.x > innerWidth + 60 || sh.y < -60 || sh.y > innerHeight + 60;
+    if(!dead){
+      for(var k2 = 0; k2 < ITEMS.length && sh.hits > 0; k2++){
+        var it2 = ITEMS[k2];
+        if(!it2 || it2.kind !== 'pepper' || it2.dead || it2.planet !== planet || it2._sx == null) continue;
+        var dx2 = it2._sx - sh.x, dy2 = it2._sy - sh.y;
+        if(dx2*dx2 + dy2*dy2 < 48*48){
+          sh.hits--;
+          killPepper(it2);
+          if(sh.type === 'ck') dead = true;
+        }
+      }
+    }
+    if(dead){
+      if(sh.el && sh.el.parentNode) sh.el.parentNode.removeChild(sh.el);
+      shots.splice(i, 1);
+    } else {
+      sh.el.style.transform = 'translate(' + sh.x.toFixed(1) + 'px,' + sh.y.toFixed(1) + 'px)';
+    }
+  }
+}
+function ensureAura(){
+  if(auraEl || !bearWrap) return;
+  if(!auraCss){
+    auraCss = true;
+    var st = document.createElement('style');
+    st.textContent = '@keyframes auraPulse{0%,100%{transform:scale(.92);opacity:.75}50%{transform:scale(1.08);opacity:1}}';
+    document.head.appendChild(st);
+  }
+  auraEl = document.createElement('div');
+  auraEl.style.cssText = 'position:absolute;left:50%;top:50%;width:150%;height:150%;margin:-75% 0 0 -75%;border:3px solid rgba(255,196,60,.85);border-radius:50%;pointer-events:none;box-shadow:0 0 14px rgba(255,196,60,.8);animation:auraPulse 1.2s ease-in-out infinite;display:none;';
+  bearWrap.appendChild(auraEl);
+}
+function ensureSnow(){
+  if(snowEl) return;
+  snowEl = document.createElement('div');
+  snowEl.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:5900;background:radial-gradient(circle,rgba(140,210,255,0) 30%,rgba(140,210,255,.35) 100%);opacity:0;transition:opacity .4s ease;';
+  layer.appendChild(snowEl);
+}
+
+/* ---------- ФОРСАЖ ---------- */
+function tryBoost(){
+  if(!gameOn || gameOver || boostOn) return;
+  if(boostFuel < CFG.BOOST_MIN){
+    if(boostFillEl){
+      boostFillEl.style.background = '#ff5a4a';
+      setTimeout(function(){ if(boostFillEl) boostFillEl.style.background = 'linear-gradient(90deg,#7a3c00,#ffb35c,#ffe08a)'; }, 300);
+    }
+    return;
+  }
+  boostOn = true;
+  boostLeft = boostFuel/CFG.BOOST_DRAIN;
+}
+
+/* ---------- GAME OVER И СБРОС ---------- */
+function initGoPanel(){
+  if(goPanel) return;
+  goPanel = document.createElement('div');
+  goPanel.setAttribute('data-keep', '1');
+  goPanel.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:90;display:none;flex-direction:column;align-items:center;gap:11px;background:#0c150c;border:6px outset #950;border-radius:10px;padding:19px 24px;box-shadow:0 20px 40px rgba(0,0,0,.7);';
+  goPanel.innerHTML = '<div id="goTitleEl" style="font:900 21px/1 monospace;letter-spacing:4px;color:#ff5a4a;text-shadow:2px 2px 0 #3a0000;">GAME OVER</div>'
+    + segRowHtmlN('goPtsEl', '\u{1F31F} ОЧКИ', 10)
+    + '<div id="goMoonEl" style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;"></div>'
+    + '<button id="goWinBtn" style="width:192px;display:none;">ПРОДОЛЖИТЬ РЕЙС</button>'
+    + '<button id="goBtn" style="width:192px;">НАЧАТЬ СНАЧАЛА</button>';
+  document.body.appendChild(goPanel);
+  goPtsEl = document.getElementById('goPtsEl');
+  goMoonEl = document.getElementById('goMoonEl');
+  goTitleEl = document.getElementById('goTitleEl');
+  goWinBtn = document.getElementById('goWinBtn');
+  document.getElementById('goWinBtn').addEventListener('click', function(){
+    expMax = true;
+    winShown = false;
+    if(goWinBtn) goWinBtn.style.display = 'none';
+    hideGameOver();
+    gameOver = false;
+    gameOn = true;
+    paused = false;
+    segUpdate();
+    applyGameMode();
+    toastFx('РЕЙС ПРОДОЛЖАЕТСЯ — ОПЫТ: MAX', '#7dff8a');
+  });
+  document.getElementById('goBtn').addEventListener('click', function(){
+    resetGame();
+    gameOver = false;
+    gameOn = true;
+    paused = false;
+    if(pauseEl) pauseEl.style.display = 'none';
+    applyGameMode();
+  });
+}
+function showGameOver(){
+  if(!goPanel) initGoPanel();
+  segSetN(goPtsEl, pts, 10);
+  if(goMoonEl) goMoonEl.textContent = '\u{1F31D} ЛУН СОБРАНО: ' + moonTot;
+  if(goWinBtn) goWinBtn.style.display = 'none';
+  goPanel.style.display = 'flex';
+}
+function hideGameOver(){ if(goPanel) goPanel.style.display = 'none'; }
+function doGameOver(){
+  if(gameOver) return;
+  gameOver = true;
+  gameOn = false;
+  boostOn = false;
+  showGameOver();
+  applyGameMode();
+}
+function doWin(){
+  if(expMax || winShown) return;
+  expMax = true;
+  winShown = true;
+  saveScore();
+  gameOn = false;
+  boostOn = false;
+  if(!goPanel) initGoPanel();
+  segSetN(goPtsEl, pts, 10);
+  if(goMoonEl) goMoonEl.textContent = '\u{1F31D} ЛУН СОБРАНО: ' + moonTot;
+  if(goTitleEl){
+    goTitleEl.textContent = '★ 7000 EXP — ИГРА ПРОЙДЕНА ★';
+    goTitleEl.style.color = '#7dff8a';
+    goTitleEl.style.textShadow = '2px 2px 0 #0a3a10';
+  }
+  if(goWinBtn) goWinBtn.style.display = '';
+  goPanel.style.display = 'flex';
+  applyGameMode();
+}
+function resetGame(){
+  cancelWarp();
+  targetIdx = -1;
+  inTransit = false;
+  if(F.pos){ F.pos = [Math.cos(A0)*CAMR0, Math.sin(A0)*CAMR0, 0]; resetBasis(); }
+  setSpaceMode();
+  score.cake = 0; score.cheese = 0; score.moon = 0;
+  provCk = CFG.START_PROV; provCh = CFG.START_PROV;
+  pts = 0; moonTot = 0;
+  moonStock = 0; moonCap = CFG.MOON_CAP0;
+  immuneT = 0; pepperCd = 0;
+  hpMax = CFG.HP0; hpCur = CFG.HP0;
+  boostFuel = 0; boostOn = false; boostMul = 1; boostLeft = 0;
+  magnetT = 0; freezeT = 0; pepBanT = 0; hotSel = 0; hotDenyT = 0;
+  for(var si = shots.length - 1; si >= 0; si--){ if(shots[si].el && shots[si].el.parentNode) shots[si].el.parentNode.removeChild(shots[si].el); }
+  shots.length = 0;
+  keys = {};
+  for(var i = 0; i < ITEMS.length; i++){
+    if(ITEMS[i] && ITEMS[i].el && ITEMS[i].el.parentNode) ITEMS[i].el.parentNode.removeChild(ITEMS[i].el);
+  }
+  ITEMS.length = 0;
+  genWorld();
+  lastHpMax = -1;
+  if(goTitleEl){ goTitleEl.textContent = 'GAME OVER'; goTitleEl.style.color = '#ff5a4a'; goTitleEl.style.textShadow = '2px 2px 0 #3a0000'; }
+  expTotal = 0; expMax = false; winShown = false;
+  saveScore();
+  segUpdate();
+  updBottomPanel();
+  hideGameOver();
+}
+
+/* ---------- CSS ЛИНЗЫ ---------- */
+(function(){
+  var css = document.createElement('style');
+  css.textContent = '.mglens{position:absolute;left:50%;top:50%;width:340px;height:340px;margin:-170px 0 0 -170px;border-radius:50%;pointer-events:none;display:none;border:3px solid rgba(125,210,255,.9);box-shadow:0 0 26px rgba(125,210,255,.55),inset 0 0 42px rgba(125,210,255,.28);background:radial-gradient(circle,rgba(125,210,255,.10) 0%,rgba(125,210,255,.03) 58%,transparent 72%);animation:mglensPulse 1.6s ease-in-out infinite;}'
+    + '@keyframes mglensPulse{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.09);opacity:1;}}';
+  document.head.appendChild(css);
+})();
+var fadeEl = document.createElement('div');
+fadeEl.style.cssText = 'position:fixed;inset:0;z-index:45;pointer-events:none;background:#000;opacity:0;transition:opacity .28s linear;';
+document.body.appendChild(fadeEl);
+fadeEl.setAttribute('data-keep','1');
+var hud = document.createElement('div');
+hud.style.cssText = 'position:fixed;left:10px;top:10px;z-index:50;background:rgba(3,8,13,.8);border:2px inset #950;color:#7dff8a;font:10px/1.5 monospace;padding:5px 8px;pointer-events:none;white-space:pre;';
+document.body.appendChild(hud);
+hud.setAttribute('data-keep','1');
+var SEG_ON = {0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg'};
+var SEG_GEO = [
+  ['h', 4, 0, 12, 4],
+  ['v', 16, 4.8, 4, 11.2],
+  ['v', 16, -4.8, 4, 11.2],
+  ['h', 4, 32.8, 12, 4],
+  ['v', 0, -4.8, 4, 11.2],
+  ['v', 0, 4.8, 4, 11.2],
+  ['h', 4, 16.4, 12, 4]
+];
+var hudTxtEl = null, hudThrEl = null, hudThrSegEl = null;
+hudTxtEl = document.createElement('div');
+hudThrEl = document.createElement('div');
+hudThrEl.innerHTML = segRowHtmlN('hudThrSeg', '\u00D7\u0422\u042F\u0413\u0410', 3);
+hudThrEl.style.cssText = 'margin-top:4px;';
+hud.appendChild(hudTxtEl);
+hud.appendChild(hudThrEl);
+hudThrSegEl = document.getElementById('hudThrSeg');
+var ctl = document.createElement('div');
+ctl.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:50;display:flex;flex-direction:column-reverse;align-items:center;gap:6px;';
+var btnPilot = document.createElement('button');
+btnPilot.textContent = 'ИГРА: СТАРТ';
+var btnMusic = document.createElement('button');
+btnMusic.textContent = 'МУЗЫКА';
+ctl.appendChild(btnPilot); ctl.appendChild(btnMusic);
+var btnShelf = document.createElement('a');
+btnShelf.href = 'hitomi.html'; btnShelf.textContent = '🪐 ПОЛКА ПЛАНЕТ';
+btnShelf.style.cssText = 'display:block;font-family:inherit;background:#222;color:#f7cc1d;border:4px outset #950;padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 #000;font-size:0.85rem;width:180px;height:40px;line-height:26px;text-align:center;text-decoration:none;';
+var btnLore = document.createElement('a');
+btnLore.href = 'hitomi_of_legends.html'; btnLore.textContent = '📖 ЛОР';
+btnLore.style.cssText = btnShelf.style.cssText;
+ctl.appendChild(btnShelf); ctl.appendChild(btnLore);
+document.body.appendChild(ctl);
+ctl.setAttribute('data-keep','1');
+
+/* ---------- СЕМИСЕГМЕНТНЫЕ СЧЁТЧИКИ (кекс/сыр) ---------- */
+var segPanel = null, segCakeEl = null, segCheeseEl = null, segMoonEl = null;
+var segStockEl = null, segStockCapEl = null;
+var topPanel = null, segPtsEl = null;
+var botPanel = null, hpBarEl = null, boostFillEl = null;
+var expFillEl = null, expLabelEl = null;
+var goPanel = null, goPtsEl = null, goMoonEl, goTitleEl = null, goWinBtn = null;
+var lensEl = null, lastHpMax = -1;
+function segRowHtml(id, label){
+  var s = '<div style="display:flex;align-items:center;gap:8px;">'
+    + '<span style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;">' + label + '</span>'
+    + '<div id="' + id + '" style="display:flex;gap:3px;padding:2px 2px;">';
+  for(var d=0; d<3; d++){
+    s += '<div class="segd" style="position:relative;width:20px;height:37px;">';
+    for(var i=0; i<7; i++){
+      var p = SEG_GEO[i];
+      s += '<div class="' + p[0] + '" style="left:' + p[1] + 'px;'
+        + (p[2] < 0 ? 'bottom:' + (-p[2]) + 'px;' : 'top:' + p[2] + 'px;')
+        + 'width:' + p[3] + 'px;height:' + p[4] + 'px;opacity:.13;"></div>';
+    }
+    s += '</div>';
+  }
+  return s + '</div></div>';
+}
+function segSet(row, val){
+  var n = Math.max(0, Math.min(999, Math.floor(val)));
+  var str = ('00' + n).slice(-3);
+  for(var i=0; i<3; i++){
+    var cell = row.children[i];
+    if(!cell) continue;
+    var on = SEG_ON[+str.charAt(i)] || '';
+    for(var j=0; j<7; j++){
+      var seg = cell.children[j];
+      if(seg) seg.style.opacity = on.indexOf('abcdefg'.charAt(j)) >= 0 ? '1' : '.13';
+    }
+  }
+}
+function segUpdate(){
+  if(!segPanel || !score) return;
+  if(segCakeEl) segSet(segCakeEl, provCk);
+  if(segCheeseEl) segSet(segCheeseEl, provCh);
+  if(segStockEl) segSet(segStockEl, moonStock);
+  if(segStockCapEl) segStockCapEl.textContent = '/' + moonCap;
+  updTopScore();
+}
+function segBump(kind){
+  if(!segPanel) return;
+  segUpdate();
+  var row = kind === 'moon' ? segStockEl : (kind === 'cheese' ? segCheeseEl : segCakeEl);
+  if(!row) return;
+  try{
+    row.style.transition = 'none';
+    row.style.transform = 'scale(1.2)';
+    setTimeout(function(){ row.style.transition = 'transform .18s ease'; row.style.transform = 'scale(1)'; }, 40);
+  }catch(e){}
+}
+function initSegPanel(){
+  if(segPanel) return;
+  segPanel = document.createElement('div');
+  segPanel.setAttribute('data-keep', '1');
+  segPanel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:60;display:none;flex-direction:column;gap:6px;background:#0c150c;border:4px inset #1a1a2e;border-radius:6px;padding:10px 11px;box-shadow:0 6px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);';
+  segPanel.innerHTML = segRowHtml('segCakeEl','\u{1F9C1} КЕКС') + segRowHtml('segCheeseEl','\u{1F9C0} СЫР') + segRowHtml('segStockEl','\u{1F31D} ЗАПАС');
+  document.body.appendChild(segPanel);
+  segCakeEl = document.getElementById('segCakeEl');
+  segCheeseEl = document.getElementById('segCheeseEl');
+  segStockEl = document.getElementById('segStockEl');
+  segStockCapEl = document.createElement('span');
+  segStockCapEl.style.cssText = 'font:700 9px/1 monospace;color:#9fd9a0;padding-left:3px;';
+  if(segStockEl && segStockEl.parentNode) segStockEl.parentNode.appendChild(segStockCapEl);
+  segUpdate();
+}
+
+
+function makeSprite(ch){
+  var d = document.createElement('div');
+  d.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;user-select:none;will-change:transform;display:none;';
+  d.textContent = ch;
+  layer.appendChild(d);
+  return d;
+}
+
+/* ---------- МИР: предметы и луны ---------- */
+var ITEMS = [];
+function rndDir(){
+  var a = Math.random()*Math.PI*2, z = Math.random()*1.6 - 0.8;
+  var r = Math.sqrt(Math.max(0, 1 - z*z));
+  return [r*Math.cos(a), z, r*Math.sin(a)];
+}
+function spawnOrbit(kind, glyph, rmin, rmax, sz, wbase, pi){
+  var dir = rndDir();
+  var r = rmin + Math.random()*(rmax - rmin);
+  var ax = cross(dir, rndDir());
+  if(len(ax) < 0.05) ax = [0,1,0];
+  ITEMS.push({ el: makeSprite(glyph), kind: kind, p0: mul(dir, r),
+    axis: norm(ax), w: wbase + Math.random()*0.10, planet: pi, angle: 0, sz: sz });
+}
+function genWorld(){
+  /* ITEM-CUT: спавн предметов (кексы, сыр, перец, сердечки, луны) вырезан из протокола */
+}
+genWorld();
+
+/* ---------- МЕДВЕДЬ-ПИЛОТ ---------- */
+var BEAR_D = 0.35, BEAR_SZ = 0.05;
+var bearWrap = null;
+(function(){
+  try{
+    var g = document.getElementById('mgHead');
+    var svg = g ? g.ownerSVGElement : null;
+    if(!svg) return;
+    bearWrap = document.createElement('div');
+    bearWrap.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;will-change:transform;transform-origin:50% 50%;display:none;';
+    var html = svg.outerHTML
+      .replace(/mg([A-Za-z]+)/g, 'zg$1')
+      .replace('width:380px; height:380px; cursor:pointer;', 'width:100%;height:100%;display:block;');
+    bearWrap.innerHTML = html;
+    bearWrap.classList.add('gbear');
+    layer.appendChild(bearWrap);
+  }catch(e){ bearWrap = null; }
+})();
+
+/* ---------- ПРОЕКЦИЯ И ПЕРЕКРЫТИЯ ---------- */
+var RING_N = norm([0.22, 1.0, 0.18]);
+var RING_IN = 1.45, RING_OUT = 2.35, GAP_IN = 1.76, GAP_OUT = 1.86;
+function ringOccl(camPos, dir, dist){
+  var denom = dot(dir, RING_N);
+  if(Math.abs(denom) < 1e-4) return false;
+  var t = -dot(camPos, RING_N)/denom;
+  if(t <= 0 || t >= dist) return false;
+  var q = add(camPos, mul(dir, t));
+  var r = len(q);
+  return (r > RING_IN && r < RING_OUT && !(r > GAP_IN && r < GAP_OUT));
+}
+function project(p, cam, W, H){
+  var v = sub(p, cam.pos);
+  var dist = len(v);
+  var z = dot(v, cam.fwd);
+  /* OPT: плавнее порог — меньше «прилипания»/рывков спрайтов у камеры */
+  if(z < 0.01) return null;
+  var dir = mul(v, 1/(dist||1));
+  var tC = -dot(cam.pos, dir) - OCCL_Y*dir[1];
+  if(tC > 0 && tC < dist){
+    var q = add(cam.pos, mul(dir, tC));
+    if(dot(q,q) + OCCL_Y*(2.0*q[1] + OCCL_Y) < 1.0){
+      var ox = dot(v, cam.right)/(z*CFG.FOV_TAN);
+      var oy = dot(v, cam.up)/(z*CFG.FOV_TAN);
+      var osx = (ox*H + W)/2;
+      var osy = (H - oy*H)/2;
+      return { occl: true, x: osx, y: osy, z: z };
+    }
+  }
+  var ux = dot(v, cam.right)/(z*CFG.FOV_TAN);
+  var uy = dot(v, cam.up)/(z*CFG.FOV_TAN);
+  var sx = (ux*H + W)/2;
+  var sy = (H - uy*H)/2;
+  if(sx < -90 || sx > W + 90 || sy < -90 || sy > H + 90) return null;
+  return { x: sx, y: sy, z: z };
+}
+function sunDirNow(simT){
+  var sa = 2*Math.PI*simT/3600.0;
+  return norm([Math.cos(sa), 0.22*Math.sin(sa), Math.sin(sa)]);
+}
+
+/* ---------- СБОР И ЭФФЕКТЫ ---------- */
+var score = { cake: 0, cheese: 0, moon: 0 };
+var provCk = CFG.START_PROV, provCh = CFG.START_PROV;
+var pts = 0, moonTot = 0;
+var moonStock = 0, moonCap = CFG.MOON_CAP0;
+var immuneT = 0, pepperCd = 0;
+var hpCur = CFG.HP0, hpMax = CFG.HP0;
+var boostFuel = 0, boostOn = false, boostMul = 1, boostLeft = 0;
+var expTotal = 0;
+var expMax = false, winShown = false;
+var gameOver = false;
+try{
+  var saved = JSON.parse(localStorage.getItem('diowkrad_game_score') || 'null');
+  if(saved){
+    score.cake = saved.cake || 0; score.cheese = saved.cheese || 0; score.moon = saved.moon || 0;
+    pts = saved.pts || 0;
+    expTotal = saved.exp || 0; expMax = !!saved.expMax; moonTot = saved.moonTot || 0;
+    moonStock = Math.min(CFG.MOON_CAP0 + Math.floor(pts/CFG.CAP_STEP), saved.stock || 0);
+  }
+}catch(e){}
+applyMilestones();
+function saveScore(){
+  try{ localStorage.setItem('diowkrad_game_score', JSON.stringify({ cake: score.cake, cheese: score.cheese, moon: score.moon, pts: pts, moonTot: moonTot, stock: moonStock, exp: expTotal, expMax: expMax })); }catch(e){}
+}
+function applyMilestones(){
+  var nc = CFG.MOON_CAP0 + Math.floor(pts/CFG.CAP_STEP);
+  if(nc > moonCap) moonCap = nc;
+  var nm = CFG.HP0;
+  for(var i = 0; i < CFG.HP_STEPS.length; i++){ if(pts >= CFG.HP_STEPS[i]) nm++; }
+  if(nm > hpMax){ hpMax = nm; hpCur = Math.min(hpCur + 1, hpMax); }
+}
+function flash(x, y, kind){
+  var col = kind === 'cake' ? '#ffd9f0' : (kind === 'cheese' ? '#ffe97d' : (kind === 'pepper' ? '#ff5a4a' : (kind === 'heart' ? '#ffb3d9' : '#cfe0ff')));
+  var f = document.createElement('div');
+  f.style.cssText = 'position:absolute;left:0;top:0;width:60px;height:60px;margin:-30px 0 0 -30px;'
+    + 'border:3px solid ' + col + ';border-radius:50%;pointer-events:none;z-index:6000;'
+    + 'transform:translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(0.3);'
+    + 'transition:transform .5s ease-out, opacity .5s ease-out;';
+  layer.appendChild(f);
+  requestAnimationFrame(function(){
+    f.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(2.6)';
+    f.style.opacity = '0';
+  });
+  setTimeout(function(){ if(f.parentNode) f.remove(); }, 550);
+}
+function respawn(it){
+  if(it.kind === 'moon'){
+    it.p0 = mul(rndDir(), (it.mi < 4 ? CFG.MOON_R[it.mi] : (1.85 + 1.12*it.mi/7)));
+    it.angle = 0;
+    return;
+  }
+  var zone = (it.kind === 'pepper' || (it.sz || 0) > 0.09);
+  var rmin = zone ? CFG.OUT_RMIN : CFG.PICK_RMIN;
+  var rmax = zone ? CFG.OUT_RMAX : CFG.PICK_RMAX;
+  var d, guard = 0;
+  do{ d = rndDir(); guard++; } while(dot(d, F.fwd) > -0.25 && guard < 40);
+  var r = rmin + Math.random()*(rmax - rmin);
+  it.p0 = mul(d, r);
+  var ax = cross(d, rndDir());
+  it.axis = len(ax) < 0.05 ? [0,1,0] : norm(ax);
+  it.w = (it.kind === 'pepper' ? 0.45 : 0.05) + Math.random()*0.10;
+  it.angle = 0;
+}
+function collect(it, pr){
+  var big = (it.sz || 0.052) > 0.09;
+  var mult = big ? 2 : 1;
+  if(it.kind === 'pepper'){
+    if(pepperCd > 0) return;
+    if(freezeT > 0 || pepBanT > 0) return;
+    pepperCd = CFG.PEPPER_CD;
+    provCk = Math.max(0, provCk - CFG.PEPPER_CK);
+    provCh = Math.max(0, provCh - CFG.PEPPER_CH);
+    boostFuel = Math.max(0, boostFuel - CFG.BOOST_PEPPER);
+    hurt(1, pr);
+    playPepper();
+    segUpdate();
+    saveScore();
+    if(hpCur <= 0) doGameOver();
+    respawn(it);
+    return;
+  }
+  if(it.kind === 'heart'){
+    hpCur = Math.min(hpMax, hpCur + 1);
+    playHeart();
+    flash(pr.x, pr.y, 'heart');
+    updBottomPanel();
+    saveScore();
+    respawn(it);
+    return;
+  }
+  score[it.kind]++;
+  if(it.kind === 'cake'){
+    provCk += mult;
+    pts += mult*CFG.PTS_CAKE;
+    boostFuel = Math.min(100, boostFuel + CFG.BOOST_CK*mult);
+    if(!expMax) expTotal += CFG.EXP_CAKE*mult;
+  } else if(it.kind === 'cheese'){
+    provCh += mult;
+    pts += mult*CFG.PTS_CHEESE;
+    boostFuel = Math.min(100, boostFuel + CFG.BOOST_CH*mult);
+    if(!expMax) expTotal += CFG.EXP_CHEESE*mult;
+  } else {
+    pts += CFG.PTS_MOON;
+    moonTot++;
+    if(moonStock < moonCap) moonStock++;
+    boostFuel = Math.min(100, boostFuel + CFG.BOOST_MOON);
+    if(!expMax) expTotal += CFG.EXP_MOON;
+  }
+  applyMilestones();
+  saveScore();
+  if(!expMax && !winShown && expTotal >= CFG.EXP_WIN) doWin();
+  playPickup(it.kind);
+  flash(pr.x, pr.y, it.kind);
+  segBump(it.kind);
+  if(bearWrap){
+    var jb = bearWrap.querySelector('.bear');
+    if(jb){
+      jb.classList.remove('jumping');
+      void jb.offsetWidth;
+      jb.classList.add('jumping');
+      clearTimeout(collect._jt);
+      collect._jt = setTimeout(function(){ jb.classList.remove('jumping'); }, 700);
+    }
+  }
+  respawn(it);
+}
+
+/* ---------- ФИЗИКА ПОЛЁТА ---------- */
+function physics(dt){
+  var P = inTransit ? FT : F;
+  var ty = 0, tp = 0, tr = 0;
+  if(keys.KeyD) ty += 1;
+  if(keys.KeyA) ty -= 1;
+  if(keys.ArrowUp) tp += 1;
+  if(keys.ArrowDown) tp -= 1;
+  if(keys.KeyE) tr += 1;
+  if(keys.KeyQ) tr -= 1;
+  var k = Math.min(1, dt*CFG.RESP);
+  yawV   += (ty*CFG.YAW_MAX   - yawV)*k;
+  if(!drag) pitchV += (tp*CFG.PITCH_MAX - pitchV)*k;
+  rollV  += (tr*CFG.ROLL_MAX  - rollV)*k;
+  if(keys.KeyW) speed += CFG.SPD_RATE*boostMul*dt;
+  if(keys.KeyS) speed -= CFG.SPD_RATE*dt;
+  var dn = -1, dd = 1e9;
+  if(inTransit){
+    var dn2 = -1, dd2 = 1e9;
+    for(var ki = 0; ki < PW.length; ki++){
+      var dk = len(sub(FT.pos, PW[ki]));
+      if(dk < dd){ dd2 = dd; dn2 = dn; dd = dk; dn = ki; }
+      else if(dk < dd2){ dd2 = dk; dn2 = ki; }
+    }
+    /* SINE-BOOST: разгон по синусоиде от объекта к объекту — у звезды ×1, на середине перегона ×3 */
+    sineMul = 1.0;
+    if(dd2 < 1e9 && dd + dd2 > 0.0){
+      var tS = Math.min(1, Math.max(0, dd/(dd + dd2)));
+      sineMul = 1 + 2*Math.sin(Math.PI*tS);
+    }
+    var ceil = CFG.SPD_MAX*(1 + Math.max(0, dd - 2)*FSD_SC_GAIN);
+    ceil = Math.min(ceil, CFG.SPD_MAX*FSD_SC_CAP)*boostMul*sineMul;
+    speed = Math.max(CFG.SPD_MIN, Math.min(ceil, speed));
+    /* ГИПЕРПРОСТРАНСТВО = свободный 3D-полёт во все стороны, как вокруг планеты,
+       только в мировых координатах: без принудительного коридора/перегона.
+       FT.pos двигается по направлению взгляда (ниже: P.pos += P.fwd*speed*dt). */
+  } else {
+    speed = Math.max(CFG.SPD_MIN, Math.min(CFG.SPD_MAX*boostMul, speed));
+  }
+  if(Math.abs(rollV) > 1e-6){
+    P.right = rotAxis(P.right, P.fwd, rollV*dt);
+    P.up    = rotAxis(P.up,    P.fwd, rollV*dt);
+  }
+  if(Math.abs(pitchV) > 1e-6){
+    P.fwd = rotAxis(P.fwd, P.right, pitchV*dt);
+    P.up  = rotAxis(P.up,  P.right, pitchV*dt);
+  }
+  if(Math.abs(yawV) > 1e-6){
+    P.fwd   = rotAxis(P.fwd,   P.up, yawV*dt);
+    P.right = rotAxis(P.right, P.up, yawV*dt);
+  }
+  P.fwd = norm(P.fwd);
+  P.right = norm(sub(P.right, mul(P.fwd, dot(P.right, P.fwd))));
+  P.up = cross(P.right, P.fwd);
+  var finChk = P.fwd[0]+P.fwd[1]+P.fwd[2]+P.right[0]+P.right[1]+P.right[2]+P.up[0]+P.up[1]+P.up[2]+P.pos[0]+P.pos[1]+P.pos[2];
+  if(!isFinite(finChk)){
+    if(inTransit){ FT.pos = PW[planet].slice(); FT.fwd = [0,0,1]; FT.up = [0,1,0]; FT.right = [1,0,0]; }
+    else resetBasis();
+  }
+  P.pos = add(P.pos, mul(P.fwd, speed*dt));
+  if(inTransit){
+    /* стыковка с любой планетой: дальняя граница гиперпространства */
+    if(dn >= 0 && dd < FSD_SOI){ /* стыковка с любой планетой: влет из гиперпространства открыт */
+      planet = dn;
+      inTransit = false;
+      F.pos = sub(FT.pos, PW[dn]);
+      var rr0 = len(F.pos);
+      if(rr0 < CFG.MINR) F.pos = mul(F.pos, CFG.MINR/(rr0||1));
+      F.fwd = P.fwd; F.right = P.right; F.up = P.up;
+      speed = Math.min(speed, CFG.SPD_MAX*boostMul);
+      targetIdx = -1;
+      toastFx('СТЫКОВКА: ' + PLANET_NAMES[dn]);
+      setSpaceMode();
+    }
+  } else {
+    var r = len(F.pos);
+    if(r < CFG.MINR){
+      var nrm = mul(F.pos, 1/(r||1));
+      F.pos = mul(nrm, CFG.MINR);
+      var inw = dot(F.fwd, nrm);
+      if(inw < 0) F.fwd = norm(sub(F.fwd, mul(nrm, inw)));
+    }
+    /* выход из зоны планеты — суперкруиз */
+    if(r > FSD_SOI){
+      FT = { pos: add(PW[planet], F.pos), fwd: F.fwd, up: F.up, right: F.right };
+      inTransit = true;
+      setSpaceMode();
+      toastFx('ГИПЕРПРОСТРАНСТВО: ПЛАНЕТЫ ВИДНЫ НА НЕБЕ', '#7dff8a');
+    }
+  }
+}
+
+/* ---------- ОТРИСОВКА СПРАЙТОВ ---------- */
+function drawSprites(cam, W, H, bgSim, dt){
+  var sun = sunDirNow(bgSim), i, it, pr, p;
+  var bearWp = add(cam.pos, mul(cam.fwd, BEAR_D));
+  for(i = 0; i < ITEMS.length; i++){
+    it = ITEMS[i];
+    if(it.planet !== planet || inTransit){ it.el.style.display = 'none'; continue; }
+    if(it.dead){ it.el.style.display = 'none'; continue; }
+    if(freezeT <= 0) it.angle += it.w*dt;
+    p = rotAxis(it.p0, it.axis, it.angle);
+    if(magnetT > 0 && gameOn && (it.kind === 'cake' || it.kind === 'cheese')){
+      var mr = MAG_R * (((it.sz || 0.052) > 0.09) ? 1.6 : 1);
+      var dv = sub(p, bearWp), dl3 = len(dv);
+      if(dl3 < mr && dl3 > 0.001){
+        var kp = Math.min(1, (1 - dl3/mr) * 3.0 + 0.4);
+        var np2 = sub(p, mul(dv, kp*dt*4));
+        it.p0 = rotAxis(np2, it.axis, -it.angle);
+        p = np2;
+      }
+    }
+    
+    pr = project(p, cam, W, H);
+    if(!pr || pr.occl){ it.el.style.display = 'none'; continue; }
+    if(PLANETS_DB.planets[planet].rings){
+      var v2 = sub(p, cam.pos), d2 = len(v2);
+      if(ringOccl(cam.pos, mul(v2, 1/(d2||1)), d2)){ it.el.style.display = 'none'; continue; }
+    }
+    var size = Math.max(14, Math.min(H*1.2, ((it.sz || 0.052)/pr.z)*H));
+    /* OPT: плавный фейд по дальности — убирает рывки «прилипания» спрайта к камере */
+    var op = Math.min(1, Math.max(0.0, (Math.min(pr.z, 3.0) - 0.03)/0.10));
+    var dl = dot(norm(p), sun);
+    it.el.style.display = 'block';
+    it.el.style.transform = 'translate(' + pr.x.toFixed(1) + 'px,' + pr.y.toFixed(1) + 'px) translate(-50%,-50%)';
+    it.el.style.fontSize = size.toFixed(1) + 'px';
+    it.el.style.opacity = op.toFixed(2);
+    it.el.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, dl)).toFixed(2) + ')';
+    it.el.style.zIndex = String(5000 - Math.round(pr.z*100));
+    if(it.kind === 'pepper'){ it._sx = pr.x; it._sy = pr.y; }
+    if(gameOn && !(it.kind === 'pepper' && (immuneT > 0 || freezeT > 0 || pepBanT > 0)) && len(sub(p, bearWp)) < CFG.PICK_RAD*(it.kind === 'moon' ? 1.5 : ((it.sz || 0.052) > 0.09 ? 2 : 1))) collect(it, pr);
+  }
+  if(bearWrap && gameOn && !paused){
+    var bpr = project(bearWp, cam, W, H);
+    if(bpr && !bpr.occl){
+      var bv = sub(bearWp, cam.pos), bd = len(bv);
+      var bo = (PLANETS_DB.planets[planet].rings) ? ringOccl(cam.pos, mul(bv, 1/(bd||1)), bd) : false;
+      if(!bo){
+        var bdl = dot(norm(bearWp), sun);
+        var bsize = Math.max(28, Math.min(H*0.9, (BEAR_SZ/bpr.z)*H));
+        var bank = Math.max(-28, Math.min(28, rollV/(CFG.ROLL_MAX||1)*28));
+        bearWrap.style.display = 'block';
+        bearWrap.style.transform = 'translate(' + bpr.x.toFixed(1) + 'px,' + bpr.y.toFixed(1) + 'px) translate(-50%,-50%) rotate(' + bank.toFixed(1) + 'deg)';
+        bearWrap.style.width = bsize.toFixed(1) + 'px';
+        bearWrap.style.height = bsize.toFixed(1) + 'px';
+        bearWrap.style.opacity = Math.min(1, Math.max(0.15, (Math.min(bpr.z, 3.0) - 0.10)/0.10)).toFixed(2);
+        bearWrap.style.filter = 'brightness(' + (0.45 + 0.55*Math.max(0, bdl)).toFixed(2) + ')';
+        bearWrap.style.zIndex = String(5000 - Math.round(bpr.z*100));
+        ensureAura();
+        if(auraEl) auraEl.style.display = (magnetT > 0) ? 'block' : 'none';
+        shotX = bpr.x; shotY = bpr.y;
+        var aimW = add(cam.pos, mul(F.fwd, 5.0));
+        var apr = project(aimW, cam, W, H);
+        if(apr && !apr.occl){ shotAimX = apr.x; shotAimY = apr.y; }
+      } else bearWrap.style.display = 'none';
+    } else bearWrap.style.display = 'none';
+  } else if(bearWrap) bearWrap.style.display = 'none';
+}
+
+/* ---------- HUD И ПЕРЕКЛЮЧЕНИЕ ПЛАНЕТ ---------- */
+function updHud(){
+  /* HUD-МИНИМУМ: скорость (сатурация 999) + множитель синуса в транзите */
+  var spd = Math.min(999, Math.round(speed*256)); /* 1 ед. = 256 св.лет */
+  var txt = 'СКОРОСТЬ: ' + spd + ' св.лет/с';
+  if(inTransit) txt += '\nСИНУС: \u00D7' + sineMul.toFixed(2);
+  if(mouseCtl) txt += '\nМЫШЬ: ВКЛ (P — вернуть курсор)';
+  /* OPT: кэш текста — не пишем в DOM, если значение не изменилось */
+  if(hudTxtEl){
+    if(hudTxtEl.__last !== txt){ hudTxtEl.textContent = txt; hudTxtEl.__last = txt; }
+  } else if(hud._last !== txt){ hud.textContent = txt; hud._last = txt; }
+  var pct = Math.round(speed/CFG.SPD_MAX*100);
+  if(hudThrSegEl) segSetN(hudThrSegEl, Math.max(0, Math.min(250, pct)), 3);
+}
+
+function trackFor(p){ return (pKind(p) === 3) ? 'Star-1.ogg' : 'Music-' + (p % 3 + 1) + '.ogg'; }
+function switchPlanet(dir){
+  if(switching) return;
+  var target = -1;
+  if(dir > 0){
+    if(planet >= FIN) return;
+    var need = expNeed(planet + 1);
+    if(expTotal < need){
+      if(expFillEl){
+        expFillEl.style.background = '#ff5a4a';
+        setTimeout(function(){ if(expFillEl) expFillEl.style.background = 'linear-gradient(90deg,#0b4d1f,#7dff8a,#d6ffb0)'; }, 300);
+      }
+      return;
+    }
+    target = planet + 1;
+  } else {
+    if(planet === 0){
+      /* назад с ХИТОМИ — только к уже открытой звезде: раньше времени не переключит */
+      if(expTotal < expNeed(FIN)) return;
+      target = FIN;
+    } else {
+      target = planet - 1;
+    }
+  }
+  switching = true;
+  magnetT = 0; freezeT = 0;
+  for(var swi = shots.length - 1; swi >= 0; swi--){ if(shots[swi].el && shots[swi].el.parentNode) shots[swi].el.parentNode.removeChild(shots[swi].el); }
+  shots.length = 0;
+  fadeEl.style.opacity = '1';
+  setTimeout(function(){
+    planet = target;
+    if(sfx.music && sfx.started){
+      try{ sfx.music.pause(); sfx.music.src = trackFor(planet); }catch(e){}
+    }
+    updHud();
+    fadeEl.style.opacity = '0';
+    if(sfx.musicOn) tryMusic();
+    setTimeout(function(){ switching = false; }, 300);
+  }, 300);
+}
+
+/* ---------- ПАУЗА: панель Управление / Механики / Правила ---------- */
+function setPaused(v){
+  if(paused === v) return;
+  paused = v;
+  if(v && document.pointerLockElement) document.exitPointerLock();
+  if(pauseEl) pauseEl.style.display = v ? 'flex' : 'none';
+  if(sfx.music){
+    if(v) sfx.music.pause();
+    else if(sfx.musicOn && sfx.started) tryMusic();
+  }
+  if(fsdAudio && warp){
+    if(v){ try{ fsdAudio.pause(); }catch(e){} }
+    else if(sfx.musicOn){ try{ var wp = fsdAudio.play(); if(wp && wp.catch) wp.catch(function(){}); }catch(e){} }
+  }
+}
+function initPausePanel(){
+  if(pauseEl) return;
+  pauseEl = document.createElement('div');
+  pauseEl.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:92;display:none;flex-direction:column;align-items:center;gap:9px;background:#0c150c;border:6px outset #950;border-radius:10px;padding:18px 26px;box-shadow:0 20px 40px rgba(0,0,0,.7);max-width:min(600px,92vw);max-height:86vh;overflow:auto;';
+  pauseEl.innerHTML =
+    '<div style="font:900 20px/1 monospace;letter-spacing:5px;color:#f7cc1d;text-shadow:2px 2px 0 #7a5c00;">ПАУЗА</div>'
+    + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#7dff8a;">УПРАВЛЕНИЕ</div>'
+    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G — FSD-прыжок к цели (Y), J — к предыдущей планете<br>Y — захват планеты в цель: прицел на небе<br>Вне зоны планеты (11 а.е.) — гиперпространство: перегон по синусоиде, скорость растёт с удалением<br>Подлёт к любой планете — стыковка: влет из гиперпространства открыт<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
+    + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#f7cc1d;">МЕХАНИКИ</div>'
+    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Кексик +3 EXP, сыр +5 EXP, луна +10 EXP (крупные — вдвое)<br>500 EXP — ЧИЗИЯ, 1500 EXP — НГАЛИН, 2250 EXP — ШИНРАРТА-B<br>7000 EXP — РЕЙС ПРОЙДЕН: ПРОДОЛЖИТЬ ИЛИ СНАЧАЛА<br>Добыча наполняет Форсаж: кексик +2%, сыр +1%, луна +5%<br>Форсаж — разгон до ×2.5, тает за 10 с, реген 100% за 90 с<br>Магнит — 12 с притяжения, Залп — 10 снарядов, Цель — 5 самонаводящихся<br>Вспышка — перчики исчезают на 10 с, Заморозка — стоп на 16 с<br>Обменник — кексики ↔ сыр 1:1, обратно 1 кексик = 2 сыра</div>'
+    + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#ff5a4a;">ПРАВИЛА</div>'
+    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Собирайте кексики и сыр, открывайте планеты за EXP<br>Перчик отнимает 1 HP и опустошает шкалу Форсажа на 5%<br>Аптечка восстанавливает 1 HP (максимум 8)<br>Нулевая провизия игру не завершает — опасен только ноль HP<br>HP = 0 — Game Over</div>'
+    + '<button id="pauseBtn" style="width:192px;">ПРОДОЛЖИТЬ</button>';
+  pauseEl.setAttribute('data-keep','1');
+  document.body.appendChild(pauseEl);
+  document.getElementById('pauseBtn').addEventListener('click', function(){ setPaused(false); });
+}
+
+/* ---------- FSD: ГИПЕРПРЫЖОК, СУПЕРКРУИЗ, ПЛАНЕТЫ НА СКАЙБОКСЕ ---------- */
+/* константы FSD (править здесь) */
+var FSD_CHARGE = 2.6, FSD_TUNNEL = 1.2, FSD_EXIT = 1.5;   /* фазы прыжка, с */
+var FSD_SC_GAIN = 0.3, FSD_SC_CAP = 24;   /* потолок суперкруиза = SPD_MAX*(1+(d-2)*GAIN), не выше SPD_MAX*CAP */
+var FSD_DOCK = 2.4, FSD_SOI = 11.0, SIN_AMP = 7.5; /* SIN_AMP — крутизна синусоиды перегона */ /* стыковка / стена закрытых / ГИПЕРПРОСТРАНСТВО начинается здесь (диск планеты на небе ~ как на скриншоте), а.е. */
+var WARP_SND = 'warp.ogg'; /* URL-ссылки отключены: локальный файл warp.ogg рядом с HTML */
+/* мировые позиции планет (радиус планеты = 1): ХИТОМИ, ЧИЗИЯ, НГАЛИН, ШИНРАРТА-B */
+var PW = PLANETS_DB.planets.map(function(p){ return p.pos.slice(); }); /* из реестра */
+/* градиентные заглушки планет удалены: тела рисуются процедурно (модуль ниже) */
+var inTransit = false;
+var sineMul = 1; /* SINE-BOOST: множитель межобъектного разгона (для HUD) */
+var FT = { pos: [0,0,0], fwd: [0,0,1], up: [0,1,0], right: [1,0,0] };
+var targetIdx = -1;
+var warp = null;
+/* Выставляем inTransit/warp в window через getter, чтобы webGL-фон (#glbg, отдельный IIFE)
+   читал их актуальное значение каждый кадр и включал uHyper (гипер-рендер). */
+try{
+  Object.defineProperty(window, 'inTransit', { get: function(){ return inTransit; }, configurable: true });
+  Object.defineProperty(window, 'warp', { get: function(){ return warp; }, configurable: true });
+}catch(e){}
+Object.defineProperty(window, 'PW', { get: function(){ return PW; }, configurable: true });
+var skyWrap = null, skyWrapEls = [], skyCvEls = [], skyLblEls = [], skyRet = null;
+var fsdAudio = null;
+var warpCv = null, warpCtx = null, warpStreaks = null;
+
+function unlockedIdx(k){ return true; }
+function expNeed(k){ return 0; }
+function toastFx(msg, col){
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;left:50%;bottom:56px;transform:translateX(-50%);z-index:120;font:700 12px/1 monospace;letter-spacing:2px;color:' + (col || '#7dff8a') + ';background:#0c150cdd;border:3px outset #950;border-radius:8px;padding:9px 16px;pointer-events:none;';
+  t.setAttribute('data-keep','1');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ if(t.parentNode) t.remove(); }, 1800);
+}
+
+/* ---------- НЕБО ГИПЕРПРОСТРАНСТВА: 3D-скайбокс — звёзды в мировых направлениях,
+   вращаются со взглядом (крен/тангаж/рысканье/мышь), как ночное небо у планет ---------- */
+var hypCv = null, hypCtx = null, hypStars = null, hypBand = null, hypConst = null,
+    hypNeb = null, hypT = 0, hypOnLast = false;
+function initHypSky(){
+  if(hypCv) return;
+  hypCv = document.createElement('canvas');
+  hypCv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;display:none;';
+  hypCv.setAttribute('data-keep','1');
+  var gb = document.getElementById('glbg');
+  if(gb && gb.parentNode) gb.parentNode.insertBefore(hypCv, gb.nextSibling);
+  else document.body.appendChild(hypCv);
+  hypCtx = hypCv.getContext('2d');
+}
+function hypRand(a){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+function hypGenStars(){
+  hypStars = []; hypBand = [];
+  var NG = norm([0.32, 0.86, 0.38]);              /* плоскость «млечного пути» */
+  var A = norm(cross(NG, [1, 0, 0])), B = norm(cross(NG, A));
+  var i, u, phi, s, d;
+  for(i = 0; i < 620; i++){                        /* фоновые звёзды по всей сфере */
+    u = hypRand(1000 + i)*2 - 1; phi = hypRand(2000 + i)*6.28318; s = Math.sqrt(1 - u*u);
+    hypStars.push({ d: [s*Math.cos(phi), u, s*Math.sin(phi)],
+      r: 0.5 + hypRand(3000 + i)*1.5, a: 0.25 + hypRand(4000 + i)*0.7,
+      ph: hypRand(5000 + i)*6.28, sp: 0.35 + hypRand(6000 + i)*1.5,
+      bl: hypRand(7000 + i) < 0.16 });
+  }
+  for(i = 0; i < 780; i++){                        /* звёзды, прижатые к млечному пути */
+    u = (hypRand(9000 + i)*2 - 1) * 0.16; phi = hypRand(11000 + i)*6.28318;
+    d = norm(add(mul(A, Math.cos(phi)), mul(B, Math.sin(phi))));
+    d = norm(add(d, mul(NG, u)));
+    hypStars.push({ d: d, r: 0.4 + hypRand(12000 + i)*1.2, a: 0.2 + hypRand(13000 + i)*0.65,
+      ph: hypRand(14000 + i)*6.28, sp: 0.3 + hypRand(15000 + i)*1.3,
+      bl: hypRand(16000 + i) < 0.12 });
+  }
+  for(i = 0; i < 230; i++){                        /* мягкое свечение вдоль полосы */
+    phi = hypRand(17000 + i)*6.28318;
+    d = norm(add(mul(A, Math.cos(phi)), mul(B, Math.sin(phi))));
+    hypBand.push({ d: d, r: 26 + hypRand(18000 + i)*60, a: 0.02 + hypRand(19000 + i)*0.05 });
+  }
+  hypConst = [];                                   /* 5 созвездий из ярких звёзд */
+  for(var c = 0; c < 5; c++){
+    u = hypRand(21000 + c)*2 - 1; phi = hypRand(22000 + c)*6.28318; s = Math.sqrt(1 - u*u);
+    var cd = [s*Math.cos(phi), u, s*Math.sin(phi)], pts = [];
+    for(i = 0; i < 6; i++){
+      pts.push(norm(add(cd, mul(norm([hypRand(23000 + c*10 + i)*2 - 1, hypRand(24000 + c*10 + i)*2 - 1, hypRand(25000 + c*10 + i)*2 - 1]), 0.10 + hypRand(26000 + c*10 + i)*0.07))));
+    }
+    hypConst.push(pts);
+  }
+  hypNeb = [                                       /* туманности холодные космические */
+    { d: norm([0.7, 0.25, 0.6]),   r: 210, a: 0.085, col: '123,92,255' },
+    { d: norm([-0.6, 0.4, 0.5]),  r: 170, a: 0.07,  col: '72,140,255' },
+    { d: norm([0.2, -0.65, -0.6]), r: 190, a: 0.06,  col: '96,120,255' }
+  ];
+}
+function drawHypSky(dt, cam){
+  if(!hypCv) initHypSky();
+  var on = gameOn && !!(inTransit || warp);
+  /* курсор: прячем в суперкруизе и варпе, показываем у планеты и на паузе */
+  var cur = (on && !paused) ? 'none' : '';
+  if(document.documentElement.style.cursor !== cur) document.documentElement.style.cursor = cur;
+  var bg0 = document.getElementById('glbg');
+  /* ГИПЕРПРОСТРАНСТВО рендерит webGL-фон(#glbg, uHyper=1) — готовый рендер ХИТОМИ.
+     2D-канвас hypCv не нужен и скрыт. */
+  if(bg0) bg0.style.opacity = '';
+  if(hypCv) hypCv.style.display = 'none';
+  if(!on){ hypOnLast = false; return; }
+  hypOnLast = true;
+  return; /* гиперпространство = webGL-шейдер (#glbg), 2D-канвас отключён */
+  hypOnLast = true;
+  var W = window.innerWidth, H = window.innerHeight;
+  if(hypCv.width !== W || hypCv.height !== H){ hypCv.width = W; hypCv.height = H; }
+  var ctx = hypCtx;
+  hypT += (dt || 0.016);
+  if(!hypStars) hypGenStars();
+  var BIG = 1e6, i, pr;
+  for(i = 0; i < hypNeb.length; i++){              /* туманности — под звёздами */
+    var nb = hypNeb[i];
+    pr = project(mul(nb.d, BIG), cam, W, H);
+    if(pr && !pr.occl){
+      var gr = ctx.createRadialGradient(pr.x, pr.y, 0, pr.x, pr.y, nb.r);
+      gr.addColorStop(0, 'rgba(' + nb.col + ',' + nb.a + ')');
+      gr.addColorStop(1, 'rgba(' + nb.col + ',0)');
+      ctx.fillStyle = gr;
+      ctx.fillRect(pr.x - nb.r, pr.y - nb.r, nb.r*2, nb.r*2);
+    }
+  }
+  for(i = 0; i < hypBand.length; i++){             /* свечение млечного пути */
+    var bd = hypBand[i];
+    pr = project(mul(bd.d, BIG), cam, W, H);
+    if(pr && !pr.occl){
+      var gb2 = ctx.createRadialGradient(pr.x, pr.y, 0, pr.x, pr.y, bd.r);
+      gb2.addColorStop(0, 'rgba(110,125,175,' + bd.a.toFixed(3) + ')');
+      gb2.addColorStop(1, 'rgba(110,125,175,0)');
+      ctx.fillStyle = gb2;
+      ctx.fillRect(pr.x - bd.r, pr.y - bd.r, bd.r*2, bd.r*2);
+    }
+  }
+  for(i = 0; i < hypStars.length; i++){            /* звёзды: проекция направления + мерцание */
+    var st = hypStars[i];
+    pr = project(mul(st.d, BIG), cam, W, H);
+    if(!pr || pr.occl) continue;
+    var tw = 0.72 + 0.28*Math.sin(hypT*st.sp + st.ph);
+    var al = Math.min(1, st.a*tw);
+    if(st.r > 1.4){                                /* крупные звёзды — с ореолом */
+      ctx.fillStyle = 'rgba(255,244,214,' + (al*0.35).toFixed(3) + ')';
+      ctx.fillRect(pr.x - 2.2, pr.y - 2.2, 4.4, 4.4);
+    }
+    ctx.fillStyle = st.bl ? ('rgba(160,190,255,' + al.toFixed(3) + ')') : ('rgba(226,232,244,' + al.toFixed(3) + ')');
+    ctx.fillRect(pr.x, pr.y, st.r, st.r);
+  }
+  ctx.strokeStyle = 'rgba(150,170,230,0.22)';      /* созвездия: линии между звёздами */
+  ctx.lineWidth = 1;
+  for(var c2 = 0; c2 < hypConst.length; c2++){
+    var P0 = null, cl = hypConst[c2], L = cl.length;
+    for(i = 0; i <= L; i++){
+      pr = project(mul(cl[i % L], BIG), cam, W, H);
+      if(pr && !pr.occl){
+        ctx.fillStyle = 'rgba(210,225,255,0.95)';
+        ctx.fillRect(pr.x - 1.5, pr.y - 1.5, 3, 3);
+        if(P0){ ctx.beginPath(); ctx.moveTo(P0.x, P0.y); ctx.lineTo(pr.x, pr.y); ctx.stroke(); }
+        P0 = pr;
+      } else P0 = null;
+    }
+  }
+}
+function setSpaceMode(){
+  var bg = document.getElementById('glbg');
+  /* В гиперпространстве webGL-фон (#glbg, uHyper=1) рендерит готовое небо ХИТОМИ,
+     поэтому НЕ скрываем его в гиперперелёте. */
+  if(bg) bg.style.opacity = '';
+}
+/* ================= ☩ ПРОЦЕДУРНЫЕ НЕБЕСНЫЕ ТЕЛА ☩ =================
+   Рендер 1:1: разрешение канвы равно размеру тела на экране, перерисовка
+   каждый кадр. Без LOD и троттлинга. Текстуры суши/облаков/сыра
+   предрассчитаны один раз (512x256), пульсар рисуется градиентами. */
+var PB_TEX = null, PB_HOLES = null, PB_RB = null, PB_RF = null;
+function pbHash(x, y, z, sd){
+  var n = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1274126177) ^ Math.imul(sd|0, 974711);
+  n = Math.imul(n ^ (n >>> 13), 1103515245);
+  return ((n ^ (n >>> 16)) >>> 0)/4294967296;
+}
+function pbVn(px, py, pz, sd){
+  var xi = Math.floor(px), yi = Math.floor(py), zi = Math.floor(pz);
+  var xf = px - xi, yf = py - yi, zf = pz - zi;
+  var sx = xf*xf*(3-2*xf), sy = yf*yf*(3-2*yf), sz = zf*zf*(3-2*zf);
+  var c000 = pbHash(xi,yi,zi,sd), c100 = pbHash(xi+1,yi,zi,sd);
+  var c010 = pbHash(xi,yi+1,zi,sd), c110 = pbHash(xi+1,yi+1,zi,sd);
+  var c001 = pbHash(xi,yi,zi+1,sd), c101 = pbHash(xi+1,yi,zi+1,sd);
+  var c011 = pbHash(xi,yi+1,zi+1,sd), c111 = pbHash(xi+1,yi+1,zi+1,sd);
+  var x00 = c000+(c100-c000)*sx, x10 = c010+(c110-c010)*sx;
+  var x01 = c001+(c101-c001)*sx, x11 = c011+(c111-c011)*sx;
+  var y0 = x00+(x10-x00)*sy, y1 = x01+(x11-x01)*sy;
+  return y0+(y1-y0)*sz;
+}
+function pbFbm(px, py, pz, sd){
+  var v = 0.55*pbVn(px, py, pz, sd);
+  v += 0.275*pbVn(px*2.07, py*2.07, pz*2.07, sd+11);
+  v += 0.1375*pbVn(px*4.28, py*4.28, pz*4.28, sd+23);
+  return v/0.9625;
+}
+function pbInitTex(){
+  if(PB_TEX) return;
+  var TW = 512, TH = 256;
+  PB_HOLES = [];
+  for(var h = 0; h < 16; h++){
+    var ta = pbHash(h,1,2,7)*Math.PI*2, pa = Math.acos(2*pbHash(h,3,4,9)-1);
+    PB_HOLES.push({ d: [Math.sin(pa)*Math.cos(ta), Math.cos(pa), Math.sin(pa)*Math.sin(ta)], r: 0.07 + 0.07*pbHash(h,5,6,3) });
+  }
+  PB_TEX = [];
+  for(var k = 0; k < PLANET_NAMES.length; k++){
+    if(pKind(k) === 3){ PB_TEX.push(null); continue; } /* пульсар: без текстуры */
+    var terr = new Uint8ClampedArray(TW*TH*3), cloud = new Uint8ClampedArray(TW*TH);
+    for(var y = 0; y < TH; y++){
+      var lat = (0.5 - y/(TH-1))*Math.PI;
+      var cl_ = Math.cos(lat), sl_ = Math.sin(lat);
+      for(var x = 0; x < TW; x++){
+        var lon = x/TW*Math.PI*2;
+        var vx = cl_*Math.cos(lon), vy = sl_, vz = cl_*Math.sin(lon);
+        var i3 = (y*TW+x)*3, r1, g1, b1;
+        if(k === 1){ /* ЧИЗИЯ: сыр */
+          var chN = pbFbm(vx*2.3, vy*2.3, vz*2.3, 41);
+          r1 = Math.round(255*(0.72+0.28*chN)); g1 = Math.round(233*(0.7+0.3*chN)); b1 = Math.round(40+120*chN);
+          var rind = Math.min(1, Math.max(0, (Math.abs(lat)-0.95)/0.5));
+          r1 = Math.round(r1*(1-rind)+138*rind); g1 = Math.round(g1*(1-rind)+92*rind); b1 = Math.round(b1*(1-rind));
+          for(var h2 = 0; h2 < 16; h2++){
+            var dd2 = vx*PB_HOLES[h2].d[0] + vy*PB_HOLES[h2].d[1] + vz*PB_HOLES[h2].d[2];
+            if(dd2 > Math.cos(PB_HOLES[h2].r)){ r1 = 92; g1 = 58; b1 = 0; }
+            else if(dd2 > Math.cos(PB_HOLES[h2].r*1.25)){
+              r1 = Math.round(r1*0.6+37); g1 = Math.round(g1*0.6+23); b1 = Math.round(b1*0.4);
+            }
+          }
+        } else {
+          var e2 = pbFbm(vx*2.1, vy*2.1, vz*2.1, 3+k*17);
+          var grn = (k === 0);
+          if(e2 > 0.52){
+            var lm = Math.min(1, (e2-0.52)/0.3);
+            r1 = grn ? Math.round(214-89*lm) : Math.round(236-60*lm);
+            g1 = grn ? 255 : Math.round(216-105*lm);
+            b1 = grn ? Math.round(176-38*lm) : 255;
+          } else {
+            var om = Math.max(0, (e2-0.3)/0.22);
+            r1 = grn ? Math.round(3+8*om) : Math.round(23+51*om);
+            g1 = grn ? Math.round(26+51*om) : Math.round(5+24*om);
+            b1 = grn ? Math.round(11+20*om) : Math.round(39+81*om);
+          }
+        }
+        terr[i3] = r1; terr[i3+1] = g1; terr[i3+2] = b1;
+        cloud[y*TW+x] = Math.round(255*pbFbm(vx*3.1+7.3, vy*3.1, vz*3.1+2.2, 61+k*7));
+      }
+    }
+    PB_TEX.push({ tw: TW, th: TH, terr: terr, cloud: cloud });
+  }
+}
+function renderPlanetBody(k, cv, size, L, simT){
+  pbInitTex();
+  var cw, ch;
+  if(pKind(k) === 1){ cw = Math.ceil(size*2.6); ch = Math.ceil(size*1.4); }
+  else if(pKind(k) === 3){ cw = Math.ceil(size*2.4); ch = Math.ceil(size*2.4); }
+  else { cw = Math.ceil(size); ch = Math.ceil(size); }
+  if(cv.width !== cw || cv.height !== ch){ cv.width = cw; cv.height = ch; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  cv.style.transform = 'translate(' + (-cw*0.5) + 'px,' + (-ch*0.5) + 'px)';
+  if(pKind(k) === 3){ pbPulsar(cv.getContext('2d'), cw, ch, simT); return; }
+  if(pKind(k) === 1){ pbCheese(cv.getContext('2d'), cw, ch, simT, L); return; }
+  pbPlanetBody(k, cv.getContext('2d'), cw, ch, simT, L);
+}
+function pbSample(tex, u, v){
+  var xi = Math.min(tex.tw-1, Math.floor(u*tex.tw)), yi = Math.min(tex.th-1, Math.floor(v*tex.th));
+  var ci = (yi*tex.tw + xi)*3;
+  return [tex.terr[ci], tex.terr[ci+1], tex.terr[ci+2], tex.cloud[yi*tex.tw + xi]];
+}
+function pbSpherePixel(tex, nx, ny, spin, drift, L, out){
+  var r2 = nx*nx + ny*ny;
+  if(r2 > 1) return false;
+  var nz = Math.sqrt(1-r2);
+  var cA = Math.cos(spin), sA = Math.sin(spin);
+  var rx = nx*cA + nz*sA, rz = -nx*sA + nz*cA;
+  var uT = Math.atan2(rz, rx)/(Math.PI*2) - spin; uT -= Math.floor(uT);
+  var uC = Math.atan2(rz, rx)/(Math.PI*2) - drift; uC -= Math.floor(uC);
+  var vv = 0.5 - Math.asin(ny)/Math.PI;
+  var c = pbSample(tex, uT, vv);
+  var cA2 = c[3]*0.00075*255/100*0.0; /* облака: доля 0..1 */
+  cA2 = (c[3]/255)*0.75;
+  var diff = Math.max(0, nx*L[0] - ny*L[1] + nz*L[2]);
+  /* ЛОД убран: планета показывается «как есть» — текстура поверхности всегда
+     различима, без чёрной ночной стороны. Объём оставляет мягкий терминатор. */
+  var sh = (0.62 + 0.38*diff)*(0.72 + 0.28*nz);
+  out[0] = (c[0]*(1-cA2) + 255*cA2)*sh;
+  out[1] = (c[1]*(1-cA2) + 255*cA2)*sh;
+  out[2] = (c[2]*(1-cA2) + 255*cA2)*sh;
+  out[3] = 255;
+  return true;
+}
+function pbPlanetBody(k, ctx, S, simT, L){
+  var tex = PB_TEX[k];
+  var img = ctx.createImageData(S, S);
+  var d = img.data, out = [0,0,0,0];
+  var spin = simT*0.05, drift = simT*0.09;
+  for(var py = 0; py < S; py++){
+    var ny = 2*(py+0.5)/S - 1;
+    for(var px = 0; px < S; px++){
+      if(pbSpherePixel(tex, 2*(px+0.5)/S - 1, ny, spin, drift, L, out)){
+        var o = (py*S+px)*4;
+        d[o] = out[0]; d[o+1] = out[1]; d[o+2] = out[2]; d[o+3] = 255;
+      }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+function pbRings(ctx, cx, cy, R, front){
+  var bands = ['#f7cc1d','#fff0a0','#d9a80e','#f7cc1d','#8a5c00','#ffe9a8','#c98f0a'];
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.35);
+  ctx.scale(1, 0.32);
+  for(var i = 0; i < 7; i++){
+    var rr = (1.08 + i*0.128)*R;
+    ctx.strokeStyle = bands[i];
+    ctx.lineWidth = R*0.055;
+    ctx.globalAlpha = (i === 4) ? 0.35 : 0.85;
+    ctx.beginPath();
+    ctx.arc(0, 0, rr, front ? 0 : Math.PI, front ? Math.PI : Math.PI*2);
+    ctx.stroke();
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+function pbCheese(ctx, cw, ch, simT, L){
+  ctx.clearRect(0, 0, cw, ch);
+  var R = ch/2.8, cx = cw*0.5, cy = ch*0.5;
+  if(!PB_RB){ PB_RB = document.createElement('canvas'); PB_RF = document.createElement('canvas'); }
+  if(PB_RB.width !== cw || PB_RB.height !== ch){ PB_RB.width = cw; PB_RB.height = ch; PB_RF.width = cw; PB_RF.height = ch; }
+  var cb = PB_RB.getContext('2d'), cf = PB_RF.getContext('2d');
+  cb.clearRect(0, 0, cw, ch); cf.clearRect(0, 0, cw, ch);
+  pbRings(cb, cx, cy, R, false);
+  pbRings(cf, cx, cy, R, true);
+  ctx.drawImage(PB_RB, 0, 0);
+  var tex = PB_TEX[1];
+  var x0 = Math.max(0, Math.floor(cx-R)), x1 = Math.min(cw, Math.ceil(cx+R));
+  var y0 = Math.max(0, Math.floor(cy-R)), y1 = Math.min(ch, Math.ceil(cy+R));
+  var img = ctx.createImageData(x1-x0, y1-y0);
+  var d = img.data, out = [0,0,0,0];
+  var spin = simT*0.05, drift = simT*0.09;
+  for(var py = y0; py < y1; py++){
+    var ny = 2*(py+0.5-cy)/(R*2);
+    for(var px = x0; px < x1; px++){
+      if(pbSpherePixel(tex, 2*(px+0.5-cx)/(R*2), ny, spin, drift, L, out)){
+        var o = ((py-y0)*(x1-x0) + (px-x0))*4;
+        d[o] = out[0]; d[o+1] = out[1]; d[o+2] = out[2]; d[o+3] = 255;
+      }
+    }
+  }
+  ctx.putImageData(img, x0, y0);
+  ctx.drawImage(PB_RF, 0, 0);
+}
+function pbPulsar(ctx, cw, ch, simT){
+  ctx.clearRect(0, 0, cw, ch);
+  var cx = cw*0.5, cy = ch*0.5, R = cw/4.8;
+  var pulse = 0.15 + 0.85*(0.5 + 0.5*Math.sin(Math.PI*2*simT/0.8));
+  var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R*2.15);
+  g.addColorStop(0, 'rgba(255,255,255,' + (0.95*pulse).toFixed(3) + ')');
+  g.addColorStop(0.25, 'rgba(190,225,255,' + (0.55*pulse).toFixed(3) + ')');
+  g.addColorStop(1, 'rgba(120,170,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, cw, ch);
+  var ax = simT*0.35;
+  for(var sgn = -1; sgn <= 1; sgn += 2){
+    var dx = Math.cos(ax)*sgn, dy = Math.sin(ax)*sgn;
+    for(var seg = 0; seg < 3; seg++){
+      var L2 = R*(1.4 + seg*0.35);
+      var flick = 0.5 + 0.5*pbHash(Math.floor(simT*13), seg, sgn, 5);
+      ctx.strokeStyle = 'rgba(200,225,255,' + (0.32*pulse*flick/(seg+1)).toFixed(3) + ')';
+      ctx.lineWidth = Math.max(1, R*(0.34 - seg*0.09));
+      ctx.beginPath();
+      ctx.moveTo(cx + dx*R*0.4, cy + dy*R*0.4);
+      ctx.lineTo(cx + dx*L2, cy + dy*L2);
+      ctx.stroke();
+    }
+  }
+  ctx.fillStyle = 'rgba(255,255,255,' + (0.9*pulse).toFixed(3) + ')';
+  ctx.beginPath(); ctx.arc(cx, cy, R*0.55, 0, Math.PI*2); ctx.fill();
+}
+function initSky(){
+  if(skyWrap) return;
+  skyWrap = document.createElement('div');
+  skyWrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;';
+  layer.appendChild(skyWrap);
+  for(var k = 0; k < PLANET_NAMES.length; k++){
+    var w = document.createElement('div');
+    w.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;display:none;pointer-events:none;z-index:5;';
+    var cv = document.createElement('canvas');
+    cv.style.cssText = 'position:absolute;left:0;top:0;display:none;';
+    w.appendChild(cv);
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'position:absolute;left:50%;top:12px;transform:translateX(-50%);font:700 10px/1 monospace;letter-spacing:1px;white-space:nowrap;text-shadow:1px 1px 2px #000;display:none;';
+    lbl.textContent = PLANET_NAMES[k];
+    w.appendChild(lbl);
+    skyWrap.appendChild(w);
+    skyWrapEls.push(w);
+    skyCvEls.push(cv);
+    skyLblEls.push(lbl);
+  }
+  skyRet = document.createElement('div');
+  skyRet.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;display:none;z-index:6000;pointer-events:none;';
+  var ring = document.createElement('div');
+  ring.style.cssText = 'position:absolute;left:0;top:0;transform:translate(-50%,-50%);border:2px dashed #f7cc1d;border-radius:50%;box-shadow:0 0 12px rgba(247,204,29,.5);';
+  skyRet.appendChild(ring);
+  skyWrap.appendChild(skyRet);
+}
+function projectW(p, cam, W, H){
+  var v = sub(p, cam.pos);
+  var dist = len(v);
+  var z = dot(v, cam.fwd);
+  if(z < 0.01) return null;
+  var ux = dot(v, cam.right)/(z*CFG.FOV_TAN);
+  var uy = dot(v, cam.up)/(z*CFG.FOV_TAN);
+  var sx = (ux*H + W)/2;
+  var sy = (H - uy*H)/2;
+  if(sx < -140 || sx > W + 140 || sy < -140 || sy > H + 140) return null;
+  return { x: sx, y: sy, z: z };
+}
+/* ☩ НЕБО: тела сортируются по дальности, рендер канвой 1:1 (без LOD), каждый кадр ☩ */
+function drawPlanetsSky(cam, W, H, bgSim){
+  initSky();
+  var retDrawn = false;
+  if(!gameOn){
+    for(var hz = 0; hz < skyWrapEls.length; hz++) skyWrapEls[hz].style.display = 'none';
+    skyRet.style.display = 'none';
+    return;
+  }
+  var sun = sunDirNow(bgSim);
+  /* свет в экранных координатах: [вправо, вниз, вглубь] */
+  var L = [dot(sun, cam.right), -dot(sun, cam.up), dot(sun, cam.fwd)];
+  var order = [];
+  for(var k = 0; k < PLANET_NAMES.length; k++){
+    if(k === planet && !inTransit) continue;
+    var wp = inTransit ? PW[k] : sub(PW[k], PW[planet]);
+    var pr = inTransit ? projectW(wp, cam, W, H) : project(wp, cam, W, H);
+    var edgeLbl = false;
+    if(!pr){
+      /* LBL-EDGE: центр сферы за кадром, но силуэт касается экрана —
+         считаем проекцию без отсечения и зажимаем метку в кадр */
+      var vF = sub(wp, cam.pos), zF = dot(vF, cam.fwd);
+      if(zF > 0.01){
+        var fux = dot(vF, cam.right)/(zF*CFG.FOV_TAN), fuy = dot(vF, cam.up)/(zF*CFG.FOV_TAN);
+        var fx = (fux*H + W)/2, fy = (H - fuy*H)/2;
+        var frad = Math.min(H*2.2, (1/zF)*H)*0.5;
+        var hidden = false;
+        if(!inTransit){
+          var dP2 = len(cam.pos), dF2 = len(vF);
+          var dirP2 = mul(cam.pos, -1/(dP2||1)), dirF2 = mul(vF, 1/(dF2||1));
+          var sepA2 = Math.acos(Math.max(-1, Math.min(1, dot(dirP2, dirF2))));
+          hidden = (sepA2 + Math.asin(Math.min(1, 1/(dF2||1))) <= Math.asin(Math.min(1, 1/(dP2||1))));
+        }
+        if(!hidden && fx > -frad && fx < W + frad && fy > -frad && fy < H + frad){
+          pr = { x: Math.max(26, Math.min(W - 26, fx)), y: Math.max(20, Math.min(H - 30, fy)), z: zF };
+          edgeLbl = true;
+        }
+      }
+    }
+    if(pr && pr.occl){
+      /* occl = луч к ЦЕНТРУ задет текущей планетой; подпись прячем только если
+         скрыт ВЕСЬ силуэт: sep + asin(1/dF) <= asin(1/dP) (обе сферы R=1). */
+      var dP = len(cam.pos), dvF = sub(wp, cam.pos), dF = len(dvF);
+      var dirP = mul(cam.pos, -1/(dP||1));
+      var dirF = mul(dvF, 1/(dF||1));
+      var sepA = Math.acos(Math.max(-1, Math.min(1, dot(dirP, dirF))));
+      var rP = Math.asin(Math.min(1, 1/(dP||1)));
+      var rF = Math.asin(Math.min(1, 1/(dF||1)));
+      if(sepA + rF <= rP) continue;
+      /* виден хотя бы край силуэта — подпись оставляем (координаты уже в pr) */
+    }
+    if(!pr) continue;
+    order.push({ k: k, pr: pr, wp: wp, edge: edgeLbl });
+  }
+  order.sort(function(a, b){ return b.pr.z - a.pr.z; }); /* дальние раньше, ближние поверх */
+  var drawn = {};
+  for(var o = 0; o < order.length; o++){
+    var k2 = order[o].k, pr2 = order[o].pr, wp2 = order[o].wp;
+    var isEdge = order[o].edge;
+    drawn[k2] = true;
+    /* 3D-ЛОД вынесен в WebGL-шейдер (#glbg) — 2D-канвас дальних планет скрываем.
+       Оставляем только мишень-ретикл и метку, чтобы цели/коллайдеры работали как раньше. */
+    var size = Math.max(3, Math.min(H*2.2, (1/pr2.z)*H));
+    var w2 = skyWrapEls[k2], cv = skyCvEls[k2], lbl = skyLblEls[k2];
+    w2.style.display = 'block';
+    w2.style.transform = 'translate(' + pr2.x.toFixed(1) + 'px,' + pr2.y.toFixed(1) + 'px)';
+    if(cv) cv.style.display = 'none';
+    lbl.style.display = 'block';
+    lbl.style.top = (isEdge ? 10 : size*0.5 + 7).toFixed(1) + 'px';
+    var un = unlockedIdx(k2);
+    lbl.style.color = un ? '#7dff8a' : '#ff5a4a';
+    lbl.textContent = un ? PLANET_NAMES[k2] : '\u{1F512} ' + PLANET_NAMES[k2];
+    if(targetIdx === k2 && !isEdge){
+      retDrawn = true;
+      skyRet.style.display = 'block';
+      var rs = size*1.8 + 14;
+      skyRet.style.transform = 'translate(' + pr2.x.toFixed(1) + 'px,' + pr2.y.toFixed(1) + 'px)';
+      skyRet.firstChild.style.width = skyRet.firstChild.style.height = rs.toFixed(1) + 'px';
+    }
+  }
+  if(!retDrawn) skyRet.style.display = 'none';
+  /* канвы-призраки: всё, что не попало в кадр, прячем */
+  for(var k3 = 0; k3 < skyWrapEls.length; k3++) if(!drawn[k3]) skyWrapEls[k3].style.display = 'none';
+}
+function fsdInitSound(){
+  if(fsdAudio) return fsdAudio;
+  var a = new Audio(relURL(WARP_SND));
+  a.addEventListener('error', function(){
+    console.warn('[ИГРА] ' + WARP_SND + ' не найден рядом с HTML — прыжок пройдёт без звука');
+  });
+  fsdAudio = a;
+  return a;
+}
+function initWarpCv(){
+  if(warpCv) return;
+  warpCv = document.createElement('canvas');
+  warpCv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:47;pointer-events:none;display:none;';
+  document.body.appendChild(warpCv);
+  warpCv.setAttribute('data-keep','1');
+  warpCtx = warpCv.getContext('2d');
+}
+function commitJump(target){
+  planet = target;
+  inTransit = false;
+  var dir = sub(FT.pos, PW[target]);
+  var dl2 = len(dir);
+  dir = (dl2 > 0.001) ? mul(dir, 1/dl2) : [0, 0.2, 1];
+  F.pos = mul(dir, FSD_DOCK);  /* выход из варпа: близко к планете — стыковочная дистанция */
+  F.fwd = FT.fwd; F.right = FT.right; F.up = FT.up;
+  speed = Math.min(speed, CFG.SPD_MAX*boostMul);
+  magnetT = 0; freezeT = 0;
+  for(var si = shots.length - 1; si >= 0; si--){ if(shots[si].el && shots[si].el.parentNode) shots[si].el.parentNode.removeChild(shots[si].el); }
+  shots.length = 0;
+  if(sfx.music && sfx.started){ try{ sfx.music.pause(); sfx.music.src = trackFor(planet); }catch(e){} }
+  if(sfx.musicOn) tryMusic();
+  targetIdx = -1;
+  updHud();
+  toastFx('ВЫХОД ИЗ ВАРПА: ' + PLANET_NAMES[target]);
+}
+function finishWarp(){
+  warp = null;
+  if(warpCv) warpCv.style.display = 'none';
+  switching = false;
+  keys = {};
+  if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} }
+  setSpaceMode();
+}
+function cancelWarp(){
+  if(!warp) return;
+  warp = null;
+  if(warpCv) warpCv.style.display = 'none';
+  switching = false;
+  if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} }
+  setSpaceMode();
+}
+function updWarp(dt){
+  initWarpCv();
+  var W = window.innerWidth, H = window.innerHeight;
+  if(warpCv.width !== W || warpCv.height !== H){ warpCv.width = W; warpCv.height = H; }
+  var ctx = warpCtx;
+  warp.t += dt;
+  var t1 = FSD_CHARGE, t2 = t1 + FSD_TUNNEL, t3 = t2 + FSD_EXIT;
+  var inten = 0, streakSpd = 0;
+  if(warp.t < t1){ var p = warp.t/t1; inten = 0.25 + 0.65*p; streakSpd = 0.15 + 0.85*p; }
+  else if(warp.t < t2){
+    inten = 1; streakSpd = 1.6;
+    if(!warp.committed && warp.t >= t1 + FSD_TUNNEL*0.5){ commitJump(warp.target); warp.committed = true; }
+  } else {
+    var pe = (warp.t - t2)/FSD_EXIT;
+    inten = Math.max(0, 1 - pe);
+    streakSpd = Math.max(0.2, 1.6*(1 - pe));
+  }
+  warpCv.style.display = 'block';
+  ctx.clearRect(0, 0, W, H);
+  var cx = W/2, cy = H/2, R = Math.sqrt(cx*cx + cy*cy);
+  ctx.globalCompositeOperation = 'lighter';
+  if(warpStreaks === null){
+    warpStreaks = [];
+    for(var i = 0; i < 150; i++) warpStreaks.push({ a: Math.random()*Math.PI*2, r: Math.random()*1.2, s: 0.5 + Math.random()*1.2, w: 0.5 + Math.random()*1.6 });
+  }
+  for(var j = 0; j < warpStreaks.length; j++){
+    var st = warpStreaks[j];
+    st.r += st.s*streakSpd*dt*1.6;
+    if(st.r > 1.35){ st.r = Math.random()*0.25; st.a = Math.random()*Math.PI*2; }
+    var rr = st.r*R;
+    var tail = Math.max(2, rr*0.55*streakSpd);
+    ctx.strokeStyle = 'rgba(190,225,255,' + (0.75*inten).toFixed(3) + ')';
+    ctx.lineWidth = st.w;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(st.a)*rr, cy + Math.sin(st.a)*rr);
+    ctx.lineTo(cx + Math.cos(st.a)*(rr - tail), cy + Math.sin(st.a)*(rr - tail));
+    ctx.stroke();
+  }
+  var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R*0.5);
+  g.addColorStop(0, 'rgba(140,190,255,' + (0.28*inten).toFixed(3) + ')');
+  g.addColorStop(1, 'rgba(140,190,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  if(warp.t >= t2){
+    var pf = (warp.t - t2)/FSD_EXIT;
+    if(pf > 0.65){
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.9*Math.min(1, (pf - 0.65)/0.35)).toFixed(3) + ')';
+      ctx.fillRect(0, 0, W, H);
+    }
+    if(fsdAudio){ try{ fsdAudio.volume = Math.max(0, 0.55*(1 - pf)); }catch(e){} }
+  }
+  if(warp.t >= t3) finishWarp();
+}
+function startFSD(target){
+  switching = true;
+  keys = {};
+  if(!inTransit){
+    FT = { pos: add(PW[planet], F.pos), fwd: F.fwd, up: F.up, right: F.right };
+    inTransit = true;
+  }
+  warp = { t: 0, target: target, committed: false };
+  setSpaceMode();
+  var a = fsdInitSound();
+  if(a && sfx.musicOn){
+    try{
+      a.currentTime = 0; a.volume = 0.55;
+      var pr = a.play();
+      if(pr && pr.catch) pr.catch(function(){});
+    }catch(e){}
+  }
+  toastFx('FSD: ЗАРЯДКА \u2192 ЦЕЛЬ: ' + PLANET_NAMES[target]);
+}
+function fsdJump(dir){
+  if(!gameOn || paused || switching || warp) return;
+  var target = -1;
+  if(dir > 0){
+    if(targetIdx >= 0){ target = targetIdx; }
+    else {
+      if(planet >= FIN){ toastFx('ФИНАЛ ДОСТИГНУТ — ПРЫЖОК НЕВОЗМОЖЕН', '#ff5a4a'); return; }
+      target = planet + 1;
+    }
+  } else {
+    target = (planet === 0) ? FIN : planet - 1;
+  }
+  if(target === planet) return;
+  if(expTotal < expNeed(target)){ denyExp(expNeed(target)); return; }
+  startFSD(target);
+}
+function cycleTarget(){
+  if(!gameOn || paused || warp) return;
+  var k = (targetIdx >= 0) ? targetIdx : -1;
+  for(var n = 0; n < PLANET_NAMES.length; n++){
+    k = (k + 1) % PLANET_NAMES.length;
+    if(k !== planet) break;
+  }
+  targetIdx = k;
+}
+
+/* ---------- ВВОД ---------- */
+var KEYSET = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, KeyQ:1, KeyE:1, KeyG:1, KeyJ:1, KeyP:1, KeyY:1, ArrowUp:1, ArrowDown:1 };
+window.__splashPlanet = 0;
+var SPLASH_TOAST = null;
+function cycleSplash(){
+  window.__splashPlanet = ((window.__splashPlanet || 0) + 1) % 2;
+  var nm = ['K-002_SIRIUS-B', 'K-001_DIOWKRAD'][window.__splashPlanet];
+  try{
+    if(sfx.music && sfx.musicOn){
+      sfx.music.pause();
+      sfx.music.src = trackFor(window.__splashPlanet);
+      sfx.music.play().catch(function(){});
+    }
+  }catch(e){}
+  if(SPLASH_TOAST && SPLASH_TOAST.parentNode) SPLASH_TOAST.remove();
+  SPLASH_TOAST = document.createElement('div');
+  SPLASH_TOAST.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:120;font:700 12px/1 monospace;letter-spacing:2px;color:#7dff8a;background:#0c150cdd;border:3px outset #950;border-radius:8px;padding:9px 16px;pointer-events:none;';
+  SPLASH_TOAST.textContent = 'ЗАСТАВКА: ' + nm;
+  document.body.appendChild(SPLASH_TOAST);
+  setTimeout(function(){ if(SPLASH_TOAST && SPLASH_TOAST.parentNode) SPLASH_TOAST.remove(); }, 1800);
+}
+window.addEventListener('keydown', function(e){
+  if(e.code === 'KeyZ' && !e.repeat && !gameOn){
+    e.preventDefault(); e.stopPropagation();
+    /* SPLASH-Z: переключение заставок по Z отключено (протокол Сириус-B) */
+    return;
+  }
+  if(gameOn && e.code === 'Escape' && !e.repeat){
+    e.preventDefault(); e.stopPropagation();
+    cancelWarp();
+    document.body.classList.toggle('dgame');
+    return;
+  }
+  if(gameOn && e.code === 'KeyO' && !e.repeat){
+    e.preventDefault(); e.stopPropagation();
+    setPaused(!paused);
+    return;
+  }
+  if(gameOn && !paused && !warp && e.code === 'KeyR' && !e.repeat){
+    e.preventDefault(); e.stopPropagation();
+    tryBoost();
+    return;
+  }
+  if(gameOn && !paused && !warp && e.code === 'KeyT' && !e.repeat){
+    e.preventDefault(); e.stopPropagation();
+    useHot(hotSel);
+    return;
+  }
+  if(gameOn && !paused && !warp && /^Digit[1-7]$/.test(e.code) && !e.repeat){
+    e.preventDefault(); e.stopPropagation();
+    hotSelect(parseInt(e.code.slice(5), 10) - 1);
+    return;
+  }
+  if(!gameOn || paused || warp || !KEYSET[e.code]) return;
+  e.preventDefault(); e.stopPropagation();
+  if(e.code === 'KeyY' && !e.repeat) cycleTarget();
+  else if(e.code === 'KeyG' && !e.repeat) fsdJump(1);
+  else if(e.code === 'KeyJ' && !e.repeat) fsdJump(-1);
+  else if(e.code === 'KeyP' && !e.repeat) toggleMouse();
+  else keys[e.code] = 1;
+  tryMusic();
+}, true);
+window.addEventListener('wheel', function(e){
+  if(!gameOn || paused || switching) return;
+  e.preventDefault();
+  if(HOT_DEFS.length) hotSelect((hotSel + (e.deltaY > 0 ? 1 : HOT_DEFS.length - 1)) % HOT_DEFS.length);
+}, { passive: false });
+window.addEventListener('keyup', function(e){
+  if(!gameOn || paused || !KEYSET[e.code]) return;
+  e.preventDefault(); e.stopPropagation();
+  keys[e.code] = 0;
+}, true);
+addEventListener('blur', function(){ keys = {}; drag = null; });
+window.addEventListener('pointerdown', function(e){
+  if(!gameOn || mouseCtl) return;
+  var t = e.target;
+  if(t && t.closest && t.closest('button,input,select,a,.panel,.lcd,.kbd-wrap,#keys,#keys2')) return;
+  drag = { x: e.clientX, y: e.clientY };
+  tryMusic();
+});
+window.addEventListener('pointermove', function(e){
+  if(!drag || !gameOn || warp) return;
+  var MF = inTransit ? FT : F;
+  var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  drag.x = e.clientX; drag.y = e.clientY;
+  if(dx){
+    MF.fwd = norm(rotAxis(MF.fwd, MF.up, -dx*CFG.DRAG_YAW));
+    MF.right = norm(rotAxis(MF.right, MF.up, -dx*CFG.DRAG_YAW));
+  }
+  if(dy){
+    MF.fwd = norm(rotAxis(MF.fwd, MF.right, -dy*CFG.DRAG_PITCH));
+    MF.up = norm(rotAxis(MF.up, MF.right, -dy*CFG.DRAG_PITCH));
+  }
+});
+window.addEventListener('pointerup', function(){ drag = null; });
+
+/* ---------- МЫШЬ: СКРЫТИЕ КУРСОРА (P) ---------- */
+function toggleMouse(){
+  if(!gameOn) return;
+  if(document.pointerLockElement){ document.exitPointerLock(); }
+  else { tryMusic(); document.body.requestPointerLock(); }
+}
+document.addEventListener('pointerlockchange', function(){
+  mouseCtl = !!document.pointerLockElement;
+});
+document.addEventListener('pointerlockerror', function(){ mouseCtl = false; });
+window.addEventListener('mousemove', function(e){
+  if(!mouseCtl || !gameOn || paused || warp) return;
+  var MF = inTransit ? FT : F;
+  var dx = e.movementX || 0, dy = e.movementY || 0;
+  if(dx){
+    MF.fwd = norm(rotAxis(MF.fwd, MF.up, -dx*CFG.DRAG_YAW));
+    MF.right = norm(rotAxis(MF.right, MF.up, -dx*CFG.DRAG_YAW));
+  }
+  if(dy){
+    MF.fwd = norm(rotAxis(MF.fwd, MF.right, -dy*CFG.DRAG_PITCH));
+    MF.up = norm(rotAxis(MF.up, MF.right, -dy*CFG.DRAG_PITCH));
+  }
+});
+
+function applyGameMode(){
+  document.body.classList.toggle('dgame', gameOn);
+  btnPilot.classList.toggle('on', gameOn);
+  if(!btnPilot.disabled) btnPilot.textContent = gameOn ? 'ИГРА: СТОП' : 'ИГРА: СТАРТ';
+  layer.style.display = gameOn ? '' : 'none';
+  hud.style.display = gameOn ? '' : 'none';
+  keys = {}; drag = null; if(!gameOn) cancelWarp();
+  if(!gameOn && document.pointerLockElement) document.exitPointerLock();
+  if(segPanel){ segPanel.style.display = gameOn ? 'flex' : 'none'; if(gameOn) segUpdate(); }
+  if(topPanel) topPanel.style.display = gameOn ? 'block' : 'none';
+  if(botPanel) botPanel.style.display = gameOn ? 'flex' : 'none';
+  if(lensEl) lensEl.style.display = 'none';
+  if(gameOn){ tryMusic(); }
+  else if(sfx.music){ sfx.music.pause(); }
+}
+btnPilot.addEventListener('click', function(){
+  if(gameOver){ gameOver = false; resetGame(); gameOn = true; }
+  else gameOn = !gameOn;
+  if(!gameOn) setPaused(false);
+  applyGameMode();
+});
+btnMusic.addEventListener('click', function(){
+  sfx.musicOn = !sfx.musicOn;
+  btnMusic.classList.toggle('on', sfx.musicOn);
+  btnMusic.textContent = sfx.musicOn ? 'МУЗЫКА' : 'МУЗЫКА (выкл)';
+  if(sfx.musicOn){ tryMusic(); if(fsdAudio && warp){ try{ fsdAudio.play().catch(function(){}); }catch(e){} } }
+  else if(sfx.music){ sfx.music.pause(); if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} } }
+});
+
+/* ---------- ПРОВЕРКА ОКРУЖЕНИЯ ---------- */
+var bgInfo = window.__bgInfo || {};
+if(bgInfo.fallback){
+  gameOn = false;
+  applyGameMode();
+  btnPilot.disabled = true;
+  btnPilot.textContent = 'ИГРА: БАЗОВЫЙ';
+  gameErr('ФОН: игровой шейдер не собрался — включён базовый R46, игра ждёт починки. Ошибка компиляции в консоли (F12).');
+}
+
+/* ---------- ГЛАВНЫЙ ЦИКЛ ИГРЫ ---------- */
+var simT = 0, lastT = performance.now();
+function loop(now){
+  requestAnimationFrame(loop);
+  try{
+    var dt = Math.min((now - lastT)/1000, 0.1);
+    lastT = now;
+    if(paused) dt = 0;
+    if(!paused) simT += dt;
+    var bgSim = (typeof window.__bgSim === 'number') ? window.__bgSim : simT*60.0;
+    var W = window.innerWidth, H = window.innerHeight;
+    var cam;
+    if(gameOn){
+      if(!paused){
+      if(warp) updWarp(dt); else physics(dt);
+      if(pepperCd > 0) pepperCd = Math.max(0, pepperCd - dt);
+      if(immuneT > 0) immuneT = Math.max(0, immuneT - dt);
+      if(boostOn){
+        boostLeft -= dt;
+        boostFuel = Math.max(0, boostFuel - CFG.BOOST_DRAIN*dt);
+        if(boostLeft <= 0 || boostFuel <= 0) boostOn = false;
+      } else if(boostFuel < 100){
+        boostFuel = Math.min(100, boostFuel + dt/CFG.BOOST_REGEN);
+      }
+      boostMul += ((boostOn ? CFG.BOOST_MULT : 1) - boostMul)*Math.min(1, dt*1.6);
+      if(magnetT > 0) magnetT = Math.max(0, magnetT - dt);
+      if(freezeT > 0) freezeT = Math.max(0, freezeT - dt);
+      if(hotDenyT > 0) hotDenyT = Math.max(0, hotDenyT - dt);
+      if(pepBanT > 0){
+        pepBanT -= dt;
+        if(pepBanT <= 0){
+          pepBanT = 0;
+          for(var pi = 0; pi < ITEMS.length; pi++){
+            var pit = ITEMS[pi];
+            if(pit && pit.kind === 'pepper'){ pit.dead = false; respawn(pit); }
+          }
+        }
+      }
+      ensureSnow();
+      if(snowEl) snowEl.style.opacity = (freezeT > 0) ? '1' : '0';
+      tickShots(dt);
+      if(lensEl) lensEl.style.display = (immuneT > 0) ? 'block' : 'none';
+      updBottomPanel();
+      }
+      OCCL_Y = 0;
+      var CP = inTransit ? FT : F;
+      cam = { pos: CP.pos, fwd: CP.fwd, up: CP.up, right: CP.right };
+      window.__gameState = { active: true, planet: planet,
+        pos: CP.pos, fwd: CP.fwd, up: CP.up, right: CP.right };
+    } else {
+      var camA = 2*Math.PI*bgSim/2275.9;
+      var cx = Math.cos(camA)*1.034, cy = Math.sin(camA)*1.034 - (pKind(window.__splashPlanet || 0) === 3 ? 0.14 : 0);
+      var f0x = -Math.sin(camA), f0y = Math.cos(camA);
+      var u0x = Math.cos(camA), u0y = Math.sin(camA);
+      var f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
+      var fl = Math.sqrt(f1x*f1x + f1y*f1y) || 1;
+      f1x /= fl; f1y /= fl;
+      var r1z = f1x*u0y - f1y*u0x;
+      OCCL_Y = (window.__splashPlanet === 3) ? 0.14 : 0;
+      cam = { pos: [cx, cy, 0], fwd: [f1x, f1y, 0], right: [0, 0, r1z], up: [-r1z*f1y, r1z*f1x, 0] };
+      window.__gameState = { active: false };
+    }
+    drawSprites(cam, W, H, bgSim, dt);
+    drawPlanetsSky(cam, W, H, bgSim);
+    drawHypSky(dt, cam);
+    updHud();
+  }catch(e){
+    gameErr('ИГРА: ошибка кадра — ' + (e && e.message ? e.message : e));
+  }
+}
+initSegPanel();
+initTopPanel();
+initBottomPanel();
+initGoPanel();
+initPausePanel();
+applyGameMode();
+updHud();
+requestAnimationFrame(loop);
+
+}catch(e){
+  gameErr('ИГРА: ошибка запуска — ' + (e && e.message ? e.message : e));
+}
+})();
+</script>
+</body>
+</html>

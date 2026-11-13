@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRC-BackUp-GL · Шаблон HTML+CSS (редактор стилей игры)</title>
+<style id="appStyle">
+/* ==== БАЗОВЫЕ ПЕРЕМЕННЫЕ ИГРЫ (из WORK GL :root) ==== */
+:root{
+  --bg: #0f0f1b;
+  --bg-panel: #0b0f16b0;
+  --panel: #1a1a2eb0;
+  --gold: #f7cc1d;
+  --cyan: #7dff8a;
+  --key-white: #fff;
+  --key-black: #16161d;
+  --accent: #4f8ee9;
+}
+/* ==== ГЛОБАЛЬНЫЙ СБРОС ==== */
+*{ box-sizing:border-box; margin:1px; padding:0; }
+body{ background:var(--bg); color:var(--key-white); font-family:'Segoe UI',system-ui,sans-serif; }
+::selection{ background:var(--accent); color:#000; }
+
+/* ==== ПАНЕЛИ (UI) ==== */
+.ui-panel{ background:var(--panel); border:4px inset #1a1a2e; border-radius:8px; padding:8px; color:#e8eef6; }
+.ui-panel .segd div{ background:#a3ff52; box-shadow:0 0 6px rgba(163,255,82,.85); }
+.ui-panel.hud-panel{ text-shadow:0 0 6px rgba(163,255,82,.45); }
+.lcd h2{ color:var(--gold); font:700 0.95rem/1 monospace; letter-spacing:1px; }
+.fnote{ font:400 11px/1.5 monospace; color:#7c8aa0; }
+
+/* ==== КНОПКИ ==== */
+button, .ui-button{ background:#222; color:var(--gold); border:4px outset #950; padding:6px 14px; cursor:pointer; font-family:inherit; }
+button:hover{ color:#fff; }
+button.act, .ui-button.act{ background:var(--accent) !important; }
+a.ui-link{ color:var(--gold); text-decoration:none; }
+
+/* ==== СЕГМЕНТНЫЙ ИНДИКАТОР (очки/тяга) ==== */
+.segd{ position:relative; }
+.segd div{ background:#a3ff52; }
+.segd div.h{ clip-path:polygon(0% 50%, 16% 0%, 84% 0%, 100% 50%, 84% 100%, 16% 100%); }
+.segd div.v{ clip-path:polygon(50% 0%, 100% 16%, 100% 84%, 50% 100%, 0% 84%, 0% 16%); }
+
+/* ==== ТОСТЫ / СООБЩЕНИЯ ==== */
+.toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); font:700 12px/1 monospace; letter-spacing:2px; color:var(--cyan); background:rgba(12,21,28,.87); border:3px outset #950; border-radius:8px; padding:9px 16px; pointer-events:none; }
+</style>
+<style>
+  /* панель самого шаблона — отдельный слой, не трогает игровые стили */
+  html,body{ margin:0; }
+  #toolbar{ position:fixed; top:0; left:0; right:0; z-index:99; background:#10131f; border-bottom:1px solid #2a3350; padding:8px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; font:700 12px/1 monospace; color:#cfe0f0; }
+  #toolbar a{ color:#4fd8ff; cursor:pointer; padding:3px 8px; border:1px solid #2c3a52; border-radius:4px; }
+  #toolbar a:hover{ background:#1c2540; }
+  #preview{ margin:64px 14px 20px; display:grid; gap:14px; max-width:1100px; }
+  .demo-panel{ background:var(--panel); border:4px inset #1a1a2e; border-radius:8px; padding:14px; }
+  .demo-panel h3{ color:var(--gold); font:700 12px/1 monospace; letter-spacing:1px; margin-bottom:8px; }
+  .seg-h{ display:inline-block; width:16px; height:28px; margin-right:2px; }
+  .seg-h i{ display:block; width:100%; height:100%; background:#a3ff52; clip-path:polygon(0% 50%,16% 0%,84% 0%,100% 50%,84% 100%,16% 100%); }
+  .seg-v{ display:inline-block; width:28px; height:16px; margin-right:2px; }
+  .seg-v i{ display:block; width:100%; height:100%; background:#a3ff52; clip-path:polygon(50% 0%,100% 16%,100% 84%,50% 100%,0% 84%,0% 16%); }
+  .btnrow{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  #exportArea{ display:none; margin:14px; background:#0a0e16; border:1px solid #2c3a52; border-radius:6px; }
+  #exportArea pre{ padding:12px; font:11px/1.5 monospace; color:#bedeff; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<div id="toolbar">
+  <span>CSS-шаблон HITOMI</span>
+  <a id="b1">Проверить стили</a>
+  <a id="b2">Экспорт CSS</a>
+  <a id="b3">Сброс</a>
+</div>
+
+<div id="preview">
+  <section class="demo-panel">
+    <h3>Панель (var --panel) · заголовок --gold</h3>
+    <p>Базовый текст цвета <span style="color:var(--gold)">--gold</span> и <span style="color:var(--cyan)">--cyan</span>. Акцент <span style="color:var(--accent)">--accent</span>.</p>
+    <div style="font:700 12px/1 monospace;color:#a3ff52;">СЕГМЕНТНЫЙ ИНДИКАТОР:</div>
+    <div style="margin:6px 0;">
+      <span class="seg-h"><i></i></span><span class="seg-h"><i></i></span><span class="seg-h"><i></i></span>
+      <span class="seg-v"><i></i></span><span class="seg-v"><i></i></span>
+    </div>
+  </section>
+
+  <section class="demo-panel">
+    <h3>Кнопки (общий стиль)</h3>
+    <div class="btnrow">
+      <button>Обычная</button>
+      <button class="act">Активная</button>
+      <a class="ui-link">Ссылка</a>
+    </div>
+  </section>
+
+  <section class="demo-panel">
+    <h3>Секции/подписи</h3>
+    <div class="fnote">fnote — мелкий подстрочный текст, цвет #7c8aa0</div>
+    <div class="lcd"><h2>LCD / заголовок</h2></div>
+  </section>
+</div>
+
+<div id="exportArea"><pre></pre></div>
+
+<script>
+"use strict";
+(function(){
+  const styleEl = document.getElementById('appStyle');
+  /* Набор ключевых CSS-переменных игры — удобно менять руками прямо тут.
+     Значения обновляются на странице сразу (через style.setProperty), затем
+     кнопка «Экспорт CSS» выводит итоговый <style> для переноса в игру. */
+  const VARS = {
+    '--bg': '#0f0f1b',
+    '--bg-panel': '#0b0f16b0',
+    '--panel': '#1a1a2eb0',
+    '--gold': '#f7cc1d',
+    '--cyan': '#7dff8a',
+    '--key-white': '#fff',
+    '--key-black': '#16161d',
+    '--accent': '#4f8ee9'
+  };
+  const preview = document.getElementById('preview');
+  function buildVarEditor(){
+    const sec = document.createElement('section');
+    sec.className = 'demo-panel';
+    sec.innerHTML = '<h3>CSS-переменные (:root) — правишь значения, применится сразу</h3>';
+    const table = document.createElement('div');
+    table.style.cssText = 'display:grid;grid-template-columns:140px 1fr 90px;gap:6px;align-items:center;font:11px/1 monospace;';
+    for(const key in VARS){
+      const lbl = document.createElement('div'); lbl.textContent = key; lbl.style.color = '#cfe0f0';
+      const inp = document.createElement('input'); inp.type = 'color'; inp.value = hexTo6(VARS[key]);
+      const num = document.createElement('div'); num.textContent = VARS[key]; num.style.color = '#8fd8a8';
+      inp.addEventListener('input', function(e){
+        const v = e.target.value; VARS[key] = v;
+        document.documentElement.style.setProperty(key, v);
+        num.textContent = v;
+      });
+      table.appendChild(lbl); table.appendChild(inp); table.appendChild(num);
+    }
+    sec.appendChild(table);
+    preview.insertBefore(sec, preview.firstChild);
+  }
+  function hexTo6(h){
+    /* поддержка #rrggbbaa → #rrggbb */
+    if(/^#[0-9a-f]{6}$/i.test(h)) return h;
+    if(/^#[0-9a-f]{8}$/i.test(h)) return h.slice(0,7);
+    return '#000000';
+  }
+  $b('b1').addEventListener('click', function(){ alert('Стили применены: панели/кнопки/сегменты используют переменные :root.'); });
+  $b('b2').addEventListener('click', function(){
+    const pre = document.querySelector('#exportArea pre');
+    pre.textContent = styleEl.textContent;
+    document.getElementById('exportArea').style.display = 'block';
+    pre.scrollIntoView({behavior:'smooth'});
+  });
+  $b('b3').addEventListener('click', function(){ location.reload(); });
+  function $(s){ return document.getElementById(s); }
+  function $b(s){ return document.getElementById(s); }
+  buildVarEditor();
+  /* первоначально применить дефолты в :root (для единообразного вида) */
+  for(const k in VARS) document.documentElement.style.setProperty(k, VARS[k]);
+})();
+</script>
+</body>
+</html>

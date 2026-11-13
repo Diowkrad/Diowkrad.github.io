@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☩ ИГРОВОЙ СТОЛ ШИНРАРТА ☩</title>
+<style>
+:root{ --bg:#05060d; --gold:#f7cc1d; --cyan:#7dff8a; --text:#cfd8e3; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ height:100%; background:var(--bg); overflow:hidden;
+  font-family:'Courier New',Courier,monospace; color:var(--text); }
+#cv{ display:block; width:100vw; height:100vh; cursor:grab; }
+#cv.drag{ cursor:grabbing; }
+#hud{
+  position:fixed; top:12px; left:12px; z-index:5; pointer-events:none;
+  background:rgba(0,0,10,.62); border:2px outset #950; padding:10px 14px;
+  font-size:13px; line-height:1.65; color:#a3ff52; letter-spacing:1px;
+  text-shadow:0 0 6px rgba(120,255,80,.5);
+}
+#hud b{ color:var(--gold); }
+#rider{
+  position:fixed; bottom:12px; left:50%; transform:translateX(-50%); z-index:5;
+  pointer-events:none; background:rgba(0,0,10,.62); border:2px outset #950;
+  padding:8px 16px; font-size:13px; letter-spacing:1px; color:#ff8a6a;
+  text-shadow:0 0 6px rgba(255,110,80,.6);
+}
+#btns{ position:fixed; top:12px; right:12px; z-index:6; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+button{
+  font-family:inherit; background:#16161f; color:var(--gold); border:3px outset #950;
+  padding:6px 12px; cursor:pointer; font-size:12px; letter-spacing:1px; box-shadow:2px 2px 0 #000;
+}
+button:hover{ filter:brightness(1.3); }
+button:active{ border-style:inset; }
+button.on{ color:var(--cyan); border-color:#565; }
+#tip{
+  position:fixed; bottom:52px; left:50%; transform:translateX(-50%); z-index:5;
+  pointer-events:none; font-size:11px; letter-spacing:1px; color:#5a6b8c;
+}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="hud">
+  ТИКИ: <b id="ticks">0</b><br>
+  ШИНРАРТА-КАЛЕНДАРЬ: <b id="cal">1 · 1 · 1</b><br>
+  СКОРОСТЬ: <b id="spd">×1</b> &nbsp; <span style="color:#5a6b8c">клик по шарику — трек, ещё клик — стоп</span>
+</div>
+<div id="rider">▼ ВСАДНИК: до пришествия Шинрарты-С к НЕМЕЗИДЕ — <b id="rid">18.5</b> D-лет</div>
+<div id="btns">
+  <button id="s1" class="on">×1</button><button id="s6">×6</button><button id="s60">×60</button>
+  <button id="all">ВСЕ ТРЕКИ</button><button id="stop">СТОП ВСЕ</button>
+</div>
+<div id="tip">ЛКМ — вращение · колесо — зум · клик по планете — трек вкл/выкл · файл space_bg.jpg рядом — свой фон</div>
+<script>
+"use strict";
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+let W,H, dpr=Math.min(window.devicePixelRatio||1,2);
+function resize(){ W=innerWidth; H=innerHeight; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+addEventListener('resize',resize); resize();
+
+// ---------- реестр (вариант А) ----------
+const A={name:'Шинрарта-A', d:0, r:26, col:'#ff7a1a', glow:22};
+const PLANETS=[
+ {name:'ХИТОМИ',    d:19.5,  r:7,  col:'#4fc3f7', inc:0,   ph:2.10, kind:'суперземля · 27.2 сут'},
+ {name:'ЧИЗИЯ',     d:45.3,  r:11, col:'#ffd54f', inc:0,   ph:4.40, kind:'газовый гигант · сыр · кольца'},
+ {name:'ШИНРАРТА-B',d:44.9,  r:6,  col:'#e8eaf6', inc:53,  ph:1.30, kind:'белый карлик · бывш. Sirius-B'},
+ {name:'НГАЛИН',    d:69.7,  r:9,  col:'#ff7043', inc:27,  ph:0.60, kind:'энергоактивная · 183.7 сут'},
+ {name:'Диовкрад',  d:71.6,  r:10, col:'#9e9e9e', inc:0,   ph:5.10, kind:'крепость · 191.4 сут'},
+ {name:'Элизия',    d:86.5,  r:8,  col:'#81c784', inc:0,   ph:2.90, kind:'мир-сад · 253.9 сут'},
+ {name:'Брэстла',   d:101.0, r:6,  col:'#e0f7fa', inc:0,   ph:3.80, kind:'лед · обсерватория · 320.7 сут'},
+ {name:'Шинрарта-С',d:108.2, r:7,  col:'#ff5252', inc:20,  ph:0.00, kind:'пульсар · 355.3 сут · кольца'},
+ {name:'НЕМЕЗИДА',  d:109.8, r:10, col:'#b71c1c', inc:0,   ph:2.20, kind:'энергетическая · 363.6 сут'}
+];
+const P0=27.2, D0=19.5;
+PLANETS.forEach(p=>{ p.P=P0*Math.pow(p.d/D0,1.5); p.om=2*Math.PI/p.P; p.on=false; p.ang=p.ph; });
+
+// ---------- фон ----------
+let bgImg=new Image(); bgImg.src='space_bg.jpg';
+bgImg.onerror=()=>{ bgImg=null; };
+const stars=[]; for(let i=0;i<420;i++) stars.push({x:Math.random(),y:Math.random(),s:Math.random()*1.6+.3,a:Math.random()*.7+.2,tw:Math.random()*6.28});
+
+// ---------- камера ----------
+let rotY=-0.35, rotX=0.42, zoom=1.0, dragging=false, lx=0, ly=0, moved=false;
+cv.addEventListener('mousedown',e=>{dragging=true;moved=false;lx=e.clientX;ly=e.clientY;cv.classList.add('drag');});
+addEventListener('mouseup',e=>{dragging=false;cv.classList.remove('drag');});
+addEventListener('mousemove',e=>{ if(!dragging)return; const dx=e.clientX-lx,dy=e.clientY-ly;
+  if(Math.abs(dx)+Math.abs(dy)>3)moved=true; rotY+=dx*0.005; rotX=Math.min(1.4,Math.max(0.05,rotX+dy*0.004)); lx=e.clientX; ly=e.clientY;});
+cv.addEventListener('wheel',e=>{e.preventDefault(); zoom*= (e.deltaY<0?1.09:0.92); zoom=Math.min(3.4,Math.max(0.35,zoom));},{passive:false});
+// тач
+cv.addEventListener('touchstart',e=>{ if(e.touches.length===1){dragging=true;moved=false;lx=e.touches[0].clientX;ly=e.touches[0].clientY;}},{passive:true});
+cv.addEventListener('touchmove',e=>{ if(dragging&&e.touches.length===1){const dx=e.touches[0].clientX-lx,dy=e.touches[0].clientY-ly;
+  if(Math.abs(dx)+Math.abs(dy)>3)moved=true; rotY+=dx*0.005; rotX=Math.min(1.4,Math.max(0.05,rotX+dy*0.004)); lx=e.touches[0].clientX; ly=e.touches[0].clientY;}},{passive:true});
+cv.addEventListener('touchend',()=>dragging=false);
+
+// ---------- проекция ----------
+function proj(x,y,z){
+  const cy=Math.cos(rotY),sy=Math.sin(rotY),cx=Math.cos(rotX),sx=Math.sin(rotX);
+  let X=x*cy - z*sy, Z=x*sy + z*cy, Y=y;
+  let Y2=Y*cx - Z*sx, Z2=Y*sx + Z*cx;
+  const s=zoom, f=900/(900+Z2*s);
+  return {sx:W/2+X*s*f, sy:H/2+Y2*s*f, f, z:Z2};
+}
+function posOf(p,t){ const a=p.ang; return [Math.cos(a)*p.d, Math.sin(a)*p.d*Math.sin(p.inc*Math.PI/180), Math.sin(a)*p.d*Math.cos(p.inc*Math.PI/180)]; }
+
+// ---------- клики ----------
+cv.addEventListener('click',e=>{
+  if(moved)return;
+  const mx=e.clientX,my=e.clientY; let best=null,bd=28;
+  const pa=proj(0,0,0);
+  PLANETS.forEach(p=>{ const [x,y,z]=posOf(p,tick); const q=proj(x,y,z);
+    const dd=Math.hypot(q.sx-mx,q.sy-my); if(dd<bd){bd=dd;best=p;} });
+  if(best){ best.on=!best.on; }
+});
+function allOn(v){ PLANETS.forEach(p=>p.on=v); }
+document.getElementById('all').onclick=()=>allOn(true);
+document.getElementById('stop').onclick=()=>allOn(false);
+let speed=1;
+const spdEls=[['s1',1],['s6',6],['s60',60]].map(([id,v])=>{
+  const el=document.getElementById(id); el.onclick=()=>{speed=v; spdEls.forEach(([i2,v2])=>document.getElementById(i2).classList.toggle('on',v2===v));
+  document.getElementById('spd').textContent='×'+v;};
+  return [id,v];
+});
+
+// ---------- календарь ----------
+const TICK_DAY=3600;
+function fmtCal(t){ const days=Math.floor(t/TICK_DAY);
+  const yr=Math.floor(days/364)+1, rem=days%364;
+  const mo=Math.floor(rem/28)+1, dy=(rem%28)+1;
+  return yr+' · '+mo+' · '+dy; }
+function yearsToRider(t){ // соединение С-Немезида: разность фаз
+  const pc=PLANETS[7], pn=PLANETS[8];
+  let rel=((pc.ang - pn.ang)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
+  const syn=1/(1/pc.P-1/pn.P);
+  let daysTo=rel/(2*Math.PI)*(syn<0?0:syn)*1; // приближенно: время до следующего выравнивания углов
+  // точнее: решаем (omc-omn)*dt = -rel
+  const dw=(pc.om-pn.om); daysTo=(2*Math.PI-rel)/dw;
+  return daysTo/364;
+}
+
+// ---------- рендер ----------
+let tick=0, last=performance.now(), trailCache={};
+function frame(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now;
+  const simDt=dt*60*speed; // сек реала -> сим-сек * скорость
+  tick+=simDt;
+  PLANETS.forEach(p=>{ if(p.on) p.ang+=p.om*simDt/3600; });
+
+  // фон
+  ctx.fillStyle='#05060d'; ctx.fillRect(0,0,W,H);
+  if(bgImg.complete&&bgImg.naturalWidth){ // cover
+    const r=Math.max(W/bgImg.naturalWidth,H/bgImg.naturalHeight);
+    const iw=bgImg.naturalWidth*r, ih=bgImg.naturalHeight*r;
+    ctx.globalAlpha=.85; ctx.drawImage(bgImg,(W-iw)/2,(H-ih)/2,iw,ih); ctx.globalAlpha=1;
+  } else { // туманности
+    const g1=ctx.createRadialGradient(W*0.2,H*0.25,0,W*0.2,H*0.25,W*0.5);
+    g1.addColorStop(0,'rgba(60,30,120,.22)'); g1.addColorStop(1,'transparent');
+    ctx.fillStyle=g1; ctx.fillRect(0,0,W,H);
+    const g2=ctx.createRadialGradient(W*0.8,H*0.7,0,W*0.8,H*0.7,W*0.55);
+    g2.addColorStop(0,'rgba(140,40,40,.18)'); g2.addColorStop(1,'transparent');
+    ctx.fillStyle=g2; ctx.fillRect(0,0,W,H);
+  }
+  for(const s of stars){ ctx.globalAlpha=s.a*(0.6+0.4*Math.sin(now*0.002+s.tw));
+    ctx.fillStyle='#cfd8ff'; ctx.fillRect(s.x*W,s.y*H,s.s,s.s); }
+  ctx.globalAlpha=1;
+
+  // орбитальные кольца
+  PLANETS.forEach(p=>{
+    ctx.beginPath(); let started=false;
+    for(let i=0;i<=128;i++){ const a=i/128*2*Math.PI;
+      const x=Math.cos(a)*p.d, z=Math.sin(a)*p.d, y=z*Math.sin(p.inc*Math.PI/180), zz=Math.sin(a)*p.d*Math.cos(p.inc*Math.PI/180);
+      const q=proj(x,y,zz);
+      if(!started){ctx.moveTo(q.sx,q.sy);started=true;} else ctx.lineTo(q.sx,q.sy);
+    }
+    ctx.strokeStyle=p.on?'rgba(247,204,29,.55)':'rgba(140,160,200,.16)';
+    ctx.lineWidth=p.on?1.6:0.7; ctx.stroke();
+  });
+
+  // звезда A
+  const pa=proj(0,0,0);
+  const gs=ctx.createRadialGradient(pa.sx,pa.sy,0,pa.sx,pa.sy,A.r*3*pa.f*zoom);
+  gs.addColorStop(0,'rgba(255,150,40,.9)'); gs.addColorStop(.3,'rgba(255,110,20,.4)'); gs.addColorStop(1,'transparent');
+  ctx.fillStyle=gs; ctx.beginPath(); ctx.arc(pa.sx,pa.sy,A.r*3*pa.f*zoom,0,7); ctx.fill();
+  ctx.fillStyle='#ffb347'; ctx.beginPath(); ctx.arc(pa.sx,pa.sy,A.r*pa.f*zoom*0.9,0,7); ctx.fill();
+
+  // планеты
+  PLANETS.forEach(p=>{
+    const [x,y,z]=posOf(p,tick); const q=proj(x,y,z);
+    // трейл
+    if(p.on){ const n=Math.min(60,Math.round(p.P*0.35));
+      ctx.beginPath();
+      for(let i=0;i<=n;i++){ const a=p.ang - i*0.03;
+        const tx=Math.cos(a)*p.d, tz=Math.sin(a)*p.d, ty=tz*Math.sin(p.inc*Math.PI/180), tzz=Math.sin(a)*p.d*Math.cos(p.inc*Math.PI/180);
+        const tq=proj(tx,ty,tzz);
+        if(i===0)ctx.moveTo(tq.sx,tq.sy); else ctx.lineTo(tq.sx,tq.sy); }
+      ctx.strokeStyle='rgba(247,204,29,.28)'; ctx.lineWidth=2.2; ctx.stroke();
+    }
+    // кольца Чизии и Ш-С
+    if(p.name==='ЧИЗИЯ'||p.name==='Шинрарта-С'){
+      ctx.save(); ctx.translate(q.sx,q.sy); ctx.scale(1,0.35); ctx.rotate(0.4);
+      ctx.beginPath(); ctx.arc(0,0,p.r*2.1*q.f*zoom,0,7);
+      ctx.strokeStyle=p.name==='ЧИЗИЯ'?'rgba(255,235,180,.55)':'rgba(255,120,120,.5)';
+      ctx.lineWidth=2.5; ctx.stroke(); ctx.beginPath(); ctx.arc(0,0,p.r*2.7*q.f*zoom,0,7);
+      ctx.strokeStyle=p.name==='ЧИЗИЯ'?'rgba(200,220,255,.3)':'rgba(255,120,120,.3)';
+      ctx.lineWidth=1.4; ctx.stroke(); ctx.restore();
+    }
+    // шарик со светотенью
+    const R=p.r*q.f*zoom;
+    const g=ctx.createRadialGradient(q.sx-R*0.4,q.sy-R*0.4,R*0.15,q.sx,q.sy,R);
+    g.addColorStop(0,lighten(p.col)); g.addColorStop(1,p.col);
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(q.sx,q.sy,R,0,7); ctx.fill();
+    if(p.on){ ctx.strokeStyle='#7dff8a'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(q.sx,q.sy,R+3.5,0,7); ctx.stroke(); }
+    // метка
+    ctx.font='11px Courier New'; ctx.fillStyle=p.on?'#f7cc1d':'rgba(207,216,227,.8)';
+    ctx.fillText(p.name,q.sx+R+6,q.sy-4);
+    ctx.fillStyle='rgba(122,255,138,.75)'; ctx.font='9px Courier New';
+    ctx.fillText(p.kind,q.sx+R+6,q.sy+8);
+  });
+
+  // HUD
+  document.getElementById('ticks').textContent=Math.floor(tick);
+  document.getElementById('cal').textContent=fmtCal(tick);
+  const yr=yearsToRider(tick); document.getElementById('rid').textContent=(yr<0?'0.0':yr.toFixed(1));
+
+  requestAnimationFrame(frame);
+}
+function lighten(c){ // осветлённая версия hex
+  const n=parseInt(c.slice(1),16), r=Math.min(255,(n>>16)+70), g=Math.min(255,((n>>8)&255)+70), b=Math.min(255,(n&255)+70);
+  return 'rgb('+r+','+g+','+b+')';
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

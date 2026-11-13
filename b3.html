@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шейдеры — полный FRAG · HITOMI OF LEGENDS</title>
+<style>
+  :root{
+    --bg:#080b12; --panel:#0d1320; --panel2:#121a2b; --line:#22304a;
+    --gold:#f7cc1d; --accent:#4f8ee9; --txt:#c9d4e6; --dim:#6b7a94;
+  }
+  html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--txt);
+    font-family:Consolas,Menlo,monospace;overflow:hidden;}
+  #cv{position:fixed;inset:0;display:block;width:100%;height:100%;cursor:crosshair;}
+  #panel{position:fixed;top:14px;right:14px;width:252px;background:rgba(16,23,37,.92);
+    border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;
+    backdrop-filter:blur(6px);z-index:10;user-select:none;
+    box-shadow:0 10px 34px rgba(0,0,0,.5);}
+  #panel h1{font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 2px;
+    color:var(--gold);font-weight:600;}
+  #panel .sub{font-size:10px;color:var(--dim);margin:0 0 12px;}
+  .row{margin:9px 0;}
+  .row label{display:block;font-size:10px;color:var(--dim);margin-bottom:4px;letter-spacing:.04em;}
+  .row label b{color:var(--txt);font-weight:600;}
+  select, button, input[type=range]{width:100%;box-sizing:border-box;background:var(--panel2);
+    border:1px solid var(--line);color:var(--txt);border-radius:7px;padding:6px 8px;
+    font:inherit;font-size:12px;outline:none;}
+  select:focus, button:focus, input:focus{border-color:var(--accent);}
+  button{cursor:pointer;background:linear-gradient(180deg,#182338,#121a2b);}
+  button:hover{border-color:var(--accent);color:#fff;}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:5px;padding:0;background:var(--line);}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:13px;height:13px;
+    border-radius:50%;background:var(--gold);cursor:pointer;border:none;}
+  .val{float:right;color:var(--gold);font-size:10px;}
+  .controls{margin-top:12px;border-top:1px solid var(--line);padding-top:9px;font-size:10px;
+    line-height:1.6;color:var(--dim);}
+  .controls b{color:var(--txt);}
+  #hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);
+    background:rgba(13,19,32,.9);border:1px solid var(--line);border-radius:8px;
+    padding:7px 14px;font-size:11px;color:var(--dim);z-index:10;white-space:nowrap;}
+  #hint b{color:var(--txt);}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="panel">
+  <h1>Шейдеры — полный FRAG</h1>
+  <p class="sub">HITOMI OF LEGENDS · WebGL1 · free-fly cam</p>
+
+  <div class="row">
+    <label>Планета (uPlanet) <span class="val" id="vPlanet">0</span></label>
+    <select id="selPlanet">
+      <option value="0">0 · Терра (terrestrial)</option>
+      <option value="1">1 · Газовик (gas · кольца)</option>
+      <option value="2">2 · Камень (rock)</option>
+      <option value="3">3 · Пульсар (pulsar · джеты)</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label>Кольца (uRingOn)</label>
+    <select id="selRing">
+      <option value="1">Вкл</option>
+      <option value="0">Выкл</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label>Джеты (uJetsOn)</label>
+    <select id="selJets">
+      <option value="1">Вкл</option>
+      <option value="0">Выкл</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <label>Скорость полёта <span class="val" id="vSpeed">0.60</span></label>
+    <input type="range" id="rngSpeed" min="0.05" max="4" step="0.05" value="0.60">
+  </div>
+
+  <div class="row">
+    <button id="btnReset">Сброс камеры</button>
+  </div>
+
+  <div class="controls">
+    <b>WASD</b> — полёт ·
+    <b>E/Q</b> — вверх/вниз<br>
+    <b>Мышь</b> — обзор (клик по экрану = pointer lock)<br>
+    <b>Колесо</b> — скорость ·
+    <b>Shift/Ctrl</b> — быстрее/медленнее
+  </div>
+</div>
+
+<div id="hint"><b>Клик по экрану</b> — захват мыши · <b>Esc</b> — отпустить</div>
+
+<script>
+"use strict";
+(function(){
+  const FRAG = `
+precision highp float;
+uniform vec2  uRes;
+uniform float uTime;
+uniform float uCamA;
+uniform float uSunA;
+uniform vec3  uCamPos;
+uniform vec3  uCamR;
+uniform vec3  uCamU;
+uniform vec3  uCamF;
+uniform float uPlanet;
+uniform float uSplash;
+uniform vec3  uP[10];
+uniform float uPKa[10];
+uniform float uPCount;
+uniform float uHyper;
+uniform vec3  uP4;
+uniform float uPK4;
+uniform vec3  uLensPos;
+uniform float uLensStr;
+uniform float uLensRad;
+uniform float uLensDopp;
+uniform float uLensActive;
+uniform vec3  uStarPos;
+uniform mat3  uAxM;
+uniform vec3  uAtmC; uniform float uAtmGlow; uniform float uAtmSize;
+uniform float uJetsOn; uniform vec3 uJetsC1; uniform vec3 uJetsC2; uniform float uJetsSp; uniform float uJetsLen;
+uniform vec3 uSunC;
+uniform float uSunB;
+uniform float uSunR;
+uniform float uSTScale;
+uniform float uSTTSpeed;
+uniform float uSTWarp;
+uniform float uSTOct;
+uniform vec3  uSTC1;
+uniform vec3  uSTC2;
+uniform vec3  uSTC3;
+uniform vec3  uSTC4;
+uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float uRingIn; uniform float uRingOut;
+uniform float uSpin; uniform float uPulseR;
+uniform float uSurfScale;
+uniform vec3  uAmbSky;
+uniform vec3  uAmbNight;
+uniform vec3  uAmbLimb;
+uniform float uAmbHaze;
+uniform vec3  uRingTilt;
+uniform vec3  uJetsTilt;
+uniform sampler2D uPal;
+uniform float uPIa[10];
+uniform float uPIcur;
+uniform vec3  uOceanC; uniform vec3 uLand1C; uniform vec3 uLand2C; uniform vec3 uIceC; uniform float uIceCov;
+uniform vec3  uCloudC; uniform float uCloudCov; uniform vec3 uCityC; uniform float uCityK;
+uniform vec3  uAurC; uniform float uAurK;
+uniform vec3  uBand1C; uniform vec3 uBand2C; uniform vec3 uBand3C; uniform vec3 uStormC; uniform float uStormK;
+uniform vec3  uHazeC; uniform vec3 uFogC;
+uniform vec3  uRock1C; uniform vec3 uRock2C; uniform vec3 uLavaC; uniform vec3 uFresC; uniform vec3 uRiverC; uniform vec3 uFres2C;
+float gCur = 0.0;
+#define CURE(u, d) ((gCur > 0.5) ? (u) : (d))
+#define SPIN ((gCur > 0.5) ? uSpin : (paln(9.0, 0.0)*8.0))
+#define SCL  ((gCur > 0.5) ? uSurfScale : (paln(7.0, 0.0)*8.0))
+mat3 rotYm(float a){ float c = cos(a), s = sin(a); return mat3(c, 0.0, -s, 0.0, 1.0, 0.0, s, 0.0, c); }
+mat3 rotXm(float a){ float c = cos(a), s = sin(a); return mat3(1.0, 0.0, 0.0, 0.0, c, s, 0.0, -s, c); }
+mat3 rotZm(float a){ float c = cos(a), s = sin(a); return mat3(c, s, 0.0, -s, c, 0.0, 0.0, 0.0, 1.0); }
+mat3 eulM(vec3 e){ return rotZm(e.z)*(rotYm(e.y)*rotXm(e.x)); }
+mat3 trn3(mat3 m){ return mat3(m[0].x, m[1].x, m[2].x, m[0].y, m[1].y, m[2].y, m[0].z, m[1].z, m[2].z); }
+float gRow = 0.0;
+vec4 palV(float slot){ return texture2D(uPal, vec2((slot + 0.5)/16.0, (clamp(gRow, 0.0, 9.0) + 0.5)/10.0)); }
+vec3 palc(float slot){ return palV(slot).rgb; }
+float paln(float slot, float ch){
+  vec4 v = palV(slot);
+  return (ch < 0.5) ? v.r : (ch < 1.5) ? v.g : (ch < 2.5) ? v.b : v.a;
+}
+uniform float uBodyR;
+ uniform float uRotC;
+#define R    1.0
+#define CAMR uBodyR
+#define FOT  __FOT__
+float hash13(vec3 p){
+  p = fract(p*0.3183099 + vec3(0.1,0.2,0.3));
+  p *= 17.0;
+  return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
+}
+float vnoise(vec3 x){
+  vec3 i = floor(x);
+  vec3 f = fract(x);
+  f = f*f*(3.0-2.0*f);
+  float n0=hash13(i);
+  float n1=hash13(i+vec3(1.0,0.0,0.0));
+  float n2=hash13(i+vec3(0.0,1.0,0.0));
+  float n3=hash13(i+vec3(1.0,1.0,0.0));
+  float n4=hash13(i+vec3(0.0,0.0,1.0));
+  float n5=hash13(i+vec3(1.0,0.0,1.0));
+  float n6=hash13(i+vec3(0.0,1.0,1.0));
+  float n7=hash13(i+vec3(1.0,1.0,1.0));
+  return mix(mix(mix(n0,n1,f.x),mix(n2,n3,f.x),f.y),
+             mix(mix(n4,n5,f.x),mix(n6,n7,f.x),f.y),f.z);
+}
+float fbm5(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
+  return v;
+}
+float fbm3(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=0.5; }
+  return v;
+}
+vec3 stars(vec3 rd){
+  vec3 c = vec3(0.0);
+  for(int L=0; L<3; L++){
+    float sc = 90.0 + float(L)*80.0;
+    vec3 g  = rd*sc;
+    vec3 id = floor(g);
+    vec3 fr = fract(g) - 0.5;
+    float h = hash13(id + float(L)*37.0);
+    if(h > 0.975){
+      vec3 off = (vec3(hash13(id+1.0), hash13(id+2.0), hash13(id+3.0)) - 0.5)*0.6;
+      float d  = length(fr - off);
+      float tw = 0.55 + 0.45*sin(uTime*(1.0+h*4.0) + h*40.0);
+      float s  = (1.0 - smoothstep(0.0, 0.14, d))*tw;
+      vec3 tint = mix(vec3(0.70,0.80,1.0), vec3(1.0,0.85,0.60), hash13(id+4.0));
+      c += s*tint*(0.35 + h*0.8);
+    }
+  }
+  return c;
+}
+vec3 lensBend(vec3 ro, vec3 rd){
+  vec3 center = uLensPos;
+  vec3 oc = ro - center;
+  float bL = dot(oc, rd);
+  vec3 closest = ro - rd*bL;
+  float impact = length(closest - center);
+  float rIn = R;
+  float rOut = max(uLensRad, rIn*1.05);
+  float band = clamp((rOut - impact) / (rOut - rIn), 0.0, 1.0);
+  float bend = uLensStr * band*band * 2.5;
+  bend = clamp(bend, 0.0, 2.5);
+  vec3 toC = normalize(center - closest + 1e-4);
+  return normalize(rd + toC*bend);
+}
+vec3 dopplerShift(vec3 c, float impact){
+  float zone = uLensRad;
+  float tD = clamp(1.0 - impact/zone, 0.0, 1.0);
+  float d = mix(0.1, uLensDopp, tD);
+  vec3 shift = vec3(0.7, 0.85, 1.2) + d*vec3(0.0, 0.0, 0.25);
+  return c * shift;
+}
+float mapSDF(vec3 p, vec3 sC){
+  float d = length(p - sC) - R;
+  for(int di = 0; di < 10; di++){
+    if(di >= int(uPCount + 0.5)) break;
+    if(length(uP[di] - uStarPos) < R*1.5) continue;
+    d = min(d, length(p - uP[di]) - R);
+  }
+  if(uHyper > 0.5){
+    d = min(d, length(p - uP4) - R);
+  }
+  return d;
+}
+float softShadowSDF(vec3 ro, vec3 lightDir, vec3 sC){
+  float res = 1.0;
+  float t = 0.0;
+  for(int i = 0; i < 12; i++){
+    float h = mapSDF(ro + lightDir*t, sC);
+    if(h < 0.001) return 0.0;
+    res = min(res, 12.0*h / t);
+    t += clamp(h, 0.02, 0.5);
+    if(t > 60.0) break;
+  }
+  return clamp(res, 0.0, 1.0);
+}
+vec3 STrandom3(vec3 c){
+  float j = 4096.0*sin(dot(c, vec3(17.0, 59.4, 15.0)));
+  vec3 rr;
+  rr.z = fract(512.0*j); j *= 0.125;
+  rr.x = fract(512.0*j); j *= 0.125;
+  rr.y = fract(512.0*j);
+  return rr - 0.5;
+}
+const float STF3 = 0.3333333;
+const float STG3 = 0.1666667;
+float STnoise(vec3 p){
+  vec3 s = floor(p + dot(p, vec3(STF3)));
+  vec3 x = p - s + dot(s, vec3(STG3));
+  vec3 e = step(vec3(0.0), x - x.yzx);
+  vec3 i1 = e*(1.0 - e.zxy);
+  vec3 i2 = 1.0 - e.zxy*(1.0 - e);
+  vec3 x1 = x - i1 + STG3;
+  vec3 x2 = x - i2 + 2.0*STG3;
+  vec3 x3 = x - 1.0 + 3.0*STG3;
+  vec4 w, d;
+  w.x = dot(x, x); w.y = dot(x1, x1); w.z = dot(x2, x2); w.w = dot(x3, x3);
+  w = max(0.6 - w, 0.0);
+  d.x = dot(STrandom3(s), x);
+  d.y = dot(STrandom3(s + i1), x1);
+  d.z = dot(STrandom3(s + i2), x2);
+  d.w = dot(STrandom3(s + 1.0), x3);
+  w *= w; w *= w; d *= w;
+  return 0.5 + dot(d, vec4(43.0));
+}
+float STfbm(vec3 x){
+  float v = 0.0;
+  float a = 0.5;
+  vec3 shift = vec3(100.0);
+  for(int i = 0; i < 4; ++i){
+    if(float(i) >= uSTOct) break;
+    v += a*STnoise(x);
+    x = x*2.0 + shift;
+    a *= 0.5;
+  }
+  return v;
+}
+void STpattern(in vec3 p, out vec3 q, out vec3 r){
+  q = vec3(STfbm(p + vec3(1.3, 5.2, 0.0)), STfbm(p + vec3(5.2, 1.3, 0.0)), STfbm(p + vec3(0.0, 0.0, 1.0)));
+  r = vec3(STfbm(p + uSTWarp*q + vec3(1.3, 5.2, 0.0)), STfbm(p + uSTWarp*q + vec3(5.2, 1.3, 0.0)), STfbm(p + uSTWarp*q + vec3(0.0, 0.0, 1.0)));
+}
+vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
+  float lodRspd = paln(11.0, 0.0)*32.0;
+  float sphA = (gCur > 0.5) ? uRotC : mod(paln(10.0, 0.0)*6.2831853 + lodRspd*uTime*0.0174532925, 6.2831853);
+  mat3 axm = (gCur > 0.5) ? uAxM : eulM((vec3(paln(10.0, 1.0), paln(10.0, 2.0), paln(10.0, 3.0))*360.0 - vec3(180.0))*0.0174532925);
+  vec3 n = axm*(rotYm(sphA)*(trn3(axm)*n0));
+  vec3 nG = n0;
+  vec3 axW = axm*vec3(0.0,1.0,0.0);
+  float latAx = dot(nG, axW);
+  vec3 r = vec3(0.0);
+  if(k == 0){
+    vec3  sp   = n*(2.6*SCL) + vec3(0.0, 0.0, uTime*0.004*SPIN);
+    float cont = fbm5(sp);
+    float land = smoothstep(0.46, 0.54, cont);
+    float coast = fbm3(n*(8.0*SCL) + vec3(0.0, uTime*0.006*SPIN, 0.0));
+    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
+    vec3 ocean = palc(0.0);
+    vec3 landc = mix(palc(1.0), palc(2.0), smoothstep(0.52,0.78,cont));
+    float mdet = fbm3(n*(12.0*SCL) + vec3(uTime*0.003*SPIN, uTime*0.001*SPIN, 0.0));
+    landc *= 0.85 + 0.30*mdet;
+    float ice  = smoothstep(0.94 - 0.28*paln(7.0, 1.0), 0.94, abs(latAx));
+    vec3 surf  = mix(ocean, landc, land);
+    surf = mix(surf, palc(3.0), ice);
+    float cl = fbm5(n*(4.2*SCL) + vec3(uTime*0.010*SPIN, 0.0, -uTime*0.006*SPIN));
+    cl = smoothstep(0.62 - (0.12 + 0.24*paln(7.0, 2.0)), 0.62 + (0.12 + 0.24*paln(7.0, 2.0)), cl);
+    surf = mix(surf, palc(4.0), cl*0.9);
+    vec3 colDay = surf*(0.15 + 1.05*lit);
+    vec3 hv = normalize(sunDir - rd);
+    float spec = pow(max(dot(nG,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
+    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+    float cellH = hash13(floor(n*90.0));
+    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
+    vec3 colNight = surf*0.03 + palc(5.0)*city*paln(8.0, 0.0)*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+    r = mix(colNight, colDay, lit);
+    float fres = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
+    r += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
+    float aurZ = smoothstep(0.72, 0.92, abs(latAx))*(1.0-lit);
+    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
+    r += palc(6.0)*aurZ*smoothstep(0.45,0.75,aur)*paln(8.0, 1.0);
+  } else if(k == 1){
+    float lat = latAx;
+    float warp = fbm3(n*(2.6*SCL) + vec3(uTime*0.008*SPIN, 0.0, 0.0));
+    float bands = sin(lat*16.0 + warp*3.2);
+    float bands2 = sin(lat*34.0 + 1.7);
+    vec3 band1 = palc(0.0);
+    vec3 band2 = palc(1.0);
+    vec3 band3 = palc(2.0);
+    vec3 surf = mix(band1, band2, smoothstep(-0.6, 0.6, bands));
+    surf = mix(surf, band3, 0.5 + 0.5*sin(lat*7.0 + 1.0));
+    surf = mix(surf, band2*0.92, 0.25*smoothstep(0.3, 0.9, bands2));
+    vec3 sdir = normalize(vec3(cos(uTime*0.02*SPIN + 2.0), -0.30, sin(uTime*0.02*SPIN + 2.0)));
+    float angS = acos(clamp(dot(n, sdir), -1.0, 1.0));
+    float storm = 1.0 - smoothstep(0.05, 0.16, angS);
+    surf = mix(surf, palc(3.0), storm*paln(7.0, 3.0));
+    surf *= 0.92 + 0.16*fbm3(n*(9.0*SCL) + vec3(uTime*0.05*SPIN, 0.0, 0.0));
+    r = surf*(0.06 + 1.05*lit);
+    float fresA = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
+    r += palc(4.0)*fresA*(0.2 + 0.8*lit)*0.8;
+    float azi = dot(nG, rd);
+    float entry = smoothstep(-0.20, 0.05, azi);
+    float blurAtm = entry*0.50;
+    r = mix(r, palc(5.0)*(0.5 + 0.6*lit), blurAtm);
+    float fogT = fbm3(n*6.0 + vec3(uTime*0.02, 0.0, uTime*0.011))-0.5;
+    float fogB = smoothstep(-0.10, 0.30, fogT);
+    float fogWide = 0.5 + 0.5*sin(lat*20.0 + fogT*7.0 + uTime*0.03);
+    float fogAmt = fogB*(0.30 + 0.70*fogWide)*(0.55 + 0.45*entry)*(0.75 + 0.25*lit);
+    r = mix(r, palc(6.0), clamp(fogAmt, 0.0, 1.0)*0.55);
+  } else if(k == 2){
+    float rock = fbm5(n*3.2);
+    vec3 surf = mix(palc(0.0), palc(1.0), rock);
+    float riv1 = fbm3(n*(3.5*SCL) + vec3(0.0, uTime*0.02*SPIN, uTime*0.013*SPIN));
+    float riv2 = fbm3(n*(7.0*SCL) - vec3(uTime*0.015*SPIN, 0.0, 0.0));
+    float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+               + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+    lava = min(lava, 1.0);
+    float pulse = 0.75 + 0.25*sin(uTime*1.5*(paln(8.0, 2.0)*8.0) + riv1*40.0);
+    r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
+    float fresP = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
+    r += palc(3.0)*fresP*0.25;
+  } else if(k == 3) {
+    float rock = fbm5(n*3.2);
+    vec3 surf = mix(palc(0.0), palc(1.0), rock);
+    float riv1 = fbm3(n*(3.5*SCL) + vec3(0.0, uTime*0.02*SPIN, uTime*0.013*SPIN));
+    float riv2 = fbm3(n*(7.0*SCL) - vec3(uTime*0.015*SPIN, 0.0, 0.0));
+    float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
+               + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
+    lava = min(lava, 1.0);
+    float pulse = 0.75 + 0.25*sin(uTime*1.5*(paln(8.0, 2.0)*8.0) + riv1*40.0);
+    r = surf*(0.05 + 0.9*lit) + palc(2.0)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
+    float fresP = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
+    r += palc(3.0)*fresP*0.45;
+  } else {
+    vec3 STq, STr;
+    vec3 STp = n*uSTScale + vec3(0.0, uTime*uSTTSpeed*0.6, uTime*uSTTSpeed);
+    STpattern(STp, STq, STr);
+    float STn = STfbm(STp + uSTWarp*STr);
+    vec3 sgl = mix(mix(mix(palc(0.0), palc(1.0), STr.z), palc(2.0), STq.x), palc(3.0), STn);
+    r = sgl*(0.4 + 0.6*lit);
+    float fresP = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
+    r *= 0.65 + 0.35*smoothstep(0.0, 0.5, 1.0 - fresP);
+    r += palc(0.0)*fresP*0.3;
+    r += palc(1.0)*fresP*0.5;
+  }
+  return r;
+}
+void main(){
+  vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
+  vec3 camPos = uCamPos;
+  vec3 fwd    = normalize(uCamF);
+  vec3 right  = normalize(uCamR);
+  vec3 upv    = normalize(uCamU);
+  vec3 rd0    = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
+  vec3 rd     = rd0;
+  vec3 up0    = normalize(camPos);
+  float dStarSync = max(length(uStarPos - camPos), R*1.05);
+  float sunR_eff = max(uSunR, 0.5*R*R/(dStarSync*dStarSync));
+  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+  vec3 wC0 = camPos - sC;
+  float b0 = dot(wC0, rd0);
+  float cc0 = dot(wC0, wC0) - R*R;
+  float disc0 = b0*b0 - cc0;
+  float tHit0 = -b0 - sqrt(max(disc0, 0.0));
+  bool hitP  = (uHyper < 0.5) && (disc0 > 0.0) && (tHit0 > 0.0);
+  vec3 sunDir  = normalize(uStarPos - sC);
+  vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
+  float tHit = tHit0;
+  if(hitP){
+    rd = rd0;
+  } else if(uLensActive > 0.5){
+    rd = lensBend(camPos, rd0);
+  } else {
+    rd = rd0;
+  }
+  vec3 wC = camPos - sC;
+  float b = dot(wC, rd);
+  float disc = b*b - dot(wC, wC) + R*R;
+  float dayLocal = dot(normalize(camPos), sunDir);
+  float dayness  = smoothstep(-0.25, 0.30, dayLocal);
+  float camR  = length(camPos);
+  float atmIn = 1.0 - smoothstep(1.786, 1.90, camR);
+  vec3 atmC = uAtmC;
+  vec3 col = vec3(0.0);
+  if(hitP){
+    vec3 p = camPos + rd*tHit;
+    vec3 n = normalize(p - sC);
+    vec3 Lp = normalize(uStarPos - p);
+    float nl  = dot(n, Lp);
+    float lit = smoothstep(-0.06, 0.18, nl);
+    lit *= softShadowSDF(p + n*0.02, Lp, sC);
+    int ki = (uPlanet < 0.5) ? 0 : ((uPlanet < 1.5) ? 1 : ((uPlanet < 2.5) ? 2 : ((uPlanet < 3.5) ? 3 : 4)));
+    gRow = uPIcur;
+    gCur = 1.0;
+    col = shadeSurface(ki, n, lit, rd, sunDir);
+  } else {
+    float daySky = smoothstep(-0.15, 0.35, dayLocal);
+    vec3 night = (length(uAmbNight) > 0.02) ? mix(vec3(0.003,0.005,0.011), uAmbNight, 0.35) : vec3(0.003,0.005,0.011);
+    night += stars(rd)*1.3;
+    float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
+    night += vec3(0.45,0.5,0.7)*bandW*fbm3(rd*4.0)*0.42;
+    night += vec3(0.8,0.75,0.6)*bandW*bandW*0.12;
+    float horiz = 1.0 - abs(dot(rd, up0));
+    vec3 day = mix(atmC*0.83, mix(atmC, vec3(1.0), 0.42), horiz*0.85);
+    vec3 starDirN = normalize(uStarPos - camPos);
+    float sunAmt = max(dot(rd, starDirN), 0.0);
+    day += uSunC*pow(sunAmt, 8.0)*0.50*uSunB;
+    day += uSunC*pow(sunAmt, 3.0)*0.18*uSunB;
+    float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
+    skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
+    day = mix(day, vec3(1.0), skycl*0.75);
+    float dSun = dot(rd, starDirN);
+    col = mix(night, day, daySky*atmIn);
+    if(uPlanet > 2.5){ col = night; } else {
+    col += uSunC*smoothstep(1.0-sunR_eff, 1.0-sunR_eff*0.4375, dSun)*3.0*uSunB;
+    col += uSunC*pow(sunAmt, 350.0)*0.9*uSunB;
+    }
+    vec3 starDir = normalize(uStarPos - camPos);
+    float dSt = dot(rd, starDir);
+    col += uSunC*smoothstep(1.0-sunR_eff*1.25, 1.0-sunR_eff*0.5625, dSt)*4.0*uSunB;
+    col += uSunC*pow(max(dSt,0.0), 120.0)*0.8*uSunB;
+    float closest = length(camPos - rd*b);
+    float atmFwd = 1.0 - smoothstep(-0.2, 0.4, b);
+    float atmo = (1.0 - smoothstep(1.0, uAtmSize, closest))*atmFwd;
+    if(uPlanet < 2.5){
+      col += atmC*atmo*dayness*atmIn*(uAtmGlow + uAmbHaze*0.5);
+      if(uPlanet > 0.5 && uPlanet < 1.5){
+        float atmoIn = smoothstep(0.15, 1.0, atmo);
+        col = mix(col, vec3(0.88, 0.70, 0.42)*(0.5 + 0.5*dayness), atmoIn*0.5);
+      }
+    } else { col += CURE(uAtmC, uAmbLimb)*atmo*(1.0 + uAmbHaze); }
+    float dM = dot(rd, moonDir);
+    float mdisc = smoothstep(0.99950, 0.99980, dM);
+    if(uHyper <= 0.5 && uPlanet < 0.5 && mdisc > 0.0){
+      vec3 lp = rd - moonDir*dM;
+      float cr = fbm3(lp*260.0);
+      vec3 mc = vec3(0.78,0.78,0.74)*(0.55 + 0.45*cr);
+      float mlit = smoothstep(-0.15, 0.15, dot(moonDir, sunDir));
+      vec3 mc2 = mc*mix(0.10, 1.0, mlit);
+      col = mix(col, mc2, mdisc);
+      col += vec3(0.60,0.65,0.85)*pow(max(dM,0.0), 900.0)*0.30;
+    }
+    if(uHyper <= 0.5 && uPlanet > 0.5 && uPlanet < 1.5){
+      for(int ci=0; ci<4; ci++){
+        float cang = uSunA + 2.1 + 0.77*float(ci);
+        vec3 cdir = normalize(vec3(cos(cang), 0.15 + 0.18*float(ci), sin(cang)));
+        float dC = dot(rd, cdir);
+        float cthr = 0.99960 - 0.00007*float(ci);
+        float cdisc = smoothstep(cthr, cthr + 0.00035, dC);
+        if(cdisc > 0.0){
+          vec3 lp = rd - cdir*dC;
+          float crel = fbm3(lp*420.0);
+          float holes = smoothstep(0.30, 0.62, fbm3(lp*160.0 + vec3(7.3)));
+          vec3 cheese = vec3(1.00,0.82,0.30)*(0.55 + 0.45*crel);
+          cheese = mix(cheese, vec3(0.42,0.28,0.08), holes*0.55);
+          float clit = smoothstep(-0.15, 0.15, dot(cdir, sunDir));
+          vec3 cc2 = cheese*mix(0.10, 1.0, clit);
+          col = mix(col, cc2, cdisc);
+          col += vec3(1.00,0.90,0.60)*pow(max(dC,0.0), 900.0)*0.25;
+        }
+      }
+    }
+    if(uHyper <= 0.5 && !hitP && uPlanet > 2.5){
+      for(int ci=0; ci<8; ci++){
+        float cang = uSunA + 2.1 + 0.55*float(ci);
+        vec3 cdir = normalize(vec3(cos(cang), 0.10 + 0.13*float(ci), sin(cang)));
+        float dC = dot(rd, cdir);
+        float cthr = 0.99955 - 0.00006*float(ci);
+        float cdisc = smoothstep(cthr, cthr + 0.00022, dC);
+        if(cdisc > 0.0){
+          vec3 lp2 = rd - cdir*dC;
+          float chz = fbm3(lp2*240.0);
+          vec3 cheese = vec3(0.95,0.78,0.30)*(0.55 + 0.45*chz);
+          float clit = smoothstep(-0.15, 0.15, dot(cdir, sunDir));
+          vec3 cc2 = cheese*mix(0.10, 1.0, clit);
+          col = mix(col, cc2, cdisc);
+          col += vec3(1.00,0.90,0.60)*pow(max(dC,0.0), 900.0)*0.25;
+        }
+      }
+    }
+  }
+  if(!hitP && uLensActive > 0.5){
+    vec3 ocL = camPos - uLensPos;
+    float bDL = dot(ocL, rd);
+    vec3 cDL   = camPos - rd*bDL;
+    float imp = length(cDL - uLensPos);
+    col = dopplerShift(col, imp);
+  }
+  if(uHyper <= 0.5 && !hitP && uJetsOn > 0.5){
+    vec3 jC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
+    vec3 jetAxes[3];
+    int nAxes = 1;
+    jetAxes[0] = vec3(0.0, 1.0, 0.0);
+    if(gRow > 8.5){ nAxes = 3; jetAxes[1] = vec3(1.0,0.0,0.0); jetAxes[2] = vec3(0.0,0.0,1.0); }
+    mat3 jtM = eulM(uJetsTilt);
+    jetAxes[0] = normalize(jtM*jetAxes[0]);
+    jetAxes[1] = normalize(jtM*jetAxes[1]);
+    jetAxes[2] = normalize(jtM*jetAxes[2]);
+    for(int ai = 0; ai < 3; ai++){
+      if(ai >= nAxes) break;
+      vec3 axis = uAxM*jetAxes[ai];
+      vec3 jW = camPos - jC;
+      float bJ = dot(rd, axis);
+      float dJd = dot(rd, jW);
+      float eJ = dot(jW, axis);
+      float denJ = 1.0 - bJ*bJ;
+      if(abs(denJ) > 0.0001){
+        float sJ = (eJ - dJd*bJ)/denJ;
+        float tJ = sJ*bJ - dJd;
+        if(tJ > 0.0){
+          float aJ = abs(sJ);
+          float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, uJetsLen, aJ));
+          float wJ = 0.04;
+          vec3 cpt = camPos + tJ*rd - jC - axis*sJ;
+          float rJ = length(cpt);
+          float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*uJetsSp);
+          float off = 0.30*(1.0 - exp(-aJ*1.4));
+          float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
+          float cool = smoothstep(0.8, 4.2, aJ);
+          vec3 jetCol = mix(uJetsC1, uJetsC2, cool);
+          float twinkle = 0.75 + 0.25*sin(uTime*uJetsSp + aJ*5.0);
+          col += jetCol*along*prof*twinkle*1.6;
+          float core = exp(-(rJ*rJ)/(wJ*wJ*0.10)*0.5);
+          col += vec3(0.95,0.97,1.0)*along*core*twinkle*1.1;
+          float swirl = exp(-( (rJ - off*turb)*(rJ - off*turb) )/(wJ*wJ*0.6)*0.5);
+          col += jetCol*along*swirl*turb*0.6;
+        }
+      }
+    }
+  }
+  float bestT = 1.0e9;
+  vec3 sphCol = vec3(0.0);
+  bool haveSph = false;
+  bool starHit = false;
+  for(int di = 0; di < 10; di++){
+    if(di >= int(uPCount + 0.5)) break;
+    vec3 pc = uP[di];
+    int dk = int(uPKa[di] + 0.5);
+    if(di < int(uPCount + 0.5)){
+      vec3 wc = camPos - pc;
+      float bb = dot(wc, rd);
+      float cc2 = dot(wc, wc) - R*R;
+      float dsc = bb*bb - cc2;
+      if(dsc > 0.0){
+        float th = -bb - sqrt(dsc);
+        if(th > 0.0 && th < bestT && (!hitP || th < tHit)){
+          vec3 pp = camPos + rd*th;
+          vec3 nn = normalize(pp - pc);
+          float dnl  = dot(nn, normalize(uStarPos - pp));
+          float isStar = (dk == 4) ? 1.0 : 0.0;
+          float dlit = mix(smoothstep(-0.02, 0.10, dnl), 1.0, isStar);
+          if(isStar < 0.5){ dlit *= softShadowSDF(pp + nn*0.02, normalize(uStarPos - pp), sC); }
+          gRow = uPIa[di];
+          gCur = 0.0;
+          sphCol = shadeSurface(dk, nn, dlit, rd, normalize(uStarPos - pp));
+          float muL = clamp(dot(nn, -rd), 0.0, 1.0);
+          sphCol *= (0.38 + 0.62*pow(muL, 0.55));
+          float bt2 = (dnl - 0.015)/0.085;
+          float bandT = exp(-bt2*bt2);
+          sphCol += vec3(1.0, 0.44, 0.20)*bandT*0.30*max(dlit, 0.12)*(1.0 - isStar);
+          bestT = th; haveSph = true; starHit = (isStar > 0.5);
+        }
+      }
+    }
+  }
+  if(uHyper > 0.5){
+    vec3 wc4 = camPos - uP4;
+    float bb4 = dot(wc4, rd);
+    float cc4 = dot(wc4, wc4) - R*R;
+    float ds4 = bb4*bb4 - cc4;
+    if(ds4 > 0.0){
+      float th4 = -bb4 - sqrt(ds4);
+      if(uHyper > 0.5 && th4 > 0.0 && th4 < bestT && (!hitP || th4 < tHit)){
+        vec3 pp4 = camPos + rd*th4;
+        vec3 nn4 = normalize(pp4 - uP4);
+        float nl4  = dot(nn4, normalize(uStarPos - pp4));
+        float lit4 = smoothstep(-0.02, 0.10, nl4);
+        lit4 *= softShadowSDF(pp4 + nn4*0.02, normalize(uStarPos - pp4), sC);
+        gRow = uPIcur;
+        gCur = 1.0;
+        sphCol = shadeSurface(int(uPK4 + 0.5), nn4, lit4, rd, normalize(uStarPos - pp4));
+        float muL4 = clamp(dot(nn4, -rd), 0.0, 1.0);
+        sphCol *= (0.38 + 0.62*pow(muL4, 0.55));
+        float bt24 = (nl4 - 0.015)/0.085;
+        float bandT4 = exp(-bt24*bt24);
+        sphCol += vec3(1.0, 0.44, 0.20)*bandT4*0.30*max(lit4, 0.12);
+        bestT = th4; haveSph = true; starHit = false;
+      }
+    }
+    float hSun = dot(rd, normalize(uStarPos - camPos));
+    col += uSunC*pow(max(hSun,0.0), 8.0)*0.50*uSunB;
+    col += uSunC*pow(max(hSun,0.0), 350.0)*0.9*uSunB;
+    col += uSunC*smoothstep(1.0-sunR_eff, 1.0-sunR_eff*0.4375, hSun)*3.0*uSunB;
+  }
+  if(haveSph){ col = sphCol; }
+  if(haveSph && starHit){
+    vec3 starDirK = normalize(uStarPos - camPos);
+    float dStK = dot(rd, starDirK);
+    col += uSunC*pow(max(dStK,0.0), 6.0)*0.35*uSunB;
+  }
+  if(uHyper <= 0.5 && uRingOn > 0.5){
+    vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
+    nR = normalize(eulM(uRingTilt)*nR);
+    float denom = dot(rd, nR);
+    if(abs(denom) > 0.0035){
+      float tR = -dot(camPos, nR)/denom;
+      if(tR > 0.05 && (!hitP || tR < tHit) && (!haveSph || tR < bestT)){
+        vec3 q = camPos + rd*tR;
+        float rr = length(q);
+        if(rr > uRingIn && rr < uRingOut){
+          float gap = smoothstep(mix(uRingIn,uRingOut,0.3444), mix(uRingIn,uRingOut,0.3667), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.4333), mix(uRingIn,uRingOut,0.4556), rr));
+          float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
+          float edge = smoothstep(uRingIn, mix(uRingIn,uRingOut,0.0778), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.9222), uRingOut, rr));
+          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
+          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
+          float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
+          alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
+          float nearHalf = step(0.0, dot(q, camPos));
+          alpha *= nearHalf;
+          col = mix(col, uRingC*bright, alpha*0.9);
+          float rngFog = fbm3(q*3.5 + vec3(uTime*0.015, 0.0, 0.0));
+          float fogR = smoothstep(1.45, 1.55, rr)*(1.0 - smoothstep(1.9, 2.2, rr));
+          float fogRing = clamp((0.35 + 0.65*rngFog)*fogR*(0.6 + 0.4*shadow)*abs(denom)*20.0, 0.0, 1.0);
+          col = mix(col, uRingC*bright, fogRing*0.35);
+        }
+      }
+    }
+  }
+  col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
+  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  float wpres = 1.5;
+  float tm = (luma * (1.0 + luma / (wpres*wpres))) / (1.0 + luma);
+  col = pow(max(col * (tm / max(luma, 1e-6)), 0.0), vec3(1.0 / 2.2));
+  float vig = 1.0 - 0.16*dot(uv*0.6, uv*0.6);
+  col *= max(vig, 0.0);
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+  const VERT = `
+attribute vec2 aP;
+void main(){ gl_Position = vec4(aP, 0.0, 1.0); }
+`;
+  const fragSource = FRAG.replace('__FOT__', '0.9');
+
+  const canvas = document.getElementById('cv');
+  const gl = canvas.getContext('webgl', {antialias:false, depth:false, stencil:false});
+  if(!gl){ alert('WebGL1 недоступен'); return; }
+
+  function compile(type, src){
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
+      const log = gl.getShaderInfoLog(sh);
+      gl.deleteShader(sh);
+      throw new Error('Shader compile error:\n' + (log||'(no log)'));
+    }
+    return sh;
+  }
+  let prog;
+  try{
+    const vs = compile(gl.VERTEX_SHADER, VERT);
+    const fs = compile(gl.FRAGMENT_SHADER, fragSource);
+    prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+      throw new Error('Program link error:\n' + (gl.getProgramInfoLog(prog)||''));
+    }
+    gl.useProgram(prog);
+  }catch(e){
+    console.error(e.message);
+    document.getElementById('hint').textContent = 'COMPILE FAIL';
+    throw e;
+  }
+
+  /* ---- вершинный буфер: полный экран ---- */
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  const aP = gl.getAttribLocation(prog, 'aP');
+  gl.enableVertexAttribArray(aP);
+  gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
+
+  /* ---- палитра: 16x10, строка = планета. NEAREST, CLAMP ---- */
+  function makePalette(){
+    const W=16, H=10;
+    const d = new Uint8Array(W*H*4);
+    // нормализация #rrggbb -> 0..1
+    const hx = (h) => [parseInt(h.slice(0,2),16)/255, parseInt(h.slice(2,4),16)/255, parseInt(h.slice(4,6),16)/255];
+    // слоты 0..15 для terrestrial-строк: океан, земля1, земля2, лёд, облака, город(ночь), аврора, [бенды...] в конце re-цикл
+    // Папказываем все 16 обычных слотов: для к0=терра 0..6, для k1 газ 0..6, для k2 камень 0..3, для k4 звезда 0..3.
+    // Сделаем универсальную палитру: строка одинакова для всех строк (0-9).
+    const palRow = [
+      /*0 ocean*/   '0a2f66',
+      /*1 land1*/   '3f7d34',
+      /*2 land2*/   '8a6f3a',
+      /*3 ice*/     'd8e9f5',
+      /*4 cloud*/   'ffffff',
+      /*5 cityN*/   'ffd477',
+      /*6 aurA*/    '5aef9a',
+      /*7 storm*/   '4a3120',
+      /*8 band*/    'a34b1f',
+      /*9 band2*/   'd5a24c',
+      /*10 band3*/  'd96a2a',
+      /*11 lava*/   'ff7a1a',
+      /*12 rock*/   '6a5a48',
+      /*13 haze*/   'c8a06a',
+      /*14 star*/   'ffd47a',
+      /*15 star2*/  'ffefb0',
+    ];
+    // Строки 0-5 = terrestrial-ish (одинаковые), 6-9 = те же (повтор)
+    for(let r=0;r<H;r++){
+      for(let s=0;s<W;s++){
+        let rgb = hx(palRow[s]);
+        // лёгкая вариация по строке, чтобы планеты отличались
+        const f = 0.9 + 0.2*((r+1)/H);
+        d[(r*W+s)*4+0] = Math.min(255, Math.round(rgb[0]*255*f));
+        d[(r*W+s)*4+1] = Math.min(255, Math.round(rgb[1]*255*f));
+        d[(r*W+s)*4+2] = Math.min(255, Math.round(rgb[2]*255*f));
+        d[(r*W+s)*4+3] = 255;
+      }
+    }
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, d);
+    return tex;
+  }
+  makePalette();
+  gl.activeTexture(gl.TEXTURE0);
+  const uPalLoc = gl.getUniformLocation(prog, 'uPal');
+  gl.uniform1i(uPalLoc, 0);
+
+  const N = (x)=>(Array.isArray(x)||ArrayBuffer.isView(x)) ? new Float32Array(x) : (typeof x==='number'?x:null);
+  const hex3 = (h)=>[(parseInt(h.slice(1,3),16))/255,(parseInt(h.slice(3,5),16))/255,(parseInt(h.slice(5,7),16))/255];
+
+  /* ---- state ---- */
+  const U = {
+    uRes:         [canvas.clientWidth, canvas.clientHeight],
+    uTime:        0.0,
+    uCamA:        0.0,
+    uSunA:        0.0,
+    uCamPos:      [3.0, 1.2, 0.0],
+    uCamR:        [1.0, 0.0, 0.0],
+    uCamU:        [0.0, 1.0, 0.0],
+    uCamF:        [-1.0, 0.0, 0.0],
+    uPlanet:      0,
+    uSplash:      0,
+    uP:           new Float32Array(30),
+    uPKa:         new Float32Array(10),
+    uPCount:      0,
+    uHyper:       0,
+    uP4:          [0,0,0],
+    uPK4:         0,
+    uLensPos:     [0,0,0],
+    uLensStr:     0,
+    uLensRad:     2.0,
+    uLensDopp:    0.5,
+    uLensActive:  0,
+    uStarPos:     [5.0, 3.0, 0.0],
+    uAxM:         new Float32Array([1,0,0, 0,1,0, 0,0,1]),
+    uAtmC:        hex3('#4d8cff'),
+    uAtmGlow:     0.85,
+    uAtmSize:     1.22,
+    uJetsOn:      1,
+    uJetsC1:      hex3('#7fd4ff'),
+    uJetsC2:      hex3('#b06aff'),
+    uJetsSp:      3.0,
+    uJetsLen:     2.6,
+    uSunC:        [1.0, 0.98, 0.92],
+    uSunB:        1.0,
+    uSunR:        0.0008,
+    uSTScale:     4.2,
+    uSTTSpeed:    0.03,
+    uSTWarp:      4.0,
+    uSTOct:       4,
+    uSTC1:        hex3('#ffe9b0'),
+    uSTC2:        hex3('#ffb86a'),
+    uSTC3:        hex3('#ff7a3a'),
+    uSTC4:        hex3('#ffd47a'),
+    uRingOn:      1,
+    uRingC:       hex3('#cfa95f'),
+    uRingSp:      2.0,
+    uRingIn:      1.45,
+    uRingOut:     2.35,
+    uSpin:        0.5,
+    uPulseR:      1.0,
+    uSurfScale:   1.0,
+    uAmbSky:      hex3('#6fa8ff'),
+    uAmbNight:    [0.0, 0.0, 0.0],
+    uAmbLimb:     hex3('#4d8cff'),
+    uAmbHaze:     0.15,
+    uRingTilt:    [0,0,0],
+    uJetsTilt:    [0,0,0],
+    uBodyR:       3.0,
+    uRotC:        0.0,
+    uPIa:         new Float32Array(10),
+    uPIcur:       0,
+    uOceanC:      hex3('#0a2f66'),
+    uLand1C:      hex3('#3f7d34'),
+    uLand2C:      hex3('#8a6f3a'),
+    uIceC:        hex3('#d8e9f5'),
+    uIceCov:      0.5,
+    uCloudC:      [1.0, 1.0, 1.0],
+    uCloudCov:    0.7,
+    uCityC:       hex3('#ffd477'),
+    uCityK:       0.6,
+    uAurC:        hex3('#5aef9a'),
+    uAurK:        0.5,
+    uBand1C:      hex3('#a34b1f'),
+    uBand2C:      hex3('#d5a24c'),
+    uBand3C:      hex3('#d96a2a'),
+    uStormC:      hex3('#4a3120'),
+    uStormK:      0.6,
+    uHazeC:       hex3('#c8a06a'),
+    uFogC:        hex3('#d8c49a'),
+    uRock1C:      hex3('#6a5a48'),
+    uRock2C:      hex3('#4a3d30'),
+    uLavaC:       hex3('#ff7a1a'),
+    uFresC:       hex3('#ff9a4a'),
+    uRiverC:      hex3('#2a4a78'),
+    uFres2C:      hex3('#ff6a4a'),
+  };
+
+  /* ---- полётная камера ---- */
+  let yaw = Math.PI;   // с [3,1.2,0] смотрю на начало -> fwd=(-1,0,0) => yaw=PI, pitch=0
+  let pitch = -0.04;   // чуть вниз для угла
+  let speed = 0.60;
+  let camPos = new Float32Array([3.0, 1.2, 0.0]);
+  const keys = {};
+  let pointerLocked = false;
+
+  document.addEventListener('keydown', (e)=>{ keys[e.code]=true; });
+  document.addEventListener('keyup',   (e)=>{ keys[e.code]=false; });
+
+  canvas.addEventListener('click', ()=>{
+    if(!pointerLocked){ canvas.requestPointerLock(); }
+  });
+  document.addEventListener('pointerlockchange', ()=>{
+    pointerLocked = (document.pointerLockElement === canvas);
+    document.getElementById('hint').style.opacity = pointerLocked ? '0.4' : '1';
+  });
+  document.addEventListener('mousemove', (e)=>{
+    if(!pointerLocked) return;
+    const s = 0.0026;
+    yaw   += e.movementX * s;
+    pitch += e.movementY * s;
+    const lim = Math.PI/2 - 0.01;
+    if(pitch >  lim) pitch =  lim;
+    if(pitch < -lim) pitch = -lim;
+  });
+  canvas.addEventListener('wheel', (e)=>{
+    e.preventDefault();
+    speed *= (e.deltaY > 0) ? (1/1.15) : 1.15;
+    if(speed < 0.05) speed = 0.05;
+    if(speed > 8)    speed = 8;
+    syncSpeedUI();
+  }, {passive:false});
+
+  function updateBasis(){
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const cy = Math.cos(yaw),   sy = Math.sin(yaw);
+    // fwd
+    const fx = cp*sy, fy = sp, fz = cp*cy;
+    // right = normalize(cross(fwd, worldUp))
+    let rx = -fy*0 + fz*1, ry = fz*0 - fx*1, rz = fx*0 - fy*0;
+    // cross(fwd, worldUp=(0,1,0)):
+    //   rx = fy*0 - fz*1 = -fz
+    //   ry = fz*0 - fx*0 = 0
+    //   rz = fx*1 - fy*0 = fx
+    rx = -fz; ry = 0; rz = fx;
+    const rl = Math.hypot(rx, ry, rz) || 1;
+    rx/=rl; ry/=rl; rz/=rl;
+    // up = cross(right, fwd)
+    let ux = ry*fz - rz*fy, uy = rz*fx - rx*fz, uz = rx*fy - ry*fx;
+    const ul = Math.hypot(ux, uy, uz) || 1;
+    U.uCamF = new Float32Array([fx, fy, fz]);
+    U.uCamR = new Float32Array([rx, ry, rz]);
+    U.uCamU = new Float32Array([ux/ul, uy/ul, uz/ul]);
+  }
+
+  function move(dt){
+    let m = speed * dt;
+    if(keys['ShiftLeft']||keys['ShiftRight']) m *= 2.6;
+    if(keys['ControlLeft']||keys['ControlRight']) m *= 0.35;
+    const F = U.uCamF, R = U.uCamR, Up = U.uCamU;
+    let dx=0, dy=0, dz=0;
+    if(keys['KeyW']){ dx+=F[0]; dy+=F[1]; dz+=F[2]; }
+    if(keys['KeyS']){ dx-=F[0]; dy-=F[1]; dz-=F[2]; }
+    if(keys['KeyD']){ dx+=R[0]; dy+=R[1]; dz+=R[2]; }
+    if(keys['KeyA']){ dx-=R[0]; dy-=R[1]; dz-=R[2]; }
+    if(keys['KeyE']){ dx+=Up[0]; dy+=Up[1]; dz+=Up[2]; }
+    if(keys['KeyQ']){ dx-=Up[0]; dy-=Up[1]; dz-=Up[2]; }
+    const l = Math.hypot(dx,dy,dz);
+    if(l>0){ camPos[0]+=dx/l*m; camPos[1]+=dy/l*m; camPos[2]+=dz/l*m; }
+    U.uCamPos = new Float32Array(camPos);
+  }
+
+  function resetCam(){
+    camPos.set([3.0, 1.2, 0.0]);
+    yaw = Math.PI; pitch = -0.04;
+  }
+
+  /* ---- UI ---- */
+  const $ = (id)=>document.getElementById(id);
+  function syncSpeedUI(){
+    $('vSpeed').textContent = speed.toFixed(2);
+    $('rngSpeed').value = speed;
+  }
+  $('rngSpeed').addEventListener('input', ()=>{ speed = parseFloat($('rngSpeed').value); syncSpeedUI(); });
+  $('selPlanet').addEventListener('change', ()=>{
+    U.uPlanet = parseFloat($('selPlanet').value);
+    $('vPlanet').textContent = U.uPlanet;
+    // кольца для 1 (газ), джеты для 3 (пульсар)
+    syncPresets();
+  });
+  $('selRing').addEventListener('change', ()=>{ U.uRingOn = parseFloat($('selRing').value); });
+  $('selJets').addEventListener('change', ()=>{ U.uJetsOn = parseFloat($('selJets').value); });
+  $('btnReset').addEventListener('click', ()=>{ resetCam(); });
+
+  function syncPresets(){
+    const p = U.uPlanet;
+    // кольца: вкл для газа, выкл для остальных
+    if(p === 1){ U.uRingOn = 1; $('selRing').value = '1'; } else { U.uRingOn = 0; $('selRing').value = '0'; }
+    // джеты: пульсар и звезда
+    if(p === 3 || p === 4){ U.uJetsOn = 1; $('selJets').value = '1'; } else { U.uJetsOn = 0; $('selJets').value = '0'; }
+    // строка палитры: читается по uPIcur независимо от типа
+    U.uPIcur = p;
+    U.uRotC += 0.4; // подкрутка при смене
+  }
+  syncPresets();
+
+  /* ---- uniform-словарь: имя вида -> [type, valueGetter] ---- */
+  const setUniforms = function(){
+    const locs = {};
+    const g = (n)=>{ if(!(n in locs)) locs[n] = gl.getUniformLocation(prog, n); return locs[n]; };
+    const u1f = (n,v)=>{ const l=g(n); if(l) gl.uniform1f(l, v); };
+    const u1i = (n,v)=>{ const l=g(n); if(l) gl.uniform1i(l, v); };
+    const u2f = (n,v)=>{ const l=g(n); if(l) gl.uniform2fv(l, N(v)); };
+    const u3f = (n,v)=>{ const l=g(n); if(l) gl.uniform3fv(l, N(v)); };
+    const um3 = (n,v)=>{ const l=g(n); if(l) gl.uniformMatrix3fv(l, false, N(v)); };
+    return function(){
+      const t = U.uTime;
+      // каждый кадр
+      U.uRes = [gl.drawingBufferWidth, gl.drawingBufferHeight];
+      u2f('uRes', U.uRes);
+      u1f('uTime', t);
+      u1f('uCamA', U.uCamA);
+      u1f('uSunA', t*0.05);
+      u3f('uCamPos', U.uCamPos);
+      u3f('uCamR', U.uCamR);
+      u3f('uCamU', U.uCamU);
+      u3f('uCamF', U.uCamF);
+      u1f('uPlanet', U.uPlanet);
+      u1f('uSplash', U.uSplash);
+      // дальние планеты отсутствуют
+      u1f('uPCount', U.uPCount);
+      u1f('uHyper', U.uHyper);
+      u3f('uP4', U.uP4);
+      u1f('uPK4', U.uPK4);
+      u3f('uLensPos', U.uLensPos);
+      u1f('uLensStr', U.uLensStr);
+      u1f('uLensRad', U.uLensRad);
+      u1f('uLensDopp', U.uLensDopp);
+      u1f('uLensActive', U.uLensActive);
+      u3f('uStarPos', U.uStarPos);
+      um3('uAxM', U.uAxM);
+      u3f('uAtmC', U.uAtmC);
+      u1f('uAtmGlow', U.uAtmGlow);
+      u1f('uAtmSize', U.uAtmSize);
+      u1f('uJetsOn', U.uJetsOn);
+      u3f('uJetsC1', U.uJetsC1);
+      u3f('uJetsC2', U.uJetsC2);
+      u1f('uJetsSp', U.uJetsSp);
+      u1f('uJetsLen', U.uJetsLen);
+      u3f('uSunC', U.uSunC);
+      u1f('uSunB', U.uSunB);
+      u1f('uSunR', U.uSunR);
+      u1f('uSTScale', U.uSTScale);
+      u1f('uSTTSpeed', U.uSTTSpeed);
+      u1f('uSTWarp', U.uSTWarp);
+      u1f('uSTOct', U.uSTOct);
+      u3f('uSTC1', U.uSTC1);
+      u3f('uSTC2', U.uSTC2);
+      u3f('uSTC3', U.uSTC3);
+      u3f('uSTC4', U.uSTC4);
+      u1f('uRingOn', U.uRingOn);
+      u3f('uRingC', U.uRingC);
+      u1f('uRingSp', U.uRingSp);
+      u1f('uRingIn', U.uRingIn);
+      u1f('uRingOut', U.uRingOut);
+      u1f('uSpin', U.uSpin);
+      u1f('uPulseR', U.uPulseR);
+      u1f('uSurfScale', U.uSurfScale);
+      u3f('uAmbSky', U.uAmbSky);
+      u3f('uAmbNight', U.uAmbNight);
+      u3f('uAmbLimb', U.uAmbLimb);
+      u1f('uAmbHaze', U.uAmbHaze);
+      u3f('uRingTilt', U.uRingTilt);
+      u3f('uJetsTilt', U.uJetsTilt);
+      u1f('uBodyR', U.uBodyR);
+      u1f('uRotC', U.uRotC);
+      // uPIa (10 array)
+      { const l = g('uPIa'); if(l) gl.uniform1fv(l, U.uPIa); }
+      u1f('uPIcur', U.uPIcur);
+      // surf-цвета
+      u3f('uOceanC', U.uOceanC);
+      u3f('uLand1C', U.uLand1C);
+      u3f('uLand2C', U.uLand2C);
+      u3f('uIceC', U.uIceC);
+      u1f('uIceCov', U.uIceCov);
+      u3f('uCloudC', U.uCloudC);
+      u1f('uCloudCov', U.uCloudCov);
+      u3f('uCityC', U.uCityC);
+      u1f('uCityK', U.uCityK);
+      u3f('uAurC', U.uAurC);
+      u1f('uAurK', U.uAurK);
+      u3f('uBand1C', U.uBand1C);
+      u3f('uBand2C', U.uBand2C);
+      u3f('uBand3C', U.uBand3C);
+      u3f('uStormC', U.uStormC);
+      u1f('uStormK', U.uStormK);
+      u3f('uHazeC', U.uHazeC);
+      u3f('uFogC', U.uFogC);
+      u3f('uRock1C', U.uRock1C);
+      u3f('uRock2C', U.uRock2C);
+      u3f('uLavaC', U.uLavaC);
+      u3f('uFresC', U.uFresC);
+      u3f('uRiverC', U.uRiverC);
+      u3f('uFres2C', U.uFres2C);
+      // массива uP[10] из 3
+      { const l = g('uP'); if(l) gl.uniform3fv(l, U.uP); }
+      { const l = g('uPKa'); if(l) gl.uniform1fv(l, U.uPKa); }
+    };
+  };
+
+  /* ---- resize ---- */
+  function resize(){
+    const dpr = window.devicePixelRatio||1;
+    const w = Math.max(1, canvas.clientWidth), h = Math.max(1, canvas.clientHeight);
+    canvas.width = Math.round(w*dpr);
+    canvas.height = Math.round(h*dpr);
+    gl.viewport(0,0,canvas.width,canvas.height);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const applyUniforms = setUniforms();
+
+  /* ---- main loop ---- */
+  let last = performance.now();
+  function frame(now){
+    const dt = Math.min(0.05, (now - last)/1000);
+    last = now;
+    U.uTime = now/1000;
+    U.uRotC += dt*0.06;
+    updateBasis();
+    move(dt);
+    applyUniforms();
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(frame);
+  }
+  updateBasis();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

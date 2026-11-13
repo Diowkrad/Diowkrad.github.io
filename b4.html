@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRC-BackUp-GL · Системы (время + орбиты)</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:#070b14; color:#dce6f2; font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; }
+  header{ padding:14px 20px; border-bottom:1px solid #1c2a40; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  header h1{ font-size:15px; letter-spacing:1px; text-transform:uppercase; color:#4fd8ff; }
+  header select, header input[type=range]{ background:#101a2b; color:#e2e8f0; border:1px solid #2c3a52; border-radius:5px; font:12px/1 monospace; }
+  header select{ padding:5px 8px; }
+  .meta{ font:11px/1.5 monospace; color:#7c8aa0; }
+  .clock{ font:700 14px/1 monospace; color:#ffd76a; background:#101a2b; border:1px solid #3a3a52; border-radius:6px; padding:5px 10px; }
+  .canvasWrap{ position:relative; margin:10px auto; width:820px; height:820px; background:#0a0f1c; border:1px solid #1c2a40; border-radius:8px; overflow:hidden; }
+  canvas{ display:block; }
+  .legend{ margin:8px 20px; font:11px/1.6 monospace; color:#8fa0b8; }
+  .legend b{ color:#cfe0f0; }
+  .speedWrap{ display:flex; align-items:center; gap:6px; }
+  .speedWrap span{ font:11px/1 monospace; color:#7c8aa0; white-space:nowrap; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Системы · время + орбиты</h1>
+  <select id="setSel">
+    <option value="HOME">HOME (Шинрарта)</option>
+    <option value="SOL">SOL</option>
+    <option value="SIRIUS">SIRIUS</option>
+  </select>
+  <select id="modeSel">
+    <option value="orbit">Орбитальное движение</option>
+    <option value="real">Реальные позиции (статика)</option>
+  </select>
+  <span class="clock" id="clock">Д:0 00:00:00</span>
+  <div class="speedWrap">
+    <span>Скорость</span>
+    <input id="speed" type="range" min="0" max="20" step="0.2" value="0.2">
+    <span id="speedVal">20x</span>
+  </div>
+  <span class="meta" id="infoTxt"></span>
+</header>
+
+<div class="canvasWrap"><canvas id="cv" width="820" height="820"></canvas></div>
+<div class="legend" id="legend"></div>
+
+<script>
+"use strict";
+(function(){
+  /* Тела из WORK GL.html (PLANETS_DB HOME / SOL / SIRIUS). pos — реальные координаты.
+     kind: 0=terr 1=cheese 2=gas 3=pulsar 4=звезда. */
+  const SETS = {
+    HOME: [
+      { n:'ХИТОМИ',     pos:[-19.15,0,3.66],    k:0, c:'#3aa0ff' },
+      { n:'ЧИЗИЯ',      pos:[-41.32,0,18.44],   k:1, c:'#f0a020' },
+      { n:'НГАЛИН',     pos:[-18.43,32,59.08],  k:2, c:'#7a58ff' },
+      { n:'ШИНРАРТА-B', pos:[21.95,36,-15.57],  k:3, c:'#cfe8ff' },
+      { n:'Элизия',     pos:[61.26,0,61],       k:0, c:'#d060ff' },
+      { n:'Брэстла',    pos:[96.48,0,29.95],    k:2, c:'#e0d030' },
+      { n:'Шинрарта-С', pos:[85.58,0,-66.13],   k:3, c:'#ffffff' },
+      { n:'НЕМЕЗИДА',   pos:[-1.95,0,-71.58],   k:1, c:'#5890ff' },
+      { n:'Диовкрад',   pos:[-106.98,0,24.9],   k:2, c:'#e04040' },
+      { n:'Шинрарта-A', pos:[0,0,0],            k:4, c:'#fff4c0' }
+    ],
+    SOL: [
+      { n:'МАЯК-КОЛЫБЕЛИ', pos:[500,0,-500],    k:3, c:'#cfe8ff' },
+      { n:'МАРС',          pos:[-305.15,336,0], k:0, c:'#ff9a62' },
+      { n:'МЕРКУРИЙ',      pos:[250.15,0,245],  k:0, c:'#ffe0a8' },
+      { n:'ЗЕМЛЯ',         pos:[130.15,0,0],    k:0, c:'#3aa0ff' },
+      { n:'ЮПИТЕР',        pos:[45.15,0,0],     k:0, c:'#ffd9a0' },
+      { n:'СОЛНЦЕ',        pos:[0,0,0],         k:4, c:'#fff4c0' }
+    ],
+    SIRIUS: [
+      { n:'МАЯК-РАЗРУШЕНИЯ', pos:[350.95,0,-350], k:3, c:'#cfe8ff' },
+      { n:'СРИУС-1A',        pos:[50.15,19,30.66],k:3, c:'#a8c8ff' },
+      { n:'СРИУС-A',         pos:[0,0,0],         k:4, c:'#e8f4ff' }
+    ]
+  };
+  const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  const setSel = document.getElementById('setSel');
+  const modeSel = document.getElementById('modeSel');
+  const clockEl = document.getElementById('clock');
+  const speedEl = document.getElementById('speed');
+  const speedVal = document.getElementById('speedVal');
+  const infoTxt = document.getElementById('infoTxt');
+  const legendEl = document.getElementById('legend');
+  const W=820, H=820, margin=60;
+
+  let simTime = 0;         /* секунды сим-времени */
+  const DAY_S = 60;        /* 1 сим-день = 60 реальных сек (быстрый просмотр) */
+
+  function dist2d(p){ return Math.hypot(p.pos[0], p.pos[2]); }
+
+  function render(now){
+    const key=setSel.value, mode=modeSel.value, set=SETS[key];
+    const star = set.find(p=>p.k===4);
+    let maxC=1;
+    set.forEach(p=>{ p.pos.forEach(v=>{ const a=Math.abs(v); if(a>maxC) maxC=a; }); });
+    const S=(W/2-margin)/maxC, ox=W/2, oy=H/2;
+    ctx.clearRect(0,0,W,H);
+
+    /* сетка */
+    ctx.strokeStyle='#101a2c'; ctx.lineWidth=1;
+    for(let g=-Math.floor(maxC/20)*20; g<=maxC; g+=20){
+      ctx.beginPath(); ctx.moveTo(ox+g*S,0); ctx.lineTo(ox+g*S,H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,oy-g*S); ctx.lineTo(W,oy-g*S); ctx.stroke();
+    }
+    ctx.strokeStyle='#2a3a55'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke();
+    ctx.fillStyle='#7c8aa0'; ctx.font='11px monospace';
+    ctx.fillText('X',W-24,oy-6); ctx.fillText('Z',ox+6,14);
+
+    /* орбиты (окружности через центр [0,0,0]) — только в режиме орбита */
+    if(mode==='orbit'){
+      ctx.strokeStyle='#1e2c44'; ctx.lineWidth=1; ctx.setLineDash([6,6]);
+      set.forEach(function(p){
+        if(p.k===4 && p.pos[0]===0 && p.pos[2]===0) return;
+        const R=dist2d(p)*S;
+        ctx.beginPath(); ctx.arc(ox,oy,R,0,6.2832); ctx.stroke();
+      });
+      ctx.setLineDash([]);
+    }
+
+    /* звезда-центр */
+    if(star && star.pos[0]===0 && star.pos[1]===0 && star.pos[2]===0){
+      const sr=18;
+      ctx.fillStyle=rgba(star.c,.18);
+      ctx.beginPath(); ctx.arc(ox,oy,sr*3,0,6.2832); ctx.fill();
+      const rg=ctx.createRadialGradient(ox,oy,2,ox,oy,sr);
+      rg.addColorStop(0,'#fff8e0'); rg.addColorStop(.5,star.c); rg.addColorStop(1,'#0000');
+      ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(ox,oy,sr,0,6.2832); ctx.fill();
+      ctx.fillStyle='#fff2c0'; ctx.font='700 12px monospace';
+      ctx.fillText(star.n+' [0,0,0]',ox+22,oy-22);
+    }
+
+    /* тела */
+    set.forEach(function(p){
+      if(p.k===4 && p.pos[0]===0 && p.pos[1]===0 && p.pos[2]===0) return;
+      let x=p.pos[0], z=p.pos[2];
+      if(mode==='orbit'){
+        /* орбита: позиция радиусом от центра + скорость, зависящая от дистанции (кеплеропод.)
+           Угловая скорость ∝ 1/sqrt(R) — дальние медленнее. Начальная фаза от направления pos. */
+        const R=dist2d(p);
+        const baseAngle=Math.atan2(p.pos[2], p.pos[0]); /* старт в реальной точке */
+        const w=6.0/Math.sqrt(Math.max(R,1));           /* рад/сим-сек */
+        let a=baseAngle + simTime*w;
+        x=R*Math.cos(a); z=R*Math.sin(a);
+      }
+      const px=ox+x*S, py=oy-z*S;
+      const r=p.k===4?14:9;
+      ctx.fillStyle=rgba(p.c,.9);
+      ctx.beginPath(); ctx.arc(px,py,r,0,6.2832); ctx.fill();
+      ctx.strokeStyle='#000a'; ctx.lineWidth=1; ctx.stroke();
+      if(mode==='real' && Math.abs(p.pos[1])>0.01){ ctx.fillStyle='#7c8aa0'; ctx.font='10px monospace'; ctx.fillText('y='+p.pos[1],px+12,py-6); }
+      ctx.fillStyle='#cfe0f0'; ctx.font='700 11px monospace'; ctx.fillText(p.n,px+12,py+4);
+    });
+
+    /* часы */
+    const days=Math.floor(simTime/DAY_S);
+    const rem=simTime-days*DAY_S;
+    const hh=Math.floor(rem/3600), mm=Math.floor((rem%3600)/60), ss=Math.floor(rem%60);
+    clockEl.textContent='Д:'+days+' '+pad(hh)+':'+pad(mm)+':'+pad(ss);
+
+    const starNm=star?star.n:'нет звезды';
+    infoTxt.textContent = (mode==='orbit' ? 'Орбитальное движение (угл. скорость ∝ 1/√R, центр [0,0,0]='+starNm+')' : 'Реальные позиции из базы (X-Z, Y отмечен)');
+    buildLegend(set, mode);
+  }
+  function pad(n){ return (n<10?'0':'')+n; }
+  function rgba(hex,a){ const n=parseInt(hex.slice(1),16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+  function buildLegend(set,mode){
+    if(mode==='orbit'){
+      legendEl.innerHTML='<b>Орбиты:</b> радиус = дистанция от центра [0,0,0], скорость ∝ 1/√R. Начальная фаза каждого тела — его реальное направление из базы.';
+    } else {
+      const items=set.map(p=>p.n+' ['+p.pos.map(function(v){return Math.round(v);}).join(', ')+']').join(' · ');
+      legendEl.innerHTML='<b>Координаты (pos, единицы мира):</b> '+items;
+    }
+  }
+
+  let last=performance.now();
+  function loop(now){
+    const dt=(now-last)/1000; last=now;
+    const mult=+speedEl.value;
+    speedVal.textContent=mult+'x';
+    if(mult>0) simTime += dt*mult;
+    render(now);
+    requestAnimationFrame(loop);
+  }
+  setSel.addEventListener('change', function(){ simTime=0; });
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

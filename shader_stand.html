@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Chocapic13 Shaders Foundation Stand</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #05070a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+        canvas {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+        #ui-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(10, 15, 26, 0.85);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            color: #e0e6ed;
+            width: 280px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        h2 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4facfe;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #a0aec0;
+        }
+        input[type="range"] {
+            width: 100%;
+            background: #2d3748;
+            border-radius: 4px;
+            height: 6px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 5px;
+            background: #00f2fe;
+            cursor: pointer;
+            box-shadow: 0 0 8px #00f2fe;
+        }
+        .value-display {
+            float: right;
+            font-family: monospace;
+            color: #00f2fe;
+        }
+        .info {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+    </style>
+    <!-- Подключаем Three.js через CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <div id="ui-container">
+        <h2>Управление светом</h2>
+        
+        <div class="control-group">
+            <label>Вращение Солнца (X)<span id="val-rotX" class="value-display">0.50</span></label>
+            <input type="range" id="rotX" min="-3.14" max="3.14" step="0.01" value="0.50">
+        </div>
+
+        <div class="control-group">
+            <label>Высота Солнца (Y)<span id="val-rotY" class="value-display">0.80</span></label>
+            <input type="range" id="rotY" min="-1.57" max="1.57" step="0.01" value="0.80">
+        </div>
+
+        <div class="control-group">
+            <label>Мягкость тени (k)<span id="val-shadowK" class="value-display">8.0</span></label>
+            <input type="range" id="shadowK" min="2.0" max="32.0" step="0.5" value="8.0">
+        </div>
+
+        <div class="control-group">
+            <label>Анизотропия тумана (g)<span id="val-fogG" class="value-display">0.75</span></label>
+            <input type="range" id="fogG" min="0.0" max="0.95" step="0.05" value="0.75">
+        </div>
+
+        <div class="info">
+            <strong>Фундамент Chocapic13:</strong><br>
+            • Трассировка SDF-сфер без полигонов.<br>
+            • Мягкие тени Soft Shadow March (8 шагов).<br>
+            • Аналитическое рассеивание света Хеньи-Гринштейна.
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // --- Инициализация сцены Three.js ---
+        const canvas = document.querySelector('#canvas');
+        const renderer = new THREE.WebGLRenderer({canvas, antialias: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+        // --- Переменные (Uniforms) для GLSL ---
+        const uniforms = {
+            u_time: { value: 0.0 },
+            u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            u_lightDir: { value: new THREE.Vector3(1.0, 1.0, 1.0).normalize() },
+            u_shadowK: { value: 8.0 },
+            u_fogG: { value: 0.75 }
+        };
+
+        // --- Вершинный шейдер (Просто отрисовка плоскости) ---
+        const vertexShader = `#version 300 es
+        in vec3 position;
+        void main() {
+            gl_Position = vec4(position, 1.0);
+        }`;
+
+        // --- Фрагментный шейдер (Ray Marching + Оптимизации света) ---
+        const fragmentShader = `#version 300 es
+        precision highp float;
+        out vec4 fragColor;
+
+        uniform float u_time;
+        uniform vec2 u_resolution;
+        uniform vec3 u_lightDir;
+        uniform float u_shadowK;
+        uniform float u_fogG;
+
+        // Расстояние до идеальной сферы (SDF)
+        float sdSphere(vec3 p, vec3 c, float r) {
+            return length(p - c) - r;
+        }
+
+        // Карта сцены
+        float map(vec3 p) {
+            // Центрированная планета-сфера
+            return sdSphere(p, vec3(0.0, 0.0, 0.0), 1.5);
+        }
+
+        // Вычисление нормалей
+        vec3 getNormal(vec3 p) {
+            vec2 e = vec2(0.001, 0.0);
+            return normalize(vec3(
+                map(p + e.xyy) - map(p - e.xyy),
+                map(p + e.yxy) - map(p - e.yxy),
+                map(p + e.yyx) - map(p - e.yyx)
+            ));
+        }
+
+        // Мягкие тени по методу Chocapic13 (всего 8 шагов)
+        float calculateShadow(vec3 ro, vec3 rd, float mint, float maxt) {
+            float res = 1.0;
+            float t = mint;
+            for(int i = 0; i < 8; i++) {
+                float h = map(ro + rd * t);
+                if(h < 0.001) return 0.0;
+                res = min(res, u_shadowK * h / t);
+                t += clamp(h, 0.05, 0.5);
+                if(t > maxt) break;
+            }
+            return clamp(res, 0.0, 1.0);
+        }
+
+        // Функция фазы Хеньи-Гринштейна для свечения атмосферного тумана
+        float henyeyGreenstein(vec3 lightDir, vec3 viewDir, float g) {
+            float cosTheta = dot(lightDir, viewDir);
+            float g2 = g * g;
+            float numerator = 1.0 - g2;
+            float denominator = pow(1.0 + g2 - 2.0 * g * cosTheta, 1.5);
+            return (1.0 / (4.0 * 3.14159265)) * (numerator / denominator);
+        }
+
+        void main() {
+            vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / u_resolution.y;
+            
+            // Взгляд из камеры
+            vec3 ro = vec3(0.0, 0.0, 4.0);
+            vec3 rd = normalize(vec3(uv, -1.0));
+            
+            // Трассировка
+            float t = 0.0;
+            bool hit = false;
+            for(int i = 0; i < 32; i++) {
+                vec3 p = ro + rd * t;
+                float d = map(p);
+                if(d < 0.001) {
+                    hit = true;
+                    break;
+                }
+                if(t > 8.0) break;
+                t += d;
+            }
+            
+            // Аналитический фоновый туман (Космос/Атмосфера)
+            float scatter = henyeyGreenstein(u_lightDir, rd, u_fogG);
+            vec3 skyColor = vec3(0.03, 0.05, 0.1) + vec3(1.0, 0.7, 0.4) * scatter * 0.15;
+            
+            vec3 color = skyColor;
+            
+            if(hit) {
+                vec3 p = ro + rd * t;
+                vec3 normal = getNormal(p);
+                
+                // Свет Ламберта (День/Ночь)
+                float diff = max(dot(normal, u_lightDir), 0.0);
+                
+                // Расчет тени от самой себя (терминатор планеты)
+                float shadow = calculateShadow(p + normal * 0.01, u_lightDir, 0.02, 3.0);
+                
+                // Цвет планеты (базовый)
+                vec3 albedo = vec3(0.4, 0.45, 0.5);
+                
+                // Ночной Эмбиент
+                vec3 ambient = vec3(0.04, 0.06, 0.12) * albedo;
+                
+                // Дневной свет
+                vec3 diffuseLight = albedo * vec3(1.0, 0.95, 0.85) * diff * shadow;
+                
+                color = diffuseLight + ambient;
+                
+                // Свечение атмосферного края планеты (Rim Lighting)
+                float rim = 1.0 - max(dot(normal, -rd), 0.0);
+                rim = pow(rim, 4.0);
+                color += vec3(0.5, 0.7, 1.0) * rim * (diff * 0.5 + 0.2);
+            }
+            
+            // Гамма-коррекция
+            color = pow(color, vec3(1.0 / 2.2));
+            fragColor = vec4(color, 1.0);
+        }
+        `;
+
+        // Сборка материала и геометрии
+        const material = new THREE.RawShaderMaterial({
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            uniforms: uniforms
+        });
+
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // --- Обработка интерфейса (UI) ---
+        const rotXInput = document.getElementById('rotX');
+        const rotYInput = document.getElementById('rotY');
+        const shadowKInput = document.getElementById('shadowK');
+        const fogGInput = document.getElementById('fogG');
+
+        function updateLightDirection() {
+            const rx = parseFloat(rotXInput.value);
+            const ry = parseFloat(rotYInput.value);
+            
+            // Вычисляем вектор направления света на основе углов
+            const dir = new THREE.Vector3(
+                Math.sin(rx) * Math.cos(ry),
+                Math.sin(ry),
+                Math.cos(rx) * Math.cos(ry)
+            ).normalize();
+            
+            uniforms.u_lightDir.value.copy(dir);
+            
+            document.getElementById('val-rotX').innerText = rx.toFixed(2);
+            document.getElementById('val-rotY').innerText = ry.toFixed(2);
+        }
+
+        rotXInput.addEventListener('input', updateLightDirection);
+        rotYInput.addEventListener('input', updateLightDirection);
+
+        shadowKInput.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            uniforms.u_shadowK.value = val;
+            document.getElementById('val-shadowK').innerText = val.toFixed(1);
+        });
+
+        fogGInput.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            uniforms.u_fogG.value = val;
+            document.getElementById('val-fogG').innerText = val.toFixed(2);
+        });
+
+        // Инициализируем вектор света при старте
+        updateLightDirection();
+
+        // --- Цикл обновления кадров ---
+        function animate(time) {
+            uniforms.u_time.value = time * 0.001;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+        });
+
+        requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
