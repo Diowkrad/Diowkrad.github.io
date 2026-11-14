@@ -5047,8 +5047,8 @@ function fsdInitSound(){
    warp-run.ogg    — фаза B (перемещение по шейдер-туннелю),
    warp-finish.ogg — фаза C (прибытие в новую систему).
    Каждый проигрывается ровно один раз за прыжок. */
-var WARP_PH = { start:'warp-start.ogg', run:'warp-run.ogg', finish:'warp-finish.ogg' };
-var warpPhAudio = { start:null, run:null, finish:null };
+var WARP_PH = { start:'warp-start.ogg', run:'warp-run.ogg', finish:'warp-finish.ogg', boom:'warp-boom.ogg' };
+var warpPhAudio = { start:null, run:null, finish:null, boom:null };
 function warpPhGet(phase){
   if(warpPhAudio[phase]) return warpPhAudio[phase];
   var fn = WARP_PH[phase];
@@ -5166,6 +5166,56 @@ float snoise(vec3 v){
   m = m*m;
   return 42.0*dot(m*m, vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
 }
+/* ---- XWA warp-boom: вспышка гипер-прыжка (адаптация ShaderToy MlKBWw) на стыках фаз ---- */
+float sdLine_boom(in vec2 p, in vec2 a, in vec2 b, in float ring){
+  vec2 pa = p-a, ba = b-a;
+  float h = clamp(dot(pa,ba)/max(dot(ba,ba), 1e-6), 0.0, 1.0);
+  return length(pa - ba*h) - ring;
+}
+float rand_boom(vec2 co){ return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453); }
+vec3 xwa_boom(float time01, vec3 v, vec2 mo){
+  const float TAU_B = 6.28318;
+  const float NUM_SLICES = 90.0;
+  const float MAX_SLICE_OFFSET = 0.4;
+  const float trail_length = 1.0;
+  const float jump_speed = 5.0;
+  const vec3 blue_col = vec3(0.3, 0.3, 0.6);
+  const vec3 white_col = vec3(0.8, 0.8, 0.95);
+  float t = time01; /* 0..1 */
+  vec3 color = vec3(0.0);
+  float p_len = length(v.xy);
+  float fade = mix(1.4, 0.0, smoothstep(0.65, 0.95, t));
+  for(float i = 0.0; i < 40.0; i++){
+    vec3 trail_color = vec3(0.0);
+    float angle = atan(v.y, v.x)/3.141592/2.0 + 0.13*i;
+    float slice = floor(angle*NUM_SLICES);
+    float slice_fract = fract(angle*NUM_SLICES);
+    float slice_offset = MAX_SLICE_OFFSET*rand_boom(vec2(slice, 4.0 + i*25.0)) - (MAX_SLICE_OFFSET/2.0);
+    float dist = 10.0*rand_boom(vec2(slice, 1.0 + i*2.0)) - 5.0;
+    float z = dist*v.z/length(v.xy);
+    float f = sign(dist); if(f == 0.0) f = 1.0;
+    float fspeed = f*(rand_boom(vec2(slice, 1.0 + i*0.1)) + i*0.01);
+    float fjump_speed = f*jump_speed;
+    float ftrail_length = f*trail_length;
+    float trail_end = 10.0*rand_boom(vec2(slice, i + 10.0)) - 5.0;
+    trail_end -= t*fspeed;
+    float trail_start = trail_end + ftrail_length;
+    if(f >= 0.0){
+      trail_start = max(trail_end, trail_start - (t*fspeed) - mix(0.0, fjump_speed, smoothstep(0.5, 1.0, t)));
+    } else {
+      trail_start = min(trail_end, trail_start - (t*fspeed) - mix(0.0, fjump_speed, smoothstep(0.5, 1.0, t)));
+    }
+    float trail_x = smoothstep(trail_start, trail_end, z);
+    trail_color = mix(blue_col, white_col, trail_x);
+    float h = sdLine_boom(vec2(slice_fract + slice_offset, z), vec2(0.5, trail_start), vec2(0.5, trail_end), mix(0.0, 0.015, z));
+    float threshold = mix(0.12, 0.0, smoothstep(0.5, 0.8, t));
+    h = (h < 0.01) ? 1.0 : 0.75*smoothstep(threshold, 0.0, abs(h));
+    trail_color *= fade*h;
+    color = max(color, trail_color);
+  }
+  color += mix(1.0, 0.0, smoothstep(0.0, 0.2, t));
+  return color;
+}
 void main(){
   float t = mod(uTime, t2)/t2;
   vec4 col = vec4(0.0);
@@ -5197,6 +5247,21 @@ void main(){
   col.rgb = clamp(col.rgb,0.0,1.0);
   float disk_col = exp(-(p_len-0.025)*4.0);
   col.rgb += clamp(vec3(disk_col),0.0,1.0);
+  /* XWA warp-boom на стыках фаз: вход в тоннель (warpST 0..2с) и остановка (последние 2с
+     перед прибытием, STAR_WARP_SHADER_T минус 2с). Классическая анимация-«взрыв туннеля». */
+  const float BOOM_T = 2.0;
+  float boom = 0.0;
+  if(uTime < BOOM_T){
+    boom = smoothstep(0.0, 0.25, uTime) * (1.0 - smoothstep(BOOM_T*0.75, BOOM_T, uTime));
+    col.rgb = mix(col.rgb, xwa_boom(uTime/BOOM_T, v, mo), 0.85*boom);
+  } else {
+    float tEnd = t2 - BOOM_T;
+    if(uTime > tEnd){
+      float lt = uTime - tEnd; /* 0..2 */
+      boom = smoothstep(0.0, 0.25, lt) * (1.0 - smoothstep(BOOM_T*0.75, BOOM_T, lt));
+      col.rgb = mix(col.rgb, xwa_boom(lt/BOOM_T, v, mo), 0.85*boom);
+    }
+  }
   gl_FragColor = vec4(col.rgb,1.0);
 }`;
 function initWarpShader(){
@@ -5370,6 +5435,7 @@ function updWarp(dt){
         initWarpShader();
         warpST = 0; warpFade = 0;
         warpPhPlay('run'); /* фаза B: звук перемещения по туннелю */
+        warpPhPlay('boom'); /* стык "зарядка→тоннель": XWA-вспышка гипер-прыжка */
         /* ФАЗА B: прячем 2D-туннель, включаем шейдер-туннель на всё время движения */
         warpCv.style.display = 'none';
         if(warpShaderCv){ warpShaderCv.style.display = 'block'; warpShaderCv.style.opacity = '1'; }
@@ -5393,7 +5459,7 @@ function updWarp(dt){
           drawWarpShader(dt);
         } else {
           /* ФАЗА C: после прибытия плавное угасание по прозрачности → показ новой системы */
-          if(!warp.sndFinish){ warp.sndFinish = true; warpPhPlay('finish'); }
+          if(!warp.sndFinish){ warp.sndFinish = true; warpPhPlay('finish'); warpPhPlay('boom'); /* стык "тоннель→остановка": XWA-вспышка */ }
           var ft = (warpST - STAR_WARP_SHADER_T)/Math.max(0.001, STAR_WARP_FADE);
           warpShaderCv.style.opacity = String(Math.max(0, 1 - ft));
           if(warpST < STAR_WARP_SHADER_T + STAR_WARP_FADE) drawWarpShader(dt);
