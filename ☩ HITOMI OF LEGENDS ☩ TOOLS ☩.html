@@ -737,6 +737,10 @@ uniform float uSplash;
 uniform vec3  uSunC;
 uniform float uSunB;
 uniform float uSunR;
+/* SUN-BODY v3.3 (из стенда hitomi_planet_sunbody_stand_v3_3): физическое светило-шар */
+uniform vec3  uSunDir;
+uniform float uSunSize;
+uniform float uSunBright;
 uniform vec3  uP[10];   /* дальние планеты — позиции относительно текущей (или мировые в гипер) */
 uniform float uPKa[10]; /* индексы дальних планет (тип поверхности 0..3) */
 uniform float uPCount; /* сколько дальних планет передано в кадре */
@@ -754,6 +758,8 @@ uniform mat3  uAxM;    /* ОРИЕНТАЦИЯ ТЕЛА: матрица Эйле
 uniform vec3  uAtmC; uniform float uAtmGlow; uniform float uAtmSize;
 uniform float uJetsOn; uniform vec3 uJetsC1; uniform vec3 uJetsC2; uniform float uJetsSp; uniform float uJetsLen;
 uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float uRingIn; uniform float uRingOut;
+uniform float uRingShad;  /* СИЛА ТЕНИ КОЛЬЦА: насколько кольцо затемняет (0..1, норма 0.92) */
+uniform float uRingFloor; /* ПОЛ ТЕНИ: мин. яркость тени кольца (0..0.3, норма 0.067 ≈ #111) */
 uniform float uSpin; uniform float uPulseR;
 uniform float uSurfScale;
 uniform float uSTScale;   /* детализация (texture scale), фид 4.2 */
@@ -827,6 +833,21 @@ float fbm5(vec3 p){
   for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
   return v;
 }
+/* SUN-BODY v3.3: octaves6 + cloudForm из стенда (для новой процедурной планеты) */
+float octaves6(vec3 q){ float f=0.0; for(int i=0;i<6;++i){ float ti=pow(2.0,float(i)); f+=vnoise(q*ti)/ti; } return f; }
+float cloudForm(vec3 q){ q.x+=sin(q.y*2.0); q.z+=cos(q.x*2.0)*0.3; float f=-0.15+vnoise(q)+vnoise(q*2.0)*0.5+vnoise(q*4.0)*0.25+vnoise(q*8.0)*0.125+vnoise(q*16.0)*0.05+vnoise(q*32.0)*0.025+vnoise(q*64.0)*0.0125; f=min(pow(abs(f),10.0)*0.5,0.5); return f; }
+/* SUN-BODY RING-SHADOW v4.1: аналитические тени колец (из игры WORK SUNBODY) */
+float ringProfile(float r){
+  float e = smoothstep(uRingIn, uRingIn+0.07, r)*smoothstep(uRingOut, uRingOut-0.18, r);
+  float b = 0.45 + 0.55*vnoise(vec3(r*30.0, 1.7, 3.1));
+  float gap = 1.0 - 0.9*exp(-pow((r - mix(uRingIn,uRingOut,0.5))*20.0, 2.0));
+  return clamp(e*b*gap, 0.0, 1.0);
+}
+float segShadow(vec3 p, vec3 l){
+  vec3 d = l - p; float dd = max(dot(d,d), 1e-5);
+  float t = clamp(-dot(p,d)/dd, 0.0, 1.0);
+  return length(p + d*t);
+}
 /* средний: 3 октавы */
 float fbm3(vec3 p){
   float v=0.0, a=0.5;
@@ -883,33 +904,6 @@ vec3 dopplerShift(vec3 c, float impact){
 
 /* ==== SDF-ТЕНИ ОТ ШИНРАРТА-A ==== */
 /* Расстояние до ближайшей сферы-планеты (текущая центр sC + дальние + гипер-4-я) */
-float mapSDF(vec3 p, vec3 sC){
-  float d = length(p - sC) - R;
-  for(int di = 0; di < 10; di++){
-    if(di >= int(uPCount + 0.5)) break;
-    /* СТАР-ЛОД: сфера Шинрарта-A не затеняет собственный свет (совпадает с uStarPos) */
-    if(length(uP[di] - uStarPos) < R*1.5) continue;
-    d = min(d, length(p - uP[di]) - R);
-  }
-  if(uHyper > 0.5){
-    d = min(d, length(p - uP4) - R);
-  }
-  return d;
-}
-/* Мягкие тени ray-march: луч к свету, затенение от сфер планет */
-float softShadowSDF(vec3 ro, vec3 lightDir, vec3 sC){
-  float res = 1.0;
-  float t = 0.0;
-  for(int i = 0; i < 12; i++){
-    float h = mapSDF(ro + lightDir*t, sC);
-    if(h < 0.001) return 0.0;
-    res = min(res, 12.0*h / t);
-    t += clamp(h, 0.02, 0.5);
-    if(t > 60.0) break;
-  }
-  return clamp(res, 0.0, 1.0);
-}
-
 /* ==== ЗВЁЗДНЫЙ ШЕЙДЕР (STAR-GL): симплекс-шум + fbm + домен-варп (ST-суффикс).
    Порт из SH-Gl.txt (Nikita Miropolskiy / Inigo Quilez). Рисует маску поверхности
    звёзд Шинрарта-A / SOL / Sirius — кипящая плазма с активными областями. ==== */
@@ -973,34 +967,78 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
   float latAx = dot(nG, axW);       /* широта по оси — стабильна при спине */ /* вращение вокруг НАКЛОНЁННОЙ оси */
   vec3 r = vec3(0.0);
   if(k == 0){
-    vec3  sp   = n*(2.6*SCL) + vec3(0.0, 0.0, uTime*0.004*SPIN);
-    float cont = fbm5(sp);
-    float land = smoothstep(0.46, 0.54, cont);
-    float coast = fbm3(n*(8.0*SCL) + vec3(0.0, uTime*0.006*SPIN, 0.0));
-    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
-    vec3 ocean = palc(0.0);
-    vec3 landc = mix(palc(1.0), palc(2.0), smoothstep(0.52,0.78,cont));
-    float mdet = fbm3(n*(12.0*SCL) + vec3(uTime*0.003*SPIN, uTime*0.001*SPIN, 0.0));
-    landc *= 0.85 + 0.30*mdet;
-    float ice  = smoothstep(0.94 - 0.28*paln(7.0, 1.0), 0.94, abs(latAx));
-    vec3 surf  = mix(ocean, landc, land);
-    surf = mix(surf, palc(3.0), ice);
-    float cl = fbm5(n*(4.2*SCL) + vec3(uTime*0.010*SPIN, 0.0, -uTime*0.006*SPIN));
-    cl = smoothstep(0.62 - (0.12 + 0.24*paln(7.0, 2.0)), 0.62 + (0.12 + 0.24*paln(7.0, 2.0)), cl);
-    surf = mix(surf, palc(4.0), cl*0.9);
-    vec3 colDay = surf*(0.15 + 1.05*lit);
-    vec3 hv = normalize(sunDir - rd);
-    float spec = pow(max(dot(nG,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
-    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+    /* SUN-BODY v3.3: НОВАЯ ПРОЦЕДУРНАЯ ПЛАНЕТА из стенда hitomi_planet_sunbody_stand_v3_3.
+       Океан + суша (трава/песок/снег) + облака + усиленный диффуз 4.0 + спекуляр. */
+    vec3 pos = n;
+    float lightIntensity = 4.0;
+    float sunNDL = max(0.0, 0.05 + 0.95*dot(n0, sunDir));
+    float f = 0.0;
+    vec3 q = pos;
+    vec3 col = vec3(0.02,0.10,0.22) * (0.5 + 0.5*vnoise(q*4.0));
+    col = col * (0.9 + 0.2*vnoise(q*8.0));
+    col = col * (0.9 + 0.2*vnoise(q*16.0));
+    col = col * (0.9 + 0.1*vnoise(q*32.0));
+    col = col * (0.9 + 0.1*vnoise(q*64.0));
+    q = vec3(0.00,0.80,0.60)*q*2.01;
+    float hm = octaves6(q + vec3(137.0)) / 1.5;
+    hm *= hm;
+    f = hm;
+    float landBlend = min(4.0*max(f - 0.3, 0.0), 1.0);
+    float nG = exp(-abs(f - 0.4)*20.0);
+    float nD = exp(-abs(f - 0.6)*20.0);
+    float snowLevel = 0.8 + vnoise(q*64.0)*0.1;
+    float nS = exp(-abs(f - snowLevel)*20.0);
+    vec3 snow   = vec3(0.85,0.85,0.85)/1.85;
+    vec3 desert = vec3(1.5,1.3,1.0)/13.0;
+    vec3 grass  = vec3(1.0,1.3,0.5)/12.0;
+    float normn = max(nG + nD + nS, 0.0001);
+    float grassD  = 1.0 + (vnoise(q*128.0) + vnoise(q*64.0) + vnoise(q*32.0))*0.5;
+    float snowD   = 1.0 + (vnoise(q*vec3(5.0,1.0,1.0)*3.0) + vnoise(q*16.0)*0.5 + vnoise(q*64.0)*0.5)*0.25;
+    float desertD = 1.0 + vnoise(q*vec3(1.0,7.0,1.0)*3.0) + vnoise(q*32.0)*0.5 + vnoise(q*64.0)*0.5;
+    vec3 land = (desertD*desert*nD + grassD*grass*nG + snowD*snow*nS) / normn;
+    col = mix(col, land, landBlend);
+    float shore = clamp(1.42*pow(1.0 - abs(landBlend - 0.4), 1.0) - 1.2, 0.0, 1.0);
+    col = mix(col, col + vec3(0.0,0.1,0.05), shore);
+    vec3 q2 = vec3(0.00,0.80,0.60)*q*2.01 + uTime*0.03;
+    vec3 off = vec3(0.1);
+    f = cloudForm(q2 + off);
+    f = 0.2 + 0.8*pow(1.0 - min(f, 1.0)*0.75, 2.0);
+    col = col * f;
+    f = cloudForm(q2);
+    vec3 cloudCol = vec3(0.2) + 0.7*vnoise(q2*2.0) + 0.4*vnoise(q2*6.0) +
+      0.2*vnoise(q2*16.0) + 0.05*vnoise(q2*32.0) + 0.04*vnoise(q2*64.0);
+    cloudCol = (cloudCol + f*0.05)*0.55;
+    col = mix(col, cloudCol*0.7, min(f*1.4, 1.0));
+    col *= (0.02 + sunNDL*lightIntensity);
+    vec3 ref = reflect(rd, n0);
+    float sunRDE = max(dot(ref, sunDir), 0.0);
+    float specN = 0.125*pow(sunRDE, 512.0);
+    col += specN*mix(col, vec3(1.0), 0.05)*sunNDL;
+    /* RING-SHADOW v4.1: тень КОЛЬЦА на поверхность планеты (из игры WORK SUNBODY).
+       Луч к свету пересекает плоскость кольца; если радиус в кольце - затемняем.
+       Пол не гаснет до #000, а до ~#111 (17/255). */
+    float rs = 1.0;
+    vec3 rnPl = normalize(vec3(0.22, 1.0, 0.18));
+    float dnR = dot(sunDir, rnPl);
+    if(abs(dnR) > 1e-3){
+      vec3 p0 = n0;
+      float tR0 = -dot(p0, rnPl)/dnR;
+      if(tR0 > 0.0){
+        float rr0 = length(p0 + sunDir*tR0);
+        if(rr0 > uRingIn && rr0 < uRingOut) rs = 1.0 - uRingShad*ringProfile(rr0);
+      }
+    }
+    col *= mix(uRingFloor, 1.0, rs);
+    r = col;
     float cellH = hash13(floor(n*90.0));
-    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
-    vec3 colNight = surf*0.03 + palc(5.0)*city*paln(8.0, 0.0)*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
-    r = mix(colNight, colDay, lit);
-    float fres = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
+    float city  = step(0.80, cellH)*landBlend*(1.0-f);
+    vec3 colNight = col*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+    r = mix(colNight, r, sunNDL);
+    float fres = pow(1.0 - clamp(dot(-rd, n0), 0.0, 1.0), 3.0);
     r += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
     float aurZ = smoothstep(0.72, 0.92, abs(latAx))*(1.0-lit);
     float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
-    r += palc(6.0)*aurZ*smoothstep(0.45,0.75,aur)*paln(8.0, 1.0);
+    r += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
   } else if(k == 1){
     float lat = latAx;
     float warp = fbm3(n*(2.6*SCL) + vec3(uTime*0.008*SPIN, 0.0, 0.0));
@@ -1138,12 +1176,17 @@ void main(){
     vec3 Lp = normalize(uStarPos - p);
     float nl  = dot(n, Lp);
     float lit = smoothstep(-0.06, 0.18, nl);
-    /* мягкая тень от Шинрарта-A (SDF ray-march) */
-    lit *= softShadowSDF(p + n*0.02, Lp, sC);
+    /* старая SDF-тень удалена: свет от звезды единственный источник, теней планет нет */
     int ki = (uPlanet < 0.5) ? 0 : ((uPlanet < 1.5) ? 1 : ((uPlanet < 2.5) ? 2 : ((uPlanet < 3.5) ? 3 : 4)));
     gRow = uPIcur;
     gCur = 1.0;
-    col = shadeSurface(ki, n, lit, rd, sunDir);
+    /* заглушка: сфера под слоями планеты — тёмная, но не прозрачная для фона.
+       Поверх неё рисуем текстуру; в самых тёмных/лимбовых пикселях планета
+       опирается на эту заглушку (max), а не проваливается к фону. */
+    vec3 surfR = shadeSurface(ki, n, lit, rd, sunDir);
+    float limbf = pow(1.0 - clamp(dot(n, -rd), 0.0, 1.0), 2.5);
+    vec3 stub = vec3(0.08, 0.09, 0.14) * (0.35 + 0.65*limbf);
+    col = max(surfR, stub);
   } else {
     /* ---- НЕБО ---- */
     /* ГИПЕРПРОСТРАНСТВО = готовое небо планеты ХИТОМИ (без магмы/градиентов),
@@ -1176,10 +1219,19 @@ void main(){
     col += uSunC*pow(sunAmt, 350.0)*0.9*uSunB;
     }
 
-    /* ЛОД СОЛНЦА ШИНРАРТА-A НА НЕБЕ: диск + ореол направлены на звезду в (0,0,0) */
+    /* СОЛНЦЕ ШИНРАРТА-A: физическое светило-шар (SUN-BODY v3.3).
+       Диск raytrace-сферы направлен по uSunDir, грануляция поверхности,
+       лимб-затемнение, гало. Направление starDir для освещения остаётся. */
     vec3 starDir = normalize(uStarPos - camPos);
     float dSt = dot(rd, starDir);
-    col += uSunC*smoothstep(1.0-sunR_eff*1.25, 1.0-sunR_eff*0.5625, dSt)*4.0*uSunB;
+    float sunDiscA = smoothstep(1.0-sunR_eff, 1.0-sunR_eff*0.5, dSt);
+    vec3 sunDirU = (length(uSunDir) > 0.01) ? normalize(uSunDir) : starDir;
+    float gran = vnoise(-starDir*36.0 + vec3(0.0, uTime*0.05, 0.0));
+    vec3 sunSurf = uSunC*(1.6 + gran*0.7);
+    col += sunSurf*sunDiscA*uSunB;
+    col += uSunC*pow(sunDiscA, 1.0)*uSunB*0.15*sunR_eff*8.0;
+    float haloA = exp(-pow(max(1.0 - dSt, 0.0), 0.75)/pow(max(2.5*sunR_eff, 0.004), 2.0));
+    col += uSunC*uSunB*0.5*haloA;
     col += uSunC*pow(max(dSt,0.0), 120.0)*0.8*uSunB;
 
     /* ореол атмосферы у лимба (лучи мимо планеты) */
@@ -1304,7 +1356,7 @@ void main(){
           /* СТАР-ЛОД: звезда самосветится — дневная сторона всегда 1.0 */
           float isStar = (dk == 4) ? 1.0 : 0.0;
           float dlit = mix(smoothstep(-0.02, 0.10, dnl), 1.0, isStar);
-          if(isStar < 0.5){ dlit *= softShadowSDF(pp + nn*0.02, normalize(uStarPos - pp), sC); }
+          /* старая SDF-тень удалена: единый свет звезды */
           gRow = uPIa[di];
           gCur = 0.0;
           sphCol = shadeSurface(dk, nn, dlit, rd, normalize(uStarPos - pp));
@@ -1331,7 +1383,7 @@ void main(){
         vec3 nn4 = normalize(pp4 - uP4);
         float nl4  = dot(nn4, normalize(uStarPos - pp4));
         float lit4 = smoothstep(-0.02, 0.10, nl4);
-        lit4 *= softShadowSDF(pp4 + nn4*0.02, normalize(uStarPos - pp4), sC);
+        /* старая SDF-тень удалена: единый свет звезды */
         gRow = uPIcur;
         gCur = 1.0;
         sphCol = shadeSurface(int(uPK4 + 0.5), nn4, lit4, rd, normalize(uStarPos - pp4));
@@ -1373,21 +1425,23 @@ void main(){
           float gap = smoothstep(mix(uRingIn,uRingOut,0.3444), mix(uRingIn,uRingOut,0.3667), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.4333), mix(uRingIn,uRingOut,0.4556), rr));
           float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
           float edge = smoothstep(uRingIn, mix(uRingIn,uRingOut,0.0778), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.9222), uRingOut, rr));
-          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
-          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
+          /* старая тень shadow удалена: только новая RING-SHADOW v4.1 (shadRing) */
+          float bright = (0.35 + 0.65*abs(dot(nR, sunDir)));
           float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
           alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
           /* Убрать дальнюю дугу колец (за планетой от камеры): оставить только
              полукольцо на ближней стороне. dot(q,camPos)>0 — та же сторона, что камера. */
           float nearHalf = step(0.0, dot(q, camPos));
           alpha *= nearHalf;
-          col = mix(col, uRingC*bright, alpha*0.9);
+          float shadRing = 1.0; /* RING-SHADOW v4.1: тень планеты на кольце (segShadow) */
+          if(uRingIn > 0.01) shadRing = smoothstep(0.99, 1.15, segShadow(q - vec3(0.0), sunDir*40.0));
+          col = mix(col, uRingC * (bright * mix(uRingFloor, 1.0, shadRing)), alpha*0.9);
           /* ТУМАН В КОЛЬЦАХ (ЧИЗИЯ): лёгкая слоистая дымка, гуще у внутреннего края
              и на ночной стороне — как застывший туман диска кол. */
           float rngFog = fbm3(q*3.5 + vec3(uTime*0.015, 0.0, 0.0));
           float fogR = smoothstep(1.45, 1.55, rr)*(1.0 - smoothstep(1.9, 2.2, rr));
-          float fogRing = clamp((0.35 + 0.65*rngFog)*fogR*(0.6 + 0.4*shadow)*abs(denom)*20.0, 0.0, 1.0);
-          col = mix(col, uRingC*bright, fogRing*0.35);
+          float fogRing = clamp((0.35 + 0.65*rngFog)*fogR*abs(denom)*20.0, 0.0, 1.0);
+          col = mix(col, uRingC * (bright * mix(uRingFloor, 1.0, shadRing)), fogRing*0.35);
         }
       }
     }
@@ -1503,6 +1557,9 @@ const uJetsOn = gl.getUniformLocation(prog, 'uJetsOn');
 const uSunC = gl.getUniformLocation(prog, 'uSunC');
 const uSunB = gl.getUniformLocation(prog, 'uSunB');
 const uSunR = gl.getUniformLocation(prog, 'uSunR');
+const uSunDir = gl.getUniformLocation(prog, 'uSunDir');
+const uSunSize = gl.getUniformLocation(prog, 'uSunSize');
+const uSunBright = gl.getUniformLocation(prog, 'uSunBright');
 const uJetsC1 = gl.getUniformLocation(prog, 'uJetsC1');
 const uJetsC2 = gl.getUniformLocation(prog, 'uJetsC2');
 const uJetsSp = gl.getUniformLocation(prog, 'uJetsSp');
@@ -1512,6 +1569,8 @@ const uRingC = gl.getUniformLocation(prog, 'uRingC');
 const uRingSp = gl.getUniformLocation(prog, 'uRingSp');
 const uRingIn = gl.getUniformLocation(prog, 'uRingIn');
 const uRingOut = gl.getUniformLocation(prog, 'uRingOut');
+const uRingShad = gl.getUniformLocation(prog, 'uRingShad');
+const uRingFloor = gl.getUniformLocation(prog, 'uRingFloor');
 const uSpin = gl.getUniformLocation(prog, 'uSpin');
 const uPulseR = gl.getUniformLocation(prog, 'uPulseR');
 const uAmbSky = gl.getUniformLocation(prog, 'uAmbSky');
@@ -1669,6 +1728,9 @@ function fxPush(pi){
   gl.uniform3f(uSunC, sunC[0], sunC[1], sunC[2]);
 gl.uniform1f(uSunB, f.sunB == null ? 1.0 : f.sunB);
 gl.uniform1f(uSunR, f.sunR == null ? 0.0008 : f.sunR);
+if(uSunDir){ var _sd = (function(){ var v = window.__uStarPosV || [0,0,0]; var l = Math.hypot(v[0],v[1],v[2])||1; return [v[0]/l,v[1]/l,v[2]/l]; })(); gl.uniform3f(uSunDir, _sd[0], _sd[1], _sd[2]); }
+if(uSunSize) gl.uniform1f(uSunSize, f.sunSize == null ? 1.2 : f.sunSize);
+if(uSunBright) gl.uniform1f(uSunBright, f.sunBright == null ? 1.0 : f.sunBright);
   gl.uniform1f(uAtmGlow, fxNum(f.glow, d.glow));
   gl.uniform1f(uAtmSize, fxNum(f.size, d.size));
   gl.uniform1f(uSpin, fxNum(f.spin, d.spin));
@@ -1686,6 +1748,8 @@ gl.uniform1f(uSunR, f.sunR == null ? 0.0008 : f.sunR);
   gl.uniform1f(uRingSp, fxNum(ring.sp, d.ring.sp));
   gl.uniform1f(uRingIn, fxNum(ring.in, d.ring.in));
   gl.uniform1f(uRingOut, fxNum(ring.out, d.ring.out));
+  gl.uniform1f(uRingShad, fxNum(ring.shad, 0.92));   /* сила тени кольца (норма 0.92) */
+  gl.uniform1f(uRingFloor, fxNum(ring.floor, 0.067));/* пол тени кольца (норма ≈ #111) */
   gl.uniform1f(uSurfScale, fxNum(surf.scale, d.surf.scale));
   gl.uniform1f(uSTScale, fxNum(surf.stScale, fxNum(d.surf.stScale, 4.2)));
   gl.uniform1f(uSTTSpeed, fxNum(surf.stTSpeed, fxNum(d.surf.stTSpeed, 0.03)));
@@ -5266,6 +5330,9 @@ function buildPlanet(){
   panP.appendChild(mkColor(p.fx, 'sun', 'ЦВЕТ СОЛНЦА'));
   if(p.fx.sunB==null)p.fx.sunB=1; panP.appendChild(mkRange(p.fx,'sunB','ЯРК. СОЛНЦА',0.2,5,0.05,null,function(v){return (v*100).toFixed(0)+'%';}));
   if(p.fx.sunR==null)p.fx.sunR=0.0008; panP.appendChild(mkRange(p.fx,'sunR','РАЗМЕР СОЛНЦА',0.0002,0.0032,0.0001,null,function(v){return (v*1250).toFixed(0)+'%';}));
+  /* SUN-BODY v3.3: размер светила-шара (sunSize) и яркость шара (sunBright) — из стенда */
+  if(p.fx.sunSize==null)p.fx.sunSize=1.2; panP.appendChild(mkRange(p.fx,'sunSize','РАЗМЕР ШАРА',0.3,4,0.05,null,function(v){return (v).toFixed(2);}));
+  if(p.fx.sunBright==null)p.fx.sunBright=1.0; panP.appendChild(mkRange(p.fx,'sunBright','ЯРКОСТЬ ШАРА',0.2,3,0.05,null,function(v){return (v).toFixed(2);}));
 
   /* ОБЛИК + АТМОСФЕРА (новые поля базы) */
   panP.appendChild(sec('ОБЛИК + АТМОСФЕРА'));
@@ -5320,6 +5387,12 @@ function buildPlanet(){
   panP.appendChild(mkRange(p.fx.ring, 'in', 'ВНУТР. РАД', 0.5, 3, 0.01));
   panP.appendChild(mkRange(p.fx.ring, 'out', 'ВНЕШН. РАД', 0.5, 6, 0.01));
   panP.appendChild(mkTilt(p.fx.ring, 'НАКЛОН (tilt°)'));
+  /* ТЕНИ КОЛЬЦА: настраиваемые на глаз пол тени (#111) и сила затемнения */
+  panP.appendChild(sec('ТЕНИ КОЛЬЦА'));
+  if(p.fx.ring.shad == null) p.fx.ring.shad = 0.92;
+  panP.appendChild(mkRange(p.fx.ring, 'shad', 'СИЛА ТЕНИ', 0, 1, 0.01, null, function(v){ return (Math.round(v*100)) + '%'; }));
+  if(p.fx.ring.floor == null) p.fx.ring.floor = 0.067;
+  panP.appendChild(mkRange(p.fx.ring, 'floor', 'ПОЛ ТЕНИ', 0, 0.3, 0.001, null, function(v){ return Math.round(v*255); }));
 
   /* поверхность */
   panP.appendChild(sec('ПОВЕРХНОСТЬ (' + p.kind + ')'));

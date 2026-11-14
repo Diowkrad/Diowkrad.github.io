@@ -1128,12 +1128,13 @@ uniform float uJetsOn; /* EDIT: синхронно с FRAG */
 uniform vec3  uSunC;
 uniform float uSunB;
 uniform float uSunR;
+uniform float uFovCin; /* КИНО-FOV: масштаб FOT во время прыжка, 1.0 = норма */
 
 uniform float uBodyR; /* пер-теловые размеры: радиус текущего тела, км */
  uniform float uRotC;  /* ВРАЩЕНИЕ СФЕРЫ: текущая фаза, рад */
 #define R    1.0
 #define CAMR uBodyR
-#define FOT  __FOT__
+#define FOT  (__FOT__ * uFovCin)
 
 /* --- хэш и шумы (средний слой) --- */
 float hash13(vec3 p){
@@ -1406,6 +1407,10 @@ uniform float uSplash;
 uniform vec3  uSunC;
 uniform float uSunB;
 uniform float uSunR;
+/* SUN-BODY v3.3 (стенд hitomi_planet_sunbody_stand_v3_3): физическое светило-шар */
+uniform vec3  uSunDir;   /* единичное направление на солнце из JS (совпадает с направлением uStarPos) */
+uniform float uSunSize;  /* радиус светила (в масштабе сферы планеты R=1) */
+uniform float uSunBright;/* яркость солнца */
 uniform vec3  uP[10];   /* дальние планеты — позиции относительно текущей (или мировые в гипер) */
 uniform float uPKa[10]; /* индексы дальних планет (тип поверхности 0..3) */
 uniform float uPCount; /* сколько дальних планет передано в кадре */
@@ -1465,9 +1470,10 @@ float paln(float slot, float ch){
 
 uniform float uBodyR; /* пер-теловые размеры: радиус текущего тела, км */
  uniform float uRotC;  /* ВРАЩЕНИЕ СФЕРЫ: текущая фаза, рад */
+uniform float uFovCin; /* КИНО-FOV: масштаб FOT во время прыжка, 1.0 = норма */
 #define R    1.0
 #define CAMR uBodyR
-#define FOT  __FOT__
+#define FOT  (__FOT__ * uFovCin)
 
 /* --- хэш и шумы (средний слой) --- */
 float hash13(vec3 p){
@@ -1495,6 +1501,23 @@ float fbm5(vec3 p){
   float v=0.0, a=0.5;
   for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
   return v;
+}
+/* SUN-BODY v3.3: octaves6 + cloudForm из стенда (для новой процедурной планеты) */
+float octaves6(vec3 q){ float f=0.0; for(int i=0;i<6;++i){ float ti=pow(2.0,float(i)); f+=vnoise(q*ti)/ti; } return f; }
+float cloudForm(vec3 q){ q.x+=sin(q.y*2.0); q.z+=cos(q.x*2.0)*0.3; float f=-0.15+vnoise(q)+vnoise(q*2.0)*0.5+vnoise(q*4.0)*0.25+vnoise(q*8.0)*0.125+vnoise(q*16.0)*0.05+vnoise(q*32.0)*0.025+vnoise(q*64.0)*0.0125; f=min(pow(abs(f),10.0)*0.5,0.5); return f; }
+/* SUN-BODY RING-SHADOW v4.1: аналитические тени колец из стенда hitomi_ring_shadow_stand_v4_1 */
+float ringProfile(float r){
+  float rnIn = mix(uRingIn, 1.0, 0.0); /* внутренний край кольца (RIN) */
+  float rnOut = uRingOut;
+  float e = smoothstep(uRingIn, uRingIn+0.07, r)*smoothstep(uRingOut, uRingOut-0.18, r);
+  float b = 0.45 + 0.55*vnoise(vec3(r*30.0, 1.7, 3.1));
+  float gap = 1.0 - 0.9*exp(-pow((r - mix(uRingIn,uRingOut,0.5))*20.0, 2.0));
+  return clamp(e*b*gap, 0.0, 1.0);
+}
+float segShadow(vec3 p, vec3 l){
+  vec3 d = l - p; float dd = max(dot(d,d), 1e-5);
+  float t = clamp(-dot(p,d)/dd, 0.0, 1.0);
+  return length(p + d*t);
 }
 /* средний: 3 октавы */
 float fbm3(vec3 p){
@@ -1548,35 +1571,6 @@ vec3 dopplerShift(vec3 c, float impact){
   float d = mix(0.1, uLensDopp, tD);
   vec3 shift = vec3(0.7, 0.85, 1.2) + d*vec3(0.0, 0.0, 0.25);
   return c * shift;
-}
-
-/* ==== SDF-ТЕНИ ОТ ШИНРАРТА-A ==== */
-/* Расстояние до ближайшей сферы-планеты (текущая центр sC + дальние + гипер-4-я) */
-float mapSDF(vec3 p, vec3 sC){
-  float d = length(p - sC) - R;
-  for(int di = 0; di < 10; di++){
-    if(di >= int(uPCount + 0.5)) break;
-    /* СТАР-ЛОД: сфера Шинрарта-A не затеняет собственный свет (совпадает с uStarPos) */
-    if(length(uP[di] - uStarPos) < R*1.5) continue;
-    d = min(d, length(p - uP[di]) - R);
-  }
-  if(uHyper > 0.5){
-    d = min(d, length(p - uP4) - R);
-  }
-  return d;
-}
-/* Мягкие тени ray-march: луч к свету, затенение от сфер планет */
-float softShadowSDF(vec3 ro, vec3 lightDir, vec3 sC){
-  float res = 1.0;
-  float t = 0.0;
-  for(int i = 0; i < 12; i++){
-    float h = mapSDF(ro + lightDir*t, sC);
-    if(h < 0.001) return 0.0;
-    res = min(res, 12.0*h / t);
-    t += clamp(h, 0.02, 0.5);
-    if(t > 60.0) break;
-  }
-  return clamp(res, 0.0, 1.0);
 }
 
 /* ==== ЗВЁЗДНЫЙ ШЕЙДЕР (STAR-GL): симплекс-шум + fbm + домен-варп (ST-суффикс).
@@ -1642,34 +1636,84 @@ vec3 shadeSurface(int k, vec3 n0, float lit, vec3 rd, vec3 sunDir){
   float latAx = dot(nG, axW);       /* широта по оси — стабильна при спине */ /* вращение вокруг НАКЛОНЁННОЙ оси */
   vec3 r = vec3(0.0);
   if(k == 0){
-    vec3  sp   = n*(2.6*SCL) + vec3(0.0, 0.0, uTime*0.004*SPIN);
-    float cont = fbm5(sp);
-    float land = smoothstep(0.46, 0.54, cont);
-    float coast = fbm3(n*(8.0*SCL) + vec3(0.0, uTime*0.006*SPIN, 0.0));
-    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
-    vec3 ocean = palc(0.0);
-    vec3 landc = mix(palc(1.0), palc(2.0), smoothstep(0.52,0.78,cont));
-    float mdet = fbm3(n*(12.0*SCL) + vec3(uTime*0.003*SPIN, uTime*0.001*SPIN, 0.0));
-    landc *= 0.85 + 0.30*mdet;
-    float ice  = smoothstep(0.94 - 0.28*paln(7.0, 1.0), 0.94, abs(latAx));
-    vec3 surf  = mix(ocean, landc, land);
-    surf = mix(surf, palc(3.0), ice);
-    float cl = fbm5(n*(4.2*SCL) + vec3(uTime*0.010*SPIN, 0.0, -uTime*0.006*SPIN));
-    cl = smoothstep(0.62 - (0.12 + 0.24*paln(7.0, 2.0)), 0.62 + (0.12 + 0.24*paln(7.0, 2.0)), cl);
-    surf = mix(surf, palc(4.0), cl*0.9);
-    vec3 colDay = surf*(0.15 + 1.05*lit);
-    vec3 hv = normalize(sunDir - rd);
-    float spec = pow(max(dot(nG,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
-    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
+    /* SUN-BODY v3.3: НОВАЯ ПРОЦЕДУРНАЯ ПЛАНЕТА из стенда hitomi_planet_sunbody_stand_v3_3.
+       Океан + суша (трава/песок/снег) + облака + усиленный диффуз 4.0 + спекуляр. */
+    vec3 pos = n; /* нормаль = единичная точка на сфере; позиция в безразм. координатах */
+    float lightIntensity = 4.0;
+    float sunNDL = max(0.0, 0.05 + 0.95*dot(n0, sunDir));
+    float f = 0.0;
+    vec3 q = pos;
+    /* океан */
+    vec3 col = vec3(0.02,0.10,0.22) * (0.5 + 0.5*vnoise(q*4.0));
+    col = col * (0.9 + 0.2*vnoise(q*8.0));
+    col = col * (0.9 + 0.2*vnoise(q*16.0));
+    col = col * (0.9 + 0.1*vnoise(q*32.0));
+    col = col * (0.9 + 0.1*vnoise(q*64.0));
+    /* суша: трава/песок/снег через octaves6 */
+    q = vec3(0.00,0.80,0.60)*q*2.01; /* орто-вариант матрицы m (упрощённо) */
+    float hm = octaves6(q + vec3(137.0)) / 1.5;
+    hm *= hm;
+    f = hm;
+    float landBlend = min(4.0*max(f - 0.3, 0.0), 1.0);
+    float nG = exp(-abs(f - 0.4)*20.0);
+    float nD = exp(-abs(f - 0.6)*20.0);
+    float snowLevel = 0.8 + vnoise(q*64.0)*0.1;
+    float nS = exp(-abs(f - snowLevel)*20.0);
+    vec3 snow   = vec3(0.85,0.85,0.85)/1.85;
+    vec3 desert = vec3(1.5,1.3,1.0)/13.0;
+    vec3 grass  = vec3(1.0,1.3,0.5)/12.0;
+    float normn = max(nG + nD + nS, 0.0001);
+    float grassD  = 1.0 + (vnoise(q*128.0) + vnoise(q*64.0) + vnoise(q*32.0))*0.5;
+    float snowD   = 1.0 + (vnoise(q*vec3(5.0,1.0,1.0)*3.0) + vnoise(q*16.0)*0.5 + vnoise(q*64.0)*0.5)*0.25;
+    float desertD = 1.0 + vnoise(q*vec3(1.0,7.0,1.0)*3.0) + vnoise(q*32.0)*0.5 + vnoise(q*64.0)*0.5;
+    vec3 land = (desertD*desert*nD + grassD*grass*nG + snowD*snow*nS) / normn;
+    col = mix(col, land, landBlend);
+    float shore = clamp(1.42*pow(1.0 - abs(landBlend - 0.4), 1.0) - 1.2, 0.0, 1.0);
+    col = mix(col, col + vec3(0.0,0.1,0.05), shore);
+    /* облака + облачная тень */
+    vec3 q2 = vec3(0.00,0.80,0.60)*q*2.01 + uTime*0.03;
+    vec3 off = vec3(0.1);
+    f = cloudForm(q2 + off);
+    f = 0.2 + 0.8*pow(1.0 - min(f, 1.0)*0.75, 2.0);
+    col = col * f;
+    f = cloudForm(q2);
+    vec3 cloudCol = vec3(0.2) + 0.7*vnoise(q2*2.0) + 0.4*vnoise(q2*6.0) +
+      0.2*vnoise(q2*16.0) + 0.05*vnoise(q2*32.0) + 0.04*vnoise(q2*64.0);
+    cloudCol = (cloudCol + f*0.05)*0.55;
+    col = mix(col, cloudCol*0.7, min(f*1.4, 1.0));
+    /* Единственный источник света — звезда (Шинрарта-A / SOL / SIRIUS). */
+    /* диффуз и спекуляр в направлении солнца (звезда) */
+    col *= (0.02 + sunNDL*lightIntensity);
+    vec3 ref = reflect(rd, n0);
+    float sunRDE = max(dot(ref, sunDir), 0.0);
+    float specN = 0.125*pow(sunRDE, 512.0);
+    col += specN*mix(col, vec3(1.0), 0.05)*sunNDL;
+    /* RING-SHADOW v4.1: тень КОЛЬЦА на поверхность планеты.
+       Луч к свету пересекает плоскость кольца (RING_N); если радиус в кольце -
+       затемняем диффуз (как в shadePlanet стенда). */
+    float rs = 1.0;
+    vec3 rnPl = normalize(vec3(0.22, 1.0, 0.18)); /* ту же нормаль, что в блоке колец */
+    float dnR = dot(sunDir, rnPl);
+    if(abs(dnR) > 1e-3){
+      vec3 p0 = n0; /* единичная точка на сфере планеты */
+      float tR0 = -dot(p0, rnPl)/dnR;
+      if(tR0 > 0.0){
+        float rr0 = length(p0 + sunDir*tR0);
+        if(rr0 > uRingIn && rr0 < uRingOut) rs = 1.0 - 0.92*ringProfile(rr0);
+      }
+    }
+    col *= mix(0.067, 1.0, rs); /* тень кольца: пол не гаснет до #000, а до ~#111 (17/255) */
+    r = col;
+    /* сохраняем ночные города/аврору поверх (color-nite от старого рецепта) */
     float cellH = hash13(floor(n*90.0));
-    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
-    vec3 colNight = surf*0.03 + palc(5.0)*city*paln(8.0, 0.0)*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
-    r = mix(colNight, colDay, lit);
-    float fres = pow(1.0 - clamp(dot(-rd, nG), 0.0, 1.0), 3.0);
+    float city  = step(0.80, cellH)*landBlend*(1.0-f);
+    vec3 colNight = col*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
+    r = mix(colNight, r, sunNDL);
+    float fres = pow(1.0 - clamp(dot(-rd, n0), 0.0, 1.0), 3.0);
     r += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
     float aurZ = smoothstep(0.72, 0.92, abs(latAx))*(1.0-lit);
     float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
-    r += palc(6.0)*aurZ*smoothstep(0.45,0.75,aur)*paln(8.0, 1.0);
+    r += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
   } else if(k == 1){
     float lat = latAx;
     float warp = fbm3(n*(2.6*SCL) + vec3(uTime*0.008*SPIN, 0.0, 0.0));
@@ -1801,18 +1845,26 @@ void main(){
   vec3 col = vec3(0.0);
 
   if(hitP){
-    /* ---- ПЛАНЕТА (ЛОД 1-в-1: единая функция поверхности) ---- */
+    /* ---- ПЛАНЕТА (ЛОД 1-в-1: единая функция поверхности) ----
+       СФЕРА-ЗАГЛУШКА: под всеми слоями планеты кладём непроницаемый тёмный
+       диск (альфа-заглушка), чтобы фон/небо/дальние планеты НЕ просвечивали
+       сквозь планету. Поверх него рисуем shadeSurface (текстуру). */
     vec3 p = camPos + rd*tHit;
     vec3 n = normalize(p - sC);
     vec3 Lp = normalize(uStarPos - p);
     float nl  = dot(n, Lp);
     float lit = smoothstep(-0.06, 0.18, nl);
-    /* мягкая тень от Шинрарта-A (SDF ray-march) */
-    lit *= softShadowSDF(p + n*0.02, Lp, sC);
+    /* старая SDF-тень удалена: свет от звезды единственный источник, теней планет нет */
     int ki = (uPlanet < 0.5) ? 0 : ((uPlanet < 1.5) ? 1 : ((uPlanet < 2.5) ? 2 : ((uPlanet < 3.5) ? 3 : 4)));
     gRow = uPIcur;
     gCur = 1.0;
-    col = shadeSurface(ki, n, lit, rd, sunDir);
+    /* заглушка: сфера под слоями планеты — тёмная, но не прозрачная для фона.
+       Поверх неё рисуем текстуру; в самых тёмных/лимбовых пикселях планета
+       опирается на эту заглушку (max), а не проваливается к фону. */
+    vec3 surfR = shadeSurface(ki, n, lit, rd, sunDir);
+    float limbf = pow(1.0 - clamp(dot(n, -rd), 0.0, 1.0), 2.5);
+    vec3 stub = vec3(0.08, 0.09, 0.14) * (0.35 + 0.65*limbf);
+    col = max(surfR, stub);
   } else {
     /* ---- НЕБО ---- */
     /* ГИПЕРПРОСТРАНСТВО = готовое небо планеты ХИТОМИ (без магмы/градиентов),
@@ -1845,10 +1897,24 @@ void main(){
     col += uSunC*pow(sunAmt, 350.0)*0.9*uSunB;
     }
 
-    /* ЛОД СОЛНЦА ШИНРАРТА-A НА НЕБЕ: диск + ореол направлены на звезду в (0,0,0) */
+    /* СОЛНЦЕ ШИНРАРТА-A: физическое светило-шар (SUN-BODY v3.3).
+       Диск raytrace-сферы направлен по uSunDir, грануляция поверхности,
+       лимб-затемнение, гало. Направление starDir для освещения остаётся. */
     vec3 starDir = normalize(uStarPos - camPos);
     float dSt = dot(rd, starDir);
-    col += uSunC*smoothstep(1.0-sunR_eff*1.25, 1.0-sunR_eff*0.5625, dSt)*4.0*uSunB;
+    /* диск светила: угловой радиус = uSunR_eff (LOD-синхрон с реальной сферой) */
+    float sunDiscA = smoothstep(1.0-sunR_eff, 1.0-sunR_eff*0.5, dSt);
+    /* грануляция поверхности (по направлению, скаляр отражённого базиса) */
+    vec3 sunDirU = (length(uSunDir) > 0.01) ? normalize(uSunDir) : starDir;
+    float gran = vnoise(-starDir*36.0 + vec3(0.0, uTime*0.05, 0.0));
+    vec3 sunSurf = uSunC*(1.6 + gran*0.7);
+    col += sunSurf*sunDiscA*uSunB;
+    /* лимб-затемнение: край диска темнее */
+    col += uSunC*pow(sunDiscA, 1.0)*uSunB*0.15*sunR_eff*8.0;
+    /* гало вокруг светила */
+    float haloA = exp(-pow(max(1.0 - dSt, 0.0), 0.75)/pow(max(2.5*sunR_eff, 0.004), 2.0));
+    col += uSunC*uSunB*0.5*haloA;
+    /* точечное ядро (прежний ореол сохранён для совместимости) */
     col += uSunC*pow(max(dSt,0.0), 120.0)*0.8*uSunB;
 
     /* ореол атмосферы у лимба (лучи мимо планеты) */
@@ -1858,6 +1924,32 @@ void main(){
        Атмосфера планеты остаётся при взгляде на неё (b<0). */
     float atmFwd = 1.0 - smoothstep(-0.2, 0.4, b);
     float atmo = (1.0 - smoothstep(1.0, uAtmSize, closest))*atmFwd;
+    /* SUN-BODY v3.3: ХОРДОВАЯ атмосфера (camera-independent) — считаем длину
+       хорды луча внутри внешней оболочки (радиус uAtmSize) и используем её
+       для лимб-свечения. Внутренний ореол не зависит от камеры, не даёт
+       «синий шар» (фикс v3.2). */
+    float shellR = uAtmSize > 1.01 ? uAtmSize : 1.1;
+    float bA = dot(rd, camPos - sC);
+    float cA = dot(camPos - sC, camPos - sC) - shellR*shellR;
+    float hA = bA*bA - cA;
+    float tEnter = 0.0, chordShell = 0.0;
+    if(hA > 0.0){
+      float e = -bA - sqrt(hA);
+      float x2 = -bA + sqrt(hA);
+      if(e < 0.0) e = 0.0;
+      if(x2 > e){ chordShell = x2 - e; tEnter = e; }
+    }
+    /* лimb-glow: семплируем вдоль хорды оболочки у поверхности планеты */
+    float glowSun = 0.0;
+    float diSun = chordShell/8.0;
+    if(diSun > 0.0){
+      for(int si2 = 0; si2 < 8; si2++){
+        vec3 pxSun = camPos + rd*(tEnter + float(si2)*diSun);
+        float dSun2 = length(pxSun - sC);
+        glowSun += exp(-abs(dSun2 - 1.0)*16.0)*diSun;
+      }
+    }
+    col += atmC*glowSun*uAtmGlow*2.0*0.35*dayness;
     if(uPlanet < 2.5){
       col += atmC*atmo*dayness*atmIn*uAtmGlow;
       /* ЧИЗИЯ: анизотропное размытие входа в атмосферу — внешний ореол шире и мягче,
@@ -1973,7 +2065,7 @@ void main(){
           /* СТАР-ЛОД: звезда самосветится — дневная сторона всегда 1.0 */
           float isStar = (dk == 4) ? 1.0 : 0.0;
           float dlit = mix(smoothstep(-0.02, 0.10, dnl), 1.0, isStar);
-          if(isStar < 0.5){ dlit *= softShadowSDF(pp + nn*0.02, normalize(uStarPos - pp), sC); }
+          /* старая SDF-тень удалена: единый свет звезды */
           gRow = uPIa[di];
           gCur = 0.0;
           sphCol = shadeSurface(dk, nn, dlit, rd, normalize(uStarPos - pp));
@@ -2000,7 +2092,7 @@ void main(){
         vec3 nn4 = normalize(pp4 - uP4);
         float nl4  = dot(nn4, normalize(uStarPos - pp4));
         float lit4 = smoothstep(-0.02, 0.10, nl4);
-        lit4 *= softShadowSDF(pp4 + nn4*0.02, normalize(uStarPos - pp4), sC);
+        /* старая SDF-тень удалена: единый свет звезды */
         gRow = uPIcur;
         gCur = 1.0;
         sphCol = shadeSurface(int(uPK4 + 0.5), nn4, lit4, rd, normalize(uStarPos - pp4));
@@ -2042,21 +2134,27 @@ void main(){
           float gap = smoothstep(mix(uRingIn,uRingOut,0.3444), mix(uRingIn,uRingOut,0.3667), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.4333), mix(uRingIn,uRingOut,0.4556), rr));
           float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
           float edge = smoothstep(uRingIn, mix(uRingIn,uRingOut,0.0778), rr)*(1.0 - smoothstep(mix(uRingIn,uRingOut,0.9222), uRingOut, rr));
-          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
-          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
+          /* старая тень shadow удалена: только новая RING-SHADOW v4.1 (shadRing) */
+          float bright = (0.35 + 0.65*abs(dot(nR, sunDir)));
+          /* RING-SHADOW v4.1: тень ПЛАНЕТЫ на кольце (из shadeRing стенда).
+             Расстояние от точки кольца q до отрезка q->светило; затемняем кольцо
+             в тени планеты (расстояние от q до центра планеты <1 → за планетой). */
+          vec3 qN = q - vec3(0.0);
+          float shadRing = smoothstep(0.99, 1.15, segShadow(qN, sunDir*40.0));
           float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
           alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
           /* Убрать дальнюю дугу колец (за планетой от камеры): оставить только
              полукольцо на ближней стороне. dot(q,camPos)>0 — та же сторона, что камера. */
           float nearHalf = step(0.0, dot(q, camPos));
           alpha *= nearHalf;
-          col = mix(col, uRingC*bright, alpha*0.9);
+          /* тень планеты затемняет цвет кольца; пол не гаснет до #000, а до ~#111 */
+          col = mix(col, uRingC * (bright * mix(0.067, 1.0, shadRing)), alpha*0.9);
           /* ТУМАН В КОЛЬЦАХ (ЧИЗИЯ): лёгкая слоистая дымка, гуще у внутреннего края
              и на ночной стороне — как застывший туман диска кол. */
           float rngFog = fbm3(q*3.5 + vec3(uTime*0.015, 0.0, 0.0));
           float fogR = smoothstep(1.45, 1.55, rr)*(1.0 - smoothstep(1.9, 2.2, rr));
-          float fogRing = clamp((0.35 + 0.65*rngFog)*fogR*(0.6 + 0.4*shadow)*abs(denom)*20.0, 0.0, 1.0);
-          col = mix(col, uRingC*bright, fogRing*0.35);
+          float fogRing = clamp((0.35 + 0.65*rngFog)*fogR*abs(denom)*20.0, 0.0, 1.0);
+          col = mix(col, uRingC * (bright * mix(0.067, 1.0, shadRing)), fogRing*0.35);
         }
       }
     }
@@ -2072,7 +2170,42 @@ void main(){
   float vig = 1.0 - 0.16*dot(uv*0.6, uv*0.6);
   col *= max(vig, 0.0);
   gl_FragColor = vec4(col, 1.0);
-}`;
+}
+
+/* ============ SUN-BODY v3.3: физическое светило-шар + гало (из стенда
+   hitomi_planet_sunbody_stand_v3_3). Портировано как ОТДЕЛЬНАЯ программа-шейдер,
+   чтобы не ломать основной FRAG. Солнце raytrace-сферой на uSunDir, грануляция,
+   лимб-затемнение, гало. В этом билде блок закомментирован — включается
+   отдельным оверлеем в JS (см. блок установки шейдера света). */
+/*
+void sunBodyMain(){
+  vec2 sP = (-uRes.xy + 2.0*gl_FragCoord.xy)/uRes.y;
+  vec3 srd = normalize(sP.x*uCamR + sP.y*uCamU + 1.7*uCamF);
+  vec3 sro = uCamPos;
+  vec3 ssunPos = uSunDir * 40.0;
+  vec3 scs = sro - ssunPos;
+  float sbs = dot(srd, scs);
+  float scsq = dot(scs, scs) - uSunSize*uSunSize;
+  float shs = sbs*sbs - scsq;
+  vec3 sCol = vec3(0.0);
+  if(shs > 0.0){
+    float st0 = -sbs - sqrt(shs);
+    if(st0 > 0.0){
+      vec3 sunN = normalize(sro + st0*srd - ssunPos);
+      float limb = clamp(dot(sunN, -srd), 0.0, 1.0);
+      float gran = noise(sunN*18.0 + vec3(0.0, uTime*0.05, 0.0));
+      sCol = uSunC * (0.9 + 1.1*limb) * uSunBright * (1.6 + gran*0.7);
+    }
+  }
+  float sAng = uSunSize/40.0;
+  float sCosA = dot(srd, uSunDir);
+  float sW = max(2.5*sAng, 0.004);
+  float sHalo = exp(-pow(max(1.0 - sCosA, 0.0), 0.75)/(sW*sW));
+  sCol += uSunC*uSunBright*0.5*sHalo;
+  gl_FragColor = vec4(sqrt(max(sCol, vec3(0.0))), 1.0);
+}
+*/
+`;
 
 
 
@@ -2149,6 +2282,7 @@ const uCR = gl.getUniformLocation(prog, 'uCamR');
     const uBR = gl.getUniformLocation(prog, 'uBodyR');
 const uCU = gl.getUniformLocation(prog, 'uCamU');
 const uCF = gl.getUniformLocation(prog, 'uCamF');
+const uFovCin = gl.getUniformLocation(prog, 'uFovCin'); /* КИНО-FOV: масштаб FOT (1.0 = норма) */
 const uPL = gl.getUniformLocation(prog, 'uPlanet');
 const uSP = gl.getUniformLocation(prog, 'uSplash');
 const uP  = gl.getUniformLocation(prog, 'uP');
@@ -2173,6 +2307,9 @@ const uJetsOn = gl.getUniformLocation(prog, 'uJetsOn');
 const uSunC = gl.getUniformLocation(prog, 'uSunC');
 const uSunB = gl.getUniformLocation(prog, 'uSunB');
 const uSunR = gl.getUniformLocation(prog, 'uSunR');
+const uSunDir = gl.getUniformLocation(prog, 'uSunDir');
+const uSunSize = gl.getUniformLocation(prog, 'uSunSize');
+const uSunBright = gl.getUniformLocation(prog, 'uSunBright');
 const uJetsC1 = gl.getUniformLocation(prog, 'uJetsC1');
 const uJetsC2 = gl.getUniformLocation(prog, 'uJetsC2');
 const uJetsSp = gl.getUniformLocation(prog, 'uJetsSp');
@@ -2368,6 +2505,9 @@ var sunC = fxHex(f.sun, [1.0, 0.9569, 0.7529]);
 gl.uniform3f(uSunC, sunC[0], sunC[1], sunC[2]);
 gl.uniform1f(uSunB, f.sunB == null ? 1.0 : f.sunB);
 gl.uniform1f(uSunR, f.sunR == null ? 0.0008 : f.sunR);
+if(uSunDir){ var _sd = window.__sunDirNow ? window.__sunDirNow() : (function(){ var v = window.__uStarPosV || [0,0,0]; var l = Math.hypot(v[0],v[1],v[2])||1; return [v[0]/l,v[1]/l,v[2]/l]; })(); gl.uniform3f(uSunDir, _sd[0], _sd[1], _sd[2]); }
+if(uSunSize) gl.uniform1f(uSunSize, f.sunSize == null ? 1.2 : f.sunSize);
+if(uSunBright) gl.uniform1f(uSunBright, f.sunBright == null ? 1.0 : f.sunBright);
   gl.uniform1f(uAtmGlow, fxNum(f.glow, d.glow));
   gl.uniform1f(uAtmSize, fxNum(f.size, d.size));
   gl.uniform1f(uSpin, fxNum(f.spin, d.spin));
@@ -2528,6 +2668,7 @@ function frame(now){
   gl.uniform2f(uRes, cv.width, cv.height);
   gl.uniform1f(uT, simTime);
   gl.uniform1f(uSA, sunA);
+  gl.uniform1f(uFovCin, window.fovWarp || 1.0); /* КИНО-FOV в шейдере: 1.0 = норма, во время прыжка меняется по фазам */
   fxPush((g && g.active) ? g.planet : (window.__splashPlanet || 0));
   /* hyper: в гиперпространстве шейдер рисует небо Нгалин + 4 сферы + солнце */
   gl.uniform1f(uHY, hypOn ? 1.0 : 0.0);
@@ -2936,6 +3077,7 @@ function initTopPanel(){
   var lb = document.createElement('div');
   lb.style.cssText = 'font:700 12px/1 monospace;letter-spacing:2px;color:#4ae8ff;white-space:nowrap;';
   lb.textContent = '\u{1F4AA} FSD ЗАРЯД';
+  fsdChargeLabelEl = lb;
   fsdChargeWrap.appendChild(lb);
   fsdBarProgressEl = document.createElement('div');
   fsdBarProgressEl.style.cssText = 'position:relative;width:260px;height:14px;background:#051520;border:1px solid #0a4a5a;border-radius:6px;overflow:hidden;';
@@ -2964,6 +3106,21 @@ function updFsdChargeUi(){
   if(fsdSegCounterEl){
     var _tx = fsdCharge + '/' + fsdMax;
     if(fsdSegCounterEl.__t !== _tx){ fsdSegCounterEl.textContent = _tx; fsdSegCounterEl.__t = _tx; }
+  }
+}
+/* КИНО-ПАНЕЛЬ межзвёздного прыжка: общие показать/скрыть для окна FSD-зарядки */
+function fsdShowCharge(){
+  if(!fsdChargeWrap) return;
+  fsdChargeWrap.style.display = 'flex';
+  fsdChargeWrap.style.opacity = '1';
+}
+function fsdHideCharge(){
+  if(!fsdChargeWrap) return;
+  fsdChargeWrap.style.display = 'none';
+  fsdChargeWrap.style.opacity = '1';
+  if(fsdChargeLabelEl){
+    fsdChargeLabelEl.textContent = '\u{1F4AA} FSD ЗАРЯД';
+    fsdChargeLabelEl.style.color = '#4ae8ff';
   }
 }
 
@@ -3557,7 +3714,7 @@ var fsdBarEl = null, lastFsdMax = -1, fsdCharge = 0, fsdMax = 7;
 var fsdChargeProgress = 0, fsdActiveRate = 0; /* прогресс текущего сегмента 0..1 и активная скорость зарядки */
 var fsdPassiveT = 0, fsdPassiveGiven = 0; /* пассивная регенерация: аккумулятор + флаг — уже выдан 1 сегмент */
 var FSD_NEUTRON_TIME = 15, FSD_STAR_TIME = 60, FSD_PASSIVE_TIME = 180; /* сек на 1 сегмент: нейтрон/обычная звезда/пассив (пассив — максимум 1 сегмент всего) */
-var fsdChargeWrap = null, fsdBarProgressEl = null, fsdBarFillEl = null, fsdSegCounterEl = null;
+var fsdChargeWrap = null, fsdChargeLabelEl = null, fsdBarProgressEl = null, fsdBarFillEl = null, fsdSegCounterEl = null;
 function segRowHtml(id, label){
   var s = '<div style="display:flex;align-items:center;gap:8px;">'
     + '<span style="font:700 10px/1 monospace;letter-spacing:2px;color:#9fd9a0;">' + label + '</span>'
@@ -4316,11 +4473,13 @@ var inTransit = false;
 var FT = { pos: [0,0,0], fwd: [0,0,1], up: [0,1,0], right: [1,0,0] };
 var targetIdx = -1;
 var warp = null;
+var fovWarp = 1.0; /* кинематографичный FOV-масштаб во время межзвёздного прыжка: 1.0 = норма */
 /* Выставляем inTransit/warp в window через getter, чтобы webGL-фон (#glbg, отдельный IIFE)
    читал их актуальное значение каждый кадр и включал uHyper (гипер-рендер). */
 try{
   Object.defineProperty(window, 'inTransit', { get: function(){ return inTransit; }, configurable: true });
   Object.defineProperty(window, 'warp', { get: function(){ return warp; }, configurable: true });
+  Object.defineProperty(window, 'fovWarp', { get: function(){ return fovWarp; }, configurable: true });
 }catch(e){}
 Object.defineProperty(window, 'PW', { get: function(){ return PW; }, configurable: true });
 var skyWrap = null, skyWrapEls = [], skyCvEls = [], skyLblEls = [], skyRet = null;
@@ -5134,6 +5293,8 @@ function finishWarp(){
   warpShaderOn = false; warpFade = 0; warpST = 0;
   if(warpCv) warpCv.style.display = 'none';
   if(warpShaderCv){ warpShaderCv.style.display = 'none'; warpShaderCv.style.opacity = '1'; }
+  fsdHideCharge();
+  fovWarp = 1.0;
   switching = false;
   keys = {};
   if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} }
@@ -5145,6 +5306,8 @@ function cancelWarp(){
   warpShaderOn = false; warpFade = 0; warpST = 0;
   if(warpCv) warpCv.style.display = 'none';
   if(warpShaderCv){ warpShaderCv.style.display = 'none'; warpShaderCv.style.opacity = '1'; }
+  fsdHideCharge();
+  fovWarp = 1.0;
   switching = false;
   if(fsdAudio){ try{ fsdAudio.pause(); }catch(e){} }
   setSpaceMode();
@@ -5159,13 +5322,43 @@ function updWarp(dt){
   var inten = 0, streakSpd = 0;
 
   if(warp.isStar){
+    /* КИНО-FOV: зарядка плавно выкручивает впёред (+75% к норме), тоннель — резкий зум (20%),
+       по прибытии FOV резко возвращается в норму. */
+    if(warp.t < t1){
+      /* суб-фаза A1 зарядки: +75% плавно (1.0 → 1.75) */
+      var fv1 = 1 + 0.75*Math.min(1, warp.t/t1);
+      fovWarp = fv1;
+      if(warp.fovGlow === undefined) warp.fovGlow = false;
+    } else if(warp.t < t2){
+      /* суб-фаза A2 тоннель-входа: 20% */
+      var fv2 = 0.20 + 0.4*Math.max(0, 1 - (warp.t - t1)/Math.max(0.001, FSD_TUNNEL));
+      fovWarp = Math.max(0.20, fv2);
+    } else {
+      /* конец фазы A / фазы B/C: резко к норме */
+      fovWarp = 1.0;
+    }
     /* ============ МЕЖЗВЁЗДНЫЙ ПРЫЖОК: 3 фазы ============ */
     if(!warp.committed){
       /* ФАЗА A: текущая 2D-анимация (зарядка→туннель→выход) проигрывается ЦЕЛИКОМ.
          Задержка перед прыжком: реальное перемещение (коммит) происходит только
          в самом конце фазы A (t3t), чтобы анимация успела отыграть. */
-      if(warp.t < t1){ var p = warp.t/t1; inten = 0.25 + 0.65*p; streakSpd = 0.15 + 0.85*p; }
-      else if(warp.t < t2){ inten = 1; streakSpd = 1.6; }
+      if(warp.t < t1){
+        var p = warp.t/t1; inten = 0.25 + 0.65*p; streakSpd = 0.15 + 0.85*p;
+        /* КИНО-ПАНЕЛЬ фазы A: показываем окно зарядки от звезды, прогресс-бар = зарядка FSD */
+        fsdShowCharge();
+        if(fsdChargeLabelEl && fsdChargeLabelEl.textContent !== 'Идет зарядка FSD') fsdChargeLabelEl.textContent = 'Идет зарядка FSD';
+        if(fsdBarFillEl) fsdBarFillEl.style.width = Math.round(p*100) + '%';
+        if(fsdChargeWrap) fsdChargeWrap.style.opacity = '1';
+      }
+      else if(warp.t < t2){
+        inten = 1; streakSpd = 1.6;
+        /* конец зарядки → вход в тоннель: сообщение + панель плавно гаснет */
+        if(!warp.fractMg){ warp.fractMg = true; toastFx('FSD: ВКЛЮЧЕН ФРАКТАЛЬНЫЙ РЕЖИМ', '#4ae8ff'); }
+        if(fsdChargeWrap){
+          var _fade = Math.max(0, 1 - (warp.t - t1)/Math.max(0.001, FSD_TUNNEL*0.6));
+          fsdChargeWrap.style.opacity = String(_fade);
+        }
+      }
       else { var pe = (warp.t - t2)/FSD_EXIT; inten = Math.max(0, 1 - pe); streakSpd = Math.max(0.2, 1.6*(1 - pe)); }
       warpCv.style.display = 'block';
       if(warpShaderCv) warpShaderCv.style.display = 'none';
@@ -5180,6 +5373,16 @@ function updWarp(dt){
         /* ФАЗА B: прячем 2D-туннель, включаем шейдер-туннель на всё время движения */
         warpCv.style.display = 'none';
         if(warpShaderCv){ warpShaderCv.style.display = 'block'; warpShaderCv.style.opacity = '1'; }
+        /* КИНО-ПАНЕЛЬ: по прибытию в систему показываем её название в окне зарядки */
+        if(fsdChargeWrap && fsdChargeLabelEl){
+          var _sysName = (StarsDB[warp.target] && StarsDB[warp.target].name) || currentSystem;
+          fsdChargeLabelEl.textContent = '\u{1F30D} СИСТЕМА: ' + _sysName;
+          fsdChargeLabelEl.style.color = '#7dff8a';
+          if(fsdBarFillEl) fsdBarFillEl.style.width = '100%';
+          fsdChargeWrap.style.opacity = '1';
+          fsdChargeWrap.style.display = 'flex';
+          warp.arriveShown = true;
+        }
       }
     } else {
       /* ФАЗА B: во время перемещения играет шейдер-туннель */
