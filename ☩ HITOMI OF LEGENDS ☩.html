@@ -2798,6 +2798,11 @@ var CFG = {
   SPD_MAX: 0.22,   /* потолок у планеты; в гипере: SPD_MAX*(1+(d-2)*FSD_SC_GAIN), не выше SPD_MAX*FSD_SC_CAP */
   SPD_DEF: 0.055,  /* скорость при старте */
   SPD_RATE: 0.16,  /* РАЗГОН: прирост скорости в секунду, ед./с² (W — разгон, S — тормоз) */
+  /* ---------- ПОЛЁТ: ИНЕРЦИЯ (Флайт-Ассист) ---------- */
+  FA_ON: true,      /* Флайт-Ассист: ОН = нос ведёт вектор скорости; ОФФ = инерция по vel */
+  FA_INERTIA: 0.92, /* при FA ОФФ — доля скорости, что живёт в векторе vel (инерция) */
+  FA_HOME: 0.20,    /* при FA ОН — скорость, с которой vel «догоняет» нос (0..1, чем выше тем быстрее) */
+  FA_BRAKE: 1.2,   /* при FA ОН без W — скорость плавного гашения инерции (торможение к 0) */
   /* ---------- ПОЛЁТ: РУЛИ ---------- */
   YAW_MAX: 0.90,   /* рыскание A/D, рад/с — предельная угловая скорость */
   PITCH_MAX: 0.75, /* тангаж ↑/↓, рад/с (не работает, пока ведёт мышь) */
@@ -2884,7 +2889,7 @@ function rotAxis(v, k, ang){
 /* ---------- ПОЛЁТ: состояние ---------- */
 var CAMR0 = 1.0 + 1000.0/bodyRadiusKm(0); /* старт полёта — от радиуса стартового тела */
 var A0 = 0.0;
-var F = { pos: [Math.cos(A0)*CAMR0, Math.sin(A0)*CAMR0, 0], fwd: null, up: null, right: null };
+var F = { pos: [Math.cos(A0)*CAMR0, Math.sin(A0)*CAMR0, 0], fwd: null, up: null, right: null, vel: null };
 function resetBasis(){
   var f0 = [-Math.sin(A0), Math.cos(A0), 0];
   var u0 = norm(F.pos);
@@ -2892,6 +2897,7 @@ function resetBasis(){
   F.fwd = norm(f1);
   F.right = norm(cross(F.fwd, u0));
   F.up = cross(F.right, F.fwd);
+  F.vel = F.fwd.slice(); /* вектор инерции стартует по носу (FA ON по умолчанию) */
 }
 resetBasis();
 var yawV = 0, pitchV = 0, rollV = 0, speed = CFG.SPD_DEF;
@@ -3873,6 +3879,54 @@ var bearWrap = null;
   }catch(e){ bearWrap = null; }
 })();
 
+/* ---------- UI-СТРЕЛКИ УПРАВЛЕНИЯ вокруг корабля (drag: потянул — корабль поворачивается) ---------- */
+var shipTune = null, shipTuneEl = null;
+function buildShipArrows(){
+  if(shipTuneEl && shipTuneEl.parentNode) return;
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;z-index:52;pointer-events:none;display:none;';
+  el.setAttribute('data-keep','4');
+  shipTuneEl = el;
+  var mk = function(sym, tx, ty, key){
+    var d = document.createElement('div');
+    d.style.cssText = 'position:absolute;left:50%;top:50%;width:56px;height:56px;transform:translate(-50%,-50%) translate(' + tx + 'px,' + ty + 'px);display:flex;align-items:center;justify-content:center;font:900 20px/1 monospace;color:#4ae8ff;background:rgba(4,20,32,.55);border:2px inset #0a4a5a;border-radius:8px;pointer-events:auto;cursor:grab;user-select:none;text-shadow:0 0 6px rgba(74,232,255,.8);';
+    d.textContent = sym;
+    d.dataset.tune = key;
+    (function(elm, kx){
+      elm.addEventListener('pointerdown', function(ev){
+        if(!gameOn || paused || warp) return;
+        ev.stopPropagation(); ev.preventDefault();
+        elm.setPointerCapture(ev.pointerId);
+        shipTune = { key: kx, el: elm, sx: ev.clientX, sy: ev.clientY, v: 0 };
+      });
+    })(d, key);
+    el.appendChild(d);
+    return d;
+  };
+  mk('▲',   0, -64, 'p_up');
+  mk('▼',   0,  64, 'p_dn');
+  mk('◀', -64,   0, 'y_l');
+  mk('▶',  64,   0, 'y_r');
+  mk('⟳', -70, -70, 'r_l');
+  mk('⟲',  70, -70, 'r_r');
+  document.body.appendChild(el);
+  document.addEventListener('pointermove', function(ev){
+    if(!shipTune) return;
+    var dx = ev.clientX - shipTune.sx, dy = ev.clientY - shipTune.sy;
+    shipTune.sx = ev.clientX; shipTune.sy = ev.clientY;
+    var k = CFG.DRAG_YAW*120;
+    var MF = inTransit ? FT : F;
+    var kk = shipTune.key;
+    if(kk === 'y_l'){ MF.fwd = norm(rotAxis(MF.fwd, MF.up, -dx*k)); MF.right = norm(rotAxis(MF.right, MF.up, -dx*k)); }
+    else if(kk === 'y_r'){ MF.fwd = norm(rotAxis(MF.fwd, MF.up,  dx*k)); MF.right = norm(rotAxis(MF.right, MF.up,  dx*k)); }
+    else if(kk === 'p_up'){ MF.fwd = norm(rotAxis(MF.fwd, MF.right, -dy*k)); MF.up = norm(rotAxis(MF.up, MF.right, -dy*k)); }
+    else if(kk === 'p_dn'){ MF.fwd = norm(rotAxis(MF.fwd, MF.right,  dy*k)); MF.up = norm(rotAxis(MF.up, MF.right,  dy*k)); }
+    else if(kk === 'r_l'){ MF.right = norm(rotAxis(MF.right, MF.fwd, -dx*k*0.6)); MF.up = norm(rotAxis(MF.up, MF.fwd, -dx*k*0.6)); }
+    else if(kk === 'r_r'){ MF.right = norm(rotAxis(MF.right, MF.fwd,  dx*k*0.6)); MF.up = norm(rotAxis(MF.up, MF.fwd,  dx*k*0.6)); }
+  });
+  document.addEventListener('pointerup', function(){ shipTune = null; });
+}
+
 /* ---------- ПРОЕКЦИЯ И ПЕРЕКРЫТИЯ ---------- */
 var RING_N = norm([0.22, 1.0, 0.18]);
 var RING_IN = 1.45, RING_OUT = 2.35, GAP_IN = 1.76, GAP_OUT = 1.86;
@@ -4099,6 +4153,7 @@ function physics(dt){
   rollV  += (tr*CFG.ROLL_MAX  - rollV)*k;
   if(keys.KeyW) speed += CFG.SPD_RATE*boostMul*dt;
   if(keys.KeyS) speed -= CFG.SPD_RATE*dt;
+  speed = Math.max(-CFG.SPD_MAX*boostMul, Math.min(CFG.SPD_MAX*boostMul, speed));
   var dn = -1, dd = 1e9;
   if(inTransit){
     for(var ki = 0; ki < PW.length; ki++){
@@ -4107,12 +4162,12 @@ function physics(dt){
     }
     var ceil = CFG.SPD_MAX*(1 + Math.max(0, dd - 2)*FSD_SC_GAIN);
     ceil = Math.min(ceil, CFG.SPD_MAX*FSD_SC_CAP)*boostMul;
-    speed = Math.max(CFG.SPD_MIN, Math.min(ceil, speed));
+    speed = Math.max(-CFG.SPD_MAX*boostMul*FSD_SC_CAP, Math.min(ceil, speed));
     /* ГИПЕРПРОСТРАНСТВО = свободный 3D-полёт во все стороны, как вокруг планеты,
        только в мировых координатах: без принудительного коридора/перегона.
        FT.pos двигается по направлению взгляда (ниже: P.pos += P.fwd*speed*dt). */
   } else {
-    speed = Math.max(CFG.SPD_MIN, Math.min(CFG.SPD_MAX*boostMul, speed));
+    speed = Math.max(-CFG.SPD_MAX*boostMul, Math.min(CFG.SPD_MAX*boostMul, speed));
   }
   if(Math.abs(rollV) > 1e-6){
     P.right = rotAxis(P.right, P.fwd, rollV*dt);
@@ -4134,7 +4189,38 @@ function physics(dt){
     if(inTransit){ FT.pos = PW[planet].slice(); FT.fwd = [0,0,1]; FT.up = [0,1,0]; FT.right = [1,0,0]; }
     else resetBasis();
   }
-  P.pos = add(P.pos, mul(P.fwd, speed*dt));
+  /* ФЛАЙТ-АССИСТ: направление скорости (vel) отдельно от носа (fwd).
+     FA ON: vel «догоняет» нос. FA OFF: vel сохраняет инерцию. Движение всегда по vel. */
+  if(!P.vel || !P.vel.length) P.vel = P.fwd.slice();
+  speed = Math.max(-CFG.SPD_MAX*boostMul, Math.min(CFG.SPD_MAX*boostMul, speed));
+  if(CFG.FA_ON){
+    /* FA ON: нос правит направлением. vel плавно сходится к fwd (скорость «прилипает» к взгляду).
+       Плавное торможение: гасим компоненту vel поперёк носа, чтобы корабль ложился на курс. */
+    var kF = Math.min(1, dt*(CFG.FA_HOME==null?0.2:CFG.FA_HOME)*12);
+    P.vel = norm(add(P.vel, mul(P.fwd, kF)));
+    /* ПЛАВНОЕ СНИЖЕНИЕ при ФА ОН: если W не нажат — скорость плавно стремится к 0 (лётчик гасит инерцию),
+       как в Elite при включённом Flight Assist и отпущенной тяге. */
+    if(!keys.KeyW){
+      var brk = Math.min(1, dt*(CFG.FA_BRAKE==null?1.2:CFG.FA_BRAKE));
+      speed += (0 - speed)*brk;
+    }
+    /* мягкое погашение скольжения поперёк носа (иначе при ФА ОН с поворотом плывёт боком) */
+    var lat = sub(P.vel, mul(P.fwd, dot(P.vel, P.fwd)));
+    var latL = len(lat);
+    if(latL > 1e-5){ var latK = Math.min(1, dt*4.5); P.vel = norm(sub(P.vel, mul(lat, latK))); }
+    P.vel = norm(add(P.vel, mul(P.fwd, speed*Math.sign(keys.KeyW||0||speed||1) * 0.0))); /* (зарезервировано) */
+  } else {
+    /* FA OFF: vel сохраняет направление; W/S уже меняют speed (выше, глобально).
+       Нос можно отвернуть как угодно — корабль продолжит скользить по vel. */
+    var iw = (CFG.FA_INERTIA==null?0.92:CFG.FA_INERTIA);
+    /* tiny friction чтоб не гуляло по инерции вечно */
+    speed *= (1 - Math.min(1, dt*0.02));
+    /* лёгкое угасание поперечной инерции (не обязательное, но красивее) */
+    var wrt = dot(P.vel, P.fwd);
+    if(wrt < 0){ P.vel = norm(add(mul(P.vel, iw), mul(P.fwd, (1-iw)*(-wrt*0.5)))); }
+  }
+  if(P.vel && len(P.vel) < 1e-6) P.vel = P.fwd.slice();
+  P.pos = add(P.pos, mul(P.vel, speed*dt));
   if(inTransit){
     /* ТВЁРДЫЕ ШАРЫ ВЕЗДЕ: в гиперпространстве нельзя пролететь сквозь планеты/звезду.
        Для каждого тела — сфера столкновения радиуса HYP_R (рендер R=1 + запас корабля).
@@ -4372,10 +4458,66 @@ function initPausePanel(){
     + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Кексик +3 EXP, сыр +5 EXP, луна +10 EXP (крупные — вдвое)<br>500 EXP — ЧИЗИЯ, 1500 EXP — НГАЛИН, 2250 EXP — ШИНРАРТА-B<br>7000 EXP — РЕЙС ПРОЙДЕН: ПРОДОЛЖИТЬ ИЛИ СНАЧАЛА<br>Добыча наполняет Форсаж: кексик +2%, сыр +1%, луна +5%<br>Форсаж — разгон до ×2.5, тает за 10 с, реген 100% за 90 с<br>Магнит — 12 с притяжения, Залп — 10 снарядов, Цель — 5 самонаводящихся<br>Вспышка — перчики исчезают на 10 с, Заморозка — стоп на 16 с<br>Обменник — кексики ↔ сыр 1:1, обратно 1 кексик = 2 сыра</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#ff5a4a;">ПРАВИЛА</div>'
     + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Собирайте кексики и сыр, открывайте планеты за EXP<br>Перчик отнимает 1 HP и опустошает шкалу Форсажа на 5%<br>Аптечка восстанавливает 1 HP (максимум 8)<br>Нулевая провизия игру не завершает — опасен только ноль HP<br>HP = 0 — Game Over</div>'
+    + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#4ae8ff;">ДИНАМИКА КОРАБЛЯ</div>'
+    + '<div id="shipDyn" style="display:flex;flex-direction:column;gap:4px;align-items:stretch;width:320px;"></div>'
     + '<button id="pauseBtn" style="width:192px;">ПРОДОЛЖИТЬ</button>';
   pauseEl.setAttribute('data-keep','1');
   document.body.appendChild(pauseEl);
   document.getElementById('pauseBtn').addEventListener('click', function(){ setPaused(false); });
+  buildShipDyn(); /* ползунки динамики корабля */
+}
+
+/* ДИНАМИКА КОРАБЛЯ: ползунки-конфиг прямо в игре (пишут в CFG/F, применяются сразу). */
+function buildShipDyn(){
+  var root = document.getElementById('shipDyn');
+  if(!root || root.__done) return;
+  root.__done = true;
+  if(CFG.FA_INERTIA == null) CFG.FA_INERTIA = 0.92; /* инерция FA OFF: доля скорости, что сохраняется в vel */
+  var rows = [
+    ['YAW_MAX',   'РЫСКАНИЕ (A/D)',  0.1, 2.5, 0.01, function(v){ return v.toFixed(2)+' рад/с'; }],
+    ['PITCH_MAX', 'ТАНГАЖ (↑/↓)',   0.1, 2.5, 0.01, function(v){ return v.toFixed(2)+' рад/с'; }],
+    ['ROLL_MAX',  'КРЕН (Q/E)',     0.1, 3.0, 0.01, function(v){ return v.toFixed(2)+' рад/с'; }],
+    ['DRAG_YAW',  'ЧУВСТВ. МЫШИ Y', 0.001, 0.01, 0.0002, null],
+    ['DRAG_PITCH','ЧУВСТВ. МЫШИ P', 0.001, 0.01, 0.0002, null],
+    ['SPD_RATE',  'РАЗГОН (W)',     0.02, 0.6, 0.01, function(v){ return v.toFixed(2)+' ед/с²'; }],
+    ['FA_INERTIA','ИНЕРЦИЯ FA OFF', 0.0, 1.0, 0.01, function(v){ return Math.round(v*100)+'%'; }],
+    ['FA_BRAKE',  'ТОРМОЖ. ФА ОН',  0.0, 3.0, 0.05, function(v){ return v.toFixed(1); }]
+  ];
+  rows.forEach(function(r){
+    var key = r[0], label = r[1], mn = r[2], mx = r[3], st = r[4], fmt = r[5];
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;font:700 10px/1 monospace;color:#cfd2e8;white-space:nowrap;';
+    var lab = document.createElement('span'); lab.style.cssText = 'flex:0 0 132px;'; lab.textContent = label;
+    var inp = document.createElement('input');
+    inp.type = 'range'; inp.min = mn; inp.max = mx; inp.step = st; inp.value = CFG[key];
+    inp.style.cssText = 'flex:1;accent-color:#4ae8ff;';
+    var val = document.createElement('span'); val.style.cssText = 'flex:0 0 84px;text-align:right;';
+    var paint = function(){ val.textContent = fmt ? fmt(+inp.value) : (+inp.value).toFixed(3); };
+    inp.addEventListener('input', function(){ CFG[key] = +inp.value; paint(); });
+    paint();
+    row.appendChild(lab); row.appendChild(inp); row.appendChild(val);
+    root.appendChild(row);
+  });
+  /* переключатель Флайт-Ассист */
+  var faRow = document.createElement('div');
+  faRow.style.cssText = 'display:flex;align-items:center;gap:8px;font:700 10px/1 monospace;color:#cfd2e8;margin-top:6px;';
+  var faLab = document.createElement('span'); faLab.style.cssText = 'flex:0 0 132px;'; faLab.textContent = 'ФЛАЙТ-АССИСТ';
+  var faBtn = document.createElement('button');
+  faBtn.style.cssText = 'flex:1;font:700 11px/1 monospace;letter-spacing:1px;';
+  var paintFa = function(){ faBtn.textContent = CFG.FA_ON ? '● ФА ОН' : '○ ФА ОФФ'; faBtn.style.color = CFG.FA_ON ? '#7dff8a' : '#ff9a5a'; };
+  faBtn.addEventListener('click', function(){ FA_syncBtn(); }); /* состояние задаёт X/клавиша; кнопка лишь отображает */
+  faRow.appendChild(faLab); faRow.appendChild(faBtn); root.appendChild(faRow);
+  paintFa();
+  if(CFG.FA_ON == null) CFG.FA_ON = true;
+}
+/* Синхронизация кнопки "ФЛАЙТ-АССИСТ" в панели с CFG.FA_ON (не переключает — состояние задаёт клавиша X). */
+function FA_syncBtn(){
+  if(CFG.FA_ON == null) CFG.FA_ON = true;
+  var faBtn = document.querySelector('#shipDyn button');
+  if(faBtn){
+    faBtn.textContent = CFG.FA_ON ? '● ФА ОН' : '○ ФА ОФФ';
+    faBtn.style.color = CFG.FA_ON ? '#7dff8a' : '#ff9a5a';
+  }
 }
 
 /* ---------- FSD: ГИПЕРПРЫЖОК, СУПЕРКРУИЗ, ПЛАНЕТЫ НА СКАЙБОКСЕ ---------- */
@@ -5682,6 +5824,17 @@ window.addEventListener('keydown', function(e){
     else useHot(hotSel);
     return;
   }
+  if(gameOn && !paused && !warp && e.code === 'KeyZ' && !e.repeat){
+    e.preventDefault(); e.stopPropagation();
+    speed = 0; /* СТОП: сброс скорости */
+    return;
+  }
+  if(gameOn && !paused && !warp && e.code === 'KeyX'){
+    e.preventDefault(); e.stopPropagation();
+    CFG.FA_ON = false; /* X зажата → Флайт-Ассист ОФФ (инерция) */
+    if(FA_syncBtn) FA_syncBtn();
+    return;
+  }
   if(gameOn && !paused && !warp && /^Digit[1-7]$/.test(e.code) && !e.repeat){
     e.preventDefault(); e.stopPropagation();
     hotSelect(parseInt(e.code.slice(5), 10) - 1);
@@ -5703,11 +5856,17 @@ window.addEventListener('wheel', function(e){
   hotSelect((hotSel + (e.deltaY > 0 ? 1 : HOT_DEFS.length - 1)) % HOT_DEFS.length);
 }, { passive: false });
 window.addEventListener('keyup', function(e){
+  if(e.code === 'KeyX'){
+    CFG.FA_ON = true; /* X отпущена → Флайт-Ассист ОН */
+    e.preventDefault(); e.stopPropagation();
+    if(FA_syncBtn) FA_syncBtn();
+    return;
+  }
   if(!gameOn || paused || !KEYSET[e.code]) return;
   e.preventDefault(); e.stopPropagation();
   keys[e.code] = 0;
 }, true);
-addEventListener('blur', function(){ keys = {}; drag = null; });
+addEventListener('blur', function(){ keys = {}; drag = null; CFG.FA_ON = true; if(FA_syncBtn) FA_syncBtn(); });
 window.addEventListener('pointerdown', function(e){
   if(!gameOn || mouseCtl) return;
   var t = e.target;
@@ -6171,6 +6330,7 @@ initTopPanel();
 initBottomPanel();
 initGoPanel();
 initPausePanel();
+buildShipArrows(); /* UI-стрелки управления вокруг корабля */
 applyGameMode();
 updHud();
 requestAnimationFrame(loop);
