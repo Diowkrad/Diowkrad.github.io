@@ -4,660 +4,466 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="Diowkrad" content="2011-2026, Example Inc.">
-<title>🧸 ☩ Diowkrad Studio ☩ 🥈 </title>
+<title>🧸 ☩ Diowkrad Studio ☩ 🥈</title>
 <link rel="shortcut icon" href="https://diowkrad.github.io/css/img/diowkrad.ico" type="image/x-icon">
-<meta name="description" content="☩ Diowkrad Studio ☩ Это фрилансерская студия по разработки различной сложности веб решений. Основное направления : Web дизайн ,GameDev, JS-Audio. Есть свои разработки. Меня зовут Михаил . Я АРЧ-разработчик с опытом более 15 лет . В сети интернет я известен под ником Diowkrad . Происхождения ника: ID-Deep-Void именно эти слова были мной перемешанны в нике. Это мой GitHub и вы можите сами ознакомится с проэктом ближе."/>
+<meta name="description" content="☩ Diowkrad Studio ☩ — студия одного разработчика: веб-разработка, компьютерная помощь, портфолио и архив решений.">
 <style>
-/* ============================================================
-   ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE — CSS - ☩
-   Селекторы отсортированы по группам, внутри группы — по алфавиту:
-   1) ТЕГИ и служебные селекторы;
-   2) ID;
-   3) КЛАССЫ;
-   4) АНИМАЦИЯ.
-   BUILD v1.2.5 «Finale»
-   База v1.0.37 «МОБИЛЬНЫЙ РОЛЛ»
-   ============================================================ */
+/* ==========================================================================
+   DIOWKRAD STUDIO — VISTA DARK EDITION
+   Тёмная тема Windows Vista / Aero: чёрное стекло, синие блики, глянец
+   Перевёрстка с нуля. Содержание сайта сохранено.
+   ========================================================================== */
 
-.rack-mount {
-         width: 100%;
-    max-width: 920px;
-    
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 18px rgba(79,142,233,0.12), 0 0 46px rgba(79,142,233,0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background-image: /* Слой 1: зерно (чуть светлее базы) */ repeating-radial-gradient(circle at 50% 50%, rgb(0 3 30 / 8%) 0px, #000000ad 2px, #00000087 2px, #00000096 4px), /* Слой 2: микро‑блики для объёма */ repeating-radial-gradient(circle at 50% 50%, #1a000080 0px, #001a00a6 1px, #00002ea8 1px, #000000b8 6px);
-    background-size: 2px 1px, 18px 18px;
-    border: 4px outset #995500;
-	align-items: stretch;
-    }
-
-
-
-/* ---------- 0. Подпись в нижней панели ---------- */
-.span_b{
-  display:flex;
-  flex-direction:column;
-  justify-content:space-evenly;
-  flex-wrap:nowrap;
-  align-items:center;
-  background:#031;
-  padding:8px;
-  border:6px inset #1a1a2e;
-}
-
-/* ---------- 1. ТЕГИ И СЛУЖЕБНЫЕ СЕЛЕКТОРЫ ---------- */
-
+/* ---------- 1. ПЕРЕМЕННЫЕ ---------- */
 :root{
-  --bg: #0f0f1b;
-  --bg-panel: #0b0f16;   /* непрозрачный фон панелей/клавиатур — закрывает фон-звезду, чтобы Keys не просвечивали сквозь звезду */
-  --panel: #1a1a2e;
-  --gold: #f7cc1d;
-  --cyan: #7dff8a;
-  --key-white: #fff;
-  --key-black: #16161d;
-  --accent: #4f8ee9;
+  --ink-0:#05080e;
+  --ink-1:#080d16;
+  --ink-2:#0c1421;
+  --ink-3:#111d2e;
+  --glass:rgba(14,26,42,.72);
+  --glass-2:rgba(20,36,56,.55);
+  --line:rgba(122,178,232,.22);
+  --line-2:rgba(150,200,245,.38);
+  --txt:#c3d8ee;
+  --txt-soft:#8aa6c4;
+  --txt-dim:#63799a;
+  --head:#eaf4ff;
+  --cyan:#5fd0ff;
+  --blue:#2f8fe0;
+  --blue-2:#1b5fa8;
+  --glow:0 0 22px rgba(64,150,235,.35);
 }
 
-/* ЧЕЛЛЕНДЖ-ЛОГ: tap-highlight живёт строго на таче */
-@media (pointer: coarse) {
-  * { -webkit-tap-highlight-color: transparent; }
-}
-
-/* глобальный сброс */
-*{ box-sizing:border-box; margin:1px; padding:0; }
-
-::-webkit-scrollbar{ width:12px; }
-
-::-webkit-scrollbar-track{
-  background: #140;
-    border: 1px solid #950;
-    border-radius: 1px;
-    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #031 2px, #000000 2px, #000000 4px), repeating-radial-gradient(circle at 50% 50%, #29ff00 1px, #008951 1px, #027729 1px, #0a1a12 6px);
-    background-size: 5px 4px, 12px 12px;
-}
-
-::-webkit-scrollbar-thumb{
-  background-color:#207;
-  border-radius:4px;
-  border:3px solid #950;
-}
-
-html{
-  background:#103;
-}
+/* ---------- 2. БАЗА ---------- */
+*{ box-sizing:border-box; }
+html, body{ margin:0; min-height:100%; }
 body{
-  background:transparent;
-    background: transparent;
-    color: var(--text-main);
-    margin: 0;
-    padding: 5px 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-/* чип-кнопка */
-button{
-  font-family:inherit;
-  background:#222;
-  color:var(--gold);
-  border:4px outset #950;
-  padding:6px 14px;
-  cursor:pointer;
-  box-shadow:2px 2px 0 #000;
-  font-size:0.85rem;
-  width:180px;
-  height:40px;
-  background-image:
-    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
-    repeating-radial-gradient(circle at 50% 50%, #111 0px, #333 1px, #111 1px, #222 6px);
-  background-size: 2px 2px, 18px 18px;
-}
-
-button:hover{
-  box-shadow:0 0 10px rgba(247,204,29,0.55), 0 0 20px rgba(247,204,29,0.25), 2px 2px 0 #000;
-}
-button:active{
-  transform:translateY(1px);
-}
-
-/* активная кнопка */
-button.on{
-  background:#f79e1d;
-  color:#99fffc;
-  background-image:
-    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
-    repeating-radial-gradient(circle at 50% 50%, #000000 0px, #000000 1px, #1a1a2e 1px, #03000b 6px);
-  background-size: 2px 2px, 9px 9px;
-  border:4px outset #4f8ee9;
-  box-shadow:0 0 12px rgba(79,142,233,0.65), 0 0 26px rgba(79,142,233,0.35), 2px 2px 0 #000;
-  text-shadow:0 0 6px rgba(153,255,252,0.8);
-}
-
-/* вывеска */
-h1 h2 h3{
-  color:var(--gold);
-  font-size:1.4rem;
-  letter-spacing:3px;
-  margin-bottom:12px;
-  text-shadow:2px 2px 0 #7a5c00, 0 0 10px rgba(247,204,29,.55);
-  border:4px outset #950;
-  background:#1a1a2e;
-  padding:6px;
-  background-image:
-    repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px),
-    repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
-  background-size: 12px 12px, 18px 18px;
-}
-
-/* загрузчик банка и выпадающие списки */
-input[type=file],
-select{
-  font-family:inherit;
-  background:#111;
-  color:var(--cyan);
-  border:4px outset #950;
-  padding:4px;
-  max-width:340px;
-  font-size:0.8rem;
-}
-
-/* ползунки */
-input[type=range]{
-  accent-color:#3bc3d6;
-  width:140px;
-}
-input[type=range]{
-  accent-color:#f90;
-  width:460px;
-  -webkit-appearance:none;
-  background:#0a2a12;
-  border:4px outset #950;
-  outline:none;
-  border-radius:16px;
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:14px;
-  height:14px;
-  background:#f90;
-  border:2px solid var(--panel);
-  border-radius:50%;
-  margin-top:-5px;
-  box-shadow:0 0 6px rgba(249,153,0,.9), 0 0 14px rgba(249,153,0,.5);
-}
-input[type=range]::-moz-range-track{
-  height:6px;
-  background:#0a2a12;
-  border:1px solid var(--gold);
-  border-radius:3px;
-}
-input[type=range]::-moz-range-thumb{
-  width:14px;
-  height:14px;
-  background:#f90;
-  border:2px solid var(--panel);
-  border-radius:50%;
-}
-
-/* ---------- 2. ID ---------- */
-
-#keys{
-  position:relative;
-  height:152px;
-  width:100%;
-  user-select:none;
-  touch-action:none;
+  font-family:"Segoe UI", Tahoma, Verdana, sans-serif;
+  font-size:14px;
+  color:var(--txt);
+  background:var(--ink-0);
+  min-height:100vh;
+  overflow-x:hidden;
   display:flex;
-  box-shadow:4px 4px 0 #000;
-  border:4px outset #950;
-  margin-bottom:10px;
-}
-
-#keys2{
-  position:relative;
-  height:152px;
-  width:100%;
-  user-select:none;
-  touch-action:none;
-  display:flex;
-  box-shadow:4px 4px 0 #000;
-  border:4px outset #950;
-  margin-bottom:10px;
-}
-
-
-
-/* ---------- 3. КЛАССЫ ---------- */
-
-a.btn{
-  display:inline-block;
-  font-family:inherit;
-  background:#222;
-  color:var(--gold);
-  border:4px outset #950;
-  padding:6px 14px;
-  cursor:pointer;
-  box-shadow:2px 2px 0 #000;
-  font-size:0.85rem;
-      width: 280px;
-  height:40px;
-  line-height:22px;
-  text-align:center;
-  text-decoration:none;
-  background-image:
-    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
-    repeating-radial-gradient(circle at 50% 50%, #111 0px, #333 1px, #111 1px, #222 6px);
-  background-size:2px 2px, 18px 18px;
-}
-a.btn:hover{ filter:brightness(1.25); }
-a.btn:active{ border-style:inset; }
-
-
-.bk{
-  position:absolute;
-  top:0;
-  height:60%;
-  background:var(--key-black);
-  border:2px solid #000;
-  z-index:2;
-  cursor:pointer;
-  touch-action:none;
-  transition:0.2s;
-  CORNER-SHAPE: SUPERELLIPSE(0.4);
-  border-radius: 0px 0px 12px 12px;
-}
-.bk:hover{
-  background:#333;
-  border:2px solid #f90;
-}
-.bk.act{ background:var(--accent) !important; }
-
-.lbl{
-  font-size:0.75rem;
-  position:absolute;
-  bottom:2px;
-  width:96%;
-  text-align:center;
-  color:#ffffff;
-  pointer-events:none;
-  text-shadow:2px 2px 6px #00000080;
-  background:#00000080;
-  text-emphasis-style:"☩";
-  border-radius:8px;
-  CORNER-SHAPE: SUPERELLIPSE(-0.7);
-  border:1px double #950;
-}
-
-/* LCD-экран */
-.lcd{
-      background: #00000061;
-    border: 6px inset #1a1a2e;
-    color: #a3ff52;
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    margin: 10px 5px 0px 5px;
-    height: 320px;
-    width: 240px;
-    max-width: 100%;
-    overflow: auto;
-    line-height: 150%;
-    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06bd 2px, #000000bd 2px, #000000bd 4px), repeating-radial-gradient(circle at 50% 50%, #000000b0 1px, #000000b0 1px, #0a1a12b0 1px, #0a1a12b0 6px);
-    background-size: 2px 3px, 12px 12px;
-}
-
-/* анимированная вывеска */
-.logotype{
-  padding:5px 5px;
-  animation:gradientMove 30s ease infinite;
-}
-
-/* окно-панель (и таб-бар) */
-.panel{
-  background:#1a1a2e;
-  border:4px outset #950;
-  display:flex;
-  flex-wrap:wrap;
-  justify-content: center;
-  flex-direction:row;
-  align-content:flex-start;
-  margin: 12px;
-  background-image:
-    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #000000 2px, #000000 2px, #000000 4px),
-    repeating-radial-gradient(circle at 50% 50%, #1a0000 0px, #001a00 1px, #00002e 1px, #000000 6px);
-  background-size: 2px 1px, 18px 18px;
-}
-
-.panel_2{
-      background: #1a1a2e;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    flex-direction: row;
-    align-content: flex-start;
-    margin: 12px;
-        background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #000000 2px, #000000 2px, #000000 4px), repeating-radial-gradient(circle at 50% 50%, #150044 0px, #272771 1px, #2f2f2f 1px, #000000 6px);
-        background-size: 2px 2px, 28px 30px;
-    border: 6px inset #1a1a2e;
-}
-/* правая колонка панели */
-.panel_buttons{
-  display:flex;
-  flex-wrap:nowrap;
-  justify-content:flex-start;
-  margin:10px 15px;
   flex-direction:column;
-  width:760px;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{ background:rgba(95,208,255,.28); color:#fff; }
+
+/* ---------- 3. ФОН: градиент + звёздный шейдер + виньетка ---------- */
+#sky-bg{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 108%, #14406b 0%, #0b2138 34%, #061020 62%, #03060c 100%),
+    linear-gradient(180deg, #04070d 0%, #060c16 100%);
+}
+#stars{ position:fixed; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none; }
+#sky-vignette{
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  background:radial-gradient(ellipse 85% 70% at 50% 42%, transparent 38%, rgba(0,4,10,.55) 78%, rgba(0,2,6,.88) 100%);
 }
 
-/* панель с кнопками под LCD */
-.panel_buttons_c{
-  display:inline-grid;
-  grid-auto-flow:row dense;
-  justify-items:start;
-  align-items:center;
-  justify-content:start;
-  align-content:start;
+/* ---------- 4. ОБОЛОЧКА ---------- */
+.shell{
+  position:relative; z-index:3;
+  width:min(1080px, 94vw);
+  margin:28px auto 56px;
 }
 
-/* внутренний ряд панели */
-.panel_lcd{
-    display: flex;
-    justify-content: flex-start;
-    align-content: flex-start;
-    margin: 15px;
-    align-items: stretch;
-    flex-wrap: wrap;
-}
-
-/* горизонтальный ряд */
-.row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-  margin-bottom:8px;
-  align-content:flex-start;
-  justify-content:flex-start;
-}
-
-/* «кнопка-подпись» в LCD-стиле */
-.row span{
-  font-family:inherit;
-  background:#000;
-  color:var(--cyan);
-  border:6px inset #1a1a2e;
-  padding:6px 14px;
-  cursor:pointer;
-  box-shadow:2px 2px 0 #000;
-  font-size:0.8rem;
-  width:180px;
-  height:40px;
-  background-image:
-    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
-    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
-  background-size: 2px 3px, 12px 12px;
-}
-
-/* span без экрана и рамки */
-.row span.plain{
-  background:none;
-  border:none;
-  box-shadow:none;
-  color:#cfd2e8;
-  padding:0;
-}
-
-/* нижняя панель подсказки */
-.row_b{
-  background:#1a1a2e;
-  border:4px outset #950;
-  padding:8px;
-  display:flex;
-  background-image:
-    repeating-radial-gradient(circle at 2px 2px, #272771 0px, #3e2e00 1px, #1a1a2e 1px, #1a1a2e 4px),
-    repeating-radial-gradient(circle at 4px 4px, #950 0px, #1a1a2e 1px, transparent 1px, #050505 6px);
-  background-size: 12px 12px, 18px 18px;
-}
-
-/* текст подсказки */
-.row_b span{
-  font-family:'Courier New', monospace;
-  font-size:0.75rem;
-  letter-spacing:1px;
-  color:var(--cyan);
-  background-image:
-    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12) 0px, #030f06 2px, #000000 2px, #000000 4px),
-    repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
-  background-size: 2px 3px, 12px 12px;
-}
-
-/* белая клавиша */
-.wk{
-  flex:1;
-  background:var(--key-white);
-  border:1px solid #555;
+/* ---------- 5. ВЕРХНЯЯ AERO-ПОЛОСА (тёмное стекло) ---------- */
+.titlebar{
   position:relative;
-  cursor:pointer;
-  touch-action:none;
-  transition:0.2s;
-  CORNER-SHAPE: SUPERELLIPSE(0.3);
-  border-radius:0px 0px 10px 10px;
+  height:40px;
+  display:flex; align-items:center; gap:11px;
+  padding:0 14px;
+  border-radius:10px 10px 0 0;
+  border:1px solid var(--line-2);
+  border-bottom:1px solid rgba(0,10,20,.9);
+  background:
+    linear-gradient(180deg, rgba(88,132,182,.92) 0%, rgba(38,66,102,.94) 44%, rgba(18,32,52,.96) 52%, rgba(9,16,28,.98) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.42),
+    inset 0 -1px 0 rgba(0,0,0,.55),
+    0 3px 12px rgba(0,6,14,.75);
+  font-size:12px; letter-spacing:.6px; color:#dbe9f8;
+  text-shadow:0 1px 2px rgba(0,0,0,.85);
 }
-.wk:hover{
-  background:#CCC;
-  border:1px solid #309;
+.titlebar::after{
+  content:''; position:absolute; inset:0; border-radius:10px 10px 0 0; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.05) 40%, transparent 58%);
 }
-.wk.act{ background:var(--accent) !important; }
-
-/* обёртка прокрутки клавиатуры */
-.kbd-wrap{
-  overflow-x:auto;
-  overflow-y:hidden;
-  scrollbar-width:none;
-  /* OPT: непрозрачная подложка клавиатур — фон-звезда/джет не просвечивает сквозь Keys */
-  background:#0d1119;
-  border:1px solid #1a1a2e;
+.titlebar .led{
+  width:9px; height:9px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #c9ecff, #3f9de0 60%, #124a7d);
+  box-shadow:0 0 8px rgba(95,208,255,.95);
 }
-.kbd-wrap::-webkit-scrollbar{ display:none; }
-
-/* фирменная лента скролла */
-.kbd-strip{
-  height:18px;
-  margin-bottom:6px;
-  box-shadow:2px 2px 0 #000;
-  border:2px inset #950;
-  background:#14101e;
-  overflow:hidden;
-  cursor:pointer;
-  user-select:none;
-  touch-action:none;
-}
-.tape{ position:relative; width:100%; height:100%; }
-.tape-thumb{
-  position:absolute;
-  top:1px;
-  height:12px;
-  background:var(--accent);
-  border:2px solid #000;
-  cursor:grab;
-  touch-action:none;
-  transition:0.15s;
-}
-.tape-thumb:active{ cursor:grabbing; }
-
-/* режим «1 КЛАВИАТУРА» */
-body.kb-single #strip2{ display:none !important; }
-body.kb-single #keys2{ display:none !important; }
-
-/* ---------- 4. АНИМАЦИЯ ---------- */
-
-@keyframes gradientMove{
-  10%{color:#FFA;}
-  20%{color:#F6F;}
-  30%{color:#AFF;}
-  40%{color:#AF9;}
-  50%{color:#AAF;}
-  60%{color:#fAF;}
-  70%{color:#96F;}
-  80%{color:#F93;}
-  90%{color:#FF9;}
-  100%{color:#666;}
+.titlebar .grow{ flex:1; }
+.titlebar .wbtn{
+  width:16px; height:14px; border-radius:3px;
+  border:1px solid rgba(150,200,245,.45);
+  background:linear-gradient(180deg, rgba(96,140,190,.95), rgba(14,26,44,.95));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
 }
 
-/* ---------- 5. ДОПОЛНЕНИЕ ДЛЯ САЙТА-ВИЗИТКИ ---------- */
-
-/* логотип-шапка на всю ширину */
-#logo{ width:100%; text-align:center; }
-
-/* скрытие/показ секций-вкладок */
-.view-hidden{ display:none; }
-
-/* таб-бар без лишнего отступа ряда */
-.tabs .row{ margin-bottom:0; }
-
-/* текстовые блоки: полный объём вместо узкого 240px */
-.lcd-full{
-    width: 100%;
-    height: 420px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    border-radius: 24px;
-    flex-wrap: wrap;
+/* ---------- 6. ОКНА (тёмное стекло) ---------- */
+.window{
+  position:relative;
+  border:1px solid var(--line);
+  border-top:0;
+  border-radius:0 0 12px 12px;
+  background:
+    linear-gradient(180deg, rgba(22,40,62,.9) 0%, rgba(10,19,32,.93) 55%, rgba(7,13,22,.95) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(160,205,250,.18),
+    inset 0 0 60px rgba(20,70,120,.18),
+    0 8px 26px rgba(0,4,10,.85),
+    0 0 40px rgba(30,90,150,.16);
+  padding:26px 28px 30px;
+  backdrop-filter:blur(2px);
 }
-.lcd-full2{
-	    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    border-radius: 24px;
-        flex-wrap: nowrap;
-    background: #0e0e2f;
-    align-content: stretch;
-    align-items: center;
+.window + .window{ margin-top:22px; border-top:1px solid var(--line); border-radius:12px; }
+.window::before{
+  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(180deg, rgba(190,225,255,.07), transparent 22%);
 }
 
-/* подзаголовки внутри LCD */
-.lcd h2{ display: flex;
-    font-size: 0.95rem;
-    color: var(--gold);
-    margin: 6px 0 4px;
-    width: 100%;
-	    min-width: 450px;
-    justify-content: center; }
-.lcd h3{ font-size:1.35rem; color:#99fffc; margin:6px 0 2px; }
-.lcd p, .lcd li{ margin:2px 0;     font-size: 1.15rem;}
-
-/* МОБИЛЬНЫЙ РОЛЛ v1.0.37 */
-@media (max-width:768px){
-  #keys, #keys2{ transform:scaleY(0.75); transform-origin:top left; }
-  .kbd-wrap{ height:114px; }
+/* ---------- 7. ЗАГОЛОВКИ ---------- */
+.eyebrow{
+  display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase;
+  color:#9fd3fb; padding:4px 13px; border-radius:11px; margin-bottom:15px;
+  border:1px solid rgba(120,190,245,.4);
+  background:linear-gradient(180deg, rgba(60,120,185,.55), rgba(16,38,64,.65));
+  box-shadow:inset 0 1px 0 rgba(200,230,255,.35), 0 0 16px rgba(60,150,230,.22);
+  text-shadow:0 1px 2px rgba(0,0,0,.7);
 }
-.p_block_flex-wrap{
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-	border-radius: 1920px;
-	border-bottom: 6px inset #1a1a2e;
-	border-top: 2px inset #e1e1ff;;
-	    background-image: repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12) 0px, #030f06 2px, #000000 2px, #000000 4px), repeating-radial-gradient(circle at 50% 50%, #000000 1px, #000000 1px, #0a1a12 1px, #0a1a12 6px);
-    background-size: 2px 3px, 12px 12px;
+.wtitle{
+  margin:-4px 0 18px; font-size:11px; font-weight:600; letter-spacing:1.8px; text-transform:uppercase;
+  color:#7fa8cf;
+}
+.wtitle span{ margin-left:9px; color:var(--txt-dim); font-weight:400; letter-spacing:.4px; text-transform:none; }
+
+/* ---------- 8. ГЕРОЙ ---------- */
+.hero{ display:flex; gap:30px; align-items:center; flex-wrap:wrap; }
+.hero-text{ flex:1 1 340px; min-width:270px; }
+h1{
+  margin:0 0 10px; font-weight:300; letter-spacing:1px; line-height:1.06;
+  font-size:clamp(28px, 3.5vw, 42px);
+  color:var(--head);
+  text-shadow:0 2px 18px rgba(60,150,235,.45), 0 1px 0 rgba(0,0,0,.9);
+}
+h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55), 0 2px 0 rgba(0,0,0,.9); }
+.subtitle{ margin:0 0 20px; font-size:14px; line-height:1.65; color:var(--txt-soft); max-width:52ch; }
+
+/* ---------- 9. ОКНО МАСКОТА (320 x 320) ---------- */
+.mascot-frame{
+  position:relative;
+  width:320px; height:320px; flex:0 0 320px;
+  border-radius:14px;
+  padding:0; overflow:hidden;
+  border:1px solid rgba(150,205,250,.5);
+  background:
+    radial-gradient(circle 74% at 50% 34%, rgba(70,140,205,.42) 0%, rgba(24,58,96,.5) 46%, rgba(6,14,24,.92) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(190,225,255,.2),
+    inset 0 10px 34px rgba(120,190,250,.22),
+    inset 0 -20px 44px rgba(0,6,14,.85),
+    0 12px 34px rgba(0,4,10,.9),
+    0 0 46px rgba(45,130,205,.28);
+}
+/* глянцевая полоса сверху окна */
+.mascot-frame::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:42%; pointer-events:none; z-index:2;
+  background:linear-gradient(180deg, rgba(215,240,255,.24) 0%, rgba(180,220,255,.07) 55%, transparent 100%);
+  border-radius:14px 14px 0 0;
+}
+/* тонкая рамка «стекла» */
+.mascot-frame::after{
+  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:3;
+  box-shadow:inset 0 0 0 1px rgba(220,240,255,.14);
+}
+.mascot-inner{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.mascot-inner svg{ width:100%; height:100%; display:block; }
+
+/* ---------- 10. КНОПКИ (тёмный Vista-глянец) ---------- */
+.actions{ display:flex; flex-wrap:wrap; gap:10px; }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  font-family:inherit; font-size:13px; font-weight:600; letter-spacing:.2px;
+  color:#d6e8fa; text-decoration:none; cursor:pointer; user-select:none;
+  padding:9px 20px; border-radius:17px;
+  border:1px solid rgba(150,200,245,.42);
+  background:
+    linear-gradient(180deg, rgba(86,126,170,.9) 0%, rgba(34,58,90,.92) 46%, rgba(16,30,50,.95) 52%, rgba(8,16,28,.97) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(220,240,255,.45),
+    inset 0 -8px 14px rgba(0,0,0,.4),
+    0 2px 7px rgba(0,4,10,.8);
+  text-shadow:0 1px 2px rgba(0,0,0,.8);
+  transition:filter .15s ease, transform .06s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.btn:hover{
+  filter:brightness(1.22) saturate(1.15);
+  border-color:rgba(120,205,255,.75);
+  box-shadow:
+    inset 0 1px 0 rgba(230,248,255,.6),
+    inset 0 -8px 16px rgba(0,0,0,.35),
+    0 3px 12px rgba(0,4,10,.85),
+    0 0 22px rgba(70,170,250,.45);
+}
+.btn:active{
+  transform:translateY(1px);
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.75), 0 0 12px rgba(70,170,250,.3);
+}
+.btn.primary{
+  color:#f2fbff;
+  border-color:rgba(140,220,255,.7);
+  background:
+    linear-gradient(180deg, #63c4f5 0%, #2f8fe0 45%, #1d6bb4 52%, #114a86 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.65),
+    inset 0 -8px 16px rgba(0,30,60,.42),
+    0 2px 10px rgba(0,4,10,.85),
+    0 0 26px rgba(70,170,250,.45);
+}
+.btn.primary:hover{ filter:brightness(1.14); box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.75), 0 3px 14px rgba(0,4,10,.9), 0 0 34px rgba(95,208,255,.6); }
+.btn:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
+.btn .ico{ font-size:14px; line-height:1; }
+
+/* ---------- 11. ТАБЫ (тёмная полоса) ---------- */
+.tabs{
+  position:relative; z-index:2;
+  display:flex; flex-wrap:wrap; gap:4px;
+  padding:10px 10px 0;
+  margin-bottom:-1px;
+}
+.tabs button{
+  font-family:inherit; font-size:12.5px; font-weight:600; letter-spacing:.5px;
+  color:#9dbbd8; cursor:pointer;
+  padding:9px 20px 10px;
+  border-radius:9px 9px 0 0;
+  border:1px solid rgba(122,178,232,.22);
+  border-bottom:0;
+  background:linear-gradient(180deg, rgba(40,66,96,.55), rgba(10,20,34,.7));
+  box-shadow:inset 0 1px 0 rgba(190,225,255,.16);
+  text-shadow:0 1px 2px rgba(0,0,0,.8);
+  transition:color .15s ease, filter .15s ease, background .15s ease;
+}
+.tabs button:hover{ color:#d6ecff; filter:brightness(1.25); }
+.tabs button.on{
+  color:#eaf6ff; position:relative; top:1px;
+  background:linear-gradient(180deg, rgba(46,92,140,.92), rgba(16,34,56,.96));
+  border-color:rgba(150,205,250,.5);
+  box-shadow:
+    inset 0 1px 0 rgba(220,245,255,.5),
+    0 -2px 12px rgba(60,150,235,.4);
+}
+
+/* ---------- 12. ГРУППЫ КОНТЕНТА ---------- */
+.group{
+  margin:0 0 16px;
+  padding:20px 22px 18px;
+  border-radius:11px;
+  border:1px solid rgba(122,178,232,.18);
+  background:linear-gradient(180deg, rgba(28,50,78,.42), rgba(9,17,28,.55));
+  box-shadow:inset 0 1px 0 rgba(170,210,250,.12), 0 2px 10px rgba(0,4,10,.4);
+}
+.group:last-child{ margin-bottom:0; }
+.group > h2{
+  margin:0 0 15px; padding-bottom:10px;
+  font-size:14px; font-weight:600; letter-spacing:1.6px; text-transform:uppercase;
+  color:#a6d4fb;
+  border-bottom:1px solid rgba(122,178,232,.28);
+  text-shadow:0 0 16px rgba(95,208,255,.35);
+}
+.group h3{
+  margin:0 0 9px; font-size:13.5px; font-weight:700; letter-spacing:.2px;
+  color:#cfe6fb;
+}
+.group p{ margin:0 0 7px; font-size:13px; line-height:1.68; color:#a9c2da; }
+.group p:last-child{ margin-bottom:0; }
+.group b{ color:#dceeff; }
+.group hr{ border:0; border-top:1px solid rgba(122,178,232,.22); margin:16px 0; }
+.group ol, .group ul{ margin:0; padding-left:22px; font-size:13px; line-height:1.75; color:#a9c2da; }
+.group li::marker{ color:#5fa9e0; }
+.group .links{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+
+/* ---------- 13. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ---------- */
+.view{ display:none; }
+.view.on{ display:block; animation:fadeIn .22s ease both; }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none} }
+
+/* ---------- 14. СТАТУС-БАР ---------- */
+.statusbar{
+  margin-top:22px;
+  display:flex; flex-wrap:wrap; gap:9px 24px; align-items:center;
+  padding:10px 15px; border-radius:9px;
+  font-size:11.5px; color:#87a6c4;
+  border:1px solid rgba(122,178,232,.22);
+  background:linear-gradient(180deg, rgba(26,46,72,.6), rgba(8,16,27,.7));
+  box-shadow:inset 0 1px 0 rgba(170,210,250,.14);
+}
+.statusbar .k{ color:#63799a; }
+.statusbar b{ color:#bfe0ff; font-weight:600; }
+.led-dot{
+  display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px;
+  background:radial-gradient(circle at 35% 30%, #b8ffd0, #22b356 62%, #0e5f2c);
+  box-shadow:0 0 8px rgba(60,220,120,.9);
+}
+
+/* ---------- 15. ПОДВАЛ ---------- */
+.foot{
+  margin:20px 0 0; text-align:center;
+  font-size:11px; letter-spacing:1.2px; color:#5b7391;
+  text-shadow:0 1px 3px rgba(0,0,0,.9);
+}
+
+/* ---------- 16. ДИАЛОГ НАСТРОЕК ---------- */
+.overlay{
+  position:fixed; inset:0; z-index:60;
+  display:none; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 50% 40%, rgba(8,20,36,.6), rgba(0,2,6,.88));
+  backdrop-filter:blur(3px);
+}
+.overlay.on{ display:flex; }
+.dialog{
+  width:min(470px, 92vw);
+  border-radius:10px; overflow:hidden;
+  border:1px solid rgba(150,205,250,.55);
+  background:linear-gradient(180deg, rgba(30,54,84,.98), rgba(10,19,32,.99) 62%, rgba(7,13,22,.99));
+  box-shadow:
+    inset 0 1px 0 rgba(220,245,255,.4),
+    0 30px 70px rgba(0,2,6,.9),
+    0 0 60px rgba(45,130,205,.35);
+}
+.dhead{
+  height:36px; display:flex; align-items:center; gap:9px; padding:0 13px;
+  font-size:12px; font-weight:600; letter-spacing:.5px; color:#dbeaf8;
+  background:linear-gradient(180deg, rgba(88,132,182,.95), rgba(38,66,102,.96) 48%, rgba(14,26,44,.97));
+  border-bottom:1px solid rgba(0,10,20,.9);
+  text-shadow:0 1px 2px rgba(0,0,0,.85);
+}
+.dhead .grow{ flex:1; }
+.dhead button{
+  border:0; background:transparent; cursor:pointer;
+  font-size:15px; line-height:1; color:#cfe4f7; padding:4px 6px; border-radius:4px;
+}
+.dhead button:hover{ background:rgba(255,255,255,.12); }
+.dbody{ padding:17px 19px 9px; font-size:12.5px; color:#a9c2da; }
+.dbody label{
+  display:block; margin:11px 0 5px;
+  font-size:11.5px; letter-spacing:.3px; color:#8aa6c4;
+}
+.dbody input[type=range]{
+  width:100%; height:16px; accent-color:#3f9de0; cursor:pointer;
+}
+.dfoot{ padding:13px 19px 17px; display:flex; justify-content:flex-end; gap:9px; }
+.rangeval{ float:right; font-weight:700; color:#bfe0ff; font-variant-numeric:tabular-nums; }
+
+/* ---------- 17. АНИМАЦИИ МЕДВЕДЯ ---------- */
+.mascot-inner .bear{ display:block; cursor:pointer; }
+.mascot-inner .paw-right{
+  transform-box:view-box; transform-origin:402px 300px;
+  transition:transform .4s cubic-bezier(.34,1.6,.64,1);
+}
+.mascot-inner .bear:hover .paw-right{ transform:rotate(-38deg) translateY(-10px); }
+.mascot-inner .ear-left{ transform-box:view-box; transform-origin:150px 90px; transition:transform .5s ease; }
+.mascot-inner .ear-right{ transform-box:view-box; transform-origin:362px 90px; transition:transform .5s ease; }
+.mascot-inner .bear:hover .ear-left{ animation:mg-earL 1.4s ease-in-out infinite; }
+.mascot-inner .bear:hover .ear-right{ animation:mg-earR 1.4s ease-in-out infinite; }
+@keyframes mg-earL{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(-6deg)} }
+@keyframes mg-earR{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(6deg)} }
+.mascot-inner .head{ transform-box:view-box; transform-origin:256px 250px; transition:transform .5s ease; }
+.mascot-inner .bear:hover .head{ animation:mg-nod 1.6s ease-in-out infinite; }
+@keyframes mg-nod{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(3deg) translateY(3px)} }
+.mascot-inner .bear:active,
+.mascot-inner .bear.jumping{ animation:mg-jump .55s cubic-bezier(.3,0,.4,1); }
+@keyframes mg-jump{
+  0%{transform:translateY(0) scale(1,1)}
+  15%{transform:translateY(4px) scale(1.04,.96)}
+  40%{transform:translateY(-30px) scale(1.03,.97)}
+  65%{transform:translateY(0) scale(.95,1.06)}
+  80%{transform:translateY(-10px) scale(1,1)}
+  100%{transform:translateY(0) scale(1,1)}
+}
+.mascot-inner .shadow{ transform-box:view-box; transform-origin:256px 470px; transition:transform .3s ease, opacity .3s ease; }
+.mascot-inner .bear:active .shadow,
+.mascot-inner .bear.jumping .shadow{ animation:mg-shadow .55s cubic-bezier(.3,0,.4,1); }
+@keyframes mg-shadow{
+  0%{transform:scale(1); opacity:.9}
+  40%{transform:scale(.6,.5); opacity:.4}
+  65%{transform:scale(1.08,.9); opacity:1}
+  80%{transform:scale(.95); opacity:.85}
+  100%{transform:scale(1); opacity:.9}
+}
+.mascot-inner .eye{ transform-box:fill-box; transform-origin:center; animation:mg-blink 4.6s infinite; }
+.mascot-inner .eye.right{ animation-delay:4.4s; }
+@keyframes mg-blink{ 0%,4%,100%{transform:scaleY(1)} 6%{transform:scaleY(.08)} 8%,10%{transform:scaleY(1)} }
+.mascot-inner .lid{ opacity:0; transition:opacity .08s; }
+.mascot-inner .bear:hover .lid{ opacity:1; }
+.mascot-inner .star{
+  transform-box:fill-box; transform-origin:center;
+  opacity:0; transform:scale(.3) rotate(0deg);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.mascot-inner .bear:hover .star{ opacity:1; animation:mg-twinkle 1.4s ease-in-out infinite; }
+.mascot-inner .bear:hover .star:nth-of-type(2){ animation-delay:.25s; }
+.mascot-inner .bear:hover .star:nth-of-type(3){ animation-delay:.5s; }
+.mascot-inner .bear:hover .star:nth-of-type(4){ animation-delay:.75s; }
+@keyframes mg-twinkle{
+  0%{opacity:.2; transform:scale(.4) rotate(0deg)}
+  50%{opacity:1; transform:scale(1.15) rotate(35deg)}
+  100%{opacity:.2; transform:scale(.4) rotate(70deg)}
+}
+.mascot-inner .body-group{
+  transform-box:view-box; transform-origin:256px 400px;
+  animation:mg-breathe 4s ease-in-out infinite;
+}
+@keyframes mg-breathe{ 0%,100%{transform:scale(1,1)} 50%{transform:scale(1.012,.992)} }
+
+/* ---------- 18. АДАПТИВ ---------- */
+@media (max-width:780px){
+  .hero{ justify-content:center; text-align:center; }
+  .hero-text{ flex:1 1 100%; }
+  .actions{ justify-content:center; }
+  .mascot-frame{ margin:0 auto; }
+  .window{ padding:22px 18px 24px; }
+  .tabs{ justify-content:center; }
+  .subtitle{ margin-left:auto; margin-right:auto; }
+}
+/* окно маскота всегда ровно 320 x 320 — на всех ширинах экрана */
+/* доступность: уважаем отключённую анимацию */
+@media (prefers-reduced-motion:reduce){
+  .mascot-inner .body-group,
+  .mascot-inner .eye{ animation:none; }
+  .view.on{ animation:none; }
 }
 </style>
 </head>
 <body>
-<!-- ☩ ФОН: GLSL-планета R46 «ГРАНЬ» перенесена на задний план. Канва позади интерфейса,
-     клики и клавиши не перехватывает, при отсутствии WebGL интерфейс работает как раньше.
-     Константы — в блоке «КОНСТАНТЫ СИМУЛЯЦИИ ФОНА» в конце файла. ☩ -->
-<canvas id="glbg" aria-hidden="true"></canvas>
-<style>
-/* фон-канва: позади всего интерфейса, не перехватывает клики */
-canvas#glbg{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-  z-index:-1;
-  pointer-events:none;
-  display:block;
-}
-/* CRT-развёртка в духе GLSL-стенда поверх всего экрана (снять при надобности) */
-html::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:9;
-  background:repeating-linear-gradient(0deg, rgba(0,0,0,.12) 0 1px, transparent 1px 3px);
-}
-</style>
-<div class="rack-mount" style="display: flex;overflow: auto;flex-direction: column;align-items: stretch;">
-<!-- ================= ШАПКА ================= -->
-<header class="panel">
-  <h1 class="logotype">🧸 Diowkrad Studio 🥈 </h1><br>
-</header>
-<div class="panel_2"
-style="
-animation: gradientMove 60s ease infinite;    text-align: center;
-"
->
- <h3 class="logotype">
-	<div>
-	<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">DIOWKRAD ENGINE 8BIT</a>
-	<a class="btn" href="☩ HITOMI OF LEGENDS ☩.html">HITOMI OF LEGENDS</a>
-	<a class="btn" href="☩ HITOMI OF LEGENDS ☩ TOOLS ☩.html">HITOMI OF LEGENDS TOOLS</a>
-	
-	</div>
-</h3>
- </div>
-<!-- ================= ТАБ-БАР ================= -->
 
+<div id="sky-bg"></div>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div id="sky-vignette"></div>
 
+<div class="shell">
 
-<nav class="panel_2 tabs" id="tabs" style="border: 0px outset #950; background:none;
-margin: 1px;
-">
-  
-    <button class="on" data-view="view-about">О ПРОЕКТЕ</button>
-    <button data-view="view-features" style="display:none;">Резерв1</button>
-    <button data-view="view-controls" style="display:none;" >Резерв2</button>
-    <button data-view="view-disclaimer">F.A.Q.</button>
-    <button data-view="view-download">СКАЧАТЬ</button>
- 
-</nav>
-<main id="app" style="
-      display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 900px;
-    background: #ffffff24;
-    padding: 20px;
-    border-radius: 4%;
-">
-<div class="p_block_flex-wrap" style="
-       background-color: #10111dcf;
-    background-image: linear-gradient(5deg, #013b147d 0 16px, transparent 16px 26px, #14411000 4px 4px, transparent 4px 5px, #0a390873 55px 70px, transparent 70px 88px, #2350197a 88px 96px, transparent 96px 115px, #14411000 115px 128px, transparent 128px 142px, #2e5c257a 142px 148px, transparent 148px 165px), linear-gradient(31deg, transparent 0 12px, #14411070 12px 19px, transparent 19px 44px, #2350196b 44px 51px, transparent 51px 76px, #0a390875 76px 83px, transparent 83px 108px, #144110 108px 115px, transparent 115px 140px, #2e5c256e 140px 147px, transparent 147px 168px), linear-gradient(71deg, transparent 0 18px, #23501994 18px 25px, transparent 25px 55px, #0a3908a1 55px 62px, transparent 62px 92px, #14411000 92px 99px, transparent 99px 130px, #2e5c257d 130px 137px, transparent 137px 165px);
-    background-size: 26px 27px;
-    background-repeat: repeat;
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    align-content: center;    min-width: 240px;
-">
-<div class="p_block" >
-						<div>
-							<span class="mishka-wrap" style="display:inline-block; text-decoration:none; line-height:0;">
-<svg class="bear" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:220px; height:220px; cursor:pointer;">
+  <!-- ===== ВЕРХНЯЯ ПОЛОСА ===== -->
+  <div class="titlebar">
+    <span class="led"></span>
+    <span>☩ DIOWKRAD STUDIO ☩</span>
+    <span class="grow"></span>
+    <span class="wbtn"></span><span class="wbtn"></span><span class="wbtn"></span>
+  </div>
+
+  <!-- ===== ГЕРОЙ ===== -->
+  <div class="window" style="border-radius:0; padding-bottom:24px;">
+    <div class="hero">
+      <div class="mascot-frame" title="Нажми — медведь отзовётся">
+        <div class="mascot-inner" id="mascot"><svg class="bear" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="display:block;cursor:pointer;">
   <defs>
     <radialGradient id="mgHead" cx="40%" cy="30%" r="85%">
       <stop offset="0%" stop-color="#f2b48c"/><stop offset="55%" stop-color="#e69f70"/><stop offset="100%" stop-color="#c97f4e"/>
@@ -810,1124 +616,518 @@ margin: 1px;
     <path class="star" d="M410 260 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/>
     <path class="star" d="M105 270 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z"/>
   </g>
-</svg>
-</span>
-<style>
-  #app .mishka-wrap{ display:inline-block; }
-  #app .mishka-wrap .bear{ display:block; cursor:pointer; }
-  #app .mishka-wrap .paw-right{
-    transform-box:view-box; transform-origin:402px 300px;
-    transition:transform .4s cubic-bezier(.34,1.6,.64,1);
-    transform:rotate(0deg) translateY(0);
-  }
-  #app .mishka-wrap .bear:hover .paw-right{ transform:rotate(-38deg) translateY(-10px); }
-  #app .mishka-wrap .ear-left{ transform-box:view-box; transform-origin:150px 90px; transition:transform .5s ease; }
-  #app .mishka-wrap .ear-right{ transform-box:view-box; transform-origin:362px 90px; transition:transform .5s ease; }
-  #app .mishka-wrap .bear:hover .ear-left{ animation:mg-earL 1.4s ease-in-out infinite; }
-  #app .mishka-wrap .bear:hover .ear-right{ animation:mg-earR 1.4s ease-in-out infinite; }
-  @keyframes mg-earL{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(-6deg)} }
-  @keyframes mg-earR{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(6deg)} }
-  #app .mishka-wrap .head{ transform-box:view-box; transform-origin:256px 250px; transition:transform .5s ease; }
-  #app .mishka-wrap .bear:hover .head{ animation:mg-nod 1.6s ease-in-out infinite; }
-  @keyframes mg-nod{ 0%,100%{transform:rotate(0)} 50%{transform:rotate(3deg) translateY(3px)} }
-  #app .mishka-wrap .bear:active,#app .mishka-wrap .bear.jumping{ animation:mg-jump .55s cubic-bezier(.3,0,.4,1); }
-  @keyframes mg-jump{
-    0%{transform:translateY(0) scale(1,1)}
-    15%{transform:translateY(4px) scale(1.04,.96)}
-    40%{transform:translateY(-30px) scale(1.03,.97)}
-    65%{transform:translateY(0) scale(.95,1.06)}
-    80%{transform:translateY(-10px) scale(1,1)}
-    100%{transform:translateY(0) scale(1,1)}
-  }
-  #app .mishka-wrap .shadow{ transform-box:view-box; transform-origin:256px 470px; transition:transform .3s ease,opacity .3s ease; }
-  #app .mishka-wrap .bear:active .shadow,#app .mishka-wrap .bear.jumping .shadow{ animation:mg-shadow .55s cubic-bezier(.3,0,.4,1); }
-  @keyframes mg-shadow{
-    0%{transform:scale(1); opacity:.9}
-    40%{transform:scale(.6,.5); opacity:.4}
-    65%{transform:scale(1.08,.9); opacity:1}
-    80%{transform:scale(.95); opacity:.85}
-    100%{transform:scale(1); opacity:.9}
-  }
-  #app .mishka-wrap .eye{ transform-box:fill-box; transform-origin:center; animation:mg-blink 4.6s infinite; }
-  #app .mishka-wrap .eye.right{ animation-delay:4.4s; }
-  @keyframes mg-blink{ 0%,4%,100%{transform:scaleY(1)} 6%{transform:scaleY(.08)} 8%,10%{transform:scaleY(1)} }
-  #app .mishka-wrap .lid{ opacity:0; transition:opacity .08s; }
-  #app .mishka-wrap .bear:hover .lid{ opacity:1; }
-  #app .mishka-wrap .star{ transform-box:fill-box; transform-origin:center; opacity:0; transform:scale(.3) rotate(0deg); transition:opacity .3s ease,transform .5s ease; }
-  #app .mishka-wrap .bear:hover .star{ opacity:1; animation:mg-twinkle 1.4s ease-in-out infinite; }
-  #app .mishka-wrap .bear:hover .star:nth-of-type(2){ animation-delay:.25s; }
-  #app .mishka-wrap .bear:hover .star:nth-of-type(3){ animation-delay:.5s; }
-  #app .mishka-wrap .bear:hover .star:nth-of-type(4){ animation-delay:.75s; }
-  @keyframes mg-twinkle{
-    0%{opacity:.2; transform:scale(.4) rotate(0deg)}
-    50%{opacity:1; transform:scale(1.15) rotate(35deg)}
-    100%{opacity:.2; transform:scale(.4) rotate(70deg)}
-  }
-  #app .mishka-wrap .body-group{ transform-box:view-box; transform-origin:256px 400px; animation:mg-breathe 4s ease-in-out infinite; }
-  @keyframes mg-breathe{ 0%,100%{transform:scale(1,1)} 50%{transform:scale(1.012,.992)} }
-</style>
+</svg></div>
+      </div>
+      <div class="hero-text">
+        <div class="eyebrow">студия одного разработчика</div>
+        <h1>DIOWKRAD<br><b>STUDIO</b></h1>
+        <p class="subtitle">
+          Фрилансерская студия веб-разработки: компьютерная помощь, сайты под ключ,
+          инструменты и проекты, которые живут прямо в браузере.
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="#view-about" data-goto="view-about">О проекте</a>
+          <button class="btn" id="btnSettings"><span class="ico">⚙</span>Настройки неба</button>
+          <a class="btn" href="#view-download" data-goto="view-download">Скачать</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<script>
-(function(){
-  var b=document.querySelector('.mishka-wrap .bear');
-  if(!b) return;
-  function jump(){
-    b.classList.remove('jumping');
-    void b.offsetWidth;
-    b.classList.add('jumping');
-  }
-  b.addEventListener('pointerdown',jump);
-  b.addEventListener('animationend',function(e){ if(e.animationName==='mg-jump') b.classList.remove('jumping'); });
+  <!-- ===== ТАБЫ ===== -->
+  <nav class="tabs" id="tabs">
+    <button class="on" data-view="view-about">О ПРОЕКТЕ</button>
+    <button data-view="view-disclaimer">F.A.Q.</button>
+    <button data-view="view-download">СКАЧАТЬ</button>
+  </nav>
 
-  /* Реакция медведя на нажатие нотных клавиш (раскладки из «УПРАВЛЕНИЕ»):
-     2 ряда: ZSXDCVGBHNM,.;/' + Q2W3ER5T6Y7UI9O0P[]'
-     1 ряд:  AWSEDFTGYHUJKOLP;'
-     Любая из них заставляет медведя прыгнуть в такт нажатию.
-     Автоповтор (e.repeat) пропускаем, чтобы зажатая клавиша не везла перезапуск. */
-  var NOTE_KEYS={};
-  ('ZSXDCVGBHNM,.;/\"Q2W3ER5T6Y7UI9O0P[]\'AWSEDFTGYHUJKOLP').split('').forEach(function(k){ NOTE_KEYS[k.toLowerCase()]=1; });
-  document.addEventListener('keydown',function(e){
-    if(e.repeat) return;
-    var t=e.target;
-    if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
-    if(!NOTE_KEYS[(e.key||'').toLowerCase()]) return;
-    jump();
-  });
-})();
-</script>
-						</div>
-					</div>
+  <!-- ===== КОНТЕНТ ===== -->
+  <div class="window">
 
+    <!-- ---------- О ПРОЕКТЕ ---------- -->
+    <section id="view-about" class="view on">
+      <div class="group">
+        <h2>О проекте</h2>
+        <h3>Что такое: Diowkrad-Studio ?</h3>
+        <p>Проект позиционирует себя как студию одного разработчика,</p>
+        <p>которая объединяет в себе сразу несколько разных сфер деятельности:</p>
+        <ol>
+          <li>Студия профессиональной компьютерной помощи.</li>
+          <li>Студия профессиональной веб-разработки.</li>
+          <li>Портфолио разработчика.</li>
+          <li>Архив найденных решений.</li>
+          <li>Мечта моего детства и моя реальность сейчас.</li>
+        </ol>
+      </div>
+
+      <div class="group">
+        <h3>Кто такой: Diowkrad ?</h3>
+        <p>Я программист с опытом более 15 лет. Первые разработки начал делать ещё школьником.</p>
+        <p>В моём опыте уже:</p>
+        <ol>
+          <li>Полный стек разработки в сфере WEB.</li>
+          <li>Администрирование и обслуживание дата-центров и серверного оборудования.</li>
+          <li>Два самостоятельных инди-проекта с полной поддержкой.</li>
+          <li>Аудио-дизайн.</li>
+          <li>Веб-дизайн.</li>
+          <li>Левел-дизайн в разработке игр и модификаций к ним.</li>
+          <li>Написание с нуля музыкального оформления и саундтреков.</li>
+          <li>Тестировка и отладка готовых проектов.</li>
+          <li>Создание игровых и веб-серверов под ключ.</li>
+        </ol>
+      </div>
+
+      <div class="group">
+        <h3>Цикл моих разработок</h3>
+        <ol>
+          <li>Написание кода первой версии 1.0.0.</li>
+          <li>Тестировка и, если нужно, багфикс.</li>
+          <li>Правки в коде.</li>
+          <li>Добавление новой фичи.</li>
+          <li>Тестировка и, если нужно, багфикс.</li>
+          <li>Выпуск новой версии.</li>
+          <li>И далее по кругу — с пункта 3 по пункт 6.</li>
+        </ol>
+      </div>
+
+      <div class="group">
+        <h3>Мои соцсети</h3>
+        <div class="links">
+          <a class="btn" href="https://vk.ru/diowkrad_nyx" target="_blank" rel="noopener">VK</a>
+          <a class="btn" href="https://www.youtube.com/aezakmi50872" target="_blank" rel="noopener">▼ YouTube</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- F.A.Q. ---------- -->
+    <section id="view-disclaimer" class="view">
+      <div class="group">
+        <h2>☩ F.A.Q ☩</h2>
+
+        <h2>🧸 ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩ 🥈</h2>
+        <h3>v1.7.13 «Quantum Fractal»</h3>
+
+        <h3>Описание</h3>
+        <p>Ядро Medvedic-core v4.0 и Monolit-core v1.2.5. Графический дизайн — Medvedic-ChipTune.</p>
+
+        <hr>
+        <h3>Звуковые движки</h3>
+        <p>Процессор на архитектуре FM и чипе YM2413.</p>
+        <p>Звуковой чип: RP-2A03G.</p>
+        <p>Звуковой чип: YM2413.</p>
+        <p>Звуковой чип: Midi GM.</p>
+        <p>Технология «Фрактальный Страж».</p>
+        <p>Технология полной обвязки звука AudioContext.</p>
+        <p>Технология Worklet.</p>
+        <p>Технология WebAudioKit для работы на Android.</p>
+        <p>Технология изолированного BLoop.</p>
+        <p>Технология AudioFlex.</p>
+        <p><b>Рекомендуется только для локального использования, без сервера.</b></p>
+        <p>По умолчанию AudioFlex отключён.</p>
+        <p>AudioFlex — новая технология, на сервере может уронить движок. Не рекомендуется к использованию на серверах.</p>
+
+        <hr>
+        <h3>Возможности</h3>
+        <ul>
+          <li>Звуковой движок с функциями чип-тюн синтезатора.</li>
+          <li>Тестовый полигон для архитектуры AudioFlex для JS.</li>
+          <li>Тестовый полигон для архитектуры «Фрактальный Страж» для JS.</li>
+          <li>Midi-плеер со своими банками звука.</li>
+          <li>Midi-процессор для ПК и смартфонов.</li>
+          <li>SoundFont2 и SoundFont3-плеер для использования банков.</li>
+          <li>Автономность: всё упаковано в один HTML-файл и просто работает.</li>
+          <li>Избавление от веб-привязок — всё нужное уже есть в файле.</li>
+          <li>Вы даже не заметите, что это HTML, а не тяжёлая программа.</li>
+        </ul>
+
+        <hr>
+        <h3>Управление</h3>
+        <p>ПК: клавиатура + мышь в двух раскладках.</p>
+        <p>Раскладка 1: клавиатура A–\</p>
+        <p>Раскладка 2, верхняя: клавиатура Q–]</p>
+        <p>Раскладка 2, нижняя: клавиатура Z–/</p>
+        <p>Сенсорное управление: режимы «одна клавиатура» и «две клавиатуры».</p>
+        <p>Midi-клавиатура: 4 midi-канала, возможность подключения до 4 клавиатур.</p>
+        <p>Вывод нажатий из файла для связки двух и более HTML-вкладок.</p>
+        <p>Обратите внимание: режим «HTML в несколько вкладок» доступен только на ПК.</p>
+      </div>
+
+      <div class="group">
+        <h2>🧸 ☩ HITOMI OF LEGENDS ☩ 🥈</h2>
+        <h3>Alpha v1.2.15 «Shadow of Hitomi»</h3>
+
+        <h3>Описание</h3>
+        <p>Космическая аркада в духе Денди: свободный полёт среди планет, гипер-прыжки, кексики 🧁 и сыр 🧀, капризный медведь 🧸.</p>
+        <p>И чиптюн-саундтрек от собственного движка ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩ — музыка и саунд-дизайн в духе Чип-Тюн-NES.</p>
+        <p>Рейс без конца. 7000 EXP — максимум уровня прокачки.</p>
+        <p>Три разных планеты и одна нетронутая звезда.</p>
+        <p>Игра — часть экосистемы DIOWKRAD и мемориал памяти дорогому мне человеку.</p>
+        <p>Игра имеет собственный ЛОР и Музей небесных тел.</p>
+
+        <hr>
+        <h3>Управление</h3>
+        <p>ПК: клавиатура + мышь. В полёте курсор прячется — взгляд управляется мышью.</p>
+        <p>W — разгон, S — тормоз.</p>
+        <p>A / D — рысканье влево/вправо, ↑ / ↓ — тангаж, Q / E — крен.</p>
+        <p>Мышь — взгляд, P — спрятать/показать курсор.</p>
+        <p>G — FSD-прыжок к луне (Y) или к следующей планете, J — к предыдущей.</p>
+        <p>Y — захват планеты в цель: прицел на небе.</p>
+        <p>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар.</p>
+        <p>T — применить предмет, ESC — интерфейс.</p>
+        <p>Гиперпространство: вне зоны планеты — ночное небо и те же рули (крен, тангаж, рысканье, мышь). Курсор скрывается автоматически.</p>
+      </div>
+    </section>
+
+    <!-- ---------- СКАЧАТЬ ---------- -->
+    <section id="view-download" class="view">
+      <div class="group">
+        <h2>☩ Скачать ☩</h2>
+
+        <h3>🧸 ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩ 🥈</h3>
+        <p>v1.7.13 «Quantum Fractal»</p>
+        <div class="links">
+          <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.zip" download>▼ Скачать архив</a>
+          <a class="btn" href="DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT.sf2" download>▼ SoundFont2</a>
+          <a class="btn primary" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">🧸 «Quantum Fractal» 🥈</a>
+        </div>
+
+        <hr>
+
+        <h3>🧸 ☩ HITOMI OF LEGENDS ☩ 🥈</h3>
+        <p>Alpha v1.2.15 «Shadow of Hitomi»</p>
+        <div class="links">
+          <a class="btn" href="https://disk.yandex.ru/d/xH0CxBunHVV8Bg" target="_blank" rel="noopener">▼ Скачать</a>
+          <a class="btn primary" href="☩ HITOMI OF LEGENDS ☩.html">🧸 Играть онлайн 🥈</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- СТАТУС ---------- -->
+    <div class="statusbar">
+      <span><i class="led-dot"></i><b>небо</b> — живо</span>
+      <span class="k">Шейдер:</span> <span id="stShader">загрузка…</span>
+      <span class="k">Звёзд:</span> <span id="stCount">600</span>
+      <span class="k">Скорость:</span> <span id="stSpeed">1.5</span>
+      <span class="k">FPS:</span> <span id="stFps">—</span>
+    </div>
+  </div>
+
+  <div class="foot">☩ Фриланс-студия веб-разработки ☩ Diowkrad Studio ® 2011–2026 ☩</div>
 </div>
 
-
-
-  <!-- ---------- ВКЛАДКА: О ПРОЕКТЕ ---------- -->
-  <section id="view-about">
-
-<!-- ================= ГЛАВНЫЙ БЛОК ================= -->
-    <div class="panel_lcd">
-      <div class="lcd lcd-full">
-        <h2>О ПРОЕКТЕ</h2>
-			<div class="lcd lcd-full2">
-				<h3>Что такое: Diowkrad-Studio ?</h3>
-				<p>Проект позиционирует себя как студию одного разработчика.</p> 
-				<p>Который объединяет в себе сразу несколько разных сфер деятельности .</p> 
-					<p>1. Студия профессиональной компьютерной помощи . </p> 
-					<p>2. Студия профессиональной Веб-разработки . </p> 
-					<p>3. Портфолио разработчика.</p> 
-					<p>4. Архив найденных решений.</p>
-					<p>5. Мечту моего детства и мою реальность сейчас .</p> 
-			</div>
-			<div class="lcd lcd-full2">
-				<h3>Кто такой: Diowkrad ?</h3>
-				<p>Я программист с опытом более 15 лет</p> 
-				<p>Первые разработки начал делать будучи еще школьником.</p> 
-				<p>В моем опыте уже</p> 
-					<p>1. Полный стек разработки в сфере WEB </p> 
-						<p>2. Администрирование и обслуживание</p> 
-						<p> дата центров и Серверного оборудования. </p> 
-					<p>3. Самостоятельные 2 инди проекта с полной поддержкой.</p> 
-					<p>4. Аудио дизайн.</p>
-					<p>5. Веб дизайн.</p>
-					<p>6. Левел дизайн в разработки игр и модификаций к ним.</p> 
-					<p>7. Написание с нуля музыкального оформления и саунд треков.</p>
-					<p>8. Тестировка и отладка готовых проектов.</p>
-					<p>9. Создание игровых и веб серверов под ключ.</p>
-			</div>
-			<div class="lcd lcd-full2">
-				<h3>Цикл моих разработок включает в себя.</h3>
-					<p>1. Написание кода первой версии 1.0.0 . </p> 
-					<p>2. Тестировка и если нужен баг фикс. </p> 
-					<p>3. Правки в коде.</p> 
-					<p>4. Добавление новой фичи.</p> 
-					<p>4. Тестировка и если нужен баг фикс.</p>
-					<p>5. Выпуск новой версии .</p>
-					<p>6. И далее по кругу до самого конца начиная с пункта 3-го по 5-й.</p> 
-			</div>
-			<div class="lcd lcd-full2">
-				<h3>Мои: Соц сети</h3>
-					<a class="btn" href="https://vk.ru/diowkrad_nyx" >VK</a>
-					<a class="btn" href="https://www.youtube.com/aezakmi50872" >▼ YouTube </a>
-			</div>
-      </div>
+<!-- ===== ДИАЛОГ НАСТРОЕК ===== -->
+<div class="overlay" id="settings">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dtitle">
+    <div class="dhead">
+      <span id="dtitle">⚙ Настройки неба</span>
+      <span class="grow"></span>
+      <button id="btnClose" aria-label="Закрыть">✕</button>
     </div>
-  </section>
-
-  <!-- ---------- ВКЛАДКА: Резерв1 ---------- -->
-  <section id="view-features" class="view-hidden" style="display:none;">
-    <div class="panel_lcd">
-      <div class="lcd lcd-full2">
-        <h2>Резерв1</h2>
-			
-        
-      </div>
+    <div class="dbody">
+      <label>Скорость полёта <span class="rangeval" id="vSpeed">1.5</span></label>
+      <input type="range" id="rSpeed" min="0" max="6" step="0.1" value="1.5">
+      <label>Количество звёзд <span class="rangeval" id="vCount">600</span></label>
+      <input type="range" id="rCount" min="120" max="1400" step="20" value="600">
+      <label>Размер звёзд <span class="rangeval" id="vSize">0.0015</span></label>
+      <input type="range" id="rSize" min="600" max="4000" step="50" value="1500">
+      <label>Сканлайны <span class="rangeval" id="vScan">10%</span></label>
+      <input type="range" id="rScan" min="0" max="30" step="1" value="10">
     </div>
-  </section>
-
-  <!-- ---------- ВКЛАДКА: Резерв2 ---------- -->
-  <section id="view-controls" class="view-hidden" style="display:none;">
-    <div class="panel_lcd">
-      <div class="lcd lcd-full">
-        <h2>Резерв2</h2>
-			<div class="lcd lcd-full2">
-
-			</div>
-        
-      </div>
+    <div class="dfoot">
+      <button class="btn" id="btnReset">Сброс</button>
+      <button class="btn primary" id="btnOk">Готово</button>
     </div>
-  </section>
-
-  <!-- ---------- ВКЛАДКА: F.A.Q. ---------- -->
-  <section id="view-disclaimer" class="view-hidden">
-    <div class="panel_lcd">
-      <div class="lcd lcd-full">
-<!-- ================= ЧЕЛЕНДЖ-ЛОГ v1.7.10 (готовая вставка в #view-disclaimer) ================= -->
-	<h2>☩ F.A.Q ☩</h2>
-		<div class="lcd lcd-full2" Style="align-items: stretch;">
-			<h2> 🧸 ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩🥈 </h2>
-					<h2> 🧸 v1.7.13 «Quantum Fractal» 🥈 </h2>
-					<h3>Описание.</h3>
-					<p>Ядро Medvedic-core v4.0 и Monolit-core v1.2.5 </p>
-					<p>Графический дизайн Medvedic-ChipTune</p>
-					<HR>
-					<h3>Звуковые движки .</h3>
-					<p>Процессор на Архитектуре FM и Чипа: YM2413 .</p>
-						<p>Звуковой чип: RP-2A03G</p>
-						<p>Звуковой чип: YM2413</p> 
-						<p>Звуковой чип: Midi GM</p>
-						<p>Технология Фрактальный Страж</p>
-						<p>Технология Полной обвязки звука AudioContext</p>
-						<p>Технология Worklet</p>
-						<p>Технология WebAudioKit для работы на Android</p>
-						<p>Технология изолированного BLoop</p>
-						<p>Технология AudioFlex</p>
-						<p>Рекомендованно только для локального использования .</p>
-						<p>Без сервера .</p>
-						<p>По умолчанию AudioFlex отключенн</p>
-						<p>AudioFlex новая технология и на сервере может уронить движок.</p>
-						<p>Не рекомендованно использования на серверах.</p>
-					<HR>
-					<h3>Возможности.</h3>
-					<p>Звуковой движок с функциями Чип-Тюн синтезатора </p> 
-					<p>Тестовый полигон для архитектуры AudioFlex для JS</p>
-					<p>Тестовый полигон для архитектуры Фрактальный Страж для JS</p> 
-					<p>Midi Плеер со своими банками звука</p> 
-					<p>Midi процессор для ПК и смартфонов</p>
-					<p>SoundFont2 и 3 Плеер для использования банков</p>
-					<p>Автономность: всё упаковано в 1 HTML файл и просто работает.</p>
-					<p>Избавление от Веб-привязок. Всё что нужно уже есть в файле.</p>
-					<p>Вы даже не заметите, что это HTML, а не тяжёлая Программа.</p>
-					
-					<h3>Управление.</h3>
-						<p>ПК Клавиатура + Мышь в двух раскладках. </p>
-						<p>1 Раскладка Клавиатура A-\ . </p> 
-						<p>2 раскладки . Верхняя Клавиатура Q-]</p>
-						<p>2 раскладки . Нижняя Клавиатура Z-/</p><BR>
-						<p>Сенсорное управление </p>
-						<p>Режимы 1 клавиатура и 2 клавиатуры</p><BR>
-						<p>Midi Клавиатура</p>
-						<p>4 миди канала возможность подключения до 4-х Midi Клавиатур</p>
-						<p>Вывод нажатий из файла для связки Двух и более HTML Вкладок</p>
-						<p>Обратите внимание на то, что режим HTML в несколько Вкладок доступен только на ПК.</p>
-		</div>
-		<div class="lcd lcd-full2" Style="align-items: stretch;">
-			<h2> 🧸 ☩ HITOMI OF LEGENDS☩ 🥈 </h2>
-					<h2> Alpha v1.2.11 «Shadow of Hitomi» </h2>
-						<h3>Описание.</h3>
-						<p>Космическая аркада в духе Денди:</p>
-						<p>Вас ждёт свободный полёт среди планет. </p> 
-						<p>Гипер-прыжки, кексики 🧁 и сыр 🧀, капризный медведь 🧸.</p>
-						<p>И чиптюн-саундтрек от собственного движка  </p>
-						<p>☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩</p>
-						<p>Музыка-саундтрек собственного сочинения.</p>
-						<p>Уникальный саунд Дизайн. В духе Чип-Тюн-NES.</p>
-						<BR>
-						<p>Рейс без конца. 7000 EXP - MAX уровень прокачки </p><BR>
-						<p>3 разных планеты </p>
-						<p>1 Нетронутая звезда.</p>
-						<p>Игра — часть экосистемы DIOWKRAD</p>
-						<p>И мемориал памяти дорогому мне человеку.</p>
-						<p>Игра имеет собственный ЛОР и Музей небесных тел.</p>
-						<HR>
-						<h3>Управление.</h3>
-							<p>ПК Клавиатура + Мышь. В полёте курсор прячется — взгляд управляется мышью.</p>
-							<p>W — разгон, S — тормоз.</p>
-							<p>A / D — рысканье влево / вправо, ↑ / ↓ — тангаж, Q / E — крен.</p>
-							<p>Мышь — взгляд, P — спрятать / показать курсор.</p><BR>
-							<p>G — FSD-прыжок к луне (Y) или к следующей планете, J — к предыдущей.</p>
-							<p>Y — захват планеты в цель: прицел на небе.</p><BR>
-							<p>R — форсаж (×2.5), 1-7 или колесо мыши — хотбар.</p>
-							<p>T — применить предмет, ESC — интерфейс.</p><BR>
-							<p>Гиперпространство</p>
-							<p>Вне зоны планеты — ночное небо и те же рули: крен, тангаж, рысканье и мышь. Курсор скрывается автоматически и возвращается на стыковке или прыжке.</p>
-		</div>
-      </div>
-	</div>
-  </section>
-
-  <!-- ---------- ВКЛАДКА: СКАЧАТЬ ---------- -->
-  <section id="view-download" class="view-hidden">
-    <div class="panel_lcd">
-		<div class="lcd lcd-full">
-			<h2>☩ СКАЧАТЬ ☩</h2>
-			<div class="lcd lcd-full2">
-				<h2> 🧸 ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩🥈 </h2>
-					<h2> 🧸 v1.7.13 «Quantum Fractal» 🥈 </h2>
-					
-					<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.zip" download>▼ СКАЧАТЬ </a>
-					<a class="btn" href="DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT.sf2" download>▼ SoundFont2 </a>
-					<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">🧸 «Quantum Fractal» 🥈</a>
-				
-				</div>
-				<div class="lcd lcd-full2">
-				  
-				<h2> 🧸 ☩ HITOMI OF LEGENDS☩ 🥈 </h2>
-					<h2> Alpha v1.2.15 «Shadow of Hitomi» </h2>
-				
-					<a class="btn" href="https://disk.yandex.ru/d/xH0CxBunHVV8Bg" download>▼ СКАЧАТЬ </a>
-					<a class="btn" href="☩ HITOMI OF LEGENDS ☩.html">🧸 «Играть онлайн» 🥈</a>
-				
-			</div>
-		</div>
-	</div>
-  </section>
-
-
-<!-- ================= ФУТЕР ================= -->
-<footer class="panel row_b" style=" border-radius: 1280px;">
-  <span style="
-    display: flex;
-    width: 100%;
-    margin: 0px 45px;
-   
-">▮Фриланс Студия веб разработки.▮ Diowkrad Studio ® 2011-2026 ▮</span>
-</footer>
-
-<script>
-// Переключение вкладок таб-бара
-document.querySelectorAll('#tabs button').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    document.querySelectorAll('#tabs button').forEach(function(b){ b.classList.remove('on'); });
-    btn.classList.add('on');
-    document.querySelectorAll('main section').forEach(function(s){ s.classList.add('view-hidden'); });
-    var target = document.getElementById(btn.dataset.view);
-    if (target) target.classList.remove('view-hidden');
-  });
-});
-</script>
+  </div>
 </div>
-</main>
+
 <script>
-/* ═══════════════ КОНСТАНТЫ СИМУЛЯЦИИ ФОНА (править здесь) ═══════════════ */
-/* Графика перенесена из GLSL-стенда R46 «ГРАНЬ» без изменений шейдера.      */
-const PLANET_RADIUS_KM  = 29371.0;   /* радиус планеты, км                    */
-const FLIGHT_SPEED_KMH  = 292000.0;   /* скорость полёта, км/ч                 */
-const SIM_TIME_SCALE    = 60.0;      /* 1 реальная секунда = N секунд симуляции */
-const DAY_CYCLE_HOURS   = 1.0;       /* длительность суток, сим-часов         */
-const CAMERA_ALT_KM     = 1000.0;     /* высота орбиты камеры                  */
-const FOV_DEG           = 60.0;      /* вертикальный угол обзора              */
-const RENDER_SCALE      = 1.0;       /* в стенде было 2.3 — для фона тяжело; 1.0 честнее */
-const START_PHASE_RAD   = 0.0;       /* стартовое положение камеры на орбите  */
-
-const CAM_R = 1.0 + CAMERA_ALT_KM / PLANET_RADIUS_KM;
-const ORBIT_PERIOD_SIM_SEC = (2*Math.PI*PLANET_RADIUS_KM/FLIGHT_SPEED_KMH)*3600.0;
-const DAY_CYCLE_SIM_SEC = DAY_CYCLE_HOURS*3600.0;
-const FOV_TAN = Math.tan(FOV_DEG*0.5*Math.PI/180.0);
-/* ════════════════════════════════════════════════════ */
-
-/* шейдеры — дословно из стенда R46, без изменений */
-const VERT = 'attribute vec2 aPos;\nvoid main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
-
-
-
-const FRAG_BASE = `precision highp float;
-uniform vec2  uRes;
-uniform float uTime;
-uniform float uCamA;
-uniform float uSunA;
-uniform float uPlanet;
-uniform float uSplash;
-
-#define R    1.0
-#define CAMR __CAMR__
-#define FOT  __FOT__
-
-/* --- хэш и шумы (средний слой) --- */
-float hash13(vec3 p){
-  p = fract(p*0.3183099 + vec3(0.1,0.2,0.3));
-  p *= 17.0;
-  return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
-}
-float vnoise(vec3 x){
-  vec3 i = floor(x);
-  vec3 f = fract(x);
-  f = f*f*(3.0-2.0*f);
-  float n0=hash13(i);
-  float n1=hash13(i+vec3(1.0,0.0,0.0));
-  float n2=hash13(i+vec3(0.0,1.0,0.0));
-  float n3=hash13(i+vec3(1.0,1.0,0.0));
-  float n4=hash13(i+vec3(0.0,0.0,1.0));
-  float n5=hash13(i+vec3(1.0,0.0,1.0));
-  float n6=hash13(i+vec3(0.0,1.0,1.0));
-  float n7=hash13(i+vec3(1.0,1.0,1.0));
-  return mix(mix(mix(n0,n1,f.x),mix(n2,n3,f.x),f.y),
-             mix(mix(n4,n5,f.x),mix(n6,n7,f.x),f.y),f.z);
-}
-/* тяжёлый: 5 октав */
-float fbm5(vec3 p){
-  float v=0.0, a=0.5;
-  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
-  return v;
-}
-/* средний: 3 октавы */
-float fbm3(vec3 p){
-  float v=0.0, a=0.5;
-  for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=0.5; }
-  return v;
-}
-
-/* --- звёзды: три слоя гридов с мерцанием --- */
-vec3 stars(vec3 rd){
-  vec3 c = vec3(0.0);
-  for(int L=0; L<3; L++){
-    float sc = 90.0 + float(L)*80.0;
-    vec3 g  = rd*sc;
-    vec3 id = floor(g);
-    vec3 fr = fract(g) - 0.5;
-    float h = hash13(id + float(L)*37.0);
-    if(h > 0.975){
-      vec3 off = (vec3(hash13(id+1.0), hash13(id+2.0), hash13(id+3.0)) - 0.5)*0.6;
-      float d  = length(fr - off);
-      float tw = 0.55 + 0.45*sin(uTime*(1.0+h*4.0) + h*40.0);
-      float s  = (1.0 - smoothstep(0.0, 0.14, d))*tw;
-      vec3 tint = mix(vec3(0.70,0.80,1.0), vec3(1.0,0.85,0.60), hash13(id+4.0));
-      c += s*tint*(0.35 + h*0.8);
-    }
-  }
-  return c;
-}
-
-void main(){
-  vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
-
-  /* --- камера: орбита через полюса, ось планеты = Y --- */
-  vec3 camPos = vec3(cos(uCamA)*CAMR, sin(uCamA)*CAMR, 0.0);
-if(uPlanet > 2.5){ camPos.y -= 0.14*uSplash; }
-  vec3 fwd = vec3(-sin(uCamA), cos(uCamA), 0.0);
-  vec3 up0 = normalize(camPos);
-  fwd = normalize(mix(fwd, -up0, 0.22));
-  vec3 right = normalize(cross(fwd, up0));
-  vec3 upv   = cross(right, fwd);
-  vec3 rd    = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
-
-  /* солнце — экваториальный круг с лёгким наклоном; луна — отстает на 0.9 рад */
-  float st = sin(uSunA), ct = cos(uSunA);
-  vec3 sunDir  = normalize(vec3(ct, 0.22*st, st));
-  vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
-
-  /* пересечение луча со сферой планеты */
-  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
-  vec3 wC = camPos - sC;
-  float b    = dot(wC, rd);
-  float cc   = dot(wC, wC) - R*R;
-  float disc = b*b - cc;
-  float tHit = -b - sqrt(max(disc, 0.0));
-  bool hitP  = (disc > 0.0) && (tHit > 0.0);
-
-  float dayLocal = dot(normalize(camPos), sunDir);
-  float dayness  = smoothstep(-0.25, 0.30, dayLocal);
-
-  vec3 col = vec3(0.0);
-
-  if(hitP){
-    /* ---- ПЛАНЕТА ---- */
-    vec3 p = camPos + rd*tHit;
-    vec3 n = normalize(p);
-    float nl  = dot(n, sunDir);
-    float lit = smoothstep(-0.06, 0.18, nl);
-
-    /* континенты: тяжёлый fbm по нормали, планета медленно вращается */
-    vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
-    float cont = fbm5(sp);
-    float land = smoothstep(0.46, 0.54, cont);
-    /* ДЕТАЛЬ: волнение береговой линии (турбулентность) — плавнее граница суши/океана */
-    float coast = fbm3(n*8.0 + vec3(0.0, uTime*0.006, 0.0));
-    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
-    vec3 ocean = vec3(0.02,0.10,0.22);
-    vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
-
-    /* ДЕТАЛЬ: микро-рельеф суши (горы/равнины) — доп. fbm, не меняет границы суши */
-    float mdet = fbm3(n*12.0 + vec3(uTime*0.003, uTime*0.001, 0.0));
-    landc *= 0.85 + 0.30*mdet;
-
-    float ice  = smoothstep(0.80, 0.94, abs(n.y));
-    vec3 surf  = mix(ocean, landc, land);
-    surf = mix(surf, vec3(0.85,0.90,0.95), ice);
-
-    /* облака: второй тяжёлый слой, свой дрейф */
-    float cl = fbm5(n*4.2 + vec3(uTime*0.010, 0.0, -uTime*0.006));
-    cl = smoothstep(0.50, 0.74, cl);
-    surf = mix(surf, vec3(0.95,0.97,1.0), cl*0.9);
-
-    vec3 colDay = surf*(0.15 + 1.05*lit);
-    /* блик океана */
-    vec3 hv = normalize(sunDir - rd);
-    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
-    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
-
-    /* ночь: огни городов на суше, мерцание */
-    float cellH = hash13(floor(n*90.0));
-    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
-    vec3 colNight = surf*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
-
-    col = mix(colNight, colDay, lit);
-
-    /* ШИНРАРТА-B: поверхность как у НГАЛИН, эффект голубой #eff5f9 */
-    if(uPlanet > 2.5){
-      vec3 nS = normalize(p - sC);
-      float rock = fbm5(nS*3.2);
-      vec3 surfS = mix(vec3(0.05,0.045,0.05), vec3(0.16,0.13,0.12), rock);
-      float riv1 = fbm3(nS*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
-      float riv2 = fbm3(nS*7.0 - vec3(uTime*0.015, 0.0, 0.0));
-      float lavS = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5))) + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
-      lavS = min(lavS, 1.0);
-      float pulS = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
-      col = surfS*(0.05 + 0.9*lit) + vec3(0.937,0.961,0.976)*lavS*pulS*(1.6 + (1.0 - lit)*2.6);
-      float fresS = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-      col += vec3(0.60,0.80,1.0)*fresS*0.45;
-    }
-
-    /* атмосферный ободок на лимбе */
-    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-    col += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
-
-    /* полярные сияния на ночном полюсе */
-    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
-    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
-    col += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
-  } else {
-    /* ---- НЕБО ---- */
-    float daySky = smoothstep(-0.15, 0.35, dayLocal);
-
-    /* ночь: база + звёзды + млечный путь */
-    vec3 night = vec3(0.004,0.006,0.013);
-    night += stars(rd)*1.15;
-    float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
-    night += vec3(0.5,0.55,0.75)*bandW*fbm3(rd*4.0)*0.35;
-
-    /* день: градиент к горизонту, зарево у солнца, облака на куполе */
-    float horiz = 1.0 - abs(dot(rd, up0));
-    vec3 day = mix(vec3(0.25,0.45,0.85), vec3(0.55,0.75,1.0), horiz*0.85);
-    float sunAmt = max(dot(rd, sunDir), 0.0);
-    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.40;
-    float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
-    skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
-    day = mix(day, vec3(1.0), skycl*0.75);
-    float dSun = dot(rd, sunDir);
-    day += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, dSun)*3.0;
-    day += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
-
-    col = mix(night, day, daySky);
-
-    if(uPlanet > 2.5){ col = night; }
-
-    /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
-    float closest = length(camPos - rd*b);
-    float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
-    if(uPlanet < 2.5){ col += vec3(0.30,0.55,1.0)*atmo*dayness*0.85; } else { col += vec3(0.05,0.10,0.24)*atmo; }
-
-    /* луна: диск с кратерами, свечение */
-    float dM = dot(rd, moonDir);
-    float mdisc = smoothstep(0.99950, 0.99980, dM);
-    if(mdisc > 0.0){
-      vec3 lp = rd - moonDir*dM;
-      float cr = fbm3(lp*260.0);
-      vec3 mc = vec3(0.78,0.78,0.74)*(0.55 + 0.45*cr);
-      float mlit = smoothstep(-0.15, 0.15, dot(moonDir, sunDir));
-      vec3 mc2 = mc*mix(0.10, 1.0, mlit);
-      col = mix(col, mc2, mdisc);
-      col += vec3(0.60,0.65,0.85)*pow(max(dM,0.0), 900.0)*0.30;
-    }
-  }
-
-
-  /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
-     тёплое ядро у полюса, холодное свечение на конце, турбулентные завихрения */
-  if(uPlanet > 2.5){
-    vec3 jC = sC;
-    vec3 jW = camPos - jC;
-    float bJ = rd.y;
-    float dJd = dot(rd, jW);
-    float eJ = jW.y;
-    float denJ = 1.0 - bJ*bJ;
-    if(abs(denJ) > 0.0001){
-      float sJ = (eJ - dJd*bJ)/denJ;
-      float tJ = sJ*bJ - dJd;
-      if(tJ > 0.0){
-        float aJ = abs(sJ);
-        /* длинные струи: вдоль оси до 6.5, колокол у полюса */
-        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, 6.5, aJ));
-        /* расширение струи с высотой — конус плазмы */
-        float wJ = 0.04;   /* постоянная ширина струи (не расширяется при отлёте) */
-        vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
-        float rJ = length(cpt);
-        /* турбулентность: закрученные струи — смещение ядра по aJ+second cooperative */
-        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*0.0833);
-        float off = 0.30*(1.0 - exp(-aJ*1.4));
-        float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
-        /* тёплое основание / холодная плазма сверху + неоновый обод */
-        float cool = smoothstep(0.8, 4.2, aJ);
-        vec3 jetCol = mix(vec3(1.0,0.55,0.20), vec3(0.45,0.75,1.0), cool);
-        float twinkle = 0.75 + 0.25*sin(uTime*0.0833 + aJ*5.0);
-        /* основной светящийся шлейф */
-        col += jetCol*along*prof*twinkle*1.6;
-        /* яркое ядро */
-        float core = exp(-(rJ*rJ)/(wJ*wJ*0.10)*0.5);
-        col += vec3(0.95,0.97,1.0)*along*core*twinkle*1.1;
-        /* закрутка: лёгкое смещение потока от оси создаёт живой вихрь */
-        float swirl = exp(-( (rJ - off*turb)*(rJ - off*turb) )/(wJ*wJ*0.6)*0.5);
-        col += jetCol*along*swirl*turb*0.6;
-      }
-    }
-  }
-  /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
-  col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
-  col = col/(1.0 + col*0.30);
-  col = pow(col, vec3(0.92));
-  float vig = 1.0 - 0.22*dot(uv*0.55, uv*0.55);
-  col *= max(vig, 0.0);
-  gl_FragColor = vec4(col, 1.0);
-}`;
-
-const FRAG = `precision highp float;
-uniform vec2  uRes;
-uniform float uTime;
-uniform float uCamA;
-uniform float uSunA;
-uniform vec3  uCamPos;
-uniform vec3  uCamR;
-uniform vec3  uCamU;
-uniform vec3  uCamF;
-uniform float uPlanet;
-uniform float uSplash;
-
-#define R    1.0
-#define CAMR __CAMR__
-#define FOT  __FOT__
-
-/* --- хэш и шумы (средний слой) --- */
-float hash13(vec3 p){
-  p = fract(p*0.3183099 + vec3(0.1,0.2,0.3));
-  p *= 17.0;
-  return fract(p.x*p.y*p.z*(p.x+p.y+p.z));
-}
-float vnoise(vec3 x){
-  vec3 i = floor(x);
-  vec3 f = fract(x);
-  f = f*f*(3.0-2.0*f);
-  float n0=hash13(i);
-  float n1=hash13(i+vec3(1.0,0.0,0.0));
-  float n2=hash13(i+vec3(0.0,1.0,0.0));
-  float n3=hash13(i+vec3(1.0,1.0,0.0));
-  float n4=hash13(i+vec3(0.0,0.0,1.0));
-  float n5=hash13(i+vec3(1.0,0.0,1.0));
-  float n6=hash13(i+vec3(0.0,1.0,1.0));
-  float n7=hash13(i+vec3(1.0,1.0,1.0));
-  return mix(mix(mix(n0,n1,f.x),mix(n2,n3,f.x),f.y),
-             mix(mix(n4,n5,f.x),mix(n6,n7,f.x),f.y),f.z);
-}
-/* тяжёлый: 5 октав */
-float fbm5(vec3 p){
-  float v=0.0, a=0.5;
-  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.07+vec3(1.7); a*=0.5; }
-  return v;
-}
-/* средний: 3 октавы */
-float fbm3(vec3 p){
-  float v=0.0, a=0.5;
-  for(int i=0;i<3;i++){ v+=a*vnoise(p); p=p*2.13; a*=0.5; }
-  return v;
-}
-
-/* --- звёзды: три слоя гридов с мерцанием --- */
-vec3 stars(vec3 rd){
-  vec3 c = vec3(0.0);
-  for(int L=0; L<3; L++){
-    float sc = 90.0 + float(L)*80.0;
-    vec3 g  = rd*sc;
-    vec3 id = floor(g);
-    vec3 fr = fract(g) - 0.5;
-    float h = hash13(id + float(L)*37.0);
-    if(h > 0.975){
-      vec3 off = (vec3(hash13(id+1.0), hash13(id+2.0), hash13(id+3.0)) - 0.5)*0.6;
-      float d  = length(fr - off);
-      float tw = 0.55 + 0.45*sin(uTime*(1.0+h*4.0) + h*40.0);
-      float s  = (1.0 - smoothstep(0.0, 0.14, d))*tw;
-      vec3 tint = mix(vec3(0.70,0.80,1.0), vec3(1.0,0.85,0.60), hash13(id+4.0));
-      c += s*tint*(0.35 + h*0.8);
-    }
-  }
-  return c;
-}
-
-void main(){
-  vec2 uv = (gl_FragCoord.xy*2.0 - uRes)/uRes.y;
-
-  /* --- камера: свободный полёт — позиция и базис приходят из JS --- */
-  vec3 camPos = uCamPos;
-  vec3 fwd    = normalize(uCamF);
-  vec3 right  = normalize(uCamR);
-  vec3 upv    = normalize(uCamU);
-  vec3 rd     = normalize(fwd + (uv.x*right + uv.y*upv)*FOT);
-  vec3 up0    = normalize(camPos);
-
-  /* солнце — экваториальный круг с лёгким наклоном; луна — отстает на 0.9 рад */
-  float st = sin(uSunA), ct = cos(uSunA);
-  vec3 sunDir  = normalize(vec3(ct, 0.22*st, st));
-  vec3 moonDir = normalize(vec3(cos(uSunA+0.9), 0.25, sin(uSunA+0.9)));
-
-  /* пересечение луча со сферой планеты */
-  vec3 sC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
-  vec3 wC = camPos - sC;
-  float b    = dot(wC, rd);
-  float cc   = dot(wC, wC) - R*R;
-  float disc = b*b - cc;
-  float tHit = -b - sqrt(max(disc, 0.0));
-  bool hitP  = (disc > 0.0) && (tHit > 0.0);
-
-  float dayLocal = dot(normalize(camPos), sunDir);
-  float dayness  = smoothstep(-0.25, 0.30, dayLocal);
-
-  /* ПУЗЫРЬ АТМОСФЕРЫ: дневное небо живёт только внутри пузыря R=1.90 */
-  float camR  = length(camPos);
-  float atmIn = 1.0 - smoothstep(1.786, 1.90, camR);
-
-  /* цвет атмосферы по планете: ХИТОМИ голубая, ЧИЗИЯ #905000, НГАЛИН #300090 */
-  vec3 atmC = vec3(0.30,0.55,1.0);
-  if(uPlanet > 0.5 && uPlanet < 1.5){ atmC = vec3(0.565,0.314,0.0); }
-  else if(uPlanet > 1.5 && uPlanet < 2.5){ atmC = vec3(0.188,0.0,0.565); }
-  else if(uPlanet > 2.5){ atmC = vec3(0.039,0.118,0.302); }
-
-  vec3 col = vec3(0.0);
-
-  if(hitP){
-    /* ---- ПЛАНЕТА ---- */
-    vec3 p = camPos + rd*tHit;
-    vec3 n = normalize(p - sC);
-    float nl  = dot(n, sunDir);
-    float lit = smoothstep(-0.06, 0.18, nl);
-
-    if(uPlanet < 0.5){
-    /* континенты: тяжёлый fbm по нормали, планета медленно вращается */
-    vec3  sp   = n*2.6 + vec3(0.0, 0.0, uTime*0.004);
-    float cont = fbm5(sp);
-    float land = smoothstep(0.46, 0.54, cont);
-    /* ДЕТАЛЬ: волнение береговой линии (турбулентность) — плавнее граница суши/океана */
-    float coast = fbm3(n*8.0 + vec3(0.0, uTime*0.006, 0.0));
-    land = mix(land, smoothstep(0.40, 0.60, cont - 0.10*coast), 0.35);
-    vec3 ocean = vec3(0.02,0.10,0.22);
-    vec3 landc = mix(vec3(0.08,0.26,0.10), vec3(0.42,0.36,0.20), smoothstep(0.52,0.78,cont));
-
-    /* ДЕТАЛЬ: микро-рельеф суши (горы/равнины) — доп. fbm, не меняет границы суши */
-    float mdet = fbm3(n*12.0 + vec3(uTime*0.003, uTime*0.001, 0.0));
-    landc *= 0.85 + 0.30*mdet;
-
-    float ice  = smoothstep(0.80, 0.94, abs(n.y));
-    vec3 surf  = mix(ocean, landc, land);
-    surf = mix(surf, vec3(0.85,0.90,0.95), ice);
-
-    /* облака: второй тяжёлый слой, свой дрейф */
-    float cl = fbm5(n*4.2 + vec3(uTime*0.010, 0.0, -uTime*0.006));
-    cl = smoothstep(0.50, 0.74, cl);
-    surf = mix(surf, vec3(0.95,0.97,1.0), cl*0.9);
-
-    vec3 colDay = surf*(0.15 + 1.05*lit);
-    /* блик океана */
-    vec3 hv = normalize(sunDir - rd);
-    float spec = pow(max(dot(n,hv),0.0), 60.0)*(1.0-land)*(1.0-ice)*(1.0-cl)*lit;
-    colDay += vec3(0.9,0.95,1.0)*spec*0.6;
-
-    /* ночь: огни городов на суше, мерцание */
-    float cellH = hash13(floor(n*90.0));
-    float city  = step(0.80, cellH)*land*(1.0-cl)*(1.0-ice);
-    vec3 colNight = surf*0.03 + vec3(1.0,0.75,0.35)*city*0.9*(0.6+0.4*sin(uTime*2.0+cellH*50.0));
-
-    col = mix(colNight, colDay, lit);
-
-    /* атмосферный ободок на лимбе */
-    float fres = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-    col += vec3(0.25,0.5,1.0)*fres*(0.2 + 0.8*lit)*1.1;
-
-    /* полярные сияния на ночном полюсе */
-    float aurZ = smoothstep(0.72, 0.92, abs(n.y))*(1.0-lit);
-    float aur  = fbm3(n*5.0 + vec3(0.0, uTime*0.2, 0.0));
-    col += vec3(0.10,0.90,0.45)*aurZ*smoothstep(0.45,0.75,aur)*0.55;
-    }
-    else if(uPlanet < 1.5){
-      /* ---- ЧИЗИЯ: газовый гигант с полосами и штормом ---- */
-      float lat = n.y;
-      float warp = fbm3(n*2.6 + vec3(uTime*0.008, 0.0, 0.0));
-      float bands = sin(lat*16.0 + warp*3.2);
-      float bands2 = sin(lat*34.0 + 1.7);
-      vec3 band1 = vec3(0.87, 0.80, 0.62);
-      vec3 band2 = vec3(0.72, 0.55, 0.34);
-      vec3 band3 = vec3(0.93, 0.88, 0.74);
-      vec3 surf = mix(band1, band2, smoothstep(-0.6, 0.6, bands));
-      surf = mix(surf, band3, 0.5 + 0.5*sin(lat*7.0 + 1.0));
-      surf = mix(surf, band2*0.92, 0.25*smoothstep(0.3, 0.9, bands2));
-      vec3 sdir = normalize(vec3(cos(uTime*0.02 + 2.0), -0.30, sin(uTime*0.02 + 2.0)));
-      float angS = acos(clamp(dot(n, sdir), -1.0, 1.0));
-      float storm = 1.0 - smoothstep(0.05, 0.16, angS);
-      surf = mix(surf, vec3(0.80, 0.42, 0.22), storm*0.85);
-      surf *= 0.92 + 0.16*fbm3(n*9.0 + vec3(uTime*0.05, 0.0, 0.0));
-      col = surf*(0.06 + 1.05*lit);
-      float fresA = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-      col += vec3(0.90, 0.75, 0.50)*fresA*(0.2 + 0.8*lit)*0.8;
-    }
-    else if(uPlanet < 2.5) {
-      /* ---- НГАЛИН: магматический мир с реками лавы ---- */
-      float rock = fbm5(n*3.2);
-      vec3 surf = mix(vec3(0.05, 0.045, 0.05), vec3(0.16, 0.13, 0.12), rock);
-      float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
-      float riv2 = fbm3(n*7.0 - vec3(uTime*0.015, 0.0, 0.0));
-      float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
-                 + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
-      lava = min(lava, 1.0);
-      float pulse = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
-      col = surf*(0.05 + 0.9*lit) + vec3(1.0, 0.38, 0.06)*lava*pulse*(1.4 + (1.0 - lit)*2.2);
-      float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-      col += vec3(1.0, 0.45, 0.10)*fresP*0.25;
-    } else {
-      /* ---- ШИНРАРТА-B: нейтронная звезда — поверхность как у НГАЛИН, эффект голубой #eff5f9 ---- */
-      float rock = fbm5(n*3.2);
-      vec3 surf = mix(vec3(0.05,0.045,0.05), vec3(0.16,0.13,0.12), rock);
-      float riv1 = fbm3(n*3.5 + vec3(0.0, uTime*0.02, uTime*0.013));
-      float riv2 = fbm3(n*7.0 - vec3(uTime*0.015, 0.0, 0.0));
-      float lava = (1.0 - smoothstep(0.0, 0.02, abs(riv1 - 0.5)))
-                 + 0.7*(1.0 - smoothstep(0.0, 0.015, abs(riv2 - 0.5)));
-      lava = min(lava, 1.0);
-      float pulse = 0.75 + 0.25*sin(uTime*1.5 + riv1*40.0);
-      col = surf*(0.05 + 0.9*lit) + vec3(0.937,0.961,0.976)*lava*pulse*(1.6 + (1.0 - lit)*2.6);
-      float fresP = pow(1.0 - clamp(dot(-rd, n), 0.0, 1.0), 3.0);
-      col += vec3(0.60,0.80,1.0)*fresP*0.45;
-    }
-  } else {
-    /* ---- НЕБО ---- */
-    float daySky = smoothstep(-0.15, 0.35, dayLocal);
-
-    /* ночь: база + звёзды + млечный путь */
-    vec3 night = vec3(0.004,0.006,0.013);
-    night += stars(rd)*1.15;
-    float bandW = pow(max(1.0 - abs(dot(rd, normalize(vec3(0.35,0.85,0.40)))), 0.0), 5.0);
-    night += vec3(0.5,0.55,0.75)*bandW*fbm3(rd*4.0)*0.35;
-
-    /* день: градиент к горизонту, зарево у солнца, облака на куполе */
-    float horiz = 1.0 - abs(dot(rd, up0));
-    vec3 day = mix(atmC*0.83, mix(atmC, vec3(1.0), 0.42), horiz*0.85);
-    float sunAmt = max(dot(rd, sunDir), 0.0);
-    day += vec3(1.0,0.72,0.40)*pow(sunAmt, 8.0)*0.40;
-    float skycl = fbm5(rd*3.0 + vec3(uTime*0.020, 0.0, uTime*0.013));
-    skycl = smoothstep(0.52, 0.78, skycl)*(0.30 + 0.70*horiz);
-    day = mix(day, vec3(1.0), skycl*0.75);
-    float dSun = dot(rd, sunDir);
-
-    col = mix(night, day, daySky*atmIn);
-    if(uPlanet > 2.5){ col = night; } else {
-    /* СОЛНЦЕ ВНЕ ПУЗЫРЯ: диск и ореол светят всегда — и внутри пузыря, и в ночи */
-    col += vec3(1.0,0.95,0.80)*smoothstep(0.99920, 0.99965, dSun)*3.0;
-    col += vec3(1.0,0.80,0.50)*pow(sunAmt, 350.0)*0.9;
-    }
-
-    /* голубой ореол атмосферы у лимба (лучи мимо планеты) */
-    float closest = length(camPos - rd*b);
-    float atmo = 1.0 - smoothstep(1.0, 1.22, closest);
-    if(uPlanet < 2.5){ col += atmC*atmo*dayness*atmIn*0.85; } else { col += vec3(0.05,0.10,0.24)*atmo; }
-
-    /* луна: диск с кратерами, свечение */
-    float dM = dot(rd, moonDir);
-    float mdisc = smoothstep(0.99950, 0.99980, dM);
-    if(uPlanet < 0.5 && mdisc > 0.0){
-      vec3 lp = rd - moonDir*dM;
-      float cr = fbm3(lp*260.0);
-      vec3 mc = vec3(0.78,0.78,0.74)*(0.55 + 0.45*cr);
-      float mlit = smoothstep(-0.15, 0.15, dot(moonDir, sunDir));
-      vec3 mc2 = mc*mix(0.10, 1.0, mlit);
-      col = mix(col, mc2, mdisc);
-      col += vec3(0.60,0.65,0.85)*pow(max(dM,0.0), 900.0)*0.30;
-    }
-    /* СЫРНЫЕ ЛУНЫ ЧИЗИИ: 4 диска на скайбоксе, дрейф за солнцем */
-    if(uPlanet > 0.5 && uPlanet < 1.5){
-      for(int ci=0; ci<4; ci++){
-        float cang = uSunA + 2.1 + 0.77*float(ci);
-        vec3 cdir = normalize(vec3(cos(cang), 0.15 + 0.18*float(ci), sin(cang)));
-        float dC = dot(rd, cdir);
-        float cthr = 0.99960 - 0.00007*float(ci);
-        float cdisc = smoothstep(cthr, cthr + 0.00035, dC);
-        if(cdisc > 0.0){
-          vec3 lp = rd - cdir*dC;
-          float crel = fbm3(lp*420.0);
-          float holes = smoothstep(0.30, 0.62, fbm3(lp*160.0 + vec3(7.3)));
-          vec3 cheese = vec3(1.00,0.82,0.30)*(0.55 + 0.45*crel);
-          cheese = mix(cheese, vec3(0.42,0.28,0.08), holes*0.55);
-          float clit = smoothstep(-0.15, 0.15, dot(cdir, sunDir));
-          vec3 cc2 = cheese*mix(0.10, 1.0, clit);
-          col = mix(col, cc2, cdisc);
-          col += vec3(1.00,0.90,0.60)*pow(max(dC,0.0), 900.0)*0.25;
-        }
-      }
-    }
-  }
-
-
-    /* СЫРНЫЕ ЛУНЫ ШИНРАРТА-B: 8 дисков на скайбоксе, дрейф за солнцем */
-    if(!hitP && uPlanet > 2.5){
-      for(int ci=0; ci<8; ci++){
-        float cang = uSunA + 2.1 + 0.55*float(ci);
-        vec3 cdir = normalize(vec3(cos(cang), 0.10 + 0.13*float(ci), sin(cang)));
-        float dC = dot(rd, cdir);
-        float cthr = 0.99955 - 0.00006*float(ci);
-        float cdisc = smoothstep(cthr, cthr + 0.00022, dC);
-        if(cdisc > 0.0){
-          vec3 lp2 = rd - cdir*dC;
-          float chz = fbm3(lp2*240.0);
-          vec3 cheese = vec3(0.95,0.78,0.30)*(0.55 + 0.45*chz);
-          float clit = smoothstep(-0.15, 0.15, dot(cdir, sunDir));
-          vec3 cc2 = cheese*mix(0.10, 1.0, clit);
-          col = mix(col, cc2, cdisc);
-          col += vec3(1.00,0.90,0.60)*pow(max(dC,0.0), 900.0)*0.25;
-        }
-      }
-    }
-  /* ---- КОЛЬЦА АУРЕЛИИ: плоскость с наклоном, щель, тень планеты ---- */
-  /* FIX: не рисовать кольца, когда луч попадает в планету — звезда непрозрачна */
-  if(!hitP && uPlanet > 0.5 && uPlanet < 1.5){
-    vec3 nR = normalize(vec3(0.22, 1.0, 0.18));
-    float denom = dot(rd, nR);
-    if(abs(denom) > 0.0035){
-      float tR = -dot(camPos, nR)/denom;
-      if(tR > 0.05 && (!hitP || tR < tHit)){
-        vec3 q = camPos + rd*tR;
-        float rr = length(q);
-        if(rr > 1.45 && rr < 2.35){
-          float gap = smoothstep(1.76, 1.78, rr)*(1.0 - smoothstep(1.84, 1.86, rr));
-          float band = 0.55 + 0.45*sin(rr*95.0 + 2.4*sin(rr*17.0));
-          float edge = smoothstep(1.45, 1.52, rr)*(1.0 - smoothstep(2.28, 2.35, rr));
-          float shadow = smoothstep(-0.06, 0.10, dot(normalize(q), sunDir));
-          float bright = (0.18 + 0.82*shadow)*(0.55 + 0.45*abs(dot(nR, sunDir)));
-          float alpha = edge*(1.0 - gap*0.92)*(0.35 + 0.65*band);
-          alpha *= clamp(abs(denom)*30.0, 0.0, 1.0);
-          col = mix(col, vec3(0.85, 0.76, 0.58)*bright, alpha*0.9);
-        }
-      }
-    }
-  }
-
-
-  /* ДЖЕТТЫ ШИНРАРТА-B: струи в стиле Elite Dangerous — длинная светящаяся плазма,
-     тёплое ядро у полюса, холодное свечение на конце, турбулентные завихрения */
-  if(uPlanet > 2.5){
-    vec3 jC = (uPlanet > 2.5) ? vec3(0.0, -0.14*uSplash, 0.0) : vec3(0.0);
-    vec3 jW = camPos - jC;
-    float bJ = rd.y;
-    float dJd = dot(rd, jW);
-    float eJ = jW.y;
-    float denJ = 1.0 - bJ*bJ;
-    if(abs(denJ) > 0.0001){
-      float sJ = (eJ - dJd*bJ)/denJ;
-      float tJ = sJ*bJ - dJd;
-      if(tJ > 0.0){
-        float aJ = abs(sJ);
-        /* длинные струи: вдоль оси до 6.5, колокол у полюса */
-        float along = smoothstep(0.86, 1.02, aJ)*(1.0 - smoothstep(1.15, 6.5, aJ));
-        /* расширение струи с высотой — конус плазмы */
-        float wJ = 0.04;   /* постоянная ширина струи (не расширяется при отлёте) */
-        vec3 cpt = camPos + tJ*rd - jC - vec3(0.0, sJ, 0.0);
-        float rJ = length(cpt);
-        /* турбулентность: закрученные струи — смещение ядра по aJ */
-        float turb = 0.55 + 0.45*sin(aJ*7.0 - uTime*0.0833);
-        float off = 0.30*(1.0 - exp(-aJ*1.4));
-        float prof = exp(-(rJ*rJ)/(wJ*wJ)*0.5);
-        /* тёплое основание / холодная плазма сверху + неоновый обод */
-        float cool = smoothstep(0.8, 4.2, aJ);
-        vec3 jetCol = mix(vec3(1.0,0.55,0.20), vec3(0.45,0.75,1.0), cool);
-        float twinkle = 0.75 + 0.25*sin(uTime*0.0833 + aJ*5.0);
-        /* основной светящийся шлейф */
-        col += jetCol*along*prof*twinkle*1.6;
-        /* яркое ядро */
-        float core = exp(-(rJ*rJ)/(wJ*wJ*0.10)*0.5);
-        col += vec3(0.95,0.97,1.0)*along*core*twinkle*1.1;
-        /* закрутка: лёгкое смещение потока от оси создаёт живой вихрь */
-        float swirl = exp(-( (rJ - off*turb)*(rJ - off*turb) )/(wJ*wJ*0.6)*0.5);
-        col += jetCol*along*swirl*turb*0.6;
-      }
-    }
-  }
-  /* дизеринг против бандинга + тонмаппинг + лёгкая гамма + виньетка */
-  col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
-  col = col/(1.0 + col*0.30);
-  col = pow(col, vec3(0.92));
-  float vig = 1.0 - 0.22*dot(uv*0.55, uv*0.55);
-  col *= max(vig, 0.0);
-  gl_FragColor = vec4(col, 1.0);
-}`;
-
-
-
-const FRAG_SRC = FRAG
-  .replace('__CAMR__', CAM_R.toFixed(6))
-  .replace('__FOT__', FOV_TAN.toFixed(6));
-const FRAG_BASE_SRC = FRAG_BASE
-  .replace('__CAMR__', CAM_R.toFixed(6))
-  .replace('__FOT__', FOV_TAN.toFixed(6));
-
+/* ==========================================================================
+   1) НЕБО: шейдер звёздного зума (Shadertoy → WebGL1)
+   Логика mainImage сохранена; iResolution → uRes, iTime → uTime.
+   Четыре параметра вынесены в uniform'ы и управляются ползунками.
+   ========================================================================== */
 (function(){
-'use strict';
-const cv = document.getElementById('glbg');
-const gl = cv.getContext('webgl', {antialias:false, depth:false, alpha:false})
+  var cv = document.getElementById('stars');
+  var stShader = document.getElementById('stShader');
+  if(!cv) return;
+
+  var gl = cv.getContext('webgl', {antialias:false, depth:false, alpha:false, premultipliedAlpha:false})
         || cv.getContext('experimental-webgl', {antialias:false, depth:false, alpha:false});
-if(!gl){
-  cv.remove();
-  console.warn('R46 ФОН: WebGL недоступен — фон остаётся базовым, интерфейс не затронут');
-  return;
-}
-function sh(type, srcStr){
-  const s = gl.createShader(type);
-  gl.shaderSource(s, srcStr);
-  gl.compileShader(s);
-  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
-    const log = gl.getShaderInfoLog(s) || 'неизвестная ошибка';
-    console.error('R46 ФОН: ошибка шейдера:\n' + log);
-    return null;
+
+  if(!gl){
+    if(stShader) stShader.textContent = 'нет WebGL — остаётся градиент';
+    cv.style.display = 'none';
+    return;
   }
-  return s;
-}
-const prog = gl.createProgram();
-const vs = sh(gl.VERTEX_SHADER, VERT);
-let fs = sh(gl.FRAGMENT_SHADER, FRAG_SRC);
-let bgFallback = false;
-if(!fs){
-  bgFallback = true;
-  fs = sh(gl.FRAGMENT_SHADER, FRAG_BASE_SRC);
-}
-if(!vs || !fs){
-  console.error('R46 ФОН: оба шейдера не собрались — фон отключён');
-  cv.remove();
-  return;
-}
-gl.attachShader(prog, vs);
-gl.attachShader(prog, fs);
-gl.linkProgram(prog);
-if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
-  console.error('R46 ФОН: ошибка линковки:\n' + (gl.getProgramInfoLog(prog)||''));
-  cv.remove();
-  return;
-}
-if(bgFallback){
-  console.warn('R46 ФОН: игровой шейдер не собрался — работает базовый ХИТОМИ (см. ошибку компиляции выше)');
-}
-window.__bgInfo = { fallback: bgFallback };
-gl.useProgram(prog);
 
-/* один большой треугольник на весь экран */
-const buf = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-const locA = gl.getAttribLocation(prog, 'aPos');
-gl.enableVertexAttribArray(locA);
-gl.vertexAttribPointer(locA, 2, gl.FLOAT, false, 0, 0);
+  var VERT =
+    'attribute vec2 aPos;' +
+    'void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
 
-const uRes = gl.getUniformLocation(prog, 'uRes');
-const uT   = gl.getUniformLocation(prog, 'uTime');
-const uCA  = gl.getUniformLocation(prog, 'uCamA');
-const uSA  = gl.getUniformLocation(prog, 'uSunA');
-const uCP = gl.getUniformLocation(prog, 'uCamPos');
-const uCR = gl.getUniformLocation(prog, 'uCamR');
-const uCU = gl.getUniformLocation(prog, 'uCamU');
-const uCF = gl.getUniformLocation(prog, 'uCamF');
-const uPL = gl.getUniformLocation(prog, 'uPlanet');
-const uSP = gl.getUniformLocation(prog, 'uSplash');
+  var FRAG = [
+    '#ifdef GL_FRAGMENT_PRECISION_HIGH',
+    'precision highp float;',
+    '#else',
+    'precision mediump float;',
+    '#endif',
+    'uniform vec2  uRes;',
+    'uniform float uTime;',
+    'uniform float uSpeed;',
+    'uniform float uCount;',
+    'uniform float uStarSize;',
+    'uniform float uScan;',
+    '',
+    'void main(){',
+    '  vec2 fragCoord = gl_FragCoord.xy;',
+    '  float speed = uSpeed;',
+    '  int starCount = int(clamp(uCount, 1.0, 2000.0));',
+    '  float starSize = uStarSize;',
+    '  float minZ = 0.3;',
+    '',
+    '  vec2 uv = (2.0 * fragCoord - uRes.xy) / uRes.y;',
+    '  vec3 color = vec3(0.0);',
+    '',
+    '  for (int i = 0; i < 2000; i++) {',
+    '    if (i >= starCount) break;',
+    '    float seed = float(i) * 0.01337;',
+    '    vec2 starXY = vec2(',
+    '      fract(sin(seed * 734.631) * 5623.541) * 2.0 - 1.0,',
+    '      fract(cos(seed * 423.891) * 3245.721) * 2.0 - 1.0',
+    '    );',
+    '    float z = mod(uTime * speed * -0.2 + seed, 1.0) + minZ * 0.1;',
+    '    float size = starSize / z;',
+    '    float brightness = 0.7 / z;',
+    '    vec2 starUV = uv - starXY * (0.5 / z);',
+    '    float star = smoothstep(size, 0.0, length(starUV));',
+    '    color += vec3(star * brightness);',
+    '  }',
+    '',
+    '  color = min(color, vec3(1.0));',
+    '  color *= 0.9 + uScan * sin(fragCoord.y * 3.14159 * 2.0);',
+    '  gl_FragColor = vec4(color, 1.0);',
+    '}'
+  ].join('\n');
 
-function resize(){
-  /* OPT: ограничиваем DPR фона (база только рендер фона, не интерфейса) */
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  const w = Math.max(1, Math.floor(innerWidth  * dpr * RENDER_SCALE));
-  const h = Math.max(1, Math.floor(innerHeight * dpr * RENDER_SCALE));
-  if(cv.width !== w || cv.height !== h){
-    cv.width = w; cv.height = h;
+  function compile(type, src){
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+      console.error('DIOWKRAD небо: ошибка компиляции\n' + gl.getShaderInfoLog(s));
+      return null;
+    }
+    return s;
+  }
+
+  var vs = compile(gl.VERTEX_SHADER, VERT);
+  var fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  if(!vs || !fs){
+    if(stShader) stShader.textContent = 'ошибка компиляции (F12)';
+    cv.style.display = 'none';
+    return;
+  }
+
+  var prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+    console.error('DIOWKRAD небо: ошибка линковки\n' + gl.getProgramInfoLog(prog));
+    if(stShader) stShader.textContent = 'ошибка линковки (F12)';
+    return;
+  }
+  gl.useProgram(prog);
+
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+
+  var aPos = gl.getAttribLocation(prog, 'aPos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  var uRes     = gl.getUniformLocation(prog, 'uRes');
+  var uTime    = gl.getUniformLocation(prog, 'uTime');
+  var uSpeed   = gl.getUniformLocation(prog, 'uSpeed');
+  var uCount   = gl.getUniformLocation(prog, 'uCount');
+  var uSize    = gl.getUniformLocation(prog, 'uStarSize');
+  var uScan    = gl.getUniformLocation(prog, 'uScan');
+
+  /* значения по умолчанию — ровно как в исходном шейдере */
+  var P = { speed:1.5, count:600, size:0.0015, scan:0.10 };
+
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize(){
+    var w = Math.max(1, Math.round(window.innerWidth * dpr));
+    var h = Math.max(1, Math.round(window.innerHeight * dpr));
+    if(cv.width !== w || cv.height !== h){
+      cv.width = w;
+      cv.height = h;
+    }
     gl.viewport(0, 0, w, h);
   }
-}
-addEventListener('resize', resize);
-resize();
-
-/* OPT: ПАРАЛЛАКС фона — координата курсора (-1..1) с плавным сглаживанием.
-   Используется только для фоновой камеры (стартовая сцена), механики игры не трогает. */
-let _parX = 0, _parY = 0;          /* текущая сглаженная позиция */
-let _parTX = 0, _parTY = 0;        /* целевая (raw) позиция курсора */
-addEventListener('mousemove', function(ev){
-  _parTX = (ev.clientX / Math.max(1, innerWidth)) * 2 - 1;
-  _parTY = (ev.clientY / Math.max(1, innerHeight)) * 2 - 1;
-}, { passive: true });
-const PARALLAX_AMOUNT = 0.008;     /* малый сдвиг, чтобы не ломать картинку */
-
-/* главный цикл: RAF сам замирает в фоновой вкладке, dt зажат сверху.
-   Камера: свободный полёт из игрового скрипта (__gameState) либо
-   орбитальное зеркало R46 (пилот выключен / игровой шейдер не собрался). */
-let simTime = 0, last = performance.now();
-let _uSP = null; /* OPT: кэш последнего uniform uSplash */
-function frame(now){
+  window.addEventListener('resize', resize);
   resize();
-  const dt = Math.min((now - last)/1000, 0.1);
-  last = now;
-  simTime += dt*SIM_TIME_SCALE;
-  window.__bgSim = simTime;
-  const sunA = 2*Math.PI*simTime/DAY_CYCLE_SIM_SEC;
-  const g = window.__gameState;
-  /* OPT: плавная интерполяция параллакса (target приближается к курсору) */
-  _parX += (_parTX - _parX) * Math.min(1, dt*6);
-  _parY += (_parTY - _parY) * Math.min(1, dt*6);
 
-  if(g && g.active){
-    gl.uniform1f(uPL, g.planet);
-    gl.uniform3f(uCP, g.pos[0], g.pos[1], g.pos[2]);
-    gl.uniform3f(uCR, g.right[0], g.right[1], g.right[2]);
-    gl.uniform3f(uCU, g.up[0], g.up[1], g.up[2]);
-    gl.uniform3f(uCF, g.fwd[0], g.fwd[1], g.fwd[2]);
-  } else {
-    const camA = START_PHASE_RAD + 2*Math.PI*simTime/ORBIT_PERIOD_SIM_SEC;
-    /* ПАРАЛЛАКС: лёгкий сдвиг орбитальной камеры за курсором (только фон) */
-    const pxOff = _parX * PARALLAX_AMOUNT, pyOff = _parY * PARALLAX_AMOUNT * 0.6;
-    const cx = Math.cos(camA)*CAM_R + pxOff, cy = Math.sin(camA)*CAM_R - ((!g || !g.active) && window.__splashPlanet === 3 ? 0.14 : 0) + pyOff;
-    let f0x = -Math.sin(camA), f0y = Math.cos(camA);
-    let u0x = Math.cos(camA), u0y = Math.sin(camA);
-    let f1x = f0x*0.78 - u0x*0.22, f1y = f0y*0.78 - u0y*0.22;
-    const f1l = Math.sqrt(f1x*f1x + f1y*f1y) || 1;
-    f1x /= f1l; f1y /= f1l;
-    /* right = fwd x up0 (z-компоненты нулевые у обоих) */
-    const r1z = f1x*u0y - f1y*u0x;
-    /* upv = right x fwd */
-    const p1x = -r1z*f1y, p1y = r1z*f1x;
-    gl.uniform1f(uPL, window.__splashPlanet || 0);
-    gl.uniform3f(uCP, cx, cy, 0);
-    gl.uniform3f(uCF, f1x, f1y, 0);
-    gl.uniform3f(uCR, 0, 0, r1z);
-    gl.uniform3f(uCU, p1x, p1y, 0);
+  var stFps = document.getElementById('stFps');
+  var frames = 0, fpsT = performance.now();
+  var simT = 0, lastT = performance.now();
+
+  function frame(now){
+    var dt = Math.min((now - lastT) / 1000, 0.1);
+    lastT = now;
+    simT += dt;
+
+    gl.uniform2f(uRes, cv.width, cv.height);
+    gl.uniform1f(uTime, simT);
+    gl.uniform1f(uSpeed, P.speed);
+    gl.uniform1f(uCount, P.count);
+    gl.uniform1f(uSize, P.size);
+    gl.uniform1f(uScan, P.scan);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    frames++;
+    if(now - fpsT > 500){
+      if(stFps) stFps.textContent = Math.round(frames * 1000 / (now - fpsT));
+      frames = 0;
+      fpsT = now;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  if(stShader) stShader.textContent = 'активен';
+
+  window.__SKY = {
+    set: function(o){
+      if(!o) return;
+      if(o.speed != null) P.speed = o.speed;
+      if(o.count != null) P.count = o.count;
+      if(o.size  != null) P.size  = o.size;
+      if(o.scan  != null) P.scan  = o.scan;
+    },
+    get: function(){ return P; }
+  };
+})();
+
+/* ==========================================================================
+   2) МАСКОТ: SVG уже в разметке, скрипт только оживляет клик
+   ========================================================================== */
+(function(){
+  var host = document.getElementById('mascot');
+  if(!host) return;
+  var svg = host.querySelector('svg');
+  if(!svg) return;
+
+  host.addEventListener('pointerdown', function(){
+    if(svg.classList.contains('jumping')) return;
+    svg.classList.add('jumping');
+  });
+  svg.addEventListener('animationend', function(e){
+    if(e.animationName === 'mg-jump') svg.classList.remove('jumping');
+  });
+})();
+
+/* ==========================================================================
+   3) ВКЛАДКИ
+   ========================================================================== */
+(function(){
+  var tabs  = Array.prototype.slice.call(document.querySelectorAll('#tabs button'));
+  var views = Array.prototype.slice.call(document.querySelectorAll('.view'));
+  if(!tabs.length || !views.length) return;
+
+  function show(id){
+    views.forEach(function(v){ v.classList.toggle('on', v.id === id); });
+    tabs.forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-view') === id); });
   }
 
-  gl.uniform2f(uRes, cv.width, cv.height);
-  gl.uniform1f(uT, simTime);
-  gl.uniform1f(uSA, sunA);
-  /* OPT: uSplash меняется редко — не шлём одинаковое значение каждый кадр */
-  const spNow = (g && g.active) ? 0.0 : 1.0;
-  if(_uSP !== spNow){ gl.uniform1f(uSP, spNow); _uSP = spNow; }
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  tabs.forEach(function(btn){
+    btn.addEventListener('click', function(){ show(btn.getAttribute('data-view')); });
+  });
 
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-goto]'), function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      show(a.getAttribute('data-goto'));
+      var bar = document.getElementById('tabs');
+      if(bar) bar.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  if(location.hash){
+    var target = location.hash.replace('#', '');
+    for(var i = 0; i < views.length; i++){
+      if(views[i].id === target){ show(target); break; }
+    }
+  }
+})();
+
+/* ==========================================================================
+   4) ДИАЛОГ НАСТРОЕК НЕБА
+   ========================================================================== */
+(function(){
+  var ov = document.getElementById('settings');
+  if(!ov) return;
+
+  var rS = document.getElementById('rSpeed');
+  var rC = document.getElementById('rCount');
+  var rZ = document.getElementById('rSize');
+  var rN = document.getElementById('rScan');
+
+  var vS = document.getElementById('vSpeed');
+  var vC = document.getElementById('vCount');
+  var vZ = document.getElementById('vSize');
+  var vN = document.getElementById('vScan');
+
+  var stSpeed = document.getElementById('stSpeed');
+  var stCount = document.getElementById('stCount');
+
+  var D = { speed:1.5, count:600, size:1500, scan:10 };
+
+  function apply(){
+    var speed = parseFloat(rS.value);
+    var count = parseInt(rC.value, 10);
+    var size  = parseInt(rZ.value, 10) / 1e6;
+    var scan  = parseInt(rN.value, 10) / 100;
+
+    if(window.__SKY) window.__SKY.set({speed:speed, count:count, size:size, scan:scan});
+
+    vS.textContent = speed.toFixed(1);
+    vC.textContent = String(count);
+    vZ.textContent = size.toFixed(4);
+    vN.textContent = Math.round(scan * 100) + '%';
+
+    if(stSpeed) stSpeed.textContent = speed.toFixed(1);
+    if(stCount) stCount.textContent = String(count);
+  }
+
+  [rS, rC, rZ, rN].forEach(function(el){
+    if(el) el.addEventListener('input', apply);
+  });
+
+  function open(){ ov.classList.add('on'); apply(); }
+  function close(){ ov.classList.remove('on'); }
+
+  document.getElementById('btnSettings').addEventListener('click', open);
+  document.getElementById('btnClose').addEventListener('click', close);
+  document.getElementById('btnOk').addEventListener('click', close);
+
+  ov.addEventListener('click', function(e){ if(e.target === ov) close(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && ov.classList.contains('on')) close();
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function(){
+    rS.value = D.speed;
+    rC.value = D.count;
+    rZ.value = D.size;
+    rN.value = D.scan;
+    apply();
+  });
+
+  apply();
 })();
 </script>
-
 </body>
 </html>
