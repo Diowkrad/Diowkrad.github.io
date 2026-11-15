@@ -453,10 +453,9 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
 
   <!-- ===== ВЕРХНЯЯ ПОЛОСА ===== -->
   <div class="titlebar">
-    <span class="led"></span>
-    <span>☩ DIOWKRAD STUDIO ☩</span>
+    <span>🧸 ☩ DIOWKRAD STUDIO ☩</span>
     <span class="grow"></span>
-    <span class="wbtn"></span><span class="wbtn"></span><span class="wbtn"></span>
+    <span class=""></span>🐻<span class="">2011-2026</span><span class="">©️</span>
   </div>
 
   <!-- ===== ГЕРОЙ ===== -->
@@ -619,16 +618,17 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
 </svg></div>
       </div>
       <div class="hero-text">
-        <div class="eyebrow">студия одного разработчика</div>
-        <h1>DIOWKRAD<br><b>STUDIO</b></h1>
+        <div class="eyebrow">Cтудия одного разработчика .</div>
+        <h1>☩ DIOWKRAD STUDIO ☩</h1>
         <p class="subtitle">
-          Фрилансерская студия веб-разработки: компьютерная помощь, сайты под ключ,
-          инструменты и проекты, которые живут прямо в браузере.
+          Фрилансерская студия веб-разработки и компьютерная помощь.
         </p>
         <div class="actions">
-          <a class="btn primary" href="#view-about" data-goto="view-about">О проекте</a>
-          <button class="btn" id="btnSettings"><span class="ico">⚙</span>Настройки неба</button>
-          <a class="btn" href="#view-download" data-goto="view-download">Скачать</a>
+          
+			<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">DIOWKRAD ENGINE 8BIT</a>
+			<a class="btn" href="☩ HITOMI OF LEGENDS ☩.html">HITOMI OF LEGENDS</a>
+			<a class="btn" href="☩ HITOMI OF LEGENDS ☩ TOOLS ☩.html">HITOMI OF LEGENDS TOOLS</a>
+          
         </div>
       </div>
     </div>
@@ -803,7 +803,7 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
     </section>
 
     <!-- ---------- СТАТУС ---------- -->
-    <div class="statusbar">
+    <div class="statusbar" style="display:none;">
       <span><i class="led-dot"></i><b>небо</b> — живо</span>
       <span class="k">Шейдер:</span> <span id="stShader">загрузка…</span>
       <span class="k">Звёзд:</span> <span id="stCount">600</span>
@@ -819,19 +819,19 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
 <div class="overlay" id="settings">
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dtitle">
     <div class="dhead">
-      <span id="dtitle">⚙ Настройки неба</span>
+      <span id="dtitle" style="display:none;">⚙ Настройки неба</span>
       <span class="grow"></span>
-      <button id="btnClose" aria-label="Закрыть">✕</button>
+      <button id="btnClose" aria-label="Закрыть" style="display:none;" >✕</button>
     </div>
-    <div class="dbody">
+    <div class="dbody" style="display:none;" >
       <label>Скорость полёта <span class="rangeval" id="vSpeed">1.5</span></label>
-      <input type="range" id="rSpeed" min="0" max="6" step="0.1" value="1.5">
+      <input type="range" id="rSpeed" min="0" max="6" step="0.1" value="1.0">
       <label>Количество звёзд <span class="rangeval" id="vCount">600</span></label>
-      <input type="range" id="rCount" min="120" max="1400" step="20" value="600">
+      <input type="range" id="rCount" min="120" max="1400" step="20" value="100">
       <label>Размер звёзд <span class="rangeval" id="vSize">0.0015</span></label>
-      <input type="range" id="rSize" min="600" max="4000" step="50" value="1500">
+      <input type="range" id="rSize" min="600" max="4000" step="50" value="1000">
       <label>Сканлайны <span class="rangeval" id="vScan">10%</span></label>
-      <input type="range" id="rScan" min="0" max="30" step="1" value="10">
+      <input type="range" id="rScan" min="0" max="30" step="1" value="0">
     </div>
     <div class="dfoot">
       <button class="btn" id="btnReset">Сброс</button>
