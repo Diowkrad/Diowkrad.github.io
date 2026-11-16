@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☩ HITOMI OF LEGENDS ☩ PULSAR-GL MODULE ☩ HYBRID ☩</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:#020308;font-family:'Courier New',monospace;color:#cfd2e8;}
+canvas#gl{display:block;width:100%;height:100%;}
+#fps{position:fixed;top:12px;left:12px;z-index:5;background:rgba(0,0,0,.5);color:#66ff99;font:12px 'Courier New',monospace;padding:4px 8px;border:2px outset #950;}
+.edbar{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:6px;background:rgba(11,15,22,.85);border:2px outset #950;padding:4px 6px;}
+.edbtn{font:11px 'Courier New',monospace;background:#111a2e;color:#f7cc1d;border:2px outset #950;padding:4px 10px;cursor:pointer;}
+.edbtn:hover{box-shadow:0 0 8px rgba(247,204,29,.5);}
+.edbtn.on{background:#f79e1d;color:#99fffc;border:2px outset #4f8ee9;}
+.edp{position:fixed;top:52px;right:10px;width:340px;max-height:calc(100vh - 70px);overflow:auto;z-index:15;background:rgba(11,15,22,.94);border:4px outset #950;padding:10px 12px;font:12px/1.45 'Courier New',monospace;color:#cfd2e8;display:none;}
+.edp.show{display:block;}
+.edp h3{margin:2px 0 8px;font-size:13px;color:#f7cc1d;letter-spacing:1px;text-shadow:1px 1px 0 #000;}
+.frow{display:flex;align-items:center;gap:6px;margin:3px 0;}
+.frow label{flex:0 0 118px;font-size:10px;color:#9fd8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.frow input[type=range]{flex:1;min-width:0;accent-color:#f79e1d;background:none;border:none;height:18px;}
+.frow input[type=color]{width:34px;height:22px;padding:0;border:2px solid #333;background:none;cursor:pointer;}
+.fval{flex:0 0 46px;text-align:right;color:#a3ff52;font-size:11px;}
+.fsec{margin:10px 0 4px;color:#7dff8a;font-size:11px;letter-spacing:2px;border-bottom:1px solid #2a3350;padding-bottom:2px;}
+.edbtn2{font:10px 'Courier New',monospace;background:#111a2e;color:#f7cc1d;border:2px outset #950;padding:4px 8px;cursor:pointer;margin:2px 4px 2px 0;}
+.edbtn2:active{border-style:inset;}
+.edTa{width:100%;height:110px;background:#060a10;color:#a3ff52;border:4px inset #1a1a2e;font:10px/1.4 'Courier New',monospace;margin:6px 0;resize:vertical;}
+.fnote{font-size:10px;color:#8b93b8;margin:4px 0;line-height:1.35;}
+#edToast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:30;background:#0b0f16;color:#f7cc1d;border:2px outset #950;padding:6px 14px;font:12px 'Courier New',monospace;opacity:0;transition:opacity .3s;pointer-events:none;max-width:80vw;}
+#edToast.show{opacity:1;}
+details{margin:6px 0;}
+details summary{color:#9fd8ff;font-size:11px;cursor:pointer;letter-spacing:1px;}
+details ol{margin:6px 0 6px 18px;font-size:10px;color:#cfd2e8;line-height:1.5;}
+details code{color:#a3ff52;}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="fps">FPS: --</div>
+
+<div class="edbar">
+  <button class="edbtn on" id="bPanel">ПАНЕЛЬ</button>
+  <button class="edbtn" id="bSpin">ВРАЩЕНИЕ КАМЕРЫ</button>
+  <button class="edbtn" id="bHelp">МОНТАЖ</button>
+</div>
+
+<div class="edp" id="panel">
+  <h3>PULSAR-GL · НАСТРОЙКИ (ГИБРИД)</h3>
+  <div class="fsec">ОСЬ И ВРАЩЕНИЕ</div>
+  <div id="rowsAxis"></div>
+  <div class="fsec">ДЖЕТЫ</div>
+  <div id="rowsJets"></div>
+  <div class="fsec">СВЕТ</div>
+  <div id="rowsLight"></div>
+  <div class="fsec">ЦВЕТА</div>
+  <div id="rowsColor"></div>
+  <div class="fsec">ПРЕСЕТЫ</div>
+  <div id="rowsPreset"></div>
+  <div class="fsec">ЭКСПОРТ fx.pg</div>
+  <div class="fnote">Вставить в реестр тела (fx.pg) либо импортировать через «ИМПОРТ» в игре. Дефолт: FXDEF[6].pg.</div>
+  <textarea class="edTa" id="expTa" spellcheck="false"></textarea>
+  <button class="edbtn2" id="bExp">ЭКСПОРТ</button>
+  <button class="edbtn2" id="bCopy">КОПИРОВАТЬ</button>
+
+  <div class="fsec" id="secHelp">ИНСТРУКЦИЯ ПО МОНТАЖУ</div>
+  <div id="helpBox">
+  <details open><summary>1 · TOOLS: регистрация типа</summary>
+  <ol>
+    <li>В <code>kindSel</code> добавить <code>'pulsar-gl'</code> в список типов.</li>
+    <li>Рядом с <code>mkRange</code> — хелпер <code>btnPreset(name, vals)</code>: пишет в <code>p.fx.pg[k]</code>, вызывает <code>buildPlanet()</code> + <code>toast()</code>.</li>
+    <li>В <code>buildPlanet()</code> после блока <code>sec('ДЖЕТЫ')</code>: секция <code>PULSAR-GL</code> — те же слайдеры, что здесь (spinSpeed, tilt, prec, rad, jetInt, jetW, jetLen, field, glow + 3 цвета).</li>
+    <li>Дефолты: <code>PG_DEF</code> рядом с <code>FXDEF</code>; поле <code>pg</code> добавить ВНУТРЬ существующей записи <code>FXDEF[6]</code>.</li>
+  </ol></details>
+  <details><summary>2 · Порт в игру: что уже есть</summary>
+  <ol>
+    <li><code>PKIND['pulsar-gl']:6</code> — есть.</li>
+    <li>Ветка шейдера <code>k==6</code> (uPg*) — есть.</li>
+    <li><code>fxPush</code>: <code>f.pg || d.pg</code> — есть.</li>
+  </ol></details>
+  <details><summary>3 · Порт в игру: два включателя</summary>
+  <ol>
+    <li>Заряд FSD: в условии добавить kind 6 — <code>pKind(planet)===3 || pKind(planet)===6</code>.</li>
+    <li>Грав-линза: <code>if(pKind(_li)!==3 && pKind(_li)!==6) continue;</code></li>
+  </ol></details>
+  <details><summary>4 · Порядок работ</summary>
+  <ol>
+    <li>Сначала TOOLS (шаги 1–4 из секции выше) — иначе экспорт не поедет.</li>
+    <li>Настроить тело здесь → ЭКСПОРТ → ИМПОРТ в игре.</li>
+    <li>Старые пульсары (kind 3) не трогать: дефолты FXDEF[6].pg их не ломают.</li>
+  </ol></details>
+  <details><summary>5 · Сборка «гибрид» (этот файл)</summary>
+  <ol>
+    <li>ШАР — из стенда: аналитическое пересечение луча со сферой, поверхность через <code>shadeStarSurface</code> (кора fbm, горячие шапки на полюсах, Френель).</li>
+    <li>ДЖЕТЫ — два прохода в одном марче: ПРОХОД 1 — конус-луч модуля (текущий), ПРОХОД 2 — наложение джетов стенда (coreBeam/outerBeam + спираль + fbm), со своей трансмиссией.</li>
+    <li>МАГИТОСФЕРА осталась от модуля (одна, чтобы не двойнить свечение). Джеты стенда влекут exp-затухание по плотности — как в стенде.</li>
+    <li>Тонмаппинг стенда (ACES + гамма) + дизеринг модуля в конце.</li>
+    <li>Для игры: оба прохода переносятся в ветку <code>k==6</code> как есть — метки ПРОХОД 1 / ПРОХОД 2 стоят в коде.</li>
+  </ol></details>
+  </div>
+</div>
+
+<div id="edToast"></div>
+
+<script id="fs" type="x-shader/x-fragment">
+precision highp float;
+uniform vec2 u_res;
+uniform float u_time;
+uniform vec3 u_camPos;
+uniform mat3 u_camMat;
+uniform float u_spin,u_tilt,u_prec,u_rad,u_jetInt,u_jetW,u_jetLen,u_field,u_glow;
+uniform vec3 u_coreC,u_jetC,u_fieldC;
+
+#define MAX_STEPS 96
+
+/* ================= УТИЛИТЫ СТЕНДА (порт WebGL2 -> WebGL1) ================= */
+mat2 rot2D(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
+float hash2(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+float hash3s(vec3 p){ p=fract(p*0.3183099+0.1); p*=17.0; return fract(p.x*p.y*p.z*(p.x+p.y+p.z)); }
+float noise3(vec3 x){
+  vec3 i=floor(x); vec3 f=fract(x); f=f*f*(3.0-2.0*f);
+  return mix(
+    mix(mix(hash3s(i+vec3(0.0,0.0,0.0)), hash3s(i+vec3(1.0,0.0,0.0)), f.x),
+        mix(hash3s(i+vec3(0.0,1.0,0.0)), hash3s(i+vec3(1.0,1.0,0.0)), f.x), f.y),
+    mix(mix(hash3s(i+vec3(0.0,0.0,1.0)), hash3s(i+vec3(1.0,0.0,1.0)), f.x),
+        mix(hash3s(i+vec3(0.0,1.0,1.0)), hash3s(i+vec3(1.0,1.0,1.0)), f.x), f.y), f.z);
+}
+float fbm(vec3 p){
+  float v=0.0, a=0.5;
+  for(int i=0;i<4;i++){ v += a*noise3(p); p = p*2.04 + vec3(0.13,-0.17,0.21); a *= 0.5; }
+  return v;
+}
+float turbNoise(vec3 p){ return sin(p.x*4.0+u_time*4.0)*cos(p.y*4.0)*sin(p.z*4.0); }
+
+/* фон стенда: галактическая полоса + звёзды (было в модуле пусто) */
+vec3 getBackground(vec3 rd){
+  vec3 col = vec3(0.005,0.008,0.018);
+  float gal = pow(max(0.0, 1.0 - abs(rd.y*1.8 + rd.x*0.5)), 4.0);
+  col += vec3(0.02,0.03,0.07)*gal*fbm(rd*4.0);
+  vec3 p = rd*180.0;
+  vec3 id = floor(p); vec3 f = fract(p)-0.5;
+  float h = hash3s(id);
+  if(h>0.965){
+    float d = length(f);
+    float star = smoothstep(0.35,0.02,d)*((h-0.965)*28.0);
+    vec3 starCol = mix(vec3(0.7,0.85,1.0), vec3(1.0,0.85,0.7), fract(h*43.1));
+    col += starCol*star*1.5;
+  }
+  return col;
+}
+
+/* магнитное пространство стенда (u_tilt в градусах -> radians) */
+vec3 toMagneticSpace(vec3 p){
+  if(u_prec>0.0){
+    p.xz *= rot2D(u_time*u_prec);
+    p.xy *= rot2D(sin(u_time*u_prec*0.7)*0.15);
+  }
+  p.xz *= rot2D(-u_time*u_spin);
+  p.xy *= rot2D(radians(u_tilt));
+  return p;
+}
+
+/* ================= ПРОХОД 2: ДЖЕТЫ СТЕНДА ================= */
+void standJets(vec3 p, out vec3 emission, out float density){
+  emission = vec3(0.0);
+  density = 0.0;
+  float r = length(p);
+  if(r < u_rad*0.95) return;
+  vec3 mp = toMagneticSpace(p);
+  float axialDist = abs(mp.y);
+  float radialDist = length(mp.xz);
+  if(axialDist > u_rad*0.7 && axialDist < u_jetLen){
+    float coneRadius = u_rad*0.18 + pow(axialDist,0.88)*u_jetW;
+    if(radialDist < coneRadius*2.2){
+      float spiralAngle = atan(mp.z,mp.x) + axialDist*2.2 - u_time*(u_spin*0.5+12.0);
+      float turb = fbm(vec3(mp.x*2.5, mp.y*0.7 - u_time*18.0, mp.z*2.5));
+      float spiral = 0.65 + 0.35*sin(spiralAngle*2.0 + turb*5.0);
+      float coreBeam = exp(-pow(radialDist/(coneRadius*0.45),2.0));
+      float outerBeam = exp(-pow(radialDist/coneRadius,2.0));
+      float lengthFade = smoothstep(u_rad*0.7,u_rad*1.3,axialDist)
+                       * pow(max(0.0,1.0-axialDist/u_jetLen),1.6);
+      float jetVal = (coreBeam*1.5 + outerBeam*0.6*spiral)*lengthFade*u_jetInt;
+      vec3 jCol = mix(u_jetC, vec3(1.0), coreBeam*0.75);
+      emission += jCol*jetVal*0.45;
+      density += jetVal*0.2;
+    }
+  }
+}
+
+/* ================= ШАР СТЕНДА ================= */
+vec3 shadeStarSurface(vec3 pos, vec3 normal, vec3 viewDir){
+  vec3 mp = toMagneticSpace(pos);
+  vec3 mNorm = normalize(mp);
+  float poleAlign = abs(mNorm.y);
+  float hotCaps = smoothstep(0.78,0.98,poleAlign);
+  float crust = fbm(mp*14.0 + vec3(0.0,u_time*2.0,0.0));
+  float fresnel = pow(1.0-max(dot(normal,viewDir),0.0),3.0);
+  vec3 baseCol = u_coreC*(0.65+0.45*crust);
+  vec3 capCol = mix(u_jetC, vec3(1.0), 0.8)*2.8;
+  vec3 col = mix(baseCol, capCol, hotCaps);
+  col += mix(u_coreC,u_jetC,0.5)*fresnel*1.5;
+  return col;
+}
+
+/* ================= ОСЬ МОДУЛЯ (ПРОХОД 1) ================= */
+vec3 axisDir(){
+  float t = radians(u_tilt);
+  vec3 a = normalize(vec3(sin(t),cos(t),0.0));
+  float pa = u_prec*u_time;
+  float c=cos(pa), s=sin(pa);
+  return normalize(vec3(a.x*c - a.z*s, a.y, a.x*s + a.z*c));
+}
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy*2.0 - u_res)/u_res.y;
+  vec3 ro = u_camPos;
+  vec3 rd = normalize(u_camMat*vec3(uv,1.6));
+
+  vec3 bg = getBackground(rd);
+
+  vec3 ax = axisDir();
+  vec3 e1 = normalize(cross(ax, vec3(0.0,0.0,1.0)+vec3(0.001,0.0,0.0)));
+  vec3 e2 = cross(ax,e1);
+  float phase = u_time*u_spin*6.2831853;
+
+  /* шар стенда: аналитическое пересечение */
+  float b = dot(ro,rd);
+  float c2 = dot(ro,ro)-u_rad*u_rad;
+  float disc = b*b-c2;
+  float starHit = 35.0; float hitStar = 0.0;
+  if(disc>0.0){ float tH=-b-sqrt(disc); if(tH>0.0){ starHit=tH; hitStar=1.0; } }
+
+  /* марч: два прохода джетов, до поверхности шара */
+  vec3 accumMine = vec3(0.0);
+  vec3 accumStand = vec3(0.0);
+  float trans = 1.0;
+  float tMin = max(0.1, length(ro)-u_jetLen-2.0);
+  float tMax = min(starHit, length(ro)+u_jetLen+2.0);
+  if(tMax > tMin){
+    float stepSize = (tMax-tMin)/float(MAX_STEPS);
+    float jit = hash3s(vec3(gl_FragCoord.xy, u_time*60.0));
+    float t = tMin + jit*stepSize;
+    for(int i=0;i<MAX_STEPS;i++){
+      if(t>=tMax || trans<0.02) break;
+      vec3 p = ro+rd*t;
+      float r = length(p);
+
+      /* -------- ПРОХОД 1: мои джеты (модуль) -------- */
+      float h = dot(p,ax);
+      vec3 q = p-ax*h;
+      float rq = length(q);
+      float jet = 0.0;
+      if(abs(h)<u_jetLen && rq<2.5){
+        float rc = u_jetW*(0.12+abs(h)/u_jetLen*1.8);
+        float cone = exp(-pow(rq/rc,2.0));
+        float fall = 0.35+0.65*pow(1.0-abs(h)/u_jetLen,0.7);
+        float ang = atan(dot(q,e2),dot(q,e1));
+        float beam = 0.45+0.55*pow(0.5+0.5*cos(ang*2.0-phase),3.0);
+        jet = u_jetInt*0.045*cone*fall*beam;
+      }
+      /* магнитосфера модуля (одна, без дублей) */
+      float ang2 = atan(dot(q,e2),dot(q,e1));
+      float field = u_field*0.006*exp(-max(r-u_rad,0.0)*1.4)
+                  * (0.6+0.4*sin(ang2*3.0+h*3.0-phase*0.5))
+                  * pow(clamp(abs(h)/max(r,1e-3),0.0,1.0),2.0);
+      accumMine += u_jetC*jet*0.60 + u_fieldC*field*0.60;
+
+      /* -------- ПРОХОД 2: джеты стенда (наложение) -------- */
+      vec3 standE; float standD;
+      standJets(p, standE, standD);
+      accumStand += standE*stepSize*trans;
+      trans *= exp(-standD*stepSize*0.6);
+
+      t += stepSize;
+    }
+  }
+
+  /* сборка как в стенде: фон -> шар -> накопленный свет */
+  vec3 col = bg*trans;
+  if(hitStar>0.5){
+    vec3 hp = ro+rd*starHit;
+    vec3 n = normalize(hp);
+    col = shadeStarSurface(hp,n,-rd)*trans;
+  }
+  col += accumMine*u_glow + accumStand*u_glow;
+
+  /* вспышка оси и гало стенда */
+  vec3 magAxisWorld = vec3(0.0,1.0,0.0);
+  magAxisWorld.xy *= rot2D(-radians(u_tilt));
+  magAxisWorld.xz *= rot2D(u_time*u_spin);
+  if(u_prec>0.0){
+    magAxisWorld.xy *= rot2D(-sin(u_time*u_prec*0.7)*0.15);
+    magAxisWorld.xz *= rot2D(-u_time*u_prec);
+  }
+  vec3 dirToStar = normalize(-ro);
+  float beamAlignment = pow(abs(dot(normalize(magAxisWorld),dirToStar)),24.0);
+  float distAtten = 1.0/(1.0+dot(ro,ro)*0.04);
+  float flare = beamAlignment*u_jetInt*distAtten*1.8;
+  float centerGlow = pow(max(0.0,dot(rd,dirToStar)),12.0);
+  col += mix(u_jetC,vec3(1.0),0.7)*flare*(0.35+centerGlow*1.5);
+  if(hitStar<0.5 && dot(-ro,rd)>0.0){
+    float closestApproach = length(cross(ro,rd));
+    float halo = exp(-closestApproach/(u_rad*0.65))*0.65*u_glow;
+    col += mix(u_coreC,u_jetC,0.4)*halo;
+  }
+
+  /* тонмаппинг стенда + дизеринг модуля в самом конце */
+  col = (col*(2.51*col+0.03))/(col*(2.43*col+0.59)+0.14);
+  col = pow(clamp(col,0.0,1.0), vec3(1.0/2.2));
+  col += (hash2(gl_FragCoord.xy)-0.5)/255.0;
+  gl_FragColor = vec4(col,1.0);
+}
+</script>
+
+<script id="vs" type="x-shader/x-vertex">
+attribute vec2 a_pos;
+void main(){ gl_Position = vec4(a_pos,0.0,1.0); }
+</script>
+
+<script>
+/* ============ PG_DEF — те же дефолты, что уедут в FXDEF[6].pg ============ */
+var PG_DEF = { spinSpeed:8.0, tilt:32, prec:0.2, rad:0.65, jetInt:1.4, jetW:0.22, jetLen:8.0,
+               field:1.0, glow:1.2, coreC:'#ffffff', jetC:'#3388ff', fieldC:'#9933ff' };
+var PG = JSON.parse(JSON.stringify(PG_DEF));
+var PRESETS = {
+  'КРАБОВИДНЫЙ':   {spinSpeed:15.0, tilt:45, prec:0.1,  rad:0.60, jetInt:1.8, jetW:0.18, jetLen:10.0, field:1.3, glow:1.3, coreC:'#ffffff', jetC:'#3399ff', fieldC:'#6633ff'},
+  'МАГНЕТАР':      {spinSpeed:2.5,  tilt:65, prec:0.4,  rad:0.85, jetInt:0.9, jetW:0.35, jetLen:6.5,  field:2.6, glow:1.6, coreC:'#ffddff', jetC:'#ff2266', fieldC:'#ff00aa'},
+  'МИЛЛИСЕКУНДНЫЙ':{spinSpeed:38.0, tilt:22, prec:0.05, rad:0.55, jetInt:2.4, jetW:0.14, jetLen:13.0, field:0.8, glow:1.4, coreC:'#e0ffff', jetC:'#00ffcc', fieldC:'#0088ff'},
+  'СУПЕР-ПУЛЬСАР': {spinSpeed:5.0,  tilt:25, prec:0.15, rad:1.25, jetInt:3.0, jetW:0.40, jetLen:16.0, field:2.4, glow:2.0, coreC:'#ffe9f4', jetC:'#b040ff', fieldC:'#6a00ff'}
+};
+
+function toast(msg){
+  var el = document.getElementById('edToast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(function(){ el.classList.remove('show'); }, 1800);
+}
+
+/* ============ GL (WebGL1 — как в игре) ============ */
+var cv = document.getElementById('gl');
+var gl = cv.getContext('webgl', {antialias:false});
+function sh(type, src){
+  var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+  return s;
+}
+var prog = gl.createProgram();
+gl.attachShader(prog, sh(gl.VERTEX_SHADER, document.getElementById('vs').textContent));
+gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, document.getElementById('fs').textContent));
+gl.linkProgram(prog); gl.useProgram(prog);
+var buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+var aPos = gl.getAttribLocation(prog,'a_pos');
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
+var U = {};
+['u_res','u_time','u_camPos','u_camMat','u_spin','u_tilt','u_prec','u_rad','u_jetInt','u_jetW','u_jetLen','u_field','u_glow','u_coreC','u_jetC','u_fieldC']
+  .forEach(function(n){ U[n] = gl.getUniformLocation(prog, n); });
+
+function hex2rgb(h){
+  return [parseInt(h.substr(1,2),16)/255, parseInt(h.substr(3,2),16)/255, parseInt(h.substr(5,2),16)/255];
+}
+
+/* ============ Камера (орбита) ============ */
+var yaw = 0.6, pitch = 0.35, dist = 6.0, autoOrbit = true, drag = null;
+function camBasis(){
+  var cp = Math.cos(pitch), sp = Math.sin(pitch), cy = Math.cos(yaw), sy = Math.sin(yaw);
+  var pos = [dist*cp*sy, dist*sp, dist*cp*cy];
+  var tgt = [0,0,0];
+  var f = [tgt[0]-pos[0], tgt[1]-pos[1], tgt[2]-pos[2]];
+  var fl = Math.hypot(f[0],f[1],f[2]); f = [f[0]/fl, f[1]/fl, f[2]/fl];
+  var up = [0,1,0];
+  var r = [f[1]*up[2]-f[2]*up[1], f[2]*up[0]-f[0]*up[2], f[0]*up[1]-f[1]*up[0]];
+  var rl = Math.hypot(r[0],r[1],r[2]); r = [r[0]/rl, r[1]/rl, r[2]/rl];
+  var u = [r[1]*f[2]-r[2]*f[1], r[2]*f[0]-r[0]*f[2], r[0]*f[1]-r[1]*f[0]];
+  return {pos:pos, mat:[r[0],r[1],r[2], u[0],u[1],u[2], f[0],f[1],f[2]]};
+}
+cv.addEventListener('mousedown', function(e){ drag = {x:e.clientX, y:e.clientY}; });
+window.addEventListener('mouseup', function(){ drag = null; });
+window.addEventListener('mousemove', function(e){
+  if(!drag) return;
+  yaw   += (e.clientX - drag.x)*0.008;
+  pitch += (e.clientY - drag.y)*0.008;
+  pitch = Math.max(-1.45, Math.min(1.45, pitch));
+  drag = {x:e.clientX, y:e.clientY};
+});
+cv.addEventListener('wheel', function(e){
+  dist *= (e.deltaY > 0 ? 1.08 : 0.93);
+  dist = Math.max(1.6, Math.min(22.0, dist));
+  e.preventDefault();
+}, {passive:false});
+
+/* ============ UI ============ */
+var SLIDERS = [
+  ['rowsAxis','spinSpeed','ВРАЩЕНИЕ (ГЦ)',0,40,0.5],
+  ['rowsAxis','tilt','НАКЛОН ОСИ °',0,90,1],
+  ['rowsAxis','prec','ПРЕЦЕССИЯ',0,2,0.05],
+  ['rowsJets','jetInt','ЯРКОСТЬ ДЖЕТОВ',0,4,0.1],
+  ['rowsJets','jetW','ШИРИНА КОНУСА',0.05,0.6,0.01],
+  ['rowsJets','jetLen','ДЛИНА ДЖЕТОВ',2,18,0.5],
+  ['rowsLight','field','МАГНИТОСФЕРА',0,3,0.1],
+  ['rowsLight','glow','GLOW',0.1,3,0.1],
+  ['rowsLight','rad','РАДИУС ЯДРА',0.2,1.5,0.05]
+];
+var COLORS = [
+  ['rowsColor','coreC','ЦВЕТ ЯДРА'],
+  ['rowsColor','jetC','ЦВЕТ ДЖЕТОВ'],
+  ['rowsColor','fieldC','ЦВЕТ МАГН. ЛИНИЙ']
+];
+SLIDERS.forEach(function(s){
+  var row = document.getElementById(s[0]);
+  var d = document.createElement('div'); d.className = 'frow';
+  var lab = document.createElement('label'); lab.textContent = s[2];
+  var inp = document.createElement('input'); inp.type = 'range';
+  inp.min = s[3]; inp.max = s[4]; inp.step = s[5]; inp.value = PG[s[1]];
+  var val = document.createElement('div'); val.className = 'fval'; val.textContent = (+PG[s[1]]).toFixed(2);
+  inp.addEventListener('input', function(){
+    PG[s[1]] = +inp.value;
+    val.textContent = (+inp.value).toFixed(2);
+  });
+  d.appendChild(lab); d.appendChild(inp); d.appendChild(val);
+  d._key = s[1]; d._inp = inp; d._val = val;
+  row.appendChild(d);
+});
+COLORS.forEach(function(c){
+  var row = document.getElementById(c[0]);
+  var d = document.createElement('div'); d.className = 'frow';
+  var lab = document.createElement('label'); lab.textContent = c[2];
+  var inp = document.createElement('input'); inp.type = 'color'; inp.value = PG[c[1]];
+  inp.addEventListener('input', function(){ PG[c[1]] = inp.value; });
+  d.appendChild(lab); d.appendChild(inp);
+  row.appendChild(d);
+});
+Object.keys(PRESETS).forEach(function(name){
+  var b = document.createElement('button'); b.className = 'edbtn2'; b.textContent = name;
+  b.addEventListener('click', function(){
+    var vals = PRESETS[name];
+    Object.keys(vals).forEach(function(k){ PG[k] = vals[k]; });
+    syncUI();
+    toast('PULSAR-GL: пресет «' + name + '» применён');
+  });
+  document.getElementById('rowsPreset').appendChild(b);
+});
+function syncUI(){
+  SLIDERS.forEach(function(s){
+    var row = document.getElementById(s[0]);
+    for(var i=0;i<row.children.length;i++){
+      var d = row.children[i];
+      if(d._key === s[1]){ d._inp.value = PG[s[1]]; d._val.textContent = (+PG[s[1]]).toFixed(2); }
+    }
+  });
+  COLORS.forEach(function(c){
+    var row = document.getElementById(c[0]);
+    for(var i=0;i<row.children.length;i++){
+      var inp = row.children[i].querySelector('input');
+      if(inp) inp.value = PG[c[1]];
+    }
+  });
+}
+
+/* ============ Экспорт ============ */
+document.getElementById('bExp').addEventListener('click', function(){
+  var o = { pg:{} };
+  SLIDERS.forEach(function(s){ o.pg[s[1]] = PG[s[1]]; });
+  COLORS.forEach(function(c){ o.pg[c[1]] = PG[c[1]]; });
+  document.getElementById('expTa').value = JSON.stringify(o);
+  toast('fx.pg собран — вставить в реестр тела');
+});
+document.getElementById('bCopy').addEventListener('click', function(){
+  var ta = document.getElementById('expTa');
+  ta.select();
+  try{ document.execCommand('copy'); toast('Скопировано в буфер'); }
+  catch(e){ toast('Скопируйте вручную'); }
+});
+
+/* ============ Панель-кнопки ============ */
+var panel = document.getElementById('panel');
+document.getElementById('bPanel').addEventListener('click', function(){
+  panel.classList.toggle('show');
+  this.classList.toggle('on');
+});
+document.getElementById('bSpin').addEventListener('click', function(){
+  autoOrbit = !autoOrbit;
+  this.classList.toggle('on', autoOrbit);
+});
+document.getElementById('bHelp').addEventListener('click', function(){
+  var hb = document.getElementById('helpBox');
+  var open = hb.style.display !== 'none';
+  hb.style.display = open ? 'none' : 'block';
+  this.classList.toggle('on', !open);
+});
+
+/* ============ Цикл ============ */
+var t0 = performance.now(), frames = 0, fpsT = t0;
+function frame(now){
+  var t = (now - t0)/1000;
+  if(autoOrbit) yaw += 0.0035;
+  var cb = camBasis();
+  var w = cv.width = Math.floor(innerWidth*0.75);
+  var h = cv.height = Math.floor(innerHeight*0.75);
+  cv.style.width = innerWidth+'px'; cv.style.height = innerHeight+'px';
+  gl.viewport(0,0,w,h);
+  gl.uniform2f(U.u_res, w, h);
+  gl.uniform1f(U.u_time, t);
+  gl.uniform3f(U.u_camPos, cb.pos[0], cb.pos[1], cb.pos[2]);
+  gl.uniformMatrix3fv(U.u_camMat, false, new Float32Array(cb.mat));
+  gl.uniform1f(U.u_spin, PG.spinSpeed);
+  gl.uniform1f(U.u_tilt, PG.tilt);
+  gl.uniform1f(U.u_prec, PG.prec);
+  gl.uniform1f(U.u_rad, PG.rad);
+  gl.uniform1f(U.u_jetInt, PG.jetInt);
+  gl.uniform1f(U.u_jetW, PG.jetW);
+  gl.uniform1f(U.u_jetLen, PG.jetLen);
+  gl.uniform1f(U.u_field, PG.field);
+  gl.uniform1f(U.u_glow, PG.glow);
+  gl.uniform3f(U.u_coreC, hex2rgb(PG.coreC)[0], hex2rgb(PG.coreC)[1], hex2rgb(PG.coreC)[2]);
+  gl.uniform3f(U.u_jetC, hex2rgb(PG.jetC)[0], hex2rgb(PG.jetC)[1], hex2rgb(PG.jetC)[2]);
+  gl.uniform3f(U.u_fieldC, hex2rgb(PG.fieldC)[0], hex2rgb(PG.fieldC)[1], hex2rgb(PG.fieldC)[2]);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  frames++;
+  if(now - fpsT > 500){
+    document.getElementById('fps').textContent = 'FPS: ' + Math.round(frames*1000/(now-fpsT));
+    frames = 0; fpsT = now;
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

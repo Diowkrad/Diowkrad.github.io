@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D GLSL Pulsar Shader Stand</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #020308;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #e0e8ff;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* UI Панель настроек */
+        #ui-panel {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 310px;
+            background: rgba(10, 14, 26, 0.78);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 160, 255, 0.25);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            max-height: calc(100vh - 30px);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        #ui-panel.collapsed {
+            transform: translateX(330px);
+        }
+        #toggle-ui {
+            position: absolute;
+            top: 15px;
+            right: 335px;
+            background: rgba(10, 14, 26, 0.85);
+            border: 1px solid rgba(100, 160, 255, 0.3);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: right 0.3s ease, background 0.2s;
+        }
+        #toggle-ui:hover {
+            background: rgba(40, 80, 160, 0.8);
+        }
+        #ui-panel.collapsed + #toggle-ui {
+            right: 15px;
+        }
+
+        h2 {
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            color: #66b2ff;
+            border-bottom: 1px solid rgba(100, 160, 255, 0.2);
+            padding-bottom: 6px;
+        }
+        .control-group {
+            margin-bottom: 11px;
+        }
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #b8c8e8;
+        }
+        .control-val {
+            color: #66b2ff;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: #4da6ff;
+        }
+        input[type="color"] {
+            width: 100%;
+            height: 26px;
+            border: none;
+            border-radius: 4px;
+            background: none;
+            cursor: pointer;
+        }
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        button.action-btn {
+            flex: 1;
+            padding: 7px;
+            background: rgba(50, 110, 220, 0.3);
+            border: 1px solid rgba(100, 160, 255, 0.4);
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        button.action-btn:hover {
+            background: rgba(70, 140, 255, 0.6);
+        }
+
+        /* Подсказка по управлению */
+        #hud-help {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(10, 14, 26, 0.65);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(100, 160, 255, 0.2);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #a0b4d8;
+            pointer-events: none;
+        }
+        #hud-help b {
+            color: #fff;
+        }
+        #fps-counter {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #66ff99;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="glcanvas"></canvas>
+<div id="fps-counter">FPS: 60</div>
+
+<div id="hud-help">
+    <b>Управление Freecam:</b><br>
+    <b>W A S D</b> — Полет | <b>Q / E</b> — Вниз / Вверх | <b>Shift</b> — Ускорение<br>
+    <b>ЛКМ + Мышь</b> — Вращение камеры | <b>Колесо</b> — Скорость полета<br>
+    <b>R</b> — Сброс камеры | <b>Пробел</b> — Пауза вращения
+</div>
+
+<div id="ui-panel">
+    <h2>Параметры Пульсара</h2>
+
+    <div class="control-group">
+        <div class="control-header"><span>Скорость вращения (Гц)</span><span class="control-val" id="val-spinSpeed">8.0</span></div>
+        <input type="range" id="spinSpeed" min="0" max="40" step="0.5" value="8.0">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Наклон магнитной оси (°)</span><span class="control-val" id="val-magTilt">32</span></div>
+        <input type="range" id="magTilt" min="0" max="90" step="1" value="32">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Прецессия оси</span><span class="control-val" id="val-precession">0.2</span></div>
+        <input type="range" id="precession" min="0" max="2.0" step="0.05" value="0.2">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Радиус ядра</span><span class="control-val" id="val-starRadius">0.65</span></div>
+        <input type="range" id="starRadius" min="0.2" max="1.5" step="0.05" value="0.65">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Яркость релятивистских джетов</span><span class="control-val" id="val-jetIntensity">1.4</span></div>
+        <input type="range" id="jetIntensity" min="0" max="4.0" step="0.1" value="1.4">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Ширина конуса джетов</span><span class="control-val" id="val-jetWidth">0.22</span></div>
+        <input type="range" id="jetWidth" min="0.05" max="0.6" step="0.01" value="0.22">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Длина джетов</span><span class="control-val" id="val-jetLength">8.0</span></div>
+        <input type="range" id="jetLength" min="2.0" max="18.0" step="0.5" value="8.0">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Плотность магнитосферы</span><span class="control-val" id="val-fieldStrength">1.0</span></div>
+        <input type="range" id="fieldStrength" min="0" max="3.0" step="0.1" value="1.0">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Абберация / Свечение (Glow)</span><span class="control-val" id="val-glow">1.2</span></div>
+        <input type="range" id="glow" min="0.1" max="3.0" step="0.1" value="1.2">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Цвет ядра</span></div>
+        <input type="color" id="coreColor" value="#ffffff">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Цвет джетов (Гамма-лучи)</span></div>
+        <input type="color" id="jetColor" value="#3388ff">
+    </div>
+
+    <div class="control-group">
+        <div class="control-header"><span>Цвет магнитных линий</span></div>
+        <input type="color" id="fieldColor" value="#9933ff">
+    </div>
+
+    <div class="btn-row">
+        <button class="action-btn" id="btn-preset-crab">Крабовидный</button>
+        <button class="action-btn" id="btn-preset-magnetar">Магнетар</button>
+        <button class="action-btn" id="btn-preset-milli">Миллисекундный</button>
+    </div>
+</div>
+<button id="toggle-ui">Скрыть UI</button>
+
+<!-- VERTEX SHADER -->
+<script id="vs" type="x-shader/x-vertex">#version 300 es
+in vec2 a_pos;
+void main() {
+    gl_Position = vec4(a_pos, 0.0, 1.0);
+}
+</script>
+
+<!-- FRAGMENT SHADER (GLSL RAYMARCHING PULSAR) -->
+<script id="fs" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+
+out vec4 fragColor;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+
+// Камера
+uniform vec3 u_camPos;
+uniform mat3 u_camMat;
+
+// Параметры Пульсара
+uniform float u_spinSpeed;
+uniform float u_magTilt;
+uniform float u_precession;
+uniform float u_starRadius;
+uniform float u_jetIntensity;
+uniform float u_jetWidth;
+uniform float u_jetLength;
+uniform float u_fieldStrength;
+uniform float u_glow;
+
+uniform vec3 u_coreColor;
+uniform vec3 u_jetColor;
+uniform vec3 u_fieldColor;
+
+#define PI 3.14159265359
+#define MAX_STEPS 96
+#define MAX_DIST 35.0
+
+mat2 rot2D(float a) {
+    float s = sin(a), c = cos(a);
+    return mat2(c, -s, s, c);
+}
+
+float hash(vec3 p) {
+    p = fract(p * 0.3183099 + 0.1);
+    p *= 17.0;
+    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+}
+
+float noise(vec3 x) {
+    vec3 i = floor(x);
+    vec3 f = fract(x);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(mix(hash(i + vec3(0,0,0)), hash(i + vec3(1,0,0)), f.x),
+                   mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x), f.y),
+               mix(mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x),
+                   mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x), f.y), f.z);
+}
+
+float fbm(vec3 p) {
+    float v = 0.0;
+    float a = 0.5;
+    for (int i = 0; i < 4; i++) {
+        v += a * noise(p);
+        p = p * 2.04 + vec3(0.13, -0.17, 0.21);
+        a *= 0.5;
+    }
+    return v;
+}
+
+float turbNoise(vec3 p) {
+    return sin(p.x * 4.0 + u_time * 4.0) * cos(p.y * 4.0) * sin(p.z * 4.0);
+}
+
+vec3 getBackground(vec3 rd) {
+    vec3 col = vec3(0.005, 0.008, 0.018);
+    
+    float gal = pow(max(0.0, 1.0 - abs(rd.y * 1.8 + rd.x * 0.5)), 4.0);
+    col += vec3(0.02, 0.03, 0.07) * gal * fbm(rd * 4.0);
+
+    vec3 p = rd * 180.0;
+    vec3 id = floor(p);
+    vec3 f = fract(p) - 0.5;
+    float h = hash(id);
+    if (h > 0.965) {
+        float d = length(f);
+        float star = smoothstep(0.35, 0.02, d) * ((h - 0.965) * 28.0);
+        vec3 starCol = mix(vec3(0.7, 0.85, 1.0), vec3(1.0, 0.85, 0.7), fract(h * 43.1));
+        col += starCol * star * 1.5;
+    }
+    return col;
+}
+
+vec3 toMagneticSpace(vec3 p) {
+    if (u_precession > 0.0) {
+        p.xz *= rot2D(u_time * u_precession);
+        p.xy *= rot2D(sin(u_time * u_precession * 0.7) * 0.15);
+    }
+    p.xz *= rot2D(-u_time * u_spinSpeed);
+    p.xy *= rot2D(u_magTilt);
+    return p;
+}
+
+void samplePulsarMedia(vec3 p, out vec3 emission, out float density) {
+    emission = vec3(0.0);
+    density = 0.0;
+
+    float r = length(p);
+    if (r < u_starRadius * 0.95) return;
+
+    vec3 mp = toMagneticSpace(p);
+    
+    // 1. РЕЛЯТИВИСТСКИЕ ДЖЕТЫ
+    float axialDist = abs(mp.y);
+    float radialDist = length(mp.xz);
+    
+    if (axialDist > u_starRadius * 0.7 && axialDist < u_jetLength) {
+        float coneRadius = u_starRadius * 0.18 + pow(axialDist, 0.88) * u_jetWidth;
+        
+        if (radialDist < coneRadius * 2.2) {
+            float spiralAngle = atan(mp.z, mp.x) + axialDist * 2.2 - u_time * (u_spinSpeed * 0.5 + 12.0);
+            vec3 noiseCoord = vec3(mp.x * 2.5, mp.y * 0.7 - u_time * 18.0, mp.z * 2.5);
+            float turb = fbm(noiseCoord);
+            float spiral = 0.65 + 0.35 * sin(spiralAngle * 2.0 + turb * 5.0);
+
+            float coreBeam = exp(-pow(radialDist / (coneRadius * 0.45), 2.0));
+            float outerBeam = exp(-pow(radialDist / coneRadius, 2.0));
+            
+            float lengthFade = smoothstep(u_starRadius * 0.7, u_starRadius * 1.3, axialDist) * 
+                               pow(max(0.0, 1.0 - axialDist / u_jetLength), 1.6);
+
+            float jetVal = (coreBeam * 1.5 + outerBeam * 0.6 * spiral) * lengthFade * u_jetIntensity;
+            
+            vec3 jCol = mix(u_jetColor, vec3(1.0), coreBeam * 0.75);
+            emission += jCol * jetVal * 0.45;
+            density += jetVal * 0.2;
+        }
+    }
+
+    // 2. МАГНИТОСФЕРА
+    if (u_fieldStrength > 0.01 && r < u_starRadius * 6.5) {
+        float sinTheta = radialDist / (r + 1e-5);
+        float L = r / (sinTheta * sinTheta + 0.02);
+        
+        float shellPattern = sin(L * 3.5 - u_time * 3.0);
+        float shellMask = smoothstep(0.75, 0.99, shellPattern);
+        
+        float phi = atan(mp.z, mp.x);
+        float filaments = pow(0.5 + 0.5 * sin(phi * 6.0 + turbNoise(mp)), 3.0);
+        
+        float polarMask = smoothstep(0.15, 0.5, sinTheta);
+        float distFade = exp(-r / (u_starRadius * 2.4)) * smoothstep(u_starRadius, u_starRadius * 1.4, r);
+        
+        float fieldVal = shellMask * filaments * polarMask * distFade * u_fieldStrength;
+        emission += u_fieldColor * fieldVal * 0.65;
+        density += fieldVal * 0.15;
+    }
+}
+
+vec3 shadeStarSurface(vec3 pos, vec3 normal, vec3 viewDir) {
+    vec3 mp = toMagneticSpace(pos);
+    vec3 mNorm = normalize(mp);
+    
+    float poleAlign = abs(mNorm.y);
+    float hotCaps = smoothstep(0.78, 0.98, poleAlign);
+    
+    float crust = fbm(mp * 14.0 + vec3(0.0, u_time * 2.0, 0.0));
+    float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
+    
+    vec3 baseCol = u_coreColor * (0.65 + 0.45 * crust);
+    vec3 capCol = mix(u_jetColor, vec3(1.0, 1.0, 1.0), 0.8) * 2.8;
+    
+    vec3 col = mix(baseCol, capCol, hotCaps);
+    col += mix(u_coreColor, u_jetColor, 0.5) * fresnel * 1.5;
+    
+    return col;
+}
+
+void main() {
+    vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / u_resolution.y;
+    
+    vec3 ro = u_camPos;
+    vec3 rd = normalize(u_camMat * vec3(uv, 1.15));
+
+    vec3 bg = getBackground(rd);
+    
+    float b = dot(ro, rd);
+    float c = dot(ro, ro) - u_starRadius * u_starRadius;
+    float h = b * b - c;
+    
+    float starHitDist = MAX_DIST;
+    bool hitStar = false;
+    if (h > 0.0) {
+        float t = -b - sqrt(h);
+        if (t > 0.0) {
+            starHitDist = t;
+            hitStar = true;
+        }
+    }
+
+    vec3 magAxisWorld = vec3(0.0, 1.0, 0.0);
+    magAxisWorld.xy *= rot2D(-u_magTilt);
+    magAxisWorld.xz *= rot2D(u_time * u_spinSpeed);
+    if (u_precession > 0.0) {
+        magAxisWorld.xy *= rot2D(-sin(u_time * u_precession * 0.7) * 0.15);
+        magAxisWorld.xz *= rot2D(-u_time * u_precession);
+    }
+    
+    vec3 dirToStar = normalize(-ro);
+    float beamAlignment = pow(abs(dot(normalize(magAxisWorld), dirToStar)), 24.0);
+    float distAtten = 1.0 / (1.0 + dot(ro, ro) * 0.04);
+    float flare = beamAlignment * u_jetIntensity * distAtten * 1.8;
+
+    vec3 accumLight = vec3(0.0);
+    float transmittance = 1.0;
+
+    float tMin = max(0.1, length(ro) - u_jetLength - 2.0);
+    float tMax = min(starHitDist, length(ro) + u_jetLength + 2.0);
+    
+    if (tMax > tMin) {
+        float stepSize = (tMax - tMin) / float(MAX_STEPS);
+        float jitter = hash(vec3(gl_FragCoord.xy, u_time * 60.0));
+        float t = tMin + jitter * stepSize;
+
+        for (int i = 0; i < MAX_STEPS; i++) {
+            if (t >= tMax || transmittance < 0.02) break;
+            
+            vec3 pos = ro + rd * t;
+            vec3 stepEmission;
+            float stepDensity;
+            
+            samplePulsarMedia(pos, stepEmission, stepDensity);
+            
+            accumLight += stepEmission * stepSize * transmittance * u_glow;
+            transmittance *= exp(-stepDensity * stepSize * 0.6);
+            
+            t += stepSize;
+        }
+    }
+
+    vec3 finalCol = bg * transmittance;
+
+    if (hitStar) {
+        vec3 hitPos = ro + rd * starHitDist;
+        vec3 normal = normalize(hitPos);
+        vec3 starCol = shadeStarSurface(hitPos, normal, -rd);
+        finalCol = starCol * transmittance;
+    }
+
+    finalCol += accumLight;
+
+    float centerGlow = pow(max(0.0, dot(rd, dirToStar)), 12.0);
+    finalCol += mix(u_jetColor, vec3(1.0), 0.7) * flare * (0.35 + centerGlow * 1.5);
+
+    float closestApproach = length(cross(ro, rd));
+    if (!hitStar && dot(-ro, rd) > 0.0) {
+        float halo = exp(-closestApproach / (u_starRadius * 0.65)) * 0.65 * u_glow;
+        finalCol += mix(u_coreColor, u_jetColor, 0.4) * halo;
+    }
+
+    finalCol = (finalCol * (2.51 * finalCol + 0.03)) / (finalCol * (2.43 * finalCol + 0.59) + 0.14);
+    finalCol = pow(clamp(finalCol, 0.0, 1.0), vec3(1.0 / 2.2));
+
+    fragColor = vec4(finalCol, 1.0);
+}
+</script>
+
+<script>
+(function() {
+    const canvas = document.getElementById('glcanvas');
+    const gl = canvas.getContext('webgl2');
+
+    if (!gl) {
+        alert('Ваш браузер не поддерживает WebGL 2.0!');
+        return;
+    }
+
+    function compileShader(type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.error(gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+            return null;
+        }
+        return shader;
+    }
+
+    const vsSource = document.getElementById('vs').textContent;
+    const fsSource = document.getElementById('fs').textContent;
+
+    const program = gl.createProgram();
+    gl.attachShader(program, compileShader(gl.VERTEX_SHADER, vsSource));
+    gl.attachShader(program, compileShader(gl.FRAGMENT_SHADER, fsSource));
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error(gl.getProgramInfoLog(program));
+        return;
+    }
+    gl.useProgram(program);
+
+    const quadVerts = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+    const vbo = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.bufferData(gl.ARRAY_BUFFER, quadVerts, gl.STATIC_DRAW);
+
+    const posLoc = gl.getAttribLocation(program, 'a_pos');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uniforms = {
+        resolution: gl.getUniformLocation(program, 'u_resolution'),
+        time: gl.getUniformLocation(program, 'u_time'),
+        camPos: gl.getUniformLocation(program, 'u_camPos'),
+        camMat: gl.getUniformLocation(program, 'u_camMat'),
+        spinSpeed: gl.getUniformLocation(program, 'u_spinSpeed'),
+        magTilt: gl.getUniformLocation(program, 'u_magTilt'),
+        precession: gl.getUniformLocation(program, 'u_precession'),
+        starRadius: gl.getUniformLocation(program, 'u_starRadius'),
+        jetIntensity: gl.getUniformLocation(program, 'u_jetIntensity'),
+        jetWidth: gl.getUniformLocation(program, 'u_jetWidth'),
+        jetLength: gl.getUniformLocation(program, 'u_jetLength'),
+        fieldStrength: gl.getUniformLocation(program, 'u_fieldStrength'),
+        glow: gl.getUniformLocation(program, 'u_glow'),
+        coreColor: gl.getUniformLocation(program, 'u_coreColor'),
+        jetColor: gl.getUniformLocation(program, 'u_jetColor'),
+        fieldColor: gl.getUniformLocation(program, 'u_fieldColor')
+    };
+
+    function hexToRgb(hex) {
+        const num = parseInt(hex.slice(1), 16);
+        return [(num >> 16 & 255) / 255, (num >> 8 & 255) / 255, (num & 255) / 255];
+    }
+
+    const state = {
+        spinSpeed: 8.0,
+        magTilt: 32 * Math.PI / 180,
+        precession: 0.2,
+        starRadius: 0.65,
+        jetIntensity: 1.4,
+        jetWidth: 0.22,
+        jetLength: 8.0,
+        fieldStrength: 1.0,
+        glow: 1.2,
+        coreColor: [1.0, 1.0, 1.0],
+        jetColor: [0.2, 0.53, 1.0],
+        fieldColor: [0.6, 0.2, 1.0],
+        paused: false
+    };
+
+    const sliders = [
+        'spinSpeed', 'magTilt', 'precession', 'starRadius',
+        'jetIntensity', 'jetWidth', 'jetLength', 'fieldStrength', 'glow'
+    ];
+
+    sliders.forEach(id => {
+        const el = document.getElementById(id);
+        const valEl = document.getElementById('val-' + id);
+        el.addEventListener('input', () => {
+            const v = parseFloat(el.value);
+            valEl.textContent = v;
+            state[id] = (id === 'magTilt') ? (v * Math.PI / 180) : v;
+        });
+    });
+
+    ['coreColor', 'jetColor', 'fieldColor'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', () => {
+            state[id] = hexToRgb(el.value);
+        });
+    });
+
+    function applyPreset(p) {
+        for (let key in p) {
+            const el = document.getElementById(key);
+            if (!el) continue;
+            el.value = p[key];
+            el.dispatchEvent(new Event('input'));
+        }
+    }
+
+    document.getElementById('btn-preset-crab').onclick = () => applyPreset({
+        spinSpeed: 15.0, magTilt: 45, precession: 0.1, starRadius: 0.6,
+        jetIntensity: 1.8, jetWidth: 0.18, jetLength: 10.0, fieldStrength: 1.3,
+        glow: 1.3, coreColor: '#ffffff', jetColor: '#3399ff', fieldColor: '#6633ff'
+    });
+
+    document.getElementById('btn-preset-magnetar').onclick = () => applyPreset({
+        spinSpeed: 2.5, magTilt: 65, precession: 0.4, starRadius: 0.85,
+        jetIntensity: 0.9, jetWidth: 0.35, jetLength: 6.5, fieldStrength: 2.6,
+        glow: 1.6, coreColor: '#ffddff', jetColor: '#ff2266', fieldColor: '#ff00aa'
+    });
+
+    document.getElementById('btn-preset-milli').onclick = () => applyPreset({
+        spinSpeed: 38.0, magTilt: 22, precession: 0.05, starRadius: 0.55,
+        jetIntensity: 2.4, jetWidth: 0.14, jetLength: 13.0, fieldStrength: 0.8,
+        glow: 1.4, coreColor: '#e0ffff', jetColor: '#00ffcc', fieldColor: '#0088ff'
+    });
+
+    const uiPanel = document.getElementById('ui-panel');
+    const toggleBtn = document.getElementById('toggle-ui');
+    toggleBtn.onclick = () => {
+        uiPanel.classList.toggle('collapsed');
+        toggleBtn.textContent = uiPanel.classList.contains('collapsed') ? 'Настройки' : 'Скрыть UI';
+    };
+
+    // --- СИСТЕМА FREECAM ---
+    const cam = {
+        pos: [0.0, 1.8, -7.5],
+        yaw: 0.0,
+        pitch: -0.22,
+        speed: 5.0,
+        sensitivity: 0.003
+    };
+
+    const keys = {};
+    let isDragging = false;
+    let lastMouse = { x: 0, y: 0 };
+
+    window.addEventListener('keydown', e => {
+        keys[e.code] = true;
+        if (e.code === 'KeyR') {
+            cam.pos = [0.0, 1.8, -7.5];
+            cam.yaw = 0.0;
+            cam.pitch = -0.22;
+        }
+        if (e.code === 'Space') {
+            state.paused = !state.paused;
+        }
+    });
+    window.addEventListener('keyup', e => keys[e.code] = false);
+
+    canvas.addEventListener('mousedown', e => {
+        if (e.button === 0) {
+            isDragging = true;
+            lastMouse.x = e.clientX;
+            lastMouse.y = e.clientY;
+        }
+    });
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const dx = e.clientX - lastMouse.x;
+        const dy = e.clientY - lastMouse.y;
+        lastMouse.x = e.clientX;
+        lastMouse.y = e.clientY;
+
+        cam.yaw += dx * cam.sensitivity;
+        cam.pitch -= dy * cam.sensitivity;
+        cam.pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, cam.pitch));
+    });
+
+    canvas.addEventListener('wheel', e => {
+        cam.speed *= (e.deltaY > 0) ? 0.85 : 1.18;
+        cam.speed = Math.max(0.5, Math.min(40.0, cam.speed));
+    });
+
+    function getCameraMatrix() {
+        const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
+        const cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+
+        // Forward
+        const f = [sy * cp, sp, cy * cp];
+        // Right
+        const r = [cy, 0, -sy];
+        // Up = cross(f, r)
+        const u = [
+            f[1] * r[2] - f[2] * r[1],
+            f[2] * r[0] - f[0] * r[2],
+            f[0] * r[1] - f[1] * r[0]
+        ];
+        return { f, r, u, mat: new Float32Array([...r, ...u, ...f]) };
+    }
+
+    function updateCamera(dt) {
+        const { f, r } = getCameraMatrix();
+        let moveSpeed = cam.speed * dt;
+        if (keys['ShiftLeft'] || keys['ShiftRight']) moveSpeed *= 2.8;
+
+        if (keys['KeyW']) {
+            cam.pos[0] += f[0] * moveSpeed;
+            cam.pos[1] += f[1] * moveSpeed;
+            cam.pos[2] += f[2] * moveSpeed;
+        }
+        if (keys['KeyS']) {
+            cam.pos[0] -= f[0] * moveSpeed;
+            cam.pos[1] -= f[1] * moveSpeed;
+            cam.pos[2] -= f[2] * moveSpeed;
+        }
+        if (keys['KeyD']) {
+            cam.pos[0] += r[0] * moveSpeed;
+            cam.pos[2] += r[2] * moveSpeed;
+        }
+        if (keys['KeyA']) {
+            cam.pos[0] -= r[0] * moveSpeed;
+            cam.pos[2] -= r[2] * moveSpeed;
+        }
+        if (keys['KeyE']) cam.pos[1] += moveSpeed;
+        if (keys['KeyQ']) cam.pos[1] -= moveSpeed;
+    }
+
+    function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let lastTime = performance.now();
+    let simTime = 0;
+    let frameCount = 0;
+    let fpsTimer = 0;
+    const fpsEl = document.getElementById('fps-counter');
+
+    function render(now) {
+        const dt = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+
+        if (!state.paused) {
+            simTime += dt;
+        }
+
+        frameCount++;
+        fpsTimer += dt;
+        if (fpsTimer >= 0.5) {
+            fpsEl.textContent = `FPS: ${Math.round(frameCount / fpsTimer)}`;
+            frameCount = 0;
+            fpsTimer = 0;
+        }
+
+        updateCamera(dt);
+        const camData = getCameraMatrix();
+
+        gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
+        gl.uniform1f(uniforms.time, simTime);
+        gl.uniform3fv(uniforms.camPos, cam.pos);
+        gl.uniformMatrix3fv(uniforms.camMat, false, camData.mat);
+
+        gl.uniform1f(uniforms.spinSpeed, state.spinSpeed);
+        gl.uniform1f(uniforms.magTilt, state.magTilt);
+        gl.uniform1f(uniforms.precession, state.precession);
+        gl.uniform1f(uniforms.starRadius, state.starRadius);
+        gl.uniform1f(uniforms.jetIntensity, state.jetIntensity);
+        gl.uniform1f(uniforms.jetWidth, state.jetWidth);
+        gl.uniform1f(uniforms.jetLength, state.jetLength);
+        gl.uniform1f(uniforms.fieldStrength, state.fieldStrength);
+        gl.uniform1f(uniforms.glow, state.glow);
+
+        gl.uniform3fv(uniforms.coreColor, state.coreColor);
+        gl.uniform3fv(uniforms.jetColor, state.jetColor);
+        gl.uniform3fv(uniforms.fieldColor, state.fieldColor);
+
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>
