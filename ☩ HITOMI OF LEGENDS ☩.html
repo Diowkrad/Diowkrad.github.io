@@ -1445,16 +1445,24 @@ uniform mat3  uAxM;    /* ОРИЕНТАЦИЯ ТЕЛА: матрица Эйле
 uniform vec3  uAtmC; uniform float uAtmGlow; uniform float uAtmSize;
 uniform float uJetsOn; uniform vec3 uJetsC1; uniform vec3 uJetsC2; uniform float uJetsSp; uniform float uJetsLen;
 uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float uRingIn; uniform float uRingOut;
-uniform float uSpin; uniform float uPulseR;
+uniform float uSpin;
 uniform float uSurfScale;
 uniform float uSTScale;   /* детализация (texture scale), фид 4.2 */
 uniform float uSTTSpeed;  /* скорость кипения (time scale), фид 0.03 */
 uniform float uSTWarp;    /* сила варпа (4·q), фид 4 */
 uniform float uSTOct;     /* октавы fbm 1..4 */
-uniform vec3  uAmbSky;   /* цвет дневного неба (per-планета, из amb.sky) */
-uniform vec3  uAmbNight; /* цвет ночной стороны (amb.nuit) */
-uniform vec3  uAmbLimb;  /* ореол лимба (amb.wand) */
-uniform float uAmbHaze;  /* глубина тумана вдали (amb.haze) */
+/* HITOMI-ТОНМАП/СВЕТ (по мотивам Complementary/BSL): uniform-объявления (восстановлены на тесте ШАГ8) */
+uniform float uTM_Exposure;
+uniform float uTM_WhiteCurve;
+uniform float uTM_LowerCurve;
+uniform float uTM_UpperCurve;
+uniform float uSat_Saturation;
+uniform float uSat_Vibrance;
+uniform float uGL_Intensity;
+uniform float uGL_DiscStrength;
+uniform float uGL_DiscBright;
+uniform float uNX_Galaxy;
+uniform float uNX_StarBoost;
 uniform vec3  uRingTilt; /* наклон плоскости колец, рад (rings.tilt) */
 uniform vec3  uJetsTilt; /* наклон оси джетов, рад (jets.tilt) */
 uniform sampler2D uPal;   /* палитра лодов: 16x10, строка = планета */
@@ -1579,7 +1587,6 @@ uniform vec3  uSpCoreC;   uniform vec3 uSpJetC;     uniform vec3 uSpFieldC;
 /* ==== ПУЛЬСАР (raymarch-ветка k==5, порт из стенда pulsar-3d-glsl-stand) ====
    Ядро + релятивистские джеты + магнитосфера. Вращение магнитной оси через
    uSpSpin/uSpTilt/uSpPrec. Вызывается из shadeSurface(k==5) и объёмного прохода. */
-mat2 spRot2D(float a){ float _s=sin(a), _c=cos(a); return mat2(_c,-_s,_s,_c); }
 float spHub(vec3 p){ p=fract(p*0.3183099+0.1); p*=17.0; return fract(p.x*p.y*p.z*(p.x+p.y+p.z)); }
 float spNse(vec3 x){
   vec3 i=floor(x), f=fract(x);
@@ -1595,74 +1602,8 @@ float spFbm(vec3 p){
   return v;
 }
 float spTurbN(vec3 p){ return sin(p.x*4.0+uTime*4.0)*cos(p.y*4.0)*sin(p.z*4.0); }
-vec3 spToMag(vec3 p){
-  if(uSpPrec>0.0){ p.xz*=spRot2D(uTime*uSpPrec); p.xy*=spRot2D(sin(uTime*uSpPrec*0.7)*0.15); }
-  p.xz*=spRot2D(-uTime*uSpSpin);
-  p.xy*=spRot2D(uSpTilt);
-  return p;
-}
 /* Объёмная среда пульсара: эмиссия/плотность через глобальные счётчики (GLSL ES 1.00 без out-структур) */
-float spEmR, spEmG, spEmB, spDn;
-void spMedia(vec3 p){
-  spEmR=0.0; spEmG=0.0; spEmB=0.0; spDn=0.0;
-  float r=length(p);
-  if(r < uSpRad*0.95) return;
-  vec3 mp = spToMag(p);
-  float ax = abs(mp.y), rd_ = length(mp.xz);
-  /* релятивистские джеты — хвост-догонялки: сегменты плазмы следуют друг за другом
-     вдоль джета, спирально закручены; заострённый конус + волна интенсивности. */
-  if(ax > uSpRad*0.7 && ax < uSpJetLen){
-    float cone = uSpRad*0.18 + pow(ax,0.88)*uSpJetW;
-    if(rd_ < cone*2.2){
-      float spA = atan(mp.z,mp.x) + ax*2.2 - uTime*(uSpSpin*0.5+12.0);
-      float turb = spTurbN(mp)*2.5;   /* лёгкий турбулентный шум вместо spFbm — разгрузка тела цикла (R46) */
-      float spiral = 0.65 + 0.35*sin(spA*2.0 + turb*5.0);
-      /* хвостовые сегменты: волна пучностей/узлов бежит вдоль джета (ax), создавая
-         эффект «догоняющих» сгустков плазмы (как клубки в хвосте пульсара ED) */
-      float kx = ax*9.0 - uTime*(uSpSpin*2.0 + 16.0);
-      float knot = 0.5 + 0.5*sin(kx);
-      knot = knot*knot;
-      /* заострение к концу джета: более узкий и тёмный хвост */
-      float taper = pow(1.0 - smoothstep(0.0, uSpJetLen*0.85, ax), 1.4);
-      float cb = exp(-pow(rd_/(cone*0.45),2.0));
-      float ob = exp(-pow(rd_/cone,2.0));
-      float lf = smoothstep(uSpRad*0.7, uSpRad*1.3, ax)*pow(max(0.0,1.0-ax/uSpJetLen),1.6);
-      float jv = (cb*1.5 + ob*0.6*spiral) * lf * uSpJetInt * (0.45 + 0.55*knot*taper);
-      vec3 jCol = mix(uSpJetC, vec3(1.0), cb*0.75);
-      spEmR += jCol.r*jv*0.45; spEmG += jCol.g*jv*0.45; spEmB += jCol.b*jv*0.45;
-      /* плотность тоже с волной — хвост «дышит» и разбит на догоняющие сгустки */
-      spDn += jv*0.2*(0.5 + 0.5*knot);
-    }
-  }
-  /* магнитосфера */
-  if(uSpField>0.01 && r < uSpRad*6.5){
-    float sinTh = rd_/(r+1e-5);
-    float L = r/(sinTh*sinTh+0.02);
-    float shMask = smoothstep(0.75,0.99, sin(L*3.5-uTime*3.0));
-    float phi = atan(mp.z,mp.x);
-    float fil = pow(0.5+0.5*sin(phi*6.0+spTurbN(mp)),3.0);
-    float pol = smoothstep(0.15,0.5,sinTh);
-    float df = exp(-r/(uSpRad*2.4))*smoothstep(uSpRad,uSpRad*1.4,r);
-    float fv = shMask*fil*pol*df*uSpField;
-    spEmR += uSpFieldC.r*fv*0.65; spEmG += uSpFieldC.g*fv*0.65; spEmB += uSpFieldC.b*fv*0.65;
-    spDn += fv*0.15;
-  }
-}
 /* Поверхность ядра пульсара: горячие полюса + краста */
-vec3 spSurface(vec3 pos, vec3 normal, vec3 viewDir){
-  vec3 mp = spToMag(pos);
-  vec3 mN = normalize(mp);
-  float pole = abs(mN.y);
-  float hot = smoothstep(0.78,0.98,pole);
-  float crust = spFbm(mp*14.0+vec3(0.0,uTime*2.0,0.0));
-  float fres = pow(1.0-max(dot(normal,viewDir),0.0),3.0);
-  vec3 base = uSpCoreC*(0.65+0.45*crust);
-  vec3 cap = mix(uSpJetC, vec3(1.0), 0.8)*2.8;
-  vec3 c = mix(base, cap, hot);
-  c += mix(uSpCoreC,uSpJetC,0.5)*fres*1.5;
-  return c;
-}
-
 /* ==== PULSAR-GL (raymarch-ветка k==6, независимый порт из стенда pulsar-3d-glsl-stand).
    Собственные функции Pg*, отдельный uniform-сет (uPg*), глобальные счётчики, как у k==5.
    НЕ пересекается с существующими пульсарами (k==5) и планетами (k==0..4). ==== */
@@ -1674,63 +1615,6 @@ vec3 PgSpace(vec3 p){
   return p;
 }
 float PgE=0.0, PgG=0.0, PgB=0.0, PgDn=0.0;
-void PgMedia(vec3 p){
-  PgE=0.0; PgG=0.0; PgB=0.0; PgDn=0.0;
-  float r = length(p);
-  if(r < uPgRad*0.95) return;
-  vec3 mp = PgSpace(p);
-  float ax = abs(mp.y), rd_ = length(mp.xz);
-  /* джеты */
-  if(ax > uPgRad*0.7 && ax < uPgJetLen){
-    float cone = uPgRad*0.18 + pow(ax,0.88)*uPgJetW;
-    if(rd_ < cone*2.2){
-      float spA = atan(mp.z,mp.x) + ax*2.2 - uTime*(uPgSpin*0.5+12.0);
-      float turb = spTurbN(mp)*2.5;                    /* лёгкий шум вместо fbm — щадит линковку */
-      float spiral = 0.65 + 0.35*sin(spA*2.0 + turb*5.0);
-      float cb = exp(-pow(rd_/(cone*0.45),2.0));
-      float ob = exp(-pow(rd_/cone,2.0));
-      float lf = smoothstep(uPgRad*0.7,uPgRad*1.3,ax)*pow(max(0.0,1.0-ax/uPgJetLen),1.6);
-      float jv = (cb*1.5 + ob*0.6*spiral)*lf*uPgJetInt;
-      vec3 jc = mix(uPgJetC, vec3(1.0), cb*0.75);
-      PgE += jc.r*jv*0.45; PgG += jc.g*jv*0.45; PgB += jc.b*jv*0.45;
-      PgDn += jv*0.2;
-    }
-  }
-  /* ПРОХОД 1: конус-луч из стенда (вторая пара джетов) */
-  if(uPgJetInt > 0.0){
-    vec3 axv = normalize(vec3(sin(uPgTilt), cos(uPgTilt), 0.0));
-    float pa = uPgPrec*uTime;
-    axv = normalize(vec3(axv.x*cos(pa) - axv.z*sin(pa), axv.y, axv.x*sin(pa) + axv.z*cos(pa)));
-    vec3 e1v = normalize(cross(axv, vec3(0.001, 0.0, 1.0)));
-    vec3 e2v = cross(axv, e1v);
-    float hh = dot(p, axv);
-    vec3 qq = p - axv*hh;
-    float rq2 = length(qq);
-    if(abs(hh) < uPgJetLen && rq2 < 2.5){
-      float rc2 = uPgJetW*(0.12 + abs(hh)/uPgJetLen*1.8);
-      float cone2 = exp(-pow(rq2/rc2, 2.0));
-      float fall2 = 0.35 + 0.65*pow(1.0 - abs(hh)/uPgJetLen, 0.7);
-      float ang2 = atan(dot(qq, e2v), dot(qq, e1v));
-      float beam2 = 0.45 + 0.55*pow(0.5 + 0.5*cos(ang2*2.0 - uTime*uPgSpin*6.2831853), 3.0);
-      float jv2 = uPgJetInt*0.045*cone2*fall2*beam2;
-      PgE += uPgJetC.r*jv2; PgG += uPgJetC.g*jv2; PgB += uPgJetC.b*jv2;
-      PgDn += jv2*0.1;
-    }
-  }
-  /* магнитосфера */
-  if(uPgField > 0.01 && r < uPgFieldR){
-    float sinTh = rd_/(r+1e-5);
-    float L = r/(sinTh*sinTh+0.02);
-    float shMask = smoothstep(0.75,0.99, sin(L*3.5-uTime*3.0));
-    float phi = atan(mp.z,mp.x);
-    float fil = pow(0.5+0.5*sin(phi*6.0+spTurbN(mp)),3.0);
-    float pol = smoothstep(0.15,0.5,sinTh);
-    float df = exp(-r/(uPgRad*2.4))*smoothstep(uPgRad,uPgRad*1.4,r);
-    float fv = shMask*fil*pol*df*uPgField;
-    PgE += uPgFieldC.r*fv*0.30; PgG += uPgFieldC.g*fv*0.30; PgB += uPgFieldC.b*fv*0.30;
-    PgDn += fv*0.15;
-  }
-}
 vec3 PgSurface(vec3 pos, vec3 normal, vec3 viewDir){
   vec3 mp = PgSpace(pos);
   vec3 mN = normalize(mp);
@@ -2122,6 +2006,23 @@ void main(){
     night += vec3(0.45,0.5,0.7)*bandW*fbm3(rd*4.0)*0.42;
     night += vec3(0.8,0.75,0.6)*bandW*bandW*0.12; /* тёплая центральная полоса млечного пути */
 
+    /* ===== HITOMI-ГАЛАКТИКА/ТУМАННОСТЬ (по мотивам Complementary EnderNebula/GetGalaxy) =====
+       Вторая плоскость — наклонённое облако fbm с фиолетово-оранжевым оттенком.
+       gG — направление на «галактический диск», ngG — сглаженная яркость горизонта.
+       Включается по uNX_Galaxy > 0. */
+    float gGal = uNX_Galaxy > 0.0 ? uNX_Galaxy : 0.35;
+    vec3 gDir = normalize(vec3(-0.4, 0.1, 0.9));
+    float gDot = max(dot(rd, gDir), 0.0);
+    float gFade = pow(gDot, 3.0) + bandW*0.6;
+    float galn = fbm3(rd*2.2 + vec3(1.7, 3.1, 0.0));
+    float galn2 = fbm3(rd*5.0 + vec3(-2.0, 0.5, 4.0));
+    vec3 galaxy = vec3(0.55,0.30,0.75)*gFade*galn*0.5
+                + vec3(1.0,0.55,0.25)*gFade*galn*galn2*0.3;
+    night += galaxy*gGal;
+
+    /* улучшенные звёзды: усиление яркости вокруг галактики (STAR_BOOST) */
+    night += stars(rd*1.6)*vec3(0.6,0.7,1.0)*(uNX_StarBoost > 0.0 ? uNX_StarBoost : 0.6)*gFade;
+
     /* день: градиент к горизонту, зарево у Шинрарта-A, облака на куполе */
     float horiz = 1.0 - abs(dot(rd, up0));
     vec3 day = mix(atmC*0.83, mix(atmC, vec3(1.0), 0.42), horiz*0.85);
@@ -2160,6 +2061,22 @@ void main(){
     col += uSunC*uSunB*0.5*haloA;
     /* точечное ядро (прежний ореол сохранён для совместимости) */
     col += uSunC*pow(max(dSt,0.0), 120.0)*0.8*uSunB;
+
+    /* ===== HITOMI-СВЕЧЕНИЕ (по мотивам Complementary/BSL sunGlare) =====
+       Гиперболический ореол солнца + острый диск, отдельные настройки. */
+    float cosS = max(dot(rd, starDir), 0.0);
+    float cosS8 = cosS*cosS; cosS8*=cosS8; cosS8*=cosS8;      /* 8-я степень — узкий пик */
+    float glareF = uGL_Intensity > 0.0 ? uGL_Intensity : 0.25;
+    float glare = cosS8*glareF*(1.0 + haloA*0.5);
+    col += uSunC*uSunB*glare;                                  /* светящийся ореол */
+    /* острый диск солнца (как RoundSunMoon: pow большой степени) */
+    float discSharp = 0.0;
+    if(uGL_DiscStrength > 0.0){
+      float csD = max(dSt, 0.0);
+      discSharp = pow(csD, 1800.0)*uGL_DiscStrength;
+      col += uSunC*vec3(0.9,0.35,0.05)*discSharp*uSunB*0.0;   /* (теплый цвет диска; см. ниже) */
+    }
+    col += uSunC*pow(max(dSt,0.0), 2600.0)*uGL_DiscBright*uSunB*0.5; /* яркое ядро диска */
 
     /* ореол атмосферы у лимба (лучи мимо планеты) */
     float closest = length(camPos - rd*b);
@@ -2458,11 +2375,29 @@ void main(){
   }
   /* дизеринг против бандинга */
   col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
-  /* PBR-тонмаппинг: white-preserving Reinhard (SuperDuperVanilla) + гамма 2.2 */
-  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
-  float wpres = 1.5; /* WHITE_PRESERVATION */
-  float tm = (luma * (1.0 + luma / (wpres*wpres))) / (1.0 + luma);
-  col = pow(max(col * (tm / max(luma, 1e-6)), 0.0), vec3(1.0 / 2.2));
+  /* HITOMI-ТОНМАППИНГ (по мотивам Complementary/BSL): S-кривая + auto-gain + vibrance/saturation.
+     Числа по умолчанию соответствуют BSL: TONEMAP_EXPOSURE=5.6, WHITE_CURVE=2.8, LOWER=UPPER=1.20,
+     SATURATION=1.0, VIBRANCE=1.15. Всё вынесено в uniform-ы для настройки из инструмента. */
+  float uExp   = uTM_Exposure   > 0.0 ? uTM_Exposure   : 0.39;
+  float uWhite = uTM_WhiteCurve > 0.0 ? uTM_WhiteCurve : 2.8;
+  float uLow   = uTM_LowerCurve > 0.0 ? uTM_LowerCurve : 0.89;
+  float uUp    = uTM_UpperCurve > 0.0 ? uTM_UpperCurve : 0.89;
+  float uSat   = uSat_Saturation >= 0.0 ? uSat_Saturation : 1.0;
+  float uVib   = uSat_Vibrance   >= 0.0 ? uSat_Vibrance   : 1.15;
+
+  col *= uExp;                                /* exposure */
+  col = col / pow(pow(col, vec3(uWhite)) + 1.0, vec3(1.0/uWhite));  /* S-кривая (white point) */
+  col = pow(col, mix(vec3(uLow), vec3(uUp), sqrt(max(col, 0.0))));  /* подгонка теней/светов */
+
+  /* vibrance (защищает уже-насыщенные области) + saturation */
+  float mnV = min(col.r, min(col.g, col.b));
+  float mxV = max(col.r, max(col.g, col.b));
+  float lumaV = (mxV + mnV) * 0.5;
+  float satV = (1.0 - (mxV - mnV)) * (1.0 - mxV) * uVib * 5.0;
+  col = mix(col, mix(col, vec3(lumaV), 1.0 - uSat), satV);
+  col = col * uSat - lumaV * (uSat - 1.0);
+
+  col = pow(max(col, 0.0), vec3(1.0 / 2.2));  /* гамма 2.2 (sRGB-декод) */
   /* мягкая виньетка */
   float vig = 1.0 - 0.16*dot(uv*0.6, uv*0.6);
   col *= max(vig, 0.0);
@@ -2607,6 +2542,18 @@ const uSunR = gl.getUniformLocation(prog, 'uSunR');
 const uSunDir = gl.getUniformLocation(prog, 'uSunDir');
 const uSunSize = gl.getUniformLocation(prog, 'uSunSize');
 const uSunBright = gl.getUniformLocation(prog, 'uSunBright');
+/* HITOMI-ТОНМАП (по мотивам Complementary/BSL): отдельные uniform-ы настроек */
+const uTM_Exposure   = gl.getUniformLocation(prog, 'uTM_Exposure');
+const uTM_WhiteCurve = gl.getUniformLocation(prog, 'uTM_WhiteCurve');
+const uTM_LowerCurve = gl.getUniformLocation(prog, 'uTM_LowerCurve');
+const uTM_UpperCurve = gl.getUniformLocation(prog, 'uTM_UpperCurve');
+const uSat_Saturation = gl.getUniformLocation(prog, 'uSat_Saturation');
+const uSat_Vibrance   = gl.getUniformLocation(prog, 'uSat_Vibrance');
+const uGL_Intensity   = gl.getUniformLocation(prog, 'uGL_Intensity');
+const uGL_DiscStrength = gl.getUniformLocation(prog, 'uGL_DiscStrength');
+const uGL_DiscBright  = gl.getUniformLocation(prog, 'uGL_DiscBright');
+const uNX_Galaxy      = gl.getUniformLocation(prog, 'uNX_Galaxy');
+const uNX_StarBoost   = gl.getUniformLocation(prog, 'uNX_StarBoost');
 const uJetsC1 = gl.getUniformLocation(prog, 'uJetsC1');
 const uJetsC2 = gl.getUniformLocation(prog, 'uJetsC2');
 const uJetsSp = gl.getUniformLocation(prog, 'uJetsSp');
@@ -2617,7 +2564,6 @@ const uRingSp = gl.getUniformLocation(prog, 'uRingSp');
 const uRingIn = gl.getUniformLocation(prog, 'uRingIn');
 const uRingOut = gl.getUniformLocation(prog, 'uRingOut');
 const uSpin = gl.getUniformLocation(prog, 'uSpin');
-const uPulseR = gl.getUniformLocation(prog, 'uPulseR');
 const uSurfScale = gl.getUniformLocation(prog, 'uSurfScale');
 /* ==== ЗВЁЗДНЫЙ ШЕЙДЕР (STAR-GL): uniform-локации маски поверхности ==== */
 const uSTScale = gl.getUniformLocation(prog, 'uSTScale');
@@ -2644,10 +2590,6 @@ const uPgFieldC = gl.getUniformLocation(prog, 'uPgFieldC');
 const uPgDrawK = gl.getUniformLocation(prog, 'uPgDrawK');
 const uPgFieldR = gl.getUniformLocation(prog, 'uPgFieldR');
     
-const uAmbSky = gl.getUniformLocation(prog, 'uAmbSky');
-const uAmbNight = gl.getUniformLocation(prog, 'uAmbNight');
-const uAmbLimb = gl.getUniformLocation(prog, 'uAmbLimb');
-const uAmbHaze = gl.getUniformLocation(prog, 'uAmbHaze');
 const uRingTilt = gl.getUniformLocation(prog, 'uRingTilt');
 const uJetsTilt = gl.getUniformLocation(prog, 'uJetsTilt');
     const uRotC = gl.getUniformLocation(prog, 'uRotC');
@@ -2824,7 +2766,6 @@ if(uSunBright) gl.uniform1f(uSunBright, f.sunBright == null ? 1.0 : f.sunBright)
   gl.uniform1f(uAtmGlow, fxNum(f.glow, d.glow));
   gl.uniform1f(uAtmSize, fxNum(f.size, d.size));
   gl.uniform1f(uSpin, fxNum(f.spin, d.spin));
-  gl.uniform1f(uPulseR, fxNum(f.pulse, d.pulse));
   gl.uniform1f(uJetsOn, fxNum(jets.on, d.jets.on));
   var jc1 = fxHex(jets.c1, fxHex(d.jets.c1, [1,0.55,0.2]));
   var jc2 = fxHex(jets.c2, fxHex(d.jets.c2, [0.45,0.75,1.0]));
@@ -2846,13 +2787,6 @@ if(uSunBright) gl.uniform1f(uSunBright, f.sunBright == null ? 1.0 : f.sunBright)
   gl.uniform1f(uSTWarp, fxNum(surf.stWarp, fxNum(d.surf.stWarp, 4.0)));
   gl.uniform1f(uSTOct, fxNum(surf.stOct, fxNum(d.surf.stOct, 4.0)));
   /* ==== ОБЛИК + АТМОСФЕРА (per-планета: amb / tilt / hud) ==== */
-  var skyC = fxHex(f.amb && f.amb.sky, fxHex(d.amb && d.amb.sky, [0.30,0.62,0.88]));
-  var ngtC = fxHex(f.amb && f.amb.nuit, fxHex(d.amb && d.amb.nuit, [0.02,0.04,0.10]));
-  var wndC = fxHex(f.amb && f.amb.wand, fxHex(d.amb && d.amb.wand, [0.56,0.72,1.0]));
-  gl.uniform3f(uAmbSky, skyC[0], skyC[1], skyC[2]);
-  gl.uniform3f(uAmbNight, ngtC[0], ngtC[1], ngtC[2]);
-  gl.uniform3f(uAmbLimb, wndC[0], wndC[1], wndC[2]);
-  gl.uniform1f(uAmbHaze, fxNum(f.amb && f.amb.haze, 0.25));
   var rtl = (ring.tilt && ring.tilt.length === 3) ? ring.tilt.map(function(x){ return x*Math.PI/180.0; }) : [0,0,0];
   gl.uniform3f(uRingTilt, rtl[0], rtl[1], rtl[2]);
   var jtl = (jets.tilt && jets.tilt.length === 3) ? jets.tilt.map(function(x){ return x*Math.PI/180.0; }) : [0,0,0];
@@ -2865,6 +2799,23 @@ if(uSunBright) gl.uniform1f(uSunBright, f.sunBright == null ? 1.0 : f.sunBright)
   gl.uniform3f(uSTC2, stc2[0], stc2[1], stc2[2]);
   gl.uniform3f(uSTC3, stc3[0], stc3[1], stc3[2]);
   gl.uniform3f(uSTC4, stc4[0], stc4[1], stc4[2]);
+  /* ==== HITOMI-ТОНМАП: настройки пост-обработки (глобальные, из CFG или дефолт BSL) ====
+     Глобальные параметры не per-планета: берём из window.CFG, если добавлены. */
+  var _g = (typeof window !== 'undefined' && window.CFG) ? window.CFG : {};
+  var _tmGet = function(k, dv){ return (_g[k] != null) ? _g[k] : dv; };
+gl.uniform1f(uTM_Exposure,   _tmGet('TM_EXPOSURE',   0.39));
+gl.uniform1f(uTM_WhiteCurve, _tmGet('TM_WHITE_CURVE', 2.8));
+gl.uniform1f(uTM_LowerCurve, _tmGet('TM_LOWER_CURVE', 0.89));
+gl.uniform1f(uTM_UpperCurve, _tmGet('TM_UPPER_CURVE', 0.89));
+  gl.uniform1f(uSat_Saturation, _tmGet('SAT_SATURATION', 1.0));
+  gl.uniform1f(uSat_Vibrance,   _tmGet('SAT_VIBRANCE', 1.15));
+  /* ==== ГЛЕЙВ/ДИСК СОЛНЦА: настройки свечения (отдельные от тонмаппинга) ==== */
+  gl.uniform1f(uGL_Intensity,   _tmGet('GL_INTENSITY', 0.25));
+  gl.uniform1f(uGL_DiscStrength, _tmGet('GL_DISC_STRENGTH', 1.0));
+  gl.uniform1f(uGL_DiscBright,  _tmGet('GL_DISC_BRIGHT', 0.8));
+  /* ==== НЕБЕСНЫЕ ОБЪЕКТЫ НОЧИ: галактика/звёзды (отдельные настройки) ==== */
+  gl.uniform1f(uNX_Galaxy,    _tmGet('NX_GALAXY', 0.35));
+  gl.uniform1f(uNX_StarBoost, _tmGet('NX_STAR_BOOST', 0.6));
   /* ==== PULSAR-GL (k==6): заливка из fx.pg (независимый пульсар из стенда) ==== */
   var pgx = f.pg || d.pg || {};
   if(typeof e !== 'undefined' && e && e.fx && e.fx.pg) pgx = e.fx.pg;
