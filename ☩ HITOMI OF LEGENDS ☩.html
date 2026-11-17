@@ -1020,16 +1020,16 @@ document.querySelectorAll('#tabs button').forEach(function(btn){
 var PLANETS_DB = {
   soi: 11,
   planets: [
-    { name:'ХИТОМИ', pos:[-19.15,0,3.66], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":4,"size":0.455,"spin":4,"pulse":8,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1,"tilt":[0,0,0]},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":4.1,"icecov":0.18,"cloudcov":0.13,"cityk":0,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002,"sunSize":4,"sunBright":1.1} },
-    { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], rkm:70000, rot:32, rspd:1.45, axx:-4, axy:0, axz:0, kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-    { name:'НГАЛИН', pos:[-18.43,32,59.08], rkm:21000, rot:-90, rspd:0.255, axx:90, axy:12, axz:0, kind:'gas', palette:'#300090', rings:false, moons:[], jets:false, unlock:500, track:'Music-3.ogg', fx:{"atm":"#3600a3","glow":2.89,"size":1.17,"spin":2.75,"pulse":2.5,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":4.8,"icecov":0.21,"cloudcov":0.12,"cityk":0.9,"aurk":0.35,"stormk":1,"r1":"#4c00ff","r2":"#25007a","lava":"#ff4000","fres":"#1e0042"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-    { name:'ШИНРАРТА-B', pos:[21.95,36,-15.57], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar-gl', palette:'#000000', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#000000","glow":0.86,"size":1.375,"spin":1,"pulse":2,"jets":false,"ring":false,"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":1.6,"stormk":0.85},"sun":"#000000","sunB":0.35,"sunR":0.0002,"sunSize":2.45,"sunBright":1.35,"pg":{"spinSpeed":0.2,"tilt":6,"prec":0,"rad":0.63,"jetInt":4,"jetW":0.13,"jetLen":20,"field":3,"glow":3,"coreC":"#2f2465","jetC":"#1e00ff","fieldC":"#2b00ff","core":1.69,"atmOn":false,"atmSize":0.62,"atmGlow":0.98,"atmColor":"#7c9bd5","lensOn":1,"lensR":3.5,"drawK":1,"fieldR":3.2}} },
-    { name:'Элизия', pos:[61.26,0,61], rkm:7400, rot:16, rspd:0.035, axx:16, axy:2, axz:0, kind:'terrestrial', palette:'#d400ff', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }], jets:false, unlock:2200, track:'Bonus-1.ogg', fx:{"atm":"#773a83","glow":3.56,"size":2.19,"spin":4.45,"pulse":4.15,"jets":{"on":0,"c1":"#ff00c8","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#c800ff","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.25,"icecov":0.75,"cloudcov":0.62,"cityk":0.9,"aurk":0.1,"stormk":1.85,"ocean":"#30003d","land1":"#9a4b9b","land2":"#685a37","ice":"#6e00db","cloud":"#8a2ce8","city":"#4d3c00","aur":"#040042"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-    { name:'Брэстла', pos:[96.48,0,29.95], rkm:6800, rot:35, rspd:0.001, axx:45, axy:35, axz:0, kind:'gas', palette:'#eeff00', rings:true, moons:[], jets:false, unlock:2800, track:'Bonus-2.ogg', fx:{"atm":"#292929","glow":1.6,"size":1.02,"spin":0.55,"pulse":1.05,"jets":{"on":false,"c1":"#ff8c33","c2":"#73bfff","sp":0.618,"len":6.5},"ring":{"on":1,"c":"#8c7340","sp":0.04,"in":1.15,"out":2.26},"surf":{"scale":1.45,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#422000","r2":"#0f0300","lava":"#4d2d00","fres":"#4d0000"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-    { name:'Шинрарта-С', pos:[85.58,0,-66.13], rkm:1400, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#8c00ff","c2":"#b375ff","sp":0.0833,"len":6.5},"ring":{"on":1,"c":"#5900ff","sp":0.1,"in":1.15,"out":3.4},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#ffffff","r2":"#cfcfcf","river":"#eff5f9","fres":"#4da6ff","lava":"#ffd8b0"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-    { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], rkm:24000, rot:112, rspd:2, axx:14, axy:0, axz:2, kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002} },
-    { name:'Диовкрад', pos:[-106.98,0,24.9], rkm:26000, rot:0, rspd:0.1, axx:0, axy:0, axz:0, kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#ff1e14","sunB":0.35,"sunR":0.0002} },
-    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ff1e0f","ln1":"#fbff11","ln2":"#ffbb1e","sp1":"#9e0b02","sp2":"#2e0e00","pr":"#ff1e0f","stScale":4.2,"stTSpeed":0.03,"stWarp":4,"stOct":4},"sun":"#ff1e0f","sunB":5,"sunR":0.0032} }
+    { name:'ХИТОМИ', pos:[-19.15,0,3.66], rkm:29371, rot:-12, rspd:0.035, axx:12, axy:0, axz:0, kind:'terrestrial', palette:'#1e64ff', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }], jets:false, unlock:0, track:'Music-1.ogg', fx:{"atm":"#1e0a78","glow":4,"size":0.455,"spin":4,"pulse":8,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.111,"len":8.1,"tilt":[0,0,0]},"ring":{"on":1,"c":"#d9c294","sp":0.14,"in":2.32,"out":3.46,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":4.1,"icecov":0.18,"cloudcov":0.13,"cityk":0,"aurk":1.2,"stormk":0.25,"ocean":"#051a38","land1":"#14421a","land2":"#6b5c33","ice":"#589edf","cloud":"#f2f7ff","city":"#ffbf59","aur":"#1ae673"},"sun":"#ff1e0f","sunB":0.2,"sunR":0.0002,"sunSize":4,"sunBright":1.1} },
+    { name:'ЧИЗИЯ', pos:[-41.32,0,18.44], rkm:70000, rot:32, rspd:1.45, axx:-4, axy:0, axz:0, kind:'cheese', palette:'#905000', rings:true, moons:[{ d:2.2, s:0.4, c:'#ffa024' }, { d:3.1, s:0.3, c:'#e29c40' }, { d:3.4, s:0.35, c:'#efbf4d' }, { d:4.1, s:0.35, c:'#f3b420' }], jets:false, unlock:250, track:'Music-2.ogg', fx:{"atm":"#bd6800","glow":3.33,"size":1.61,"spin":7.9,"pulse":1.4,"jets":{"on":0,"c1":"#ff8c33","c2":"#002442","sp":0.3,"len":10,"tilt":[0,0,0]},"ring":{"on":1,"c":"#c8ae79","sp":0.215,"in":2.25,"out":5.55,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":4.4,"icecov":0.2,"cloudcov":0.78,"cityk":1.15,"aurk":1,"stormk":0.85,"b1":"#ff2600","b2":"#573b00","b3":"#ff9500","storm":"#ff5900","fres":"#412901","haze":"#ff9900","fog":"#eeff00"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002,"sunSize":1.2,"sunBright":1} },
+    { name:'НГАЛИН', pos:[-18.43,32,59.08], rkm:21000, rot:-90, rspd:0.255, axx:90, axy:12, axz:0, kind:'gas', palette:'#300090', rings:false, moons:[], jets:false, unlock:500, track:'Music-3.ogg', fx:{"atm":"#3600a3","glow":2.89,"size":1.17,"spin":2.75,"pulse":2.5,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5,"tilt":[0,0,0]},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":4.8,"icecov":0.21,"cloudcov":0.12,"cityk":0.9,"aurk":0.35,"stormk":1,"r1":"#4c00ff","r2":"#25007a","lava":"#ff4000","fres":"#1e0042"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002,"sunSize":1.2,"sunBright":1} },
+    { name:'ШИНРАРТА-B', pos:[21.95,36,-15.57], rkm:6200, rot:16, rspd:15.8, axx:11, axy:-18, axz:0, kind:'pulsar-gl', palette:'#000000', rings:false, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:1500, track:'Star-1.ogg', fx:{"atm":"#000000","glow":0.86,"size":1.375,"spin":1,"pulse":2,"jets":false,"ring":false,"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":1.6,"stormk":0.85},"sun":"#000000","sunB":0.35,"sunR":0.0002,"sunSize":2.45,"sunBright":1.35,"pg":{"spinSpeed":0.2,"tilt":8,"prec":0,"rad":0.65,"jetInt":4,"jetW":0.1,"jetLen":20,"field":3,"glow":3,"coreC":"#7181fe","jetC":"#2b00ff","fieldC":"#2b00ff","core":1.69,"atmOn":false,"atmSize":0.62,"atmGlow":0.98,"atmColor":"#ff0000","lensOn":1,"lensR":4.2,"drawK":1,"fieldR":3.2}} },
+    { name:'Элизия', pos:[61.26,0,61], rkm:7400, rot:16, rspd:0.035, axx:16, axy:2, axz:0, kind:'terrestrial', palette:'#d400ff', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }], jets:false, unlock:2200, track:'Bonus-1.ogg', fx:{"atm":"#391d3f","glow":0,"size":1.345,"spin":2.2,"pulse":0,"jets":{"on":0,"c1":"#ff00c8","c2":"#73bfff","sp":0.0833,"len":6.5,"tilt":[0,0,0]},"ring":{"on":0,"c":"#c800ff","sp":0.015,"in":1.45,"out":2.35,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":3.25,"icecov":0.75,"cloudcov":0.62,"cityk":0.9,"aurk":0.1,"stormk":1.85,"ocean":"#30003d","land1":"#9a4b9b","land2":"#685a37","ice":"#6e00db","cloud":"#8a2ce8","city":"#4d3c00","aur":"#040042"},"sun":"#ff1e0f","sunB":0.6,"sunR":0.0002,"sunSize":1.2,"sunBright":1} },
+    { name:'Брэстла', pos:[96.48,0,29.95], rkm:6800, rot:35, rspd:0.001, axx:45, axy:35, axz:0, kind:'gas', palette:'#eeff00', rings:true, moons:[], jets:false, unlock:2800, track:'Bonus-2.ogg', fx:{"atm":"#292929","glow":1.6,"size":1.02,"spin":0.55,"pulse":1.05,"jets":{"on":false,"c1":"#ff8c33","c2":"#73bfff","sp":0.618,"len":6.5,"tilt":[0,0,0]},"ring":{"on":1,"c":"#8c7340","sp":0.04,"in":1.15,"out":2.26,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":1.45,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#422000","r2":"#0f0300","lava":"#4d2d00","fres":"#4d0000"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002,"sunSize":1.2,"sunBright":1} },
+    { name:'Шинрарта-С', pos:[85.58,0,-66.13], rkm:1400, rot:130, rspd:18, axx:130, axy:24, axz:0, kind:'pulsar', palette:'#969696', rings:true, moons:[], jets:true, unlock:3300, track:'Star-2.ogg', fx:{"atm":"#ffffff","glow":4,"size":3,"spin":1,"pulse":1.5,"jets":{"on":1,"c1":"#1100ff","c2":"#4400ff","sp":1,"len":14.5,"tilt":[45,0,0]},"ring":{"on":1,"c":"#5900ff","sp":0.085,"in":1.15,"out":3.4,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":3.05,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#0d0b0d","r2":"#29211f","river":"#eff5f9","lava":"#ffd8b0","fres":"#99ccff"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0003,"sunSize":1,"sunBright":1.4,"pg":{"spinSpeed":8,"tilt":32,"prec":0.2,"rad":0.65,"jetInt":1.4,"jetW":0.22,"jetLen":8,"field":1,"glow":1.2,"coreC":"#ffffff","jetC":"#3388ff","fieldC":"#9933ff","core":1,"atmOn":1,"atmSize":1,"atmGlow":0.85,"atmColor":"#4d8cff","lensOn":1,"lensR":3,"drawK":1,"fieldR":3.2}} },
+    { name:'НЕМЕЗИДА', pos:[-1.95,0,-71.58], rkm:24000, rot:112, rspd:2, axx:14, axy:0, axz:2, kind:'cheese', palette:'#005eff', rings:false, moons:[], jets:false, unlock:5000, track:'Bonus-3.ogg', fx:{"atm":"#7a002b","glow":0.85,"size":1.22,"spin":1,"pulse":1.5,"jets":{"on":0,"c1":"#d100a4","c2":"#6b0000","sp":0.111,"len":6.05,"tilt":[0,0,0]},"ring":{"on":1,"c":"#862323","sp":0.015,"in":1.45,"out":2.35,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":3.1,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"b1":"#7000fa","b2":"#d60072","b3":"#54006b","storm":"#ff00dd","fres":"#00b3ff","haze":"#8000ff","fog":"#8c00ff"},"sun":"#ff1e0f","sunB":0.35,"sunR":0.0002,"sunSize":1.2,"sunBright":1} },
+    { name:'Диовкрад', pos:[-106.98,0,24.9], rkm:26000, rot:0, rspd:0.1, axx:0, axy:0, axz:0, kind:'gas', palette:'#ff0000', rings:true, moons:[{ d:2, s:0.35, c:'#d8d2c4' }, { d:2.7, s:0.35, c:'#d8d2c4' }, { d:3.4, s:0.35, c:'#d8d2c4' }, { d:4.1, s:0.35, c:'#d8d2c4' }, { d:4.8, s:0.35, c:'#d8d2c4' }, { d:5.5, s:0.35, c:'#d8d2c4' }, { d:6.2, s:0.35, c:'#d8d2c4' }, { d:6.9, s:0.35, c:'#d8d2c4' }], jets:true, unlock:5700, track:'Bonus-4.ogg', fx:{"atm":"#570000","glow":0.92,"size":1.145,"spin":8,"pulse":1.5,"jets":{"on":0,"c1":"#29008a","c2":"#004f8f","sp":0.0833,"len":6.5,"tilt":[0,0,0]},"ring":{"on":0,"c":"#d9c294","sp":0.015,"in":1.45,"out":2.35,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":8,"icecov":0.5,"cloudcov":0.5,"cityk":0.9,"aurk":0.55,"stormk":0.85,"r1":"#020080","r2":"#1c005c","lava":"#805a1e","fres":"#7a0000"},"sun":"#ff1e14","sunB":0.35,"sunR":0.0002,"sunSize":1.2,"sunBright":1} },
+    { name:'Шинрарта-A', pos:[0,0,0], rkm:280000, rot:36, rspd:0.055, axx:72, axy:16, axz:32, kind:'star-gl', type:'star_M', palette:'#fff4c0', rings:false, moons:[], jets:false, unlock:6500, track:'Star-0.ogg', fx:{"atm":"#ff8f4d","glow":1.2,"size":1.55,"spin":2.4,"pulse":0.9,"jets":{"on":0,"c1":"#ff8c33","c2":"#73bfff","sp":0.0833,"len":6.5,"tilt":[0,0,0]},"ring":{"on":0,"c":"#d9c294","sp":0.035,"in":1.45,"out":2.35,"tilt":[0,0,0],"shad":0.92,"floor":0.067},"surf":{"scale":6.4,"icecov":1,"cloudcov":1,"cityk":2,"aurk":2,"stormk":3,"c1":"#ff1e0f","ln1":"#fbff11","ln2":"#ffbb1e","sp1":"#9e0b02","sp2":"#2e0e00","pr":"#ff1e0f","stScale":4.2,"stTSpeed":0.03,"stWarp":4,"stOct":4},"sun":"#ff1e0f","sunB":5,"sunR":0.0032,"sunSize":1.2,"sunBright":1} }
   ]
 };
 var PKIND = {
@@ -1104,6 +1104,29 @@ function eulMat(x, y, z){ /* матрица Rz*Ry*Rx (колонки), град�
            cz*sy*sx - sz*cx, sz*sy*sx + cz*cx, cy*sx,
            cz*sy*cx + sz*sx, sz*sy*cx - cz*sx, cy*cx ];
 }
+/* Таблица масштабов тел: имя -> множитель размера (1 = как в реестре). Правь числа прямо здесь */
+var BODY_SCALE_TABLE = {
+  'ХИТОМИ':1,
+  'ЧИЗИЯ':1,
+  'НГАЛИН':1,
+  'ШИНРАРТА-B':1,
+  'Элизия':1,
+  'Брэстла':1,
+  'Шинрарта-С':1,
+  'НЕМЕЗИДА':1,
+  'Диовкрад':1,
+  'Шинрарта-A':1
+};
+
+/* ☩ МАСШТАБ ТЕЛА: единый источник — правка редактора → таблица → 1 (кламп 0.1–5) */
+function bodyScaleVal(pi){
+  try{
+    var e = (pi && typeof pi === 'object') ? pi : ((typeof PLANETS_DB !== 'undefined' && PLANETS_DB.planets) ? PLANETS_DB.planets[pi] : null);
+    var sc = (e && typeof BODY_SCALE_TABLE !== 'undefined' && BODY_SCALE_TABLE[e.name]) || 1;
+    if(e && e.scale != null) sc = Math.max(0.1, Math.min(5, +e.scale || 1));
+    return sc || 1;
+  }catch(_bsv){ return 1; }
+}
 function bodyRadiusKm(pi){
   try{
     var e = (typeof PLANETS_DB !== 'undefined' && PLANETS_DB.planets) ? PLANETS_DB.planets[pi] : null;
@@ -1120,6 +1143,12 @@ function bodyRadiusKm(pi){
           r *= Math.max(0.5, Math.min(2.0, aG));
         }
       }catch(_pe){}
+      /* SCALE-TABLE: пер-теловой масштаб (приоритет: правка -> таблица -> 1) */
+      try{
+        var sc = (typeof BODY_SCALE_TABLE !== 'undefined' && BODY_SCALE_TABLE[e.name]) || 1;
+        if(e.scale != null) sc = Math.max(0.1, Math.min(5, +e.scale || 1));
+        r *= sc;
+      }catch(_sc){}
       return r;
     }
   }catch(err){}
@@ -1445,24 +1474,16 @@ uniform mat3  uAxM;    /* ОРИЕНТАЦИЯ ТЕЛА: матрица Эйле
 uniform vec3  uAtmC; uniform float uAtmGlow; uniform float uAtmSize;
 uniform float uJetsOn; uniform vec3 uJetsC1; uniform vec3 uJetsC2; uniform float uJetsSp; uniform float uJetsLen;
 uniform float uRingOn; uniform vec3 uRingC; uniform float uRingSp; uniform float uRingIn; uniform float uRingOut;
-uniform float uSpin;
+uniform float uSpin; uniform float uPulseR;
 uniform float uSurfScale;
 uniform float uSTScale;   /* детализация (texture scale), фид 4.2 */
 uniform float uSTTSpeed;  /* скорость кипения (time scale), фид 0.03 */
 uniform float uSTWarp;    /* сила варпа (4·q), фид 4 */
 uniform float uSTOct;     /* октавы fbm 1..4 */
-/* HITOMI-ТОНМАП/СВЕТ (по мотивам Complementary/BSL): uniform-объявления (восстановлены на тесте ШАГ8) */
-uniform float uTM_Exposure;
-uniform float uTM_WhiteCurve;
-uniform float uTM_LowerCurve;
-uniform float uTM_UpperCurve;
-uniform float uSat_Saturation;
-uniform float uSat_Vibrance;
-uniform float uGL_Intensity;
-uniform float uGL_DiscStrength;
-uniform float uGL_DiscBright;
-uniform float uNX_Galaxy;
-uniform float uNX_StarBoost;
+uniform vec3  uAmbSky;   /* цвет дневного неба (per-планета, из amb.sky) */
+uniform vec3  uAmbNight; /* цвет ночной стороны (amb.nuit) */
+uniform vec3  uAmbLimb;  /* ореол лимба (amb.wand) */
+uniform float uAmbHaze;  /* глубина тумана вдали (amb.haze) */
 uniform vec3  uRingTilt; /* наклон плоскости колец, рад (rings.tilt) */
 uniform vec3  uJetsTilt; /* наклон оси джетов, рад (jets.tilt) */
 uniform sampler2D uPal;   /* палитра лодов: 16x10, строка = планета */
@@ -1587,6 +1608,7 @@ uniform vec3  uSpCoreC;   uniform vec3 uSpJetC;     uniform vec3 uSpFieldC;
 /* ==== ПУЛЬСАР (raymarch-ветка k==5, порт из стенда pulsar-3d-glsl-stand) ====
    Ядро + релятивистские джеты + магнитосфера. Вращение магнитной оси через
    uSpSpin/uSpTilt/uSpPrec. Вызывается из shadeSurface(k==5) и объёмного прохода. */
+mat2 spRot2D(float a){ float _s=sin(a), _c=cos(a); return mat2(_c,-_s,_s,_c); }
 float spHub(vec3 p){ p=fract(p*0.3183099+0.1); p*=17.0; return fract(p.x*p.y*p.z*(p.x+p.y+p.z)); }
 float spNse(vec3 x){
   vec3 i=floor(x), f=fract(x);
@@ -1602,8 +1624,74 @@ float spFbm(vec3 p){
   return v;
 }
 float spTurbN(vec3 p){ return sin(p.x*4.0+uTime*4.0)*cos(p.y*4.0)*sin(p.z*4.0); }
+vec3 spToMag(vec3 p){
+  if(uSpPrec>0.0){ p.xz*=spRot2D(uTime*uSpPrec); p.xy*=spRot2D(sin(uTime*uSpPrec*0.7)*0.15); }
+  p.xz*=spRot2D(-uTime*uSpSpin);
+  p.xy*=spRot2D(uSpTilt);
+  return p;
+}
 /* Объёмная среда пульсара: эмиссия/плотность через глобальные счётчики (GLSL ES 1.00 без out-структур) */
+float spEmR, spEmG, spEmB, spDn;
+void spMedia(vec3 p){
+  spEmR=0.0; spEmG=0.0; spEmB=0.0; spDn=0.0;
+  float r=length(p);
+  if(r < uSpRad*0.95) return;
+  vec3 mp = spToMag(p);
+  float ax = abs(mp.y), rd_ = length(mp.xz);
+  /* релятивистские джеты — хвост-догонялки: сегменты плазмы следуют друг за другом
+     вдоль джета, спирально закручены; заострённый конус + волна интенсивности. */
+  if(ax > uSpRad*0.7 && ax < uSpJetLen){
+    float cone = uSpRad*0.18 + pow(ax,0.88)*uSpJetW;
+    if(rd_ < cone*2.2){
+      float spA = atan(mp.z,mp.x) + ax*2.2 - uTime*(uSpSpin*0.5+12.0);
+      float turb = spTurbN(mp)*2.5;   /* лёгкий турбулентный шум вместо spFbm — разгрузка тела цикла (R46) */
+      float spiral = 0.65 + 0.35*sin(spA*2.0 + turb*5.0);
+      /* хвостовые сегменты: волна пучностей/узлов бежит вдоль джета (ax), создавая
+         эффект «догоняющих» сгустков плазмы (как клубки в хвосте пульсара ED) */
+      float kx = ax*9.0 - uTime*(uSpSpin*2.0 + 16.0);
+      float knot = 0.5 + 0.5*sin(kx);
+      knot = knot*knot;
+      /* заострение к концу джета: более узкий и тёмный хвост */
+      float taper = pow(1.0 - smoothstep(0.0, uSpJetLen*0.85, ax), 1.4);
+      float cb = exp(-pow(rd_/(cone*0.45),2.0));
+      float ob = exp(-pow(rd_/cone,2.0));
+      float lf = smoothstep(uSpRad*0.7, uSpRad*1.3, ax)*pow(max(0.0,1.0-ax/uSpJetLen),1.6);
+      float jv = (cb*1.5 + ob*0.6*spiral) * lf * uSpJetInt * (0.45 + 0.55*knot*taper);
+      vec3 jCol = mix(uSpJetC, vec3(1.0), cb*0.75);
+      spEmR += jCol.r*jv*0.45; spEmG += jCol.g*jv*0.45; spEmB += jCol.b*jv*0.45;
+      /* плотность тоже с волной — хвост «дышит» и разбит на догоняющие сгустки */
+      spDn += jv*0.2*(0.5 + 0.5*knot);
+    }
+  }
+  /* магнитосфера */
+  if(uSpField>0.01 && r < uSpRad*6.5){
+    float sinTh = rd_/(r+1e-5);
+    float L = r/(sinTh*sinTh+0.02);
+    float shMask = smoothstep(0.75,0.99, sin(L*3.5-uTime*3.0));
+    float phi = atan(mp.z,mp.x);
+    float fil = pow(0.5+0.5*sin(phi*6.0+spTurbN(mp)),3.0);
+    float pol = smoothstep(0.15,0.5,sinTh);
+    float df = exp(-r/(uSpRad*2.4))*smoothstep(uSpRad,uSpRad*1.4,r);
+    float fv = shMask*fil*pol*df*uSpField;
+    spEmR += uSpFieldC.r*fv*0.65; spEmG += uSpFieldC.g*fv*0.65; spEmB += uSpFieldC.b*fv*0.65;
+    spDn += fv*0.15;
+  }
+}
 /* Поверхность ядра пульсара: горячие полюса + краста */
+vec3 spSurface(vec3 pos, vec3 normal, vec3 viewDir){
+  vec3 mp = spToMag(pos);
+  vec3 mN = normalize(mp);
+  float pole = abs(mN.y);
+  float hot = smoothstep(0.78,0.98,pole);
+  float crust = spFbm(mp*14.0+vec3(0.0,uTime*2.0,0.0));
+  float fres = pow(1.0-max(dot(normal,viewDir),0.0),3.0);
+  vec3 base = uSpCoreC*(0.65+0.45*crust);
+  vec3 cap = mix(uSpJetC, vec3(1.0), 0.8)*2.8;
+  vec3 c = mix(base, cap, hot);
+  c += mix(uSpCoreC,uSpJetC,0.5)*fres*1.5;
+  return c;
+}
+
 /* ==== PULSAR-GL (raymarch-ветка k==6, независимый порт из стенда pulsar-3d-glsl-stand).
    Собственные функции Pg*, отдельный uniform-сет (uPg*), глобальные счётчики, как у k==5.
    НЕ пересекается с существующими пульсарами (k==5) и планетами (k==0..4). ==== */
@@ -1615,6 +1703,63 @@ vec3 PgSpace(vec3 p){
   return p;
 }
 float PgE=0.0, PgG=0.0, PgB=0.0, PgDn=0.0;
+void PgMedia(vec3 p){
+  PgE=0.0; PgG=0.0; PgB=0.0; PgDn=0.0;
+  float r = length(p);
+  if(r < uPgRad*0.95) return;
+  vec3 mp = PgSpace(p);
+  float ax = abs(mp.y), rd_ = length(mp.xz);
+  /* джеты */
+  if(ax > uPgRad*0.7 && ax < uPgJetLen){
+    float cone = uPgRad*0.18 + pow(ax,0.88)*uPgJetW;
+    if(rd_ < cone*2.2){
+      float spA = atan(mp.z,mp.x) + ax*2.2 - uTime*(uPgSpin*0.5+12.0);
+      float turb = spTurbN(mp)*2.5;                    /* лёгкий шум вместо fbm — щадит линковку */
+      float spiral = 0.65 + 0.35*sin(spA*2.0 + turb*5.0);
+      float cb = exp(-pow(rd_/(cone*0.45),2.0));
+      float ob = exp(-pow(rd_/cone,2.0));
+      float lf = smoothstep(uPgRad*0.7,uPgRad*1.3,ax)*pow(max(0.0,1.0-ax/uPgJetLen),1.6);
+      float jv = (cb*1.5 + ob*0.6*spiral)*lf*uPgJetInt;
+      vec3 jc = mix(uPgJetC, vec3(1.0), cb*0.75);
+      PgE += jc.r*jv*0.45; PgG += jc.g*jv*0.45; PgB += jc.b*jv*0.45;
+      PgDn += jv*0.2;
+    }
+  }
+  /* ПРОХОД 1: конус-луч из стенда (вторая пара джетов) */
+  if(uPgJetInt > 0.0){
+    vec3 axv = normalize(vec3(sin(uPgTilt), cos(uPgTilt), 0.0));
+    float pa = uPgPrec*uTime;
+    axv = normalize(vec3(axv.x*cos(pa) - axv.z*sin(pa), axv.y, axv.x*sin(pa) + axv.z*cos(pa)));
+    vec3 e1v = normalize(cross(axv, vec3(0.001, 0.0, 1.0)));
+    vec3 e2v = cross(axv, e1v);
+    float hh = dot(p, axv);
+    vec3 qq = p - axv*hh;
+    float rq2 = length(qq);
+    if(abs(hh) < uPgJetLen && rq2 < 2.5){
+      float rc2 = uPgJetW*(0.12 + abs(hh)/uPgJetLen*1.8);
+      float cone2 = exp(-pow(rq2/rc2, 2.0));
+      float fall2 = 0.35 + 0.65*pow(1.0 - abs(hh)/uPgJetLen, 0.7);
+      float ang2 = atan(dot(qq, e2v), dot(qq, e1v));
+      float beam2 = 0.45 + 0.55*pow(0.5 + 0.5*cos(ang2*2.0 - uTime*uPgSpin*6.2831853), 3.0);
+      float jv2 = uPgJetInt*0.045*cone2*fall2*beam2;
+      PgE += uPgJetC.r*jv2; PgG += uPgJetC.g*jv2; PgB += uPgJetC.b*jv2;
+      PgDn += jv2*0.1;
+    }
+  }
+  /* магнитосфера */
+  if(uPgField > 0.01 && r < uPgFieldR){
+    float sinTh = rd_/(r+1e-5);
+    float L = r/(sinTh*sinTh+0.02);
+    float shMask = smoothstep(0.75,0.99, sin(L*3.5-uTime*3.0));
+    float phi = atan(mp.z,mp.x);
+    float fil = pow(0.5+0.5*sin(phi*6.0+spTurbN(mp)),3.0);
+    float pol = smoothstep(0.15,0.5,sinTh);
+    float df = exp(-r/(uPgRad*2.4))*smoothstep(uPgRad,uPgRad*1.4,r);
+    float fv = shMask*fil*pol*df*uPgField;
+    PgE += uPgFieldC.r*fv*0.30; PgG += uPgFieldC.g*fv*0.30; PgB += uPgFieldC.b*fv*0.30;
+    PgDn += fv*0.15;
+  }
+}
 vec3 PgSurface(vec3 pos, vec3 normal, vec3 viewDir){
   vec3 mp = PgSpace(pos);
   vec3 mN = normalize(mp);
@@ -2006,23 +2151,6 @@ void main(){
     night += vec3(0.45,0.5,0.7)*bandW*fbm3(rd*4.0)*0.42;
     night += vec3(0.8,0.75,0.6)*bandW*bandW*0.12; /* тёплая центральная полоса млечного пути */
 
-    /* ===== HITOMI-ГАЛАКТИКА/ТУМАННОСТЬ (по мотивам Complementary EnderNebula/GetGalaxy) =====
-       Вторая плоскость — наклонённое облако fbm с фиолетово-оранжевым оттенком.
-       gG — направление на «галактический диск», ngG — сглаженная яркость горизонта.
-       Включается по uNX_Galaxy > 0. */
-    float gGal = uNX_Galaxy > 0.0 ? uNX_Galaxy : 0.35;
-    vec3 gDir = normalize(vec3(-0.4, 0.1, 0.9));
-    float gDot = max(dot(rd, gDir), 0.0);
-    float gFade = pow(gDot, 3.0) + bandW*0.6;
-    float galn = fbm3(rd*2.2 + vec3(1.7, 3.1, 0.0));
-    float galn2 = fbm3(rd*5.0 + vec3(-2.0, 0.5, 4.0));
-    vec3 galaxy = vec3(0.55,0.30,0.75)*gFade*galn*0.5
-                + vec3(1.0,0.55,0.25)*gFade*galn*galn2*0.3;
-    night += galaxy*gGal;
-
-    /* улучшенные звёзды: усиление яркости вокруг галактики (STAR_BOOST) */
-    night += stars(rd*1.6)*vec3(0.6,0.7,1.0)*(uNX_StarBoost > 0.0 ? uNX_StarBoost : 0.6)*gFade;
-
     /* день: градиент к горизонту, зарево у Шинрарта-A, облака на куполе */
     float horiz = 1.0 - abs(dot(rd, up0));
     vec3 day = mix(atmC*0.83, mix(atmC, vec3(1.0), 0.42), horiz*0.85);
@@ -2061,22 +2189,6 @@ void main(){
     col += uSunC*uSunB*0.5*haloA;
     /* точечное ядро (прежний ореол сохранён для совместимости) */
     col += uSunC*pow(max(dSt,0.0), 120.0)*0.8*uSunB;
-
-    /* ===== HITOMI-СВЕЧЕНИЕ (по мотивам Complementary/BSL sunGlare) =====
-       Гиперболический ореол солнца + острый диск, отдельные настройки. */
-    float cosS = max(dot(rd, starDir), 0.0);
-    float cosS8 = cosS*cosS; cosS8*=cosS8; cosS8*=cosS8;      /* 8-я степень — узкий пик */
-    float glareF = uGL_Intensity > 0.0 ? uGL_Intensity : 0.25;
-    float glare = cosS8*glareF*(1.0 + haloA*0.5);
-    col += uSunC*uSunB*glare;                                  /* светящийся ореол */
-    /* острый диск солнца (как RoundSunMoon: pow большой степени) */
-    float discSharp = 0.0;
-    if(uGL_DiscStrength > 0.0){
-      float csD = max(dSt, 0.0);
-      discSharp = pow(csD, 1800.0)*uGL_DiscStrength;
-      col += uSunC*vec3(0.9,0.35,0.05)*discSharp*uSunB*0.0;   /* (теплый цвет диска; см. ниже) */
-    }
-    col += uSunC*pow(max(dSt,0.0), 2600.0)*uGL_DiscBright*uSunB*0.5; /* яркое ядро диска */
 
     /* ореол атмосферы у лимба (лучи мимо планеты) */
     float closest = length(camPos - rd*b);
@@ -2375,29 +2487,11 @@ void main(){
   }
   /* дизеринг против бандинга */
   col += (hash13(vec3(gl_FragCoord.xy*1.0, fract(uTime)*100.0)) - 0.5)/255.0;
-  /* HITOMI-ТОНМАППИНГ (по мотивам Complementary/BSL): S-кривая + auto-gain + vibrance/saturation.
-     Числа по умолчанию соответствуют BSL: TONEMAP_EXPOSURE=5.6, WHITE_CURVE=2.8, LOWER=UPPER=1.20,
-     SATURATION=1.0, VIBRANCE=1.15. Всё вынесено в uniform-ы для настройки из инструмента. */
-  float uExp   = uTM_Exposure   > 0.0 ? uTM_Exposure   : 0.39;
-  float uWhite = uTM_WhiteCurve > 0.0 ? uTM_WhiteCurve : 2.8;
-  float uLow   = uTM_LowerCurve > 0.0 ? uTM_LowerCurve : 0.89;
-  float uUp    = uTM_UpperCurve > 0.0 ? uTM_UpperCurve : 0.89;
-  float uSat   = uSat_Saturation >= 0.0 ? uSat_Saturation : 1.0;
-  float uVib   = uSat_Vibrance   >= 0.0 ? uSat_Vibrance   : 1.15;
-
-  col *= uExp;                                /* exposure */
-  col = col / pow(pow(col, vec3(uWhite)) + 1.0, vec3(1.0/uWhite));  /* S-кривая (white point) */
-  col = pow(col, mix(vec3(uLow), vec3(uUp), sqrt(max(col, 0.0))));  /* подгонка теней/светов */
-
-  /* vibrance (защищает уже-насыщенные области) + saturation */
-  float mnV = min(col.r, min(col.g, col.b));
-  float mxV = max(col.r, max(col.g, col.b));
-  float lumaV = (mxV + mnV) * 0.5;
-  float satV = (1.0 - (mxV - mnV)) * (1.0 - mxV) * uVib * 5.0;
-  col = mix(col, mix(col, vec3(lumaV), 1.0 - uSat), satV);
-  col = col * uSat - lumaV * (uSat - 1.0);
-
-  col = pow(max(col, 0.0), vec3(1.0 / 2.2));  /* гамма 2.2 (sRGB-декод) */
+  /* PBR-тонмаппинг: white-preserving Reinhard (SuperDuperVanilla) + гамма 2.2 */
+  float luma = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  float wpres = 1.5; /* WHITE_PRESERVATION */
+  float tm = (luma * (1.0 + luma / (wpres*wpres))) / (1.0 + luma);
+  col = pow(max(col * (tm / max(luma, 1e-6)), 0.0), vec3(1.0 / 2.2));
   /* мягкая виньетка */
   float vig = 1.0 - 0.16*dot(uv*0.6, uv*0.6);
   col *= max(vig, 0.0);
@@ -2542,18 +2636,6 @@ const uSunR = gl.getUniformLocation(prog, 'uSunR');
 const uSunDir = gl.getUniformLocation(prog, 'uSunDir');
 const uSunSize = gl.getUniformLocation(prog, 'uSunSize');
 const uSunBright = gl.getUniformLocation(prog, 'uSunBright');
-/* HITOMI-ТОНМАП (по мотивам Complementary/BSL): отдельные uniform-ы настроек */
-const uTM_Exposure   = gl.getUniformLocation(prog, 'uTM_Exposure');
-const uTM_WhiteCurve = gl.getUniformLocation(prog, 'uTM_WhiteCurve');
-const uTM_LowerCurve = gl.getUniformLocation(prog, 'uTM_LowerCurve');
-const uTM_UpperCurve = gl.getUniformLocation(prog, 'uTM_UpperCurve');
-const uSat_Saturation = gl.getUniformLocation(prog, 'uSat_Saturation');
-const uSat_Vibrance   = gl.getUniformLocation(prog, 'uSat_Vibrance');
-const uGL_Intensity   = gl.getUniformLocation(prog, 'uGL_Intensity');
-const uGL_DiscStrength = gl.getUniformLocation(prog, 'uGL_DiscStrength');
-const uGL_DiscBright  = gl.getUniformLocation(prog, 'uGL_DiscBright');
-const uNX_Galaxy      = gl.getUniformLocation(prog, 'uNX_Galaxy');
-const uNX_StarBoost   = gl.getUniformLocation(prog, 'uNX_StarBoost');
 const uJetsC1 = gl.getUniformLocation(prog, 'uJetsC1');
 const uJetsC2 = gl.getUniformLocation(prog, 'uJetsC2');
 const uJetsSp = gl.getUniformLocation(prog, 'uJetsSp');
@@ -2564,6 +2646,7 @@ const uRingSp = gl.getUniformLocation(prog, 'uRingSp');
 const uRingIn = gl.getUniformLocation(prog, 'uRingIn');
 const uRingOut = gl.getUniformLocation(prog, 'uRingOut');
 const uSpin = gl.getUniformLocation(prog, 'uSpin');
+const uPulseR = gl.getUniformLocation(prog, 'uPulseR');
 const uSurfScale = gl.getUniformLocation(prog, 'uSurfScale');
 /* ==== ЗВЁЗДНЫЙ ШЕЙДЕР (STAR-GL): uniform-локации маски поверхности ==== */
 const uSTScale = gl.getUniformLocation(prog, 'uSTScale');
@@ -2590,6 +2673,10 @@ const uPgFieldC = gl.getUniformLocation(prog, 'uPgFieldC');
 const uPgDrawK = gl.getUniformLocation(prog, 'uPgDrawK');
 const uPgFieldR = gl.getUniformLocation(prog, 'uPgFieldR');
     
+const uAmbSky = gl.getUniformLocation(prog, 'uAmbSky');
+const uAmbNight = gl.getUniformLocation(prog, 'uAmbNight');
+const uAmbLimb = gl.getUniformLocation(prog, 'uAmbLimb');
+const uAmbHaze = gl.getUniformLocation(prog, 'uAmbHaze');
 const uRingTilt = gl.getUniformLocation(prog, 'uRingTilt');
 const uJetsTilt = gl.getUniformLocation(prog, 'uJetsTilt');
     const uRotC = gl.getUniformLocation(prog, 'uRotC');
@@ -2766,6 +2853,7 @@ if(uSunBright) gl.uniform1f(uSunBright, f.sunBright == null ? 1.0 : f.sunBright)
   gl.uniform1f(uAtmGlow, fxNum(f.glow, d.glow));
   gl.uniform1f(uAtmSize, fxNum(f.size, d.size));
   gl.uniform1f(uSpin, fxNum(f.spin, d.spin));
+  gl.uniform1f(uPulseR, fxNum(f.pulse, d.pulse));
   gl.uniform1f(uJetsOn, fxNum(jets.on, d.jets.on));
   var jc1 = fxHex(jets.c1, fxHex(d.jets.c1, [1,0.55,0.2]));
   var jc2 = fxHex(jets.c2, fxHex(d.jets.c2, [0.45,0.75,1.0]));
@@ -2787,6 +2875,13 @@ if(uSunBright) gl.uniform1f(uSunBright, f.sunBright == null ? 1.0 : f.sunBright)
   gl.uniform1f(uSTWarp, fxNum(surf.stWarp, fxNum(d.surf.stWarp, 4.0)));
   gl.uniform1f(uSTOct, fxNum(surf.stOct, fxNum(d.surf.stOct, 4.0)));
   /* ==== ОБЛИК + АТМОСФЕРА (per-планета: amb / tilt / hud) ==== */
+  var skyC = fxHex(f.amb && f.amb.sky, fxHex(d.amb && d.amb.sky, [0.30,0.62,0.88]));
+  var ngtC = fxHex(f.amb && f.amb.nuit, fxHex(d.amb && d.amb.nuit, [0.02,0.04,0.10]));
+  var wndC = fxHex(f.amb && f.amb.wand, fxHex(d.amb && d.amb.wand, [0.56,0.72,1.0]));
+  gl.uniform3f(uAmbSky, skyC[0], skyC[1], skyC[2]);
+  gl.uniform3f(uAmbNight, ngtC[0], ngtC[1], ngtC[2]);
+  gl.uniform3f(uAmbLimb, wndC[0], wndC[1], wndC[2]);
+  gl.uniform1f(uAmbHaze, fxNum(f.amb && f.amb.haze, 0.25));
   var rtl = (ring.tilt && ring.tilt.length === 3) ? ring.tilt.map(function(x){ return x*Math.PI/180.0; }) : [0,0,0];
   gl.uniform3f(uRingTilt, rtl[0], rtl[1], rtl[2]);
   var jtl = (jets.tilt && jets.tilt.length === 3) ? jets.tilt.map(function(x){ return x*Math.PI/180.0; }) : [0,0,0];
@@ -2799,23 +2894,6 @@ if(uSunBright) gl.uniform1f(uSunBright, f.sunBright == null ? 1.0 : f.sunBright)
   gl.uniform3f(uSTC2, stc2[0], stc2[1], stc2[2]);
   gl.uniform3f(uSTC3, stc3[0], stc3[1], stc3[2]);
   gl.uniform3f(uSTC4, stc4[0], stc4[1], stc4[2]);
-  /* ==== HITOMI-ТОНМАП: настройки пост-обработки (глобальные, из CFG или дефолт BSL) ====
-     Глобальные параметры не per-планета: берём из window.CFG, если добавлены. */
-  var _g = (typeof window !== 'undefined' && window.CFG) ? window.CFG : {};
-  var _tmGet = function(k, dv){ return (_g[k] != null) ? _g[k] : dv; };
-gl.uniform1f(uTM_Exposure,   _tmGet('TM_EXPOSURE',   0.39));
-gl.uniform1f(uTM_WhiteCurve, _tmGet('TM_WHITE_CURVE', 2.8));
-gl.uniform1f(uTM_LowerCurve, _tmGet('TM_LOWER_CURVE', 0.89));
-gl.uniform1f(uTM_UpperCurve, _tmGet('TM_UPPER_CURVE', 0.89));
-  gl.uniform1f(uSat_Saturation, _tmGet('SAT_SATURATION', 1.0));
-  gl.uniform1f(uSat_Vibrance,   _tmGet('SAT_VIBRANCE', 1.15));
-  /* ==== ГЛЕЙВ/ДИСК СОЛНЦА: настройки свечения (отдельные от тонмаппинга) ==== */
-  gl.uniform1f(uGL_Intensity,   _tmGet('GL_INTENSITY', 0.25));
-  gl.uniform1f(uGL_DiscStrength, _tmGet('GL_DISC_STRENGTH', 1.0));
-  gl.uniform1f(uGL_DiscBright,  _tmGet('GL_DISC_BRIGHT', 0.8));
-  /* ==== НЕБЕСНЫЕ ОБЪЕКТЫ НОЧИ: галактика/звёзды (отдельные настройки) ==== */
-  gl.uniform1f(uNX_Galaxy,    _tmGet('NX_GALAXY', 0.35));
-  gl.uniform1f(uNX_StarBoost, _tmGet('NX_STAR_BOOST', 0.6));
   /* ==== PULSAR-GL (k==6): заливка из fx.pg (независимый пульсар из стенда) ==== */
   var pgx = f.pg || d.pg || {};
   if(typeof e !== 'undefined' && e && e.fx && e.fx.pg) pgx = e.fx.pg;
@@ -4102,7 +4180,8 @@ function rndDir(){
 }
 function spawnOrbit(kind, glyph, rmin, rmax, sz, wbase, pi){
   var dir = rndDir();
-  var r = rmin + srand()*(rmax - rmin);
+  var r0 = rmin + srand()*(rmax - rmin);
+  var r = 1 + (r0 - 1)/bodyScaleVal(pi);
   var ax = cross(dir, rndDir());
   if(len(ax) < 0.05) ax = [0,1,0];
   ITEMS.push({ el: makeSprite(glyph), kind: kind, p0: mul(dir, r),
@@ -4346,7 +4425,8 @@ function respawn(it){
   var rmax = zone ? CFG.OUT_RMAX : CFG.PICK_RMAX;
   var d, guard = 0;
   do{ d = rndDir(); guard++; } while(dot(d, F.fwd) > -0.25 && guard < 40);
-  var r = rmin + srand()*(rmax - rmin);
+  var r0 = rmin + srand()*(rmax - rmin);
+  var r = 1 + (r0 - 1)/bodyScaleVal(it.planet);
   it.p0 = mul(d, r);
   var ax = cross(d, rndDir());
   it.axis = len(ax) < 0.05 ? [0,1,0] : norm(ax);
@@ -4546,7 +4626,8 @@ function physics(dt){
       inTransit = false;
       F.pos = sub(FT.pos, PW[dn]);
       var rr0 = len(F.pos);
-      if(rr0 < CFG.MINR) F.pos = mul(F.pos, CFG.MINR/(rr0||1));
+      var MRd = 1 + (CFG.MINR-1)/bodyScaleVal(dn);
+      if(rr0 < MRd) F.pos = mul(F.pos, MRd/(rr0||1));
       F.fwd = P.fwd; F.right = P.right; F.up = P.up;
       speed = Math.min(speed, CFG.SPD_MAX*boostMul);
       targetIdx = -1;
@@ -4555,9 +4636,10 @@ function physics(dt){
     }
   } else {
     var r = len(F.pos);
-    if(r < CFG.MINR){
+    var MRf = 1 + (CFG.MINR-1)/bodyScaleVal(planet);
+    if(r < MRf){
       var nrm = mul(F.pos, 1/(r||1));
-      F.pos = mul(nrm, CFG.MINR);
+      F.pos = mul(nrm, MRf);
       var inw = dot(F.fwd, nrm);
       if(inw < 0) F.fwd = norm(sub(F.fwd, mul(nrm, inw)));
     }
@@ -6071,8 +6153,8 @@ var KEYSET = { KeyW:1, KeyS:1, KeyA:1, KeyD:1, KeyQ:1, KeyE:1, KeyG:1, KeyJ:1, K
 window.__splashPlanet = 0;
 var SPLASH_TOAST = null;
 function cycleSplash(){
-  window.__splashPlanet = ((window.__splashPlanet || 0) + 1) % 4;
-  var nm = ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН', 'ШИНРАРТА-B'][window.__splashPlanet];
+  window.__splashPlanet = ((window.__splashPlanet || 0) + 1) % (typeof PLANET_NAMES !== 'undefined' && PLANET_NAMES.length ? PLANET_NAMES.length : 4);
+  var nm = (typeof PLANET_NAMES !== 'undefined' && PLANET_NAMES.length) ? PLANET_NAMES[window.__splashPlanet] : ['ХИТОМИ', 'ЧИЗИЯ', 'НГАЛИН', 'ШИНРАРТА-B'][window.__splashPlanet];
   try{
     if(sfx.music && sfx.musicOn){
       sfx.music.pause();
