@@ -106,24 +106,13 @@ body{
 
 /* ---------- 6. ОКНА (тёмное стекло) ---------- */
 .window{
-  position:relative;
-  border:1px solid var(--line);
-  border-top:0;
-  border-radius:0 0 12px 12px;
-  background:
-    linear-gradient(180deg, rgba(22,40,62,.9) 0%, rgba(10,19,32,.93) 55%, rgba(7,13,22,.95) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(160,205,250,.18),
-    inset 0 0 60px rgba(20,70,120,.18),
-    0 8px 26px rgba(0,4,10,.85),
-    0 0 40px rgba(30,90,150,.16);
-  padding:26px 28px 30px;
-  backdrop-filter:blur(2px);
-}
-.window + .window{ margin-top:22px; border-top:1px solid var(--line); border-radius:12px; }
-.window::before{
-  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-  background:linear-gradient(180deg, rgba(190,225,255,.07), transparent 22%);
+  position: relative;
+    border: 1px solid var(--line);
+    border-top: 0;
+    background: linear-gradient(180deg, rgb(1 0 7 / 90%) 0%, rgb(1 0 45 / 93%) 55%, rgb(10 0 41 / 95%) 100%);
+    box-shadow: inset 0 1px 0 rgba(160, 205, 250, .18), inset 0 0 60px rgba(20, 70, 120, .18), 0 8px 26px rgb(17 0 72 / 85%), 0 0 40px rgb(20 0 41 / 16%);
+    padding: 23px 28px 30px;
+    backdrop-filter: blur(4px);
 }
 
 /* ---------- 7. ЗАГОЛОВКИ ---------- */
@@ -182,7 +171,10 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
 }
 .mascot-inner{
   position:absolute; inset:0;
-  display:flex; align-items:center; justify-content:center;
+  display:flex; align-items:center; justify-content:center;    background-color: #051d04;
+  background-image: linear-gradient(337deg, #013b14 0 16px, transparent 16px 26px, #144110 4px 4px, transparent 4px 5px, #0a3908 55px 70px, transparent 70px 88px, #235019 88px 96px, transparent 96px 115px, #144110 115px 128px, transparent 128px 142px, #2e5c25 142px 148px, transparent 148px 165px), linear-gradient(235deg, transparent 0 12px, #144110 12px 19px, transparent 19px 44px, #235019 44px 51px, transparent 51px 76px, #0a3908 76px 83px, transparent 83px 108px, #144110 108px 115px, transparent 115px 140px, #2e5c25 140px 147px, transparent 147px 168px), linear-gradient(116deg, transparent 0 18px, #235019 18px 25px, transparent 25px 55px, #0a3908 55px 62px, transparent 62px 92px, #144110 92px 99px, transparent 99px 130px, #2e5c25 130px 137px, transparent 137px 165px);
+    background-size: 38px 26px;
+    background-repeat: repeat;
 }
 .mascot-inner svg{ width:100%; height:100%; display:block; }
 
@@ -191,7 +183,7 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
 .btn{
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
   font-family:inherit; font-size:13px; font-weight:600; letter-spacing:.2px;
-  color:#d6e8fa; text-decoration:none; cursor:pointer; user-select:none;
+  color:#f90; text-decoration:none; cursor:pointer; user-select:none;
   padding:9px 20px; border-radius:17px;
   border:1px solid rgba(150,200,245,.42);
   background:
@@ -282,11 +274,11 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
   margin:0 0 9px; font-size:13.5px; font-weight:700; letter-spacing:.2px;
   color:#cfe6fb;
 }
-.group p{ margin:0 0 7px; font-size:13px; line-height:1.68; color:#a9c2da; }
+.group p{ margin:0 0 7px; font-size:18px; line-height:1.68; color:#a9c2da; }
 .group p:last-child{ margin-bottom:0; }
 .group b{ color:#dceeff; }
 .group hr{ border:0; border-top:1px solid rgba(122,178,232,.22); margin:16px 0; }
-.group ol, .group ul{ margin:0; padding-left:22px; font-size:13px; line-height:1.75; color:#a9c2da; }
+.group ol, .group ul{ margin:0; padding-left:22px; font-size:16px; line-height:1.75; color:#ffc984; }
 .group li::marker{ color:#5fa9e0; }
 .group .links{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
 
@@ -616,16 +608,16 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
 </svg></div>
       </div>
       <div class="hero-text">
-        <div class="eyebrow">Cтудия одного разработчика .</div>
+        <div class="eyebrow">Cтудия разработчика ☩ Diowkrad ☩.</div>
         <h1>☩ DIOWKRAD STUDIO ☩</h1>
         <p class="subtitle">
           Фрилансерская студия веб-разработки и компьютерная помощь.
         </p>
         <div class="actions">
           
-			<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">DIOWKRAD ENGINE 8BIT</a>
-			<a class="btn" href="☩ HITOMI OF LEGENDS ☩.html">HITOMI OF LEGENDS</a>
-			<a class="btn" href="☩ HITOMI OF LEGENDS ☩ TOOLS ☩.html">HITOMI OF LEGENDS TOOLS</a>
+			<a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">☩ DIOWKRAD ENGINE 8BIT ☩</a>
+			<a class="btn" href="☩ HITOMI OF LEGENDS ☩.html">☩ HITOMI OF LEGENDS ☩</a>
+			<a class="btn" href="☩ HITOMI OF LEGENDS ☩ TOOLS ☩.html">☩ HITOMI OF LEGENDS TOOLS ☩</a>
           
         </div>
       </div>
@@ -784,7 +776,7 @@ h1 b{ font-weight:700; color:#9dd6ff; text-shadow:0 0 26px rgba(95,208,255,.55),
         <h3>🧸 ☩ DIOWKRAD SF2 CHIP-TUNE ENGINE ☩ 🥈</h3>
         <p>v1.7.13 «Quantum Fractal»</p>
         <div class="links">
-          <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.zip" download>▼ Скачать архив</a>
+          <a class="btn" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.zip" download>▼ Скачать</a>
           <a class="btn" href="DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT.sf2" download>▼ SoundFont2</a>
           <a class="btn primary" href="☩ DIOWKRAD SF2 CHIP-TUNE ENGINE - 8BIT ☩.html">🧸 «Quantum Fractal» 🥈</a>
         </div>
