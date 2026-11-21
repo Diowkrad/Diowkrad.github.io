@@ -3677,8 +3677,7 @@ function updHud(){
   if(inTransit) txt += '\nРЕЖИМ: ГИПЕРПРОСТРАНСТВО';
   if(targetIdx >= 0){
     var dtgt = inTransit ? len(sub(FT.pos, PW[targetIdx])) : len(sub(PW[targetIdx], PW[planet]));
-    txt += '\nЦЕЛЬ: ' + PLANET_NAMES[targetIdx] + ' — ' + dtgt.toFixed(1) + ' а.е. — '
-      + (unlockedIdx(targetIdx) ? 'G: ПРЫЖОК' : '\u{1F512} НУЖНО ' + expNeed(targetIdx) + ' EXP');
+    txt += '\nЦЕЛЬ: ' + PLANET_NAMES[targetIdx] + ' — ' + dtgt.toFixed(1) + ' а.е. — G: ПРЫЖОК';
   }
   if(hudTxtEl){
     if(hudTxtEl.__last !== txt){ hudTxtEl.textContent = txt; hudTxtEl.__last = txt; }
@@ -3707,23 +3706,9 @@ function switchPlanet(dir){
   var target = -1;
   if(dir > 0){
     if(planet >= FIN) return;
-    var need = expNeed(planet + 1);
-    if(expTotal < need){
-      if(expFillEl){
-        expFillEl.style.background = '#ff5a4a';
-        setTimeout(function(){ if(expFillEl) expFillEl.style.background = 'linear-gradient(90deg,#0b4d1f,#7dff8a,#d6ffb0)'; }, 300);
-      }
-      return;
-    }
     target = planet + 1;
   } else {
-    if(planet === 0){
-      /* назад с ХИТОМИ — только к уже открытой звезде: раньше времени не переключит */
-      if(expTotal < expNeed(FIN)) return;
-      target = FIN;
-    } else {
-      target = planet - 1;
-    }
+    target = (planet === 0) ? FIN : planet - 1;
   }
   switching = true;
   magnetT = 0; freezeT = 0;
@@ -3764,7 +3749,7 @@ function initPausePanel(){
   pauseEl.innerHTML =
     '<div style="font:900 20px/1 monospace;letter-spacing:5px;color:#f7cc1d;text-shadow:2px 2px 0 #7a5c00;">ПАУЗА</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#7dff8a;">УПРАВЛЕНИЕ</div>'
-    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G — FSD-прыжок к цели (Y), J — к предыдущей планете<br>Y — захват планеты в цель: прицел на небе<br>U — межзвёздный FSD: выделить ориентир-звезду (Sol / Sirius), кольцо = цель<br>FSD-заряд (панель): копится у пульсаров/нейтронных звёзд, 7 сегментов<br>Вне зоны планеты (11 а.е.) — гиперпространство: перегон по синусоиде, скорость растёт с удалением<br>Подлёт к любой планете — стыковка: влет из гиперпространства открыт<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
+    + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">W — разгон, S — тормоз<br>A / D — поворот влево / вправо<br>Q / E — крен, ↑ / ↓ — тангаж<br>G — FSD-варп вперёд, J — назад (планеты)<br>Y — захват планеты в цель: прицел на небе<br>U — межзвёздный режим: цель — следующая звезда маршрута<br>G / J в межзвёздном режиме — следующий / предыдущий сегмент маршрута<br>FSD-заряд (панель): копится у пульсаров/нейтронных звёзд, 7 сегментов<br>Вне зоны планеты (11 а.е.) — гиперпространство: перегон по синусоиде, скорость растёт с удалением<br>Подлёт к любой планете — стыковка: влет из гиперпространства открыт<br>P — мышь: спрятать / показать курсор<br>R — форсаж (×2.5), 1–7 или колесо мыши — хотбар<br>T — применить предмет, O — пауза, ESC — интерфейс</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#f7cc1d;">МЕХАНИКИ</div>'
     + '<div style="font:400 11px/1.7 monospace;color:#cfd2e8;text-align:center;">Кексик +3 EXP, сыр +5 EXP, луна +10 EXP (крупные — вдвое)<br>500 EXP — ЧИЗИЯ, 1500 EXP — НГАЛИН, 2250 EXP — ШИНРАРТА-B<br>7000 EXP — РЕЙС ПРОЙДЕН: ПРОДОЛЖИТЬ ИЛИ СНАЧАЛА<br>Добыча наполняет Форсаж: кексик +2%, сыр +1%, луна +5%<br>Форсаж — разгон до ×2.5, тает за 10 с, реген 100% за 90 с<br>Магнит — 12 с притяжения, Залп — 10 снарядов, Цель — 5 самонаводящихся<br>Вспышка — перчики исчезают на 10 с, Заморозка — стоп на 16 с<br>Обменник — кексики ↔ сыр 1:1, обратно 1 кексик = 2 сыра</div>'
     + '<div style="font:900 12px/1.5 monospace;letter-spacing:2px;color:#ff5a4a;">ПРАВИЛА</div>'
@@ -4532,6 +4517,7 @@ function loadStarSystem(si){
   var key = (StarsDB[si] && StarsDB[si].sys) || 'home';
   var set = SYSTEM_SETS[key] || HOME_PLANETS;
   currentSystem = key; /* прячем лод системы, куда вошли */
+  window.__SYSTEM_KEY = key; /* мост для модуля мира: откуда строить новый маршрут */
   PLANETS_DB.planets = set;
   PLANET_NAMES = set.map(function(p){ return p.name; });
   PW = set.map(function(p){ return p.pos.slice(); });
@@ -4569,6 +4555,10 @@ if(key === 'sirius'){
 }
 function commitStarJump(si){
   loadStarSystem(si);
+  /* МИР: гасим лод звезды, из которой прыгнули (в редакторе может отсутствовать) */
+  if(typeof hideAllStarLods === "function") hideAllStarLods();
+  /* МИР: маршрут пересчитывается по факту посадки (старт — текущая система) */
+  try{ if(window.WORLD_COMMIT) window.WORLD_COMMIT(); }catch(_wc){}
   speed = Math.min(speed, CFG.SPD_MAX*boostMul);
   F.fwd = FT.fwd; F.right = FT.right; F.up = FT.up;
   for(var sl = shots.length - 1; sl >= 0; sl--){ if(shots[sl].el && shots[sl].el.parentNode) shots[sl].el.parentNode.removeChild(shots[sl].el); }
@@ -4584,24 +4574,27 @@ function startFSD(target, isStar){
   }
   warp = { t: 0, target: target, committed: false, isStar: !!isStar };
   setSpaceMode();
-  var a = fsdInitSound();
-  if(a && sfx.musicOn){
-    try{
-      a.currentTime = 0; a.volume = 0.55;
-      var pr = a.play();
-      if(pr && pr.catch) pr.catch(function(){});
-    }catch(e){}
+  if(isStar){
+    /* фаза A: звук начала межзвёздного прыжка (в редакторе может отсутствовать) */
+    if(typeof warpPhPlay === "function") warpPhPlay('start');
+  } else {
+    var a = fsdInitSound();
+    if(a && sfx.musicOn){
+      try{
+        a.currentTime = 0; a.volume = 0.55;
+        var pr = a.play();
+        if(pr && pr.catch) pr.catch(function(){});
+      }catch(e){}
+    }
   }
   toastFx(isStar ? ('FSD: ПЕРЕЛЁТ \u2192 ' + StarsDB[target].name) : ('FSD: ЗАРЯДКА \u2192 ЦЕЛЬ: ' + PLANET_NAMES[target]));
 }
 function fsdJump(dir){
   if(!gameOn || paused || switching || warp) return;
-  /* МЕЖЗВЁЗДНЫЙ ПЕРЕЛЁТ: G при выделенном звёздном лоде (U) сменяет систему */
+  /* МЕЖЗВЁЗДНЫЙ ПРЫЖОК — ТОЛЬКО ПО МАРШРУТУ (карта M, клавиша Enter).
+     Прямой прыжок к звезде отключён: к SOL/SIRIUS ведёт маршрут, а не телепорт. */
   if(dir > 0 && starSel >= 0){
-    /* межзвёздный прыжок: нужен минимум 1 сегмент заряда; прыжок тратит 1 */
-    if(fsdCharge < 1){ toastFx('FSD: НУЖЕН 1 ЗАРЯД', '#ff5a4a'); return; }
-    fsdCharge--; fsdChargeProgress = 0; fsdActiveRate = 0;
-    startFSD(starSel, true);
+    toastFx('ПРЫЖОК ТОЛЬКО ПО МАРШРУТУ — ОТКРОЙ КАРТУ (M)', '#ffd27a');
     return;
   }
   var target = -1;
@@ -4615,7 +4608,7 @@ function fsdJump(dir){
     target = (planet === 0) ? FIN : planet - 1;
   }
   if(target === planet) return;
-  if(expTotal < expNeed(target)){ denyExp(expNeed(target)); return; }
+  /* EXP-гейт снят: межпланетный варп доступен всегда */
   startFSD(target);
 }
 function cycleTarget(){
@@ -4702,10 +4695,16 @@ window.addEventListener('keydown', function(e){
   }
   if(!gameOn || paused || warp || !KEYSET[e.code]) return;
   e.preventDefault(); e.stopPropagation();
-  if(e.code === 'KeyY' && !e.repeat) cycleTarget();
-  else if(e.code === 'KeyU' && !e.repeat) cycleStar();
-  else if(e.code === 'KeyG' && !e.repeat) fsdJump(1);
-  else if(e.code === 'KeyJ' && !e.repeat) fsdJump(-1);
+  if(e.code === 'KeyY' && !e.repeat){ window.__WORLD_MODE = 'planet'; cycleTarget(); }
+  else if(e.code === 'KeyU' && !e.repeat){ return; } /* U принадлежит карте мира: см. модуль WORLD */
+  else if(e.code === 'KeyG' && !e.repeat){
+    if(window.__WORLD_MODE === 'star'){ return; } /* межзвёздный таргет: G обрабатывает модуль WORLD */
+    fsdJump(1); /* межпланетный варп вперёд */
+  }
+  else if(e.code === 'KeyJ' && !e.repeat){
+    if(window.__WORLD_MODE === 'star'){ return; }
+    fsdJump(-1); /* межпланетный варп назад */
+  }
   else if(e.code === 'KeyP' && !e.repeat) toggleMouse();
   else keys[e.code] = 1;
   tryMusic();
@@ -6296,6 +6295,7 @@ htUndoBtns();
   var mapWrap=null, mapCv=null, panel=null;
   var mapOpen=false;
   var route=[], routeStart=null, routeGoal=null, nextTarget=null;
+  var pendingRecalc = null, jumpFrom = null, prevStar = null; /* цель летящего варпа: маршрут пересчитываем по посадке */
   var cam = { zoom: 1, rotY: 0, rotX: 0, panX: 0, panY: 0 };
   window.WORLD_CAM = cam;
 
@@ -6305,9 +6305,17 @@ htUndoBtns();
   }
 
   function currentStar(){
-    var key = (typeof currentSystem !== "undefined") ? currentSystem : "home";
-    var name = key === "sol" ? "SOL" : (key === "sirius" ? "SIRIUS" : "ШИНРАРТА-A");
-    for(var i=0;i<allStars.length;i++){ if(allStars[i].name === name) return allStars[i]; }
+    var key = window.__SYSTEM_KEY || ((typeof currentSystem !== "undefined") ? currentSystem : "home");
+    var i;
+    /* сгенерированная система: в наборах ключ вида "w<сид>" */
+    for(i = 0; i < allStars.length; i++){
+      if(("w" + allStars[i].sysSeed) === key) return allStars[i];
+    }
+    /* канон */
+    var name = (key === "sol") ? "SOL" : (key === "sirius") ? "SIRIUS" : (key === "home") ? "ШИНРАРТА-A" : null;
+    if(name){
+      for(i = 0; i < allStars.length; i++){ if(allStars[i].name === name) return allStars[i]; }
+    }
     return allStars[0];
   }
 
@@ -6416,7 +6424,8 @@ htUndoBtns();
       "FSD: " + charges() + "/" + FSD_MAX + " сегментов\n" +
       (route.length
         ? "путь: " + route[0].name + " → " + (nextTarget ? nextTarget.name : "—") + " → " + route[route.length-1].name + "\n" +
-          "точек: " + route.length + " · " + total.toFixed(1) + " св. лет"
+          "осталось: " + total.toFixed(1) + " св. лет · прыжков: " + (route.length - 1) + "\n" +
+          "G вперёд · J назад · U следующая · M закрыть"
         : "ЛКМ назначение · Shift+ЛКМ осмотр · U следующая · M закрыть");
   }
 
@@ -6560,6 +6569,8 @@ htUndoBtns();
     routeStart = cur;
     routeGoal = st;
     nextTarget = route.length > 1 ? route[1] : null;
+    window.WORLD_TARGET = nextTarget; /* цель — следующая звезда маршрута, не конечная */
+    window.__WORLD_MODE = "star";
     window.WORLD_ROUTE = route.slice();
     drawMap();
   }
@@ -6586,6 +6597,7 @@ htUndoBtns();
     var bodies = bodiesFor(st);
     window.PLANETS_DB_Random = bodies;
     var key = "w" + st.sysSeed;
+    window.__SYSTEM_KEY = key; /* мост для модуля мира: откуда строить новый маршрут */
     if(typeof SYSTEM_SETS !== "undefined" && SYSTEM_SETS) SYSTEM_SETS[key] = bodies;
     if(window.PLANETS_DB && window.PLANETS_DB.planets){ window.PLANETS_DB.planets = bodies; }
     try{
@@ -6597,21 +6609,35 @@ htUndoBtns();
     fadeSwap();
   }
 
-  function jumpNext(){
+  /* МАРШРУТ: точка старта — всегда текущая система; остаток считается заново */
+  function recalcRoute(from){
+    routeStart = from || currentStar() || null;
+    if(routeStart && routeGoal && routeGoal !== routeStart){
+      var r = findRoute(routeStart, routeGoal);
+      route = (r && r.length > 1) ? r : [routeStart];
+    } else if(routeStart && routeGoal === routeStart){
+      route = [];
+    } else {
+      route = routeStart ? [routeStart] : [];
+    }
     if(!route || route.length < 2){
-      if(typeof toastFx === 'function') toastFx('МАРШРУТ НЕ ВЫБРАН', '#ff8a8a');
-      return false;
+      route = []; routeStart = null; routeGoal = null; nextTarget = null;
+      window.__WORLD_MODE = "planet";
+    } else {
+      nextTarget = route[1];
     }
-    var target = nextTarget || route[1];
-    var idx = route.indexOf(target);
-    if(idx < 1) idx = 1;
-    var have = charges();
-    if(have <= 0){
+    window.WORLD_ROUTE = route.slice();
+    window.WORLD_TARGET = nextTarget || null;
+    if(typeof syncStarLod === "function") syncStarLod();
+    if(mapOpen) drawMap();
+  }
+
+  /* один межзвёздный сегмент: регистрация системы и пересчёт остатка */
+  function performStarJump(target){
+    if(!target) return false;
+    jumpFrom = currentStar() || null;
+    if(charges() <= 0){
       if(typeof toastFx === 'function') toastFx('FSD: НЕТ ЗАРЯДОВ — НУЖНА ДОЗАРЯДКА', '#ff8a8a');
-      return false;
-    }
-    if(idx > have){
-      if(typeof toastFx === 'function') toastFx('СЕГМЕНТ КРАСНЫЙ: НУЖНО ' + idx + ' ЗАРЯДОВ', '#ff8a8a');
       return false;
     }
     if(window.GAME_FSD){ window.GAME_FSD.charge = Math.max(0, window.GAME_FSD.charge - 1); }
@@ -6619,19 +6645,45 @@ htUndoBtns();
     if(typeof updFsdChargeUi === 'function'){ try{ updFsdChargeUi(); }catch(e){} }
     var _jumpIdx = registerSystem(target);
     if(_jumpIdx >= 0 && window.GAME_JUMP && typeof window.GAME_JUMP.start === "function"){
-      window.GAME_JUMP.start(_jumpIdx); /* анимация прыжка: warp, затем смена базы */
+      window.GAME_JUMP.start(_jumpIdx);
     } else {
       fadeSwap();
     }
-
-    route = route.slice(idx);
-    nextTarget = route.length > 1 ? route[1] : null;
-    if(route.length < 2){ route = []; routeStart = null; routeGoal = null; }
-    window.WORLD_ROUTE = route.slice();
-    if(mapOpen) drawMap();
-    syncStarLod();
+    pendingRecalc = target;
+    if(!(window.GAME_JUMP && typeof window.GAME_JUMP.start === "function")){
+      pendingRecalc = null;
+      recalcRoute(target); /* без варпа (редактор) — пересчёт сразу */
+    }
     return true;
   }
+
+  function jumpNext(){
+    if(!route || route.length < 2){
+      if(typeof toastFx === 'function') toastFx('МАРШРУТ НЕ ВЫБРАН', '#ff8a8a');
+      return false;
+    }
+    return performStarJump(nextTarget || route[1]);
+  }
+
+  /* назад по маршруту: возврат в систему, откуда пришли */
+  function jumpPrev(){
+    if(!route || route.length < 2){
+      if(typeof toastFx === 'function') toastFx('МАРШРУТ НЕ ВЫБРАН', '#ff8a8a');
+      return false;
+    }
+    if(prevStar) return performStarJump(prevStar); /* назад: в систему, откуда пришли */
+
+    return performStarJump(route[0]);
+  }
+
+  /* мост игры: пересчёт маршрута после завершения варпа */
+  window.WORLD_COMMIT = function(){
+    if(pendingRecalc){
+      var _t = pendingRecalc; pendingRecalc = null;
+      recalcRoute(_t);
+      prevStar = jumpFrom; jumpFrom = null;
+    }
+  };
 
   /* ---------- зарядка и обнаружение нейтронной ---------- */
   var passiveT = 0, neutronT = 0;
@@ -6754,6 +6806,7 @@ htUndoBtns();
   }
 
   /* ---------- клавиши: перехват в capture-фазе, старые обработчики не мешают ---------- */
+  window.__WORLD_MODE = window.__WORLD_MODE || "planet";
   window.addEventListener("keydown", function(e){
     var k = (e.key || "").toLowerCase();
     if(k === "m" || k === "ь"){ e.preventDefault(); e.stopPropagation(); toggleMap(); return; }
@@ -6761,9 +6814,17 @@ htUndoBtns();
     if(k === "enter" && !mapOpen && route && route.length > 1){
       e.preventDefault(); e.stopPropagation(); jumpNext(); return;
     }
-    if(k === "g" || k === "п"){ e.preventDefault(); e.stopPropagation(); jumpNext(); return; }
+    if(k === "g" || k === "п"){
+      if(window.__WORLD_MODE !== "star") return;
+      e.preventDefault(); e.stopPropagation(); jumpNext(); return;
+    }
+    if(k === "j" || k === "о"){
+      if(window.__WORLD_MODE !== "star") return;
+      e.preventDefault(); e.stopPropagation(); jumpPrev(); return;
+    }
     if(k === "u" || k === "г"){
       if(route && route.length > 1){
+        window.__WORLD_MODE = "star";
         nextTarget = route[1]; /* только следующий узел пути */
         window.WORLD_TARGET = nextTarget;
         if(typeof toastFx === "function") toastFx("СЛЕДУЮЩАЯ: " + nextTarget.name, "#ffd27a");
