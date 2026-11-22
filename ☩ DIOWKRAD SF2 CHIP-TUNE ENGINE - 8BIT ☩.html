@@ -8988,9 +8988,11 @@
 /** YM2413.draw() — выполняет вспомогательное действие «draw» */
 			function draw() {
 				requestAnimationFrame(draw);
-				ctx.fillStyle = '#050d08';
+				/*Эффект люминофора: полупрозрачная заливка (послесвечение CRT)*/
+				ctx.fillStyle = 'rgba(5, 13, 8, 0.25)';
 				ctx.fillRect(0, 0, cv.width, cv.height);
-				ctx.strokeStyle = '#174a17';
+				/*Фон Осцелографа 1*/
+				ctx.strokeStyle = 'rgba(0, 0, 0, 0.0)';
 				for (let x = 0; x < cv.width; x += 30) {
 					ctx.beginPath();
 					ctx.moveTo(x, 0);
@@ -9011,17 +9013,44 @@
 				if (!analyser13) return;
 				const buf = new Uint8Array(analyser13.fftSize);
 				analyser13.getByteTimeDomainData(buf);
-				ctx.strokeStyle = '#9bbc0f';
-				ctx.lineWidth = 2;
-				ctx.beginPath();
 				const step = buf.length / cv.width;
-				for (let i = 0; i < cv.width; i++) {
-					const v = buf[(i * step) | 0] / 128 - 1;
-					const yy = cv.height / 2 + v * cv.height * 0.45;
-					if (i === 0) ctx.moveTo(i, yy);
-					else ctx.lineTo(i, yy);
-				}
-				ctx.stroke();
+				// --- Декоративное свечение: ореол + яркая линия (функционал не меняется) ---
+				const _path = function(lineW) {
+					ctx.lineWidth = lineW;
+					ctx.beginPath();
+					for (let i = 0; i < cv.width; i++) {
+						const v = buf[(i * step) | 0] / 128 - 1;
+						const yy = cv.height / 2 + v * cv.height * 0.45;
+						if (i === 0) ctx.moveTo(i, yy);
+						else ctx.lineTo(i, yy);
+					}
+					ctx.stroke();
+				};
+				/*Линия осцелографа 1*/
+				/*Фон Четвертый слой 1*/
+				ctx.strokeStyle = 'rgba(100, 255, 100, 0.75)';
+				_path(8);
+				/*Линия Третий слой 1*/
+				ctx.strokeStyle = 'rgba(0, 100, 0, 0.50)';
+				_path(6);
+				/*Линия Второй слой 1*/
+				ctx.strokeStyle = 'rgba(0, 50, 0, 0.25)';
+				_path(4);
+				/*Линия Первый слой 1 — переливающийся радужный градиент*/
+				(function(){
+					const t = performance.now() / 1000;
+					const wx = cv.width;
+					const g = ctx.createLinearGradient(0, 0, wx, 0);
+					g.addColorStop(0.00, 'hsl(' + ((t*90+  0)%360) + ', 100%, 55%)');
+					g.addColorStop(0.17, 'hsl(' + ((t*90+ 60)%360) + ', 100%, 55%)');
+					g.addColorStop(0.33, 'hsl(' + ((t*90+120)%360) + ', 100%, 55%)');
+					g.addColorStop(0.50, 'hsl(' + ((t*90+180)%360) + ', 100%, 55%)');
+					g.addColorStop(0.66, 'hsl(' + ((t*90+240)%360) + ', 100%, 55%)');
+					g.addColorStop(0.83, 'hsl(' + ((t*90+300)%360) + ', 100%, 55%)');
+					g.addColorStop(1.00, 'hsl(' + ((t*90+360)%360) + ', 100%, 55%)');
+					ctx.strokeStyle = g;
+				})();
+				_path(2);
 				ctx.lineWidth = 1;
 			}
 			draw();
@@ -9277,9 +9306,11 @@
 
 /** YM2413.grid() — выполняет вспомогательное действие «grid» */
 			function grid() {
-				ctx.fillStyle = '#050d08';
+				/*Фон Клетки осцелограф 2 + эффект люминофора (послесвечение)*/
+				ctx.fillStyle = 'rgba(0, 0, 0, 0.30)';
 				ctx.fillRect(0, 0, cv.width, cv.height);
-				ctx.strokeStyle = '#174a17';
+				/*Фон сетка осцелограф 2*/
+				ctx.strokeStyle = 'rgba(0, 0, 0, 0.0)';
 				ctx.lineWidth = 1;
 				for (let x = 0; x < cv.width; x += 30) {
 					ctx.beginPath();
@@ -9293,7 +9324,8 @@
 					ctx.lineTo(cv.width, y);
 					ctx.stroke();
 				}
-				ctx.strokeStyle = '#2d6a2d';
+				/*Фон линии осцелограф 2*/
+				ctx.strokeStyle = 'rgba(0, 0, 0, 0.0)';
 				ctx.beginPath();
 				ctx.moveTo(0, cv.height / 2);
 				ctx.lineTo(cv.width, cv.height / 2);
@@ -9343,30 +9375,58 @@
 				grid();
 				const start = findTrigger(buf);
 				const span = Math.min(buf.length - start, Math.floor(buf.length / 2));
-				ctx.strokeStyle = '#9bbc0f';
-				ctx.lineWidth = 2;
-				ctx.beginPath();
-				for (let i = 0; i < cv.width; i++) {
-					const v = buf[start + Math.floor(i * span / cv.width)] || 0;
-					const yy = cv.height / 2 + v * cv.height * 0.45;
-					if (i === 0) ctx.moveTo(i, yy);
-					else ctx.lineTo(i, yy);
-				}
-				ctx.stroke();
+				// --- Декоративное свечение линии (функционал не изменён) ---
+				const _path = function(lineW, style) {
+					ctx.strokeStyle = style;
+					ctx.lineWidth = lineW;
+					ctx.beginPath();
+					for (let i = 0; i < cv.width; i++) {
+						const v = buf[start + Math.floor(i * span / cv.width)] || 0;
+						const yy = cv.height / 2 + v * cv.height * 0.45;
+						if (i === 0) ctx.moveTo(i, yy);
+						else ctx.lineTo(i, yy);
+					}
+					ctx.stroke();
+				};
+				/*Линия осцелографа 2 Индентична настройкам 1*/
+				_path(8, 'rgba(100, 255, 100, 0.75)');
+				_path(6, 'rgba(0, 100, 0, 0.50)');
+				_path(4, 'rgba(0, 50, 0, 0.25)');
+				/*Линия Первый слой 2 — переливающийся радужный градиент*/
+				(function(){
+					const t = performance.now() / 1000;
+					const g = ctx.createLinearGradient(0, 0, cv.width, 0);
+					g.addColorStop(0.00, 'hsl(' + ((t*90+  0)%360) + ', 100%, 55%)');
+					g.addColorStop(0.17, 'hsl(' + ((t*90+ 60)%360) + ', 100%, 55%)');
+					g.addColorStop(0.33, 'hsl(' + ((t*90+120)%360) + ', 100%, 55%)');
+					g.addColorStop(0.50, 'hsl(' + ((t*90+180)%360) + ', 100%, 55%)');
+					g.addColorStop(0.66, 'hsl(' + ((t*90+240)%360) + ', 100%, 55%)');
+					g.addColorStop(0.83, 'hsl(' + ((t*90+300)%360) + ', 100%, 55%)');
+					g.addColorStop(1.00, 'hsl(' + ((t*90+360)%360) + ', 100%, 55%)');
+					ctx.strokeStyle = g;
+				})();
+				_path(2, ctx.strokeStyle);
 				ctx.lineWidth = 1;
 			}
+
 			let acSf = 44100;
 
 /** YM2413.drawSpec() — выполняет вспомогательное действие «draw spec» */
 			function drawSpec() {
 				grid();
 				const bw = cv.width / freqBuf.length;
-				ctx.fillStyle = '#9bbc0f';
+				// --- Декоративная заливка спектра (градиент по высоте) ---
+				ctx.fillStyle = '#1f7a2a';
 				for (let i = 2; i < freqBuf.length; i++) {
 					const h = (freqBuf[i] / 255) * cv.height;
 					if (h > 1) ctx.fillRect(i * bw, cv.height - h, bw, h);
 				}
-				ctx.strokeStyle = '#2d6a2d';
+				ctx.fillStyle = 'rgba(120, 235, 90, 0.5)';
+				for (let i = 2; i < freqBuf.length; i++) {
+					const h = (freqBuf[i] / 255) * cv.height;
+					if (h > 1) ctx.fillRect(i * bw, cv.height - Math.min(h, 8), bw, Math.min(h, 8));
+				}
+				ctx.strokeStyle = '#000';
 				for (let f = 1000; f < acSf / 2; f += 1000) {
 					const xx = f / (acSf / 2) * cv.width;
 					ctx.beginPath();
@@ -9379,19 +9439,25 @@
 /** YM2413.drawXY(buf) — выполняет вспомогательное действие «draw x y» (аргументы: buf) */
 			function drawXY(buf) {
 				grid();
-				ctx.strokeStyle = '#9bbc0f';
-				ctx.beginPath();
 				const off = Math.floor(buf.length / 4),
 					n = Math.min(cv.width, 800);
-				for (let i = 0; i < n; i++) {
-					const a = buf[Math.floor(i * buf.length / n / 2)] || 0;
-					const b = buf[(Math.floor(i * buf.length / n / 2) + off) % buf.length] || 0;
-					const xx = cv.width / 2 + a * cv.width * 0.42;
-					const yy = cv.height / 2 + b * cv.height * 0.42;
-					if (i === 0) ctx.moveTo(xx, yy);
-					else ctx.lineTo(xx, yy);
-				}
-				ctx.stroke();
+				const _points = function(lineW, style) {
+					ctx.strokeStyle = style;
+					ctx.lineWidth = lineW;
+					ctx.beginPath();
+					for (let i = 0; i < n; i++) {
+						const a = buf[Math.floor(i * buf.length / n / 2)] || 0;
+						const b = buf[(Math.floor(i * buf.length / n / 2) + off) % buf.length] || 0;
+						const xx = cv.width / 2 + a * cv.width * 0.42;
+						const yy = cv.height / 2 + b * cv.height * 0.42;
+						if (i === 0) ctx.moveTo(xx, yy);
+						else ctx.lineTo(xx, yy);
+					}
+					ctx.stroke();
+				};
+				_points(5, 'rgba(55, 200, 60, 0.18)');
+				_points(2, '#8ae24a');
+				ctx.lineWidth = 1;
 			}
 
 /** YM2413.loop(ts) — выполняет вспомогательное действие «loop» (аргументы: ts) */
